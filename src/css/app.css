@@ -1,0 +1,269 @@
+/**
+ * SPDX-FileCopyrightText: 2026 cpcMomentum
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Central design language for Rechnungswerk, lifted from the editor mockup
+ * (docs/erechnung-editor-mockup-v1.html) which in turn mirrors the WorkTime /
+ * Vinarium look. Scoped under .app-rechnungswerk so it never leaks into the
+ * rest of Nextcloud. Views use these classes instead of bespoke per-component
+ * CSS, so the design stays consistent from one source.
+ */
+
+/* ---- View container: centered content column (mockup .nc-content__inner) ---- */
+.app-rechnungswerk .rw-view {
+	max-width: 980px;
+	margin: 0 auto;
+	padding: 24px 28px 64px;
+}
+
+.app-rechnungswerk .rw-view__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+.app-rechnungswerk .rw-view__head h2 {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+/* ---- Section = card ---- */
+.app-rechnungswerk .rw-section {
+	background: var(--color-main-background);
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius-large);
+	padding: 18px 20px;
+	margin-bottom: 16px;
+}
+.app-rechnungswerk .rw-section > h3 {
+	margin: 0 0 14px;
+	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-text-maxcontrast);
+}
+
+/* ---- Form ---- */
+.app-rechnungswerk .rw-form-row {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin-bottom: 14px;
+}
+.app-rechnungswerk .rw-field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1 1 220px;
+	min-width: 0;
+}
+.app-rechnungswerk .rw-field--narrow {
+	flex: 0 1 120px;
+}
+.app-rechnungswerk .rw-field--inline {
+	flex-direction: row;
+	align-items: center;
+	gap: 12px;
+}
+.app-rechnungswerk .rw-field > span {
+	font-weight: 500;
+	font-size: 13px;
+	color: var(--color-main-text);
+}
+.app-rechnungswerk .rw-input {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+	padding: 8px 10px;
+	border: 1px solid var(--color-border-dark, var(--color-border));
+	border-radius: var(--border-radius);
+	background: var(--color-main-background);
+	color: var(--color-main-text);
+	font-family: inherit;
+	font-size: 14px;
+}
+.app-rechnungswerk textarea.rw-input {
+	resize: vertical;
+}
+.app-rechnungswerk .rw-input:focus {
+	outline: 2px solid var(--color-primary-element);
+	outline-offset: -1px;
+	border-color: var(--color-primary-element);
+}
+.app-rechnungswerk .rw-input[readonly],
+.app-rechnungswerk .rw-input:disabled {
+	background: var(--color-background-hover);
+	color: var(--color-text-maxcontrast);
+	cursor: not-allowed;
+}
+.app-rechnungswerk .rw-hint {
+	margin: 4px 0 0;
+	font-size: 0.85em;
+	color: var(--color-text-maxcontrast);
+}
+
+/* ---- Tables (list + positions) ---- */
+.app-rechnungswerk .rw-table-wrap {
+	background: var(--color-main-background);
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius-large);
+	overflow-x: auto;
+}
+.app-rechnungswerk .rw-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+.app-rechnungswerk .rw-table th {
+	text-align: left;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--color-text-maxcontrast);
+	padding: 10px 12px;
+	border-bottom: 2px solid var(--color-border);
+	background: transparent;
+}
+.app-rechnungswerk .rw-table td {
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--color-border);
+	vertical-align: top;
+}
+.app-rechnungswerk .rw-table tbody tr:last-child td {
+	border-bottom: none;
+}
+.app-rechnungswerk .rw-table .num {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+.app-rechnungswerk .rw-table .strong {
+	font-weight: 600;
+}
+.app-rechnungswerk .rw-row-clickable {
+	cursor: pointer;
+}
+.app-rechnungswerk .rw-row-clickable:hover {
+	background: var(--color-background-hover);
+}
+.app-rechnungswerk .rw-muted {
+	color: var(--color-text-maxcontrast);
+	font-size: 0.9em;
+}
+
+/* Positions table: fixed layout so inputs never overlap. */
+.app-rechnungswerk .rw-table--positions {
+	min-width: 680px;
+	table-layout: fixed;
+}
+.app-rechnungswerk .rw-table--positions td,
+.app-rechnungswerk .rw-table--positions th {
+	padding: 8px 10px;
+	overflow: hidden;
+}
+.app-rechnungswerk .rw-col-qty { width: 84px; }
+.app-rechnungswerk .rw-col-unit { width: 112px; }
+.app-rechnungswerk .rw-col-price { width: 124px; }
+.app-rechnungswerk .rw-col-tax { width: 96px; }
+.app-rechnungswerk .rw-col-sum { width: 112px; }
+.app-rechnungswerk .rw-col-actions { width: 44px; }
+.app-rechnungswerk .rw-input--sub {
+	font-size: 0.9em;
+}
+/* Line total centered in its column (aligns visually with the VAT select). */
+.app-rechnungswerk .rw-table--positions .rw-sum {
+	text-align: center;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+.app-rechnungswerk .rw-table--positions th.rw-sum {
+	font-weight: 600;
+}
+/* Description spans the full table width as its own sub-row under each item. */
+.app-rechnungswerk .rw-pos-main > td {
+	border-bottom: none;
+	padding-bottom: 4px;
+}
+.app-rechnungswerk .rw-pos-desc > td {
+	padding-top: 0;
+}
+
+/* ---- KPI / totals cards (mockup .kpi-card) ---- */
+.app-rechnungswerk .rw-totals {
+	display: flex;
+	justify-content: flex-end;
+}
+.app-rechnungswerk .rw-kpi-card {
+	min-width: 320px;
+	background: var(--color-main-background);
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius-large);
+	padding: 14px 18px;
+}
+.app-rechnungswerk .rw-kpi-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 4px 0;
+	font-variant-numeric: tabular-nums;
+}
+.app-rechnungswerk .rw-kpi-row--muted {
+	color: var(--color-text-maxcontrast);
+	font-size: 0.92em;
+}
+.app-rechnungswerk .rw-kpi-row--grand {
+	border-top: 2px solid var(--color-border);
+	margin-top: 6px;
+	padding-top: 8px;
+	font-size: 1.1em;
+}
+
+/* ---- Status chips: solid fills, white text, equal width (WorkTime badges) ---- */
+.app-rechnungswerk .rw-chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 132px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+	padding: 4px 12px;
+	border-radius: var(--border-radius-element, var(--border-radius));
+	color: #fff;
+	vertical-align: middle;
+}
+.app-rechnungswerk .rw-chip--draft {
+	background: #5b6770;
+}
+.app-rechnungswerk .rw-chip--committed {
+	background: #4a9d63;
+}
+.app-rechnungswerk .rw-chip--cancelled {
+	background: #cc4b42;
+}
+
+/* ---- Sticky action bar ---- */
+.app-rechnungswerk .rw-action-bar {
+	position: sticky;
+	bottom: 0;
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	padding: 12px 0;
+	margin-top: 8px;
+	background: var(--color-main-background);
+	border-top: 1px solid var(--color-border);
+}
+.app-rechnungswerk .rw-toolbar {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+}
