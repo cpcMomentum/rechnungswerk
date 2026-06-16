@@ -14,6 +14,7 @@ use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Db\SettingsMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\DB\Exception as DBException;
 
 class SettingsService {
 
@@ -39,7 +40,12 @@ class SettingsService {
 			$now = new DateTime();
 			$settings->setCreatedAt($now);
 			$settings->setUpdatedAt($now);
-			return $this->mapper->insert($settings);
+			try {
+				return $this->mapper->insert($settings);
+			} catch (DBException) {
+				// Concurrent first-access: unique constraint hit; return the row that won.
+				return $this->mapper->findByOwner($userId);
+			}
 		}
 	}
 
