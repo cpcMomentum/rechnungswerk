@@ -78,6 +78,9 @@ class Version000100Date20260616120000 extends SimpleMigrationStep {
 		$table->addIndex(['owner_user_id'], 'rw_invoice_owner');
 		$table->addIndex(['owner_user_id', 'status'], 'rw_invoice_owner_status');
 		$table->addIndex(['related_invoice_id'], 'rw_invoice_related');
+		// DB-level guard: duplicate committed numbers are a GoBD violation;
+		// NULL (drafts) is ignored by UNIQUE indexes in all supported engines.
+		$table->addUniqueIndex(['number'], 'rw_invoice_number_unique');
 	}
 
 	private function createInvoiceItemTable(ISchemaWrapper $schema): void {
