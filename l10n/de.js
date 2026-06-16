@@ -42,6 +42,7 @@ OC.L10N.register(
     "Entwurf" : "Entwurf",
     "Entwurf löschen" : "Entwurf löschen",
     "Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?" : "Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?",
+    "Fällig am" : "Fällig am",
     "Festgeschrieben" : "Festgeschrieben",
     "Festschreiben" : "Festschreiben",
     "Festschreiben fehlgeschlagen" : "Festschreiben fehlgeschlagen",
@@ -93,6 +94,7 @@ OC.L10N.register(
     "Referenznummer" : "Referenznummer",
     "Schlusstext" : "Schlusstext",
     "Schlusstext / Anmerkungen" : "Schlusstext / Anmerkungen",
+    "Skonto" : "Skonto",
     "Speichern" : "Speichern",
     "Speichern fehlgeschlagen" : "Speichern fehlgeschlagen",
     "Standard-Preis (€)" : "Standard-Preis (€)",
@@ -119,7 +121,9 @@ OC.L10N.register(
     "Versand" : "Versand",
     "Vorschau: {preview}" : "Vorschau: {preview}",
     "Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)" : "Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)",
-    "Zurück" : "Zurück",
+    "z. B. 2 % bei Zahlung bis …" : "z. B. 2 % bei Zahlung bis …",
+    "Zahlungsbedingungen" : "Zahlungsbedingungen",
+    "Zahlungsziel (Tage)" : "Zahlungsziel (Tage)",
     "Zwischensumme (netto)" : "Zwischensumme (netto)"
 },
 "nplurals=2; plural=(n != 1);");

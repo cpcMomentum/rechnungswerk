@@ -35,6 +35,8 @@ export interface InvoiceInput {
 	greeting?: string | null
 	extraText?: string | null
 	customFields?: Array<{ label: string, value: string }>
+	paymentTermDays?: number | null
+	discountTerms?: string | null
 	items?: InvoiceItemInput[]
 }
 

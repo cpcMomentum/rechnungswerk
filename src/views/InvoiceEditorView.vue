@@ -102,6 +102,20 @@
 			</div>
 		</section>
 
+		<!-- Zahlungsbedingungen -->
+		<section class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Zahlungsbedingungen') }}</h3>
+			<div class="rw-form-row">
+				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Zahlungsziel (Tage)') }}</span>
+					<input v-model="form.paymentTermDays" class="rw-input" type="number" min="0" step="1" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Fällig am') }}</span>
+					<input class="rw-input" type="text" readonly :value="dueDatePreview || '—'" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Skonto') }}</span>
+					<input v-model="form.discountTerms" class="rw-input" type="text" :readonly="readonly"
+						:placeholder="t('rechnungswerk', 'z. B. 2 % bei Zahlung bis …')" /></label>
+			</div>
+		</section>
+
 		<!-- Schlusstext -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
@@ -184,6 +198,20 @@ const form = reactive({
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
 	performanceDate: '', referenceNumber: '', orderNumber: '', buyerReference: '',
 	greeting: '', extraText: '',
+	paymentTermDays: '' as string | number, discountTerms: '',
+})
+
+const dueDatePreview = computed(() => {
+	const days = Number.parseInt(String(form.paymentTermDays), 10)
+	if (Number.isNaN(days)) {
+		return ''
+	}
+	if (invoice.value?.dueDate) {
+		return new Date(invoice.value.dueDate).toLocaleDateString()
+	}
+	const base = invoice.value?.issueDate ? new Date(invoice.value.issueDate) : new Date()
+	base.setDate(base.getDate() + days)
+	return base.toLocaleDateString()
 })
 
 const readonly = computed(() => invoice.value !== null && invoice.value.status !== 'draft')
@@ -228,6 +256,8 @@ async function load(id: number) {
 	form.buyerReference = detail.buyerReference ?? ''
 	form.greeting = detail.greeting ?? ''
 	form.extraText = detail.extraText ?? ''
+	form.paymentTermDays = detail.paymentTermDays ?? ''
+	form.discountTerms = detail.discountTerms ?? ''
 	items.value = detail.items.length > 0 ? detail.items.map(itemFromInvoiceItem) : [emptyItem()]
 }
 
@@ -245,6 +275,7 @@ function onContactSelect(c: ContactMatch) {
 function buildInput(): InvoiceInput {
 	return {
 		...form,
+		paymentTermDays: form.paymentTermDays === '' ? null : Number(form.paymentTermDays),
 		items: items.value
 			.filter(i => i.name.trim() !== '')
 			.map(i => ({

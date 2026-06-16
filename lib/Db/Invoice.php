@@ -68,6 +68,12 @@ use OCP\DB\Types;
  * @method void setExtraText(?string $extraText)
  * @method ?string getCustomFields()
  * @method void setCustomFields(?string $customFields)
+ * @method ?int getPaymentTermDays()
+ * @method void setPaymentTermDays(?int $paymentTermDays)
+ * @method ?\DateTime getDueDate()
+ * @method void setDueDate(?\DateTime $dueDate)
+ * @method ?string getDiscountTerms()
+ * @method void setDiscountTerms(?string $discountTerms)
  * @method ?\DateTime getCommittedAt()
  * @method void setCommittedAt(?\DateTime $committedAt)
  * @method ?\DateTime getCreatedAt()
@@ -123,6 +129,9 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $greeting = null;
 	protected ?string $extraText = null;
 	protected ?string $customFields = null;
+	protected ?int $paymentTermDays = null;
+	protected ?\DateTime $dueDate = null;
+	protected ?string $discountTerms = null;
 	protected ?\DateTime $committedAt = null;
 	protected ?\DateTime $createdAt = null;
 	protected ?\DateTime $updatedAt = null;
@@ -155,6 +164,9 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('greeting', Types::TEXT);
 		$this->addType('extraText', Types::TEXT);
 		$this->addType('customFields', Types::TEXT);
+		$this->addType('paymentTermDays', Types::INTEGER);
+		$this->addType('dueDate', Types::DATE);
+		$this->addType('discountTerms', Types::STRING);
 		$this->addType('committedAt', Types::DATETIME);
 		$this->addType('createdAt', Types::DATETIME);
 		$this->addType('updatedAt', Types::DATETIME);
@@ -215,6 +227,9 @@ class Invoice extends Entity implements JsonSerializable {
 			'greeting' => $this->getGreeting(),
 			'extraText' => $this->getExtraText(),
 			'customFields' => $this->getCustomFieldsArray(),
+			'paymentTermDays' => $this->getPaymentTermDays(),
+			'dueDate' => $this->formatDate($this->getDueDate()),
+			'discountTerms' => $this->getDiscountTerms(),
 			'committedAt' => $this->formatDateTime($this->getCommittedAt()),
 			'createdAt' => $this->formatDateTime($this->getCreatedAt()),
 			'updatedAt' => $this->formatDateTime($this->getUpdatedAt()),
