@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Testing
+coverage/
+.phpunit.cache/
+test-results/
+
+# OS
+.DS_Store
+._*
+
+# Logs
+*.log
+
+# Secrets
+*.pem
+*.key
+*.crt
+credentials.json
+
+# Interne Dev-Artefakte (lokal behalten, nicht oeffentlich)
+CLAUDE.md
+.claude/
+archive/
+sessions/
+docs/produktbeschreibung.md
+docs/plan.md
+docs/*produktbeschreibung*.md
+docs/erechnung-app-konzept-*.md
+docs/erechnung-editor-mockup-*.html
+
+# App Store Tarballs
+*.tar.gz
+
+# Vite build intermediate (final output goes to js/ and css/, die committed werden!)
+dist/

@@ -1,0 +1,29 @@
+{
+  "name": "cpcmomentum/rechnungswerk",
+  "description": "Rechnungen und E-Rechnungen schreiben mit automatischer DATEV-Übergabe",
+  "license": "AGPL-3.0-or-later",
+  "type": "project",
+  "require": {
+    "php": ">=8.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "OCA\\Rechnungswerk\\": "lib/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OCA\\Rechnungswerk\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test:unit": "phpunit -c tests/phpunit.xml"
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

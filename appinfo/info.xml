@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+
+    <id>rechnungswerk</id>
+    <name>Rechnungswerk</name>
+    <summary>Rechnungen und E-Rechnungen schreiben mit automatischer DATEV-Übergabe</summary>
+    <description><![CDATA[
+# Rechnungswerk
+
+Schlanke Nextcloud-App zum Erstellen von Rechnungen und **E-Rechnungen** (ZUGFeRD/EN16931)
+für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und automatischer
+Übergabe an DATEV, ohne den starren Zwang von DATEV Auftragswesen Next.
+
+## Features
+
+- **Rechnungs-Editor** — Positionen mit Menge, Maßeinheit, Einzelpreis und USt-Satz pro Zeile, Live-Summen
+- **ZUGFeRD-Erzeugung** — eine lesbare PDF, die zugleich eine gültige E-Rechnung ist (PDF/A-3 + EN16931-CII-XML)
+- **Festschreibung** — GoBD-konform: Entwurf → festgeschrieben (unveränderbar) → Storno/Gutschrift
+- **DATEV-Übergabe** — automatisch per Upload Mail beim Festschreiben
+- **Kundenversand** — PDF-Download und In-App-Versand mit Empfängerwahl aus Nextcloud-Kontakten
+- **Produktkatalog** — wiederkehrende Leistungen einmal pflegen
+- **Stammdaten** — Firmendaten, Logo, Standardtexte, Nummernformat, Kleinunternehmer §19
+    ]]></description>
+
+    <version>0.1.0</version>
+    <licence>AGPL-3.0-or-later</licence>
+
+    <author mail="axel.deffner@cpcmomentum.com" homepage="https://github.com/cpcMomentum">Axel Deffner</author>
+
+    <namespace>Rechnungswerk</namespace>
+
+    <category>organization</category>
+    <category>office</category>
+
+    <bugs>https://github.com/cpcMomentum/rechnungswerk/issues</bugs>
+    <repository type="git">https://github.com/cpcMomentum/rechnungswerk.git</repository>
+
+    <dependencies>
+        <nextcloud min-version="30" max-version="33"/>
+        <php min-version="8.2"/>
+    </dependencies>
+
+    <navigations>
+        <navigation>
+            <name>Rechnungswerk</name>
+            <route>rechnungswerk.page.index</route>
+            <icon>app.svg</icon>
+            <order>10</order>
+        </navigation>
+    </navigations>
+</info>
