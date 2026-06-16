@@ -141,11 +141,22 @@ class InvoiceService {
 			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
 		}
 
+		// Create the settings row outside the transaction: a failed INSERT would
+		// otherwise abort the commit transaction on PostgreSQL.
+		$this->settingsService->getOrCreate($userId);
+
 		$now = new DateTime();
 		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock and re-check the status inside the
+			// transaction. Two concurrent commits on the same draft would
+			// otherwise both pass the pre-check and each reserve a number,
+			// leaving a gap in the sequence (GoBD violation).
+			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$this->assertDraft($invoice);
+
 			$number = $this->settingsService->reserveNextNumber($userId, $year);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
@@ -177,12 +188,21 @@ class InvoiceService {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
 		}
 
+		$this->settingsService->getOrCreate($userId);
+
 		$now = new DateTime();
 		$year = (int)$now->format('Y');
-		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
 		$this->db->beginTransaction();
 		try {
+			// Lock the original and re-check inside the transaction so a double
+			// cancel cannot create two storno documents for the same invoice.
+			$original = $this->findOwnedForUpdate($id, $userId);
+			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
+				throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
+			}
+			$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
+
 			$storno = new Invoice();
 			$storno->setOwnerUserId($userId);
 			$storno->setStatus(Invoice::STATUS_COMMITTED);
@@ -237,6 +257,17 @@ class InvoiceService {
 	private function findOwned(int $id, string $userId): Invoice {
 		try {
 			return $this->invoiceMapper->findOneByOwner($id, $userId);
+		} catch (DoesNotExistException) {
+			throw new NotFoundException('Rechnung nicht gefunden.');
+		}
+	}
+
+	/**
+	 * @throws NotFoundException
+	 */
+	private function findOwnedForUpdate(int $id, string $userId): Invoice {
+		try {
+			return $this->invoiceMapper->findOneByOwnerForUpdate($id, $userId);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException('Rechnung nicht gefunden.');
 		}
