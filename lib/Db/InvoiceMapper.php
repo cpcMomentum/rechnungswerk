@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Db;
 
-use DateTime;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -42,23 +41,5 @@ class InvoiceMapper extends QBMapper {
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
 			->andWhere($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)));
 		return $this->findEntity($qb);
-	}
-
-	/**
-	 * Highest counter value already used for a given year by this owner.
-	 * Used as a safety net alongside the persisted Settings counter.
-	 */
-	public function countCommittedInYear(string $userId, int $year): int {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*', 'cnt'))
-			->from($this->tableName)
-			->where($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)))
-			->andWhere($qb->expr()->isNotNull('number'))
-			->andWhere($qb->expr()->gte('issue_date', $qb->createNamedParameter(new DateTime($year . '-01-01'), IQueryBuilder::PARAM_DATE)))
-			->andWhere($qb->expr()->lt('issue_date', $qb->createNamedParameter(new DateTime(($year + 1) . '-01-01'), IQueryBuilder::PARAM_DATE)));
-		$result = $qb->executeQuery();
-		$row = $result->fetch();
-		$result->closeCursor();
-		return (int)($row['cnt'] ?? 0);
 	}
 }
