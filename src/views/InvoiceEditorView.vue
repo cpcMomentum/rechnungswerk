@@ -58,8 +58,11 @@
 				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Land') }}</span>
 					<input v-model="form.recipientCountry" class="rw-input" type="text" :readonly="readonly" /></label>
 			</div>
-			<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
-				<input v-model="form.recipientVatId" class="rw-input" type="text" :readonly="readonly" /></label>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
+					<input v-model="form.recipientVatId" class="rw-input" type="text" :readonly="readonly" /></label>
+				<span class="rw-field" aria-hidden="true" />
+			</div>
 		</section>
 
 		<!-- Einleitung (vor den Positionen) -->
