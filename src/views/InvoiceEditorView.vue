@@ -1,7 +1,7 @@
 <template>
 	<div class="rechnungswerk-view editor">
 		<div class="editor-top">
-			<NcButton type="tertiary" @click="backToList">
+			<NcButton variant="tertiary" @click="backToList">
 				<template #icon><ArrowLeftIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Zurück') }}
 			</NcButton>
@@ -111,12 +111,12 @@
 					<template #icon><LockIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'Festschreiben') }}
 				</NcButton>
-				<NcButton v-if="invoice" type="error" :disabled="saving" @click="askDelete">
+				<NcButton v-if="invoice" variant="error" :disabled="saving" @click="askDelete">
 					{{ t('rechnungswerk', 'Löschen') }}
 				</NcButton>
 			</template>
 			<template v-else-if="invoice && invoice.status === 'committed'">
-				<NcButton type="error" :disabled="saving" @click="askCancel">
+				<NcButton variant="error" :disabled="saving" @click="askCancel">
 					{{ t('rechnungswerk', 'Stornieren') }}
 				</NcButton>
 			</template>
@@ -157,7 +157,7 @@ import { useSettingsStore } from '@/stores/settingsStore'
 import { INVOICE_STATUS_LABELS, type ContactMatch, type InvoiceDetail } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
-import { computeTotals } from '@/utils/invoiceCalc'
+import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import type { InvoiceInput } from '@/api/invoices'
 
 const props = defineProps<{ id?: string }>()
@@ -187,13 +187,8 @@ const headerTitle = computed(() => invoice.value
 
 const totals = computed(() => computeTotals(items.value.map(i => ({
 	taxRateBp: i.taxRateBp,
-	lineTotalCents: lineTotal(i),
+	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
 }))))
-
-function lineTotal(item: EditorItem): number {
-	const milli = Math.round((Number(String(item.quantity).replace(',', '.')) || 0) * 1000)
-	return Math.round((milli * euroInputToCents(item.priceInput)) / 1000)
-}
 
 onMounted(async () => {
 	try {

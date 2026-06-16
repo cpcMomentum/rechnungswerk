@@ -54,7 +54,7 @@
 						</td>
 						<td class="num strong">{{ formatCents(lineTotal(item)) }}</td>
 						<td v-if="!readonly" class="num">
-							<NcButton type="tertiary" :aria-label="t('rechnungswerk', 'Position entfernen')" @click="remove(i)">
+							<NcButton variant="tertiary" :aria-label="t('rechnungswerk', 'Position entfernen')" @click="remove(i)">
 								<template #icon><DeleteIcon :size="20" /></template>
 							</NcButton>
 						</td>
