@@ -64,7 +64,7 @@
 						</tr>
 					</template>
 					<tr v-if="items.length === 0">
-						<td :colspan="readonly ? 6 : 7" class="rw-muted" style="text-align: center; padding: 16px;">
+						<td :colspan="readonly ? 6 : 7" class="rw-muted empty-row">
 							{{ t('rechnungswerk', 'Noch keine Positionen.') }}
 						</td>
 					</tr>
@@ -133,3 +133,10 @@ function remove(index: number) {
 	items.value.splice(index, 1)
 }
 </script>
+
+<style scoped>
+.empty-row {
+	text-align: center;
+	padding: 16px;
+}
+</style>

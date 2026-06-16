@@ -62,7 +62,7 @@
 					@update:model-value="onToggleSmallBusiness">
 					{{ t('rechnungswerk', 'Kleinunternehmer nach §19 UStG (kein USt-Ausweis)') }}
 				</NcCheckboxRadioSwitch>
-				<label v-if="!form.smallBusiness" class="rw-field" style="margin-top: 12px;">
+				<label v-if="!form.smallBusiness" class="rw-field tax-rate-field">
 					<span>{{ t('rechnungswerk', 'Standard-USt-Satz') }}</span>
 					<select v-model.number="form.defaultTaxRateBp" class="rw-input">
 						<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
@@ -221,6 +221,9 @@ function fail(e: unknown, fallback: string) {
 
 <style scoped>
 /* Layout/cards/fields/inputs come from the shared src/css/app.css. */
+.tax-rate-field {
+	margin-top: 12px;
+}
 .rw-settings-title {
 	margin: 0 0 16px;
 	font-size: 22px;
