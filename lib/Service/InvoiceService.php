@@ -356,7 +356,7 @@ class InvoiceService {
 		$totals = InvoiceCalculator::computeTotals($lines);
 		$invoice->setSubtotalCents($totals['subtotalCents']);
 		$invoice->setTotalCents($totals['totalCents']);
-		$invoice->setTaxBreakdown(json_encode($totals['taxBreakdown']));
+		$invoice->setTaxBreakdown(json_encode($totals['taxBreakdown']) ?: '[]');
 	}
 
 	/**
