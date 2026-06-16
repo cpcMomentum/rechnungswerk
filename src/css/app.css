@@ -231,9 +231,9 @@
 	border-color: var(--color-border-dark, var(--color-border));
 }
 .app-rechnungswerk .rw-chip--committed {
-	background: #eaf5ee;
+	background: color-mix(in srgb, var(--color-success, #46ba61) 14%, var(--color-main-background));
 	color: var(--color-success-text, #2d7d46);
-	border-color: #bfe0cb;
+	border-color: color-mix(in srgb, var(--color-success, #46ba61) 35%, var(--color-border));
 }
 .app-rechnungswerk .rw-chip--cancelled {
 	background: var(--color-background-dark);
