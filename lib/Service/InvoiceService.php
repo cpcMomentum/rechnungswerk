@@ -81,12 +81,17 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function update(int $id, string $userId, array $data): array {
-		$invoice = $this->findOwned($id, $userId);
-		$this->assertDraft($invoice);
-		$this->applyHeader($invoice, $data, $userId);
+		// Fast 404/409 outside the transaction for a quick user-visible error.
+		$this->assertDraft($this->findOwned($id, $userId));
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock so a concurrent commit() cannot slip
+			// between our pre-check and this write and leave a committed
+			// invoice with its status overwritten back to draft.
+			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$this->assertDraft($invoice);
+			$this->applyHeader($invoice, $data, $userId);
 			if (array_key_exists('items', $data)) {
 				$this->replaceItems($invoice, $this->extractItems($data, $userId));
 			}
@@ -107,11 +112,15 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function delete(int $id, string $userId): void {
-		$invoice = $this->findOwned($id, $userId);
-		$this->assertDraft($invoice);
+		$this->findOwned($id, $userId); // Fast 404 before opening a transaction.
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock to prevent a concurrent commit() from
+			// slipping through: without this a committed (GoBD-relevant)
+			// invoice could be deleted by a concurrent in-flight delete call.
+			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$this->assertDraft($invoice);
 			$this->itemMapper->deleteByInvoice((int)$invoice->getId());
 			$this->invoiceMapper->delete($invoice);
 			$this->db->commit();
