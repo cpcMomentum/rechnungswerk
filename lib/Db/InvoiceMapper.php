@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Db;
 
+use DateTime;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -52,7 +53,9 @@ class InvoiceMapper extends QBMapper {
 		$qb->select($qb->func()->count('*', 'cnt'))
 			->from($this->tableName)
 			->where($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)))
-			->andWhere($qb->expr()->isNotNull('number'));
+			->andWhere($qb->expr()->isNotNull('number'))
+			->andWhere($qb->expr()->gte('issue_date', $qb->createNamedParameter(new DateTime($year . '-01-01'), IQueryBuilder::PARAM_DATE)))
+			->andWhere($qb->expr()->lt('issue_date', $qb->createNamedParameter(new DateTime(($year + 1) . '-01-01'), IQueryBuilder::PARAM_DATE)));
 		$result = $qb->executeQuery();
 		$row = $result->fetch();
 		$result->closeCursor();
