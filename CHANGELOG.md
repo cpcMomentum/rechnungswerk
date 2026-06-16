@@ -8,6 +8,17 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 ## [Unreleased]
 
 ### Added
+- Rechnungs-Editor + Liste (It. 3): `InvoicesView` mit Status-Chips und
+  `InvoiceEditorView` (Rechnungsdaten · Empfänger · Positionen · Steuer&Summen · Texte)
+- Editierbare Positionstabelle mit Live-Summen + USt-Aufschlüsselung (Client-Vorschau,
+  Server autoritativ), Produkt-Übernahme aus dem Katalog, §19-konforme 0%-Erzwingung
+- Empfänger-Auswahl aus Nextcloud-Kontakten (`ContactController` + `OCP\Contacts\IManager`)
+  mit Tipp-Vorschlägen und Auto-Befüllung
+- Lifecycle in der UI: Entwurf speichern → Festschreiben (Bestätigung, endgültige Nummer,
+  read-only) → Stornieren (Stornobeleg)
+- l10n de/en erweitert (120 Keys)
+
+### Added (frühere Iterationen)
 - Stammdaten + Produktkatalog (It. 2): `ProductService`/`ProductController`
   (`/api/v1/products` CRUD) und `SettingsController` (`/api/v1/settings`)
 - Frontend `ProductsView` (Tabelle + Editor-Modal) und `SettingsView` (gegliedertes

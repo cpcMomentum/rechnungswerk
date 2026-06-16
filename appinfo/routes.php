@@ -30,5 +30,8 @@ return [
 		// Settings (one row per owner)
 		['name' => 'settings#show', 'url' => '/api/v1/settings', 'verb' => 'GET'],
 		['name' => 'settings#save', 'url' => '/api/v1/settings', 'verb' => 'PUT'],
+
+		// Contacts (recipient picker)
+		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],
 	],
 ];

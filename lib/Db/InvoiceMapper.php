@@ -42,4 +42,20 @@ class InvoiceMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)));
 		return $this->findEntity($qb);
 	}
+
+	/**
+	 * Like findOneByOwner() but locks the row (SELECT ... FOR UPDATE) so the
+	 * caller's transaction holds it until commit. Used to serialise commit/cancel
+	 * and prevent gaps/duplicates in the sequential number on concurrent calls.
+	 *
+	 * @throws DoesNotExistException
+	 */
+	public function findOneByOwnerForUpdate(int $id, string $userId): Invoice {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)))
+			->forUpdate();
+		return $this->findEntity($qb);
+	}
 }

@@ -15,11 +15,16 @@ use OCA\Rechnungswerk\Db\SettingsMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception as DBException;
+use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\IDBConnection;
 
 class SettingsService {
 
+	private const SETTINGS_TABLE = 'rechnungswerk_settings';
+
 	public function __construct(
 		private readonly SettingsMapper $mapper,
+		private readonly IDBConnection $db,
 	) {
 	}
 
@@ -124,23 +129,44 @@ class SettingsService {
 
 	/**
 	 * Reserve and return the next invoice number for the given year, persisting
-	 * the incremented counter. Counter resets per calendar year.
+	 * the incremented counter. The counter resets per calendar year.
 	 *
-	 * Must be called inside a DB transaction owned by the caller.
+	 * MUST be called inside a DB transaction owned by the caller. The owner's
+	 * settings row is locked with SELECT ... FOR UPDATE so that concurrent
+	 * commits serialise and can never hand out the same sequential number
+	 * (a duplicate invoice number would violate GoBD).
 	 */
 	public function reserveNextNumber(string $userId, int $year): string {
-		$settings = $this->getOrCreate($userId);
+		$this->getOrCreate($userId);
 
-		if ($settings->getNumberCounterYear() !== $year) {
-			$settings->setNumberCounterYear($year);
-			$settings->setNumberCounter(0);
+		// Lock the owner's settings row for the rest of the caller's transaction.
+		$select = $this->db->getQueryBuilder();
+		$select->select('number_counter', 'number_counter_year', 'number_format')
+			->from(self::SETTINGS_TABLE)
+			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter($userId)))
+			->forUpdate();
+		$result = $select->executeQuery();
+		$row = $result->fetch();
+		$result->closeCursor();
+
+		$counter = (int)($row['number_counter'] ?? 0);
+		$counterYear = isset($row['number_counter_year']) && $row['number_counter_year'] !== null
+			? (int)$row['number_counter_year'] : null;
+		$format = (string)($row['number_format'] ?? '');
+		if ($format === '') {
+			$format = Settings::DEFAULT_NUMBER_FORMAT;
 		}
-		$next = $settings->getNumberCounter() + 1;
-		$settings->setNumberCounter($next);
-		$settings->setUpdatedAt(new DateTime());
-		$this->mapper->update($settings);
 
-		$format = $settings->getNumberFormat() ?? Settings::DEFAULT_NUMBER_FORMAT;
+		$next = ($counterYear === $year) ? $counter + 1 : 1;
+
+		$update = $this->db->getQueryBuilder();
+		$update->update(self::SETTINGS_TABLE)
+			->set('number_counter', $update->createNamedParameter($next, IQueryBuilder::PARAM_INT))
+			->set('number_counter_year', $update->createNamedParameter($year, IQueryBuilder::PARAM_INT))
+			->set('updated_at', $update->createNamedParameter(new DateTime(), IQueryBuilder::PARAM_DATETIME_MUTABLE))
+			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter($userId)));
+		$update->executeStatement();
+
 		return InvoiceCalculator::formatNumber($format, $next, $year);
 	}
 }

@@ -81,12 +81,17 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function update(int $id, string $userId, array $data): array {
-		$invoice = $this->findOwned($id, $userId);
-		$this->assertDraft($invoice);
-		$this->applyHeader($invoice, $data, $userId);
+		// Fast 404/409 outside the transaction for a quick user-visible error.
+		$this->assertDraft($this->findOwned($id, $userId));
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock so a concurrent commit() cannot slip
+			// between our pre-check and this write and leave a committed
+			// invoice with its status overwritten back to draft.
+			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$this->assertDraft($invoice);
+			$this->applyHeader($invoice, $data, $userId);
 			if (array_key_exists('items', $data)) {
 				$this->replaceItems($invoice, $this->extractItems($data, $userId));
 			}
@@ -107,11 +112,15 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function delete(int $id, string $userId): void {
-		$invoice = $this->findOwned($id, $userId);
-		$this->assertDraft($invoice);
+		$this->findOwned($id, $userId); // Fast 404 before opening a transaction.
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock to prevent a concurrent commit() from
+			// slipping through: without this a committed (GoBD-relevant)
+			// invoice could be deleted by a concurrent in-flight delete call.
+			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$this->assertDraft($invoice);
 			$this->itemMapper->deleteByInvoice((int)$invoice->getId());
 			$this->invoiceMapper->delete($invoice);
 			$this->db->commit();
@@ -141,11 +150,22 @@ class InvoiceService {
 			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
 		}
 
+		// Create the settings row outside the transaction: a failed INSERT would
+		// otherwise abort the commit transaction on PostgreSQL.
+		$this->settingsService->getOrCreate($userId);
+
 		$now = new DateTime();
 		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock and re-check the status inside the
+			// transaction. Two concurrent commits on the same draft would
+			// otherwise both pass the pre-check and each reserve a number,
+			// leaving a gap in the sequence (GoBD violation).
+			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$this->assertDraft($invoice);
+
 			$number = $this->settingsService->reserveNextNumber($userId, $year);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
@@ -177,12 +197,21 @@ class InvoiceService {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
 		}
 
+		$this->settingsService->getOrCreate($userId);
+
 		$now = new DateTime();
 		$year = (int)$now->format('Y');
-		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
 		$this->db->beginTransaction();
 		try {
+			// Lock the original and re-check inside the transaction so a double
+			// cancel cannot create two storno documents for the same invoice.
+			$original = $this->findOwnedForUpdate($id, $userId);
+			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
+				throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
+			}
+			$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
+
 			$storno = new Invoice();
 			$storno->setOwnerUserId($userId);
 			$storno->setStatus(Invoice::STATUS_COMMITTED);
@@ -237,6 +266,17 @@ class InvoiceService {
 	private function findOwned(int $id, string $userId): Invoice {
 		try {
 			return $this->invoiceMapper->findOneByOwner($id, $userId);
+		} catch (DoesNotExistException) {
+			throw new NotFoundException('Rechnung nicht gefunden.');
+		}
+	}
+
+	/**
+	 * @throws NotFoundException
+	 */
+	private function findOwnedForUpdate(int $id, string $userId): Invoice {
+		try {
+			return $this->invoiceMapper->findOneByOwnerForUpdate($id, $userId);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException('Rechnung nicht gefunden.');
 		}
@@ -317,9 +357,14 @@ class InvoiceService {
 			$unitPriceCents = (int)($row['unitPriceCents'] ?? 0);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
+			$name = (string)($row['name'] ?? '');
+			if (mb_strlen($name) > 255) {
+				throw new ValidationException('Positionsname darf maximal 255 Zeichen lang sein.');
+			}
+
 			$item = new InvoiceItem();
 			$item->setProductId(isset($row['productId']) && $row['productId'] !== null ? (int)$row['productId'] : null);
-			$item->setName((string)($row['name'] ?? ''));
+			$item->setName($name);
 			$item->setDescription(isset($row['description']) && $row['description'] !== '' ? (string)$row['description'] : null);
 			$item->setQuantity($quantity);
 			$item->setUnitCode((string)($row['unitCode'] ?? InvoiceItem::UNIT_PIECE));
