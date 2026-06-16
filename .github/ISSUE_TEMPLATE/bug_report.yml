@@ -1,0 +1,72 @@
+name: Bug Report
+description: Einen Bug melden der nicht sofort gefixt wird
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Bitte fülle die folgenden Felder aus um den Bug zu beschreiben.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Zusammenfassung
+      description: Kurze Beschreibung des Bugs
+      placeholder: Was ist das Problem?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zur Reproduktion
+      description: Wie kann man den Bug reproduzieren?
+      placeholder: |
+        1. Gehe zu ...
+        2. Klicke auf ...
+        3. Beobachte ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+      description: Was sollte passieren?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Tatsächliches Verhalten
+      description: Was passiert stattdessen?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Kritisch (System nicht nutzbar, Datenverlust, Sicherheit)
+        - Hoch (Kernfunktion betroffen, Workaround möglich)
+        - Mittel (Feature eingeschränkt, UX beeinträchtigt)
+        - Niedrig (Kosmetisch, Edge Case)
+    validations:
+      required: true
+
+  - type: textarea
+    id: components
+    attributes:
+      label: Betroffene Komponenten
+      description: Welche Dateien/Komponenten sind betroffen?
+      placeholder: "z.B. src/auth/login.ts, frontend/components/LoginForm.tsx"
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Zusätzlicher Kontext
+      description: Screenshots, Logs, Workarounds oder sonstige Informationen

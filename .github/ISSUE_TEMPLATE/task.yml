@@ -1,0 +1,41 @@
+name: Task
+description: Eine Implementierungs-Aufgabe anlegen
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Task
+        Beschreibe die Aufgabe.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung
+      description: Was muss gemacht werden?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Kontext
+      description: Warum ist das nötig? Hintergrund-Information
+
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Akzeptanzkriterien
+      description: Woran erkennt man dass die Aufgabe erledigt ist?
+      placeholder: |
+        - [ ] Kriterium 1
+        - [ ] Kriterium 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Abhängigkeiten
+      description: Was muss vorher fertig sein?

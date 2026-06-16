@@ -1,0 +1,61 @@
+name: Improvement
+description: Tech Debt, Refactoring oder DX-Verbesserung vorschlagen
+title: "[Improvement]: "
+labels: ["improvement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Improvement
+        Beschreibe die gewünschte Verbesserung.
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Aktueller Zustand
+      description: Was existiert heute? Was ist das Problem damit?
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired
+    attributes:
+      label: Gewünschter Zustand
+      description: Was soll sich ändern? Wie soll es danach aussehen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Warum ist diese Verbesserung wichtig?
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact-Bereich
+      options:
+        - Performance
+        - Developer Experience
+        - Wartbarkeit
+        - Sicherheit
+        - Code-Qualität
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Geschätzter Aufwand
+      options:
+        - S (< 1 Stunde)
+        - M (1-4 Stunden)
+        - L (1-2 Tage)
+        - XL (> 2 Tage)
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Betroffene Bereiche
+      description: Welche Dateien/Komponenten sind betroffen?

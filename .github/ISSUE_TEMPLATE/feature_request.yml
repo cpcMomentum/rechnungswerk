@@ -1,0 +1,53 @@
+name: Feature Request
+description: Ein neues Feature oder eine Zukunfts-Idee vorschlagen
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Beschreibe dein Feature oder deine Idee.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Problem / Motivation
+      description: Welches Problem löst dieses Feature? Warum ist es wichtig?
+      placeholder: Als User möchte ich ..., damit ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Vorgeschlagene Lösung
+      description: Was soll gebaut werden? Wie soll es funktionieren?
+    validations:
+      required: true
+
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Akzeptanzkriterien
+      description: Woran erkennt man dass das Feature fertig ist?
+      placeholder: |
+        - [ ] Kriterium 1
+        - [ ] Kriterium 2
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorität
+      options:
+        - Must-have (Kernfunktion, MVP-relevant)
+        - Should-have (Wichtig, aber nicht blockierend)
+        - Nice-to-have (Wünschenswert, kann warten)
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativen
+      description: Welche anderen Ansätze wurden betrachtet?
