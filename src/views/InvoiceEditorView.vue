@@ -106,7 +106,7 @@
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Zahlungsbedingungen') }}</h3>
 			<div class="rw-form-row">
-				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Zahlungsziel (Tage)') }}</span>
+				<label class="rw-field payterm-days"><span>{{ t('rechnungswerk', 'Zahlungsziel (Tage)') }}</span>
 					<input v-model="form.paymentTermDays" class="rw-input" type="number" min="0" step="1" :readonly="readonly" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Fällig am') }}</span>
 					<input class="rw-input" type="text" readonly :value="dueDatePreview || '—'" /></label>
@@ -403,5 +403,13 @@ function fail(e: unknown, fallback: string) {
 .more summary {
 	cursor: pointer;
 	color: var(--color-text-maxcontrast);
+}
+/* Keep the "Zahlungsziel (Tage)" label on one line so the field stays aligned
+   with the neighbouring boxes. */
+.payterm-days {
+	flex: 0 0 170px;
+}
+.payterm-days > span {
+	white-space: nowrap;
 }
 </style>
