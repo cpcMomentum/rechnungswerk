@@ -19,5 +19,16 @@ return [
 		['name' => 'invoice#destroy', 'url' => '/api/v1/invoices/{id}',        'verb' => 'DELETE'],
 		['name' => 'invoice#commit',  'url' => '/api/v1/invoices/{id}/commit', 'verb' => 'POST'],
 		['name' => 'invoice#cancel',  'url' => '/api/v1/invoices/{id}/cancel', 'verb' => 'POST'],
+
+		// Products
+		['name' => 'product#index',   'url' => '/api/v1/products',      'verb' => 'GET'],
+		['name' => 'product#show',    'url' => '/api/v1/products/{id}', 'verb' => 'GET'],
+		['name' => 'product#create',  'url' => '/api/v1/products',      'verb' => 'POST'],
+		['name' => 'product#update',  'url' => '/api/v1/products/{id}', 'verb' => 'PATCH'],
+		['name' => 'product#destroy', 'url' => '/api/v1/products/{id}', 'verb' => 'DELETE'],
+
+		// Settings (one row per owner)
+		['name' => 'settings#show', 'url' => '/api/v1/settings', 'verb' => 'GET'],
+		['name' => 'settings#save', 'url' => '/api/v1/settings', 'verb' => 'PUT'],
 	],
 ];
