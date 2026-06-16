@@ -53,7 +53,7 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Ort') }}</span>
 					<input v-model="form.recipientCity" class="rw-input" type="text" :readonly="readonly" /></label>
 				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Land') }}</span>
-					<input v-model="form.recipientCountry" class="rw-input" type="text" :readonly="readonly" /></label>
+					<input v-model="form.recipientCountry" class="rw-input" type="text" maxlength="2" :readonly="readonly" /></label>
 			</div>
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>

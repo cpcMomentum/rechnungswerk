@@ -313,13 +313,21 @@ class InvoiceService {
 				$invoice->{'set' . ucfirst($field)}($value !== null && $value !== '' ? (string)$value : null);
 			}
 		}
+		if (array_key_exists('discountTerms', $data) && $data['discountTerms'] !== null
+				&& mb_strlen((string)$data['discountTerms']) > 255) {
+			throw new ValidationException('Feld „Skonto" darf höchstens 255 Zeichen lang sein.');
+		}
 		if (array_key_exists('paymentTermDays', $data)) {
 			$days = $data['paymentTermDays'];
 			$invoice->setPaymentTermDays($days !== null && $days !== '' ? max(0, (int)$days) : null);
 		}
 		if (array_key_exists('recipientCountry', $data)) {
 			$country = $data['recipientCountry'];
-			$invoice->setRecipientCountry($country !== null && $country !== '' ? (string)$country : 'DE');
+			$country = $country !== null && $country !== '' ? (string)$country : 'DE';
+			if (mb_strlen($country) > 2) {
+				throw new ValidationException('Das Länderfeld muss ein ISO 3166-1-Alpha-2-Code sein (z. B. „DE").');
+			}
+			$invoice->setRecipientCountry($country);
 		} elseif ($invoice->getRecipientCountry() === null) {
 			$invoice->setRecipientCountry('DE');
 		}
