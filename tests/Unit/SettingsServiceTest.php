@@ -14,8 +14,14 @@ use OCA\Rechnungswerk\Db\SettingsMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IDBConnection;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Pure validation / default-creation behaviour is unit-tested here. The
+ * sequential numbering in reserveNextNumber() uses a row-locked SELECT ... FOR
+ * UPDATE and is verified against a real database (NC Docker), not mocked.
+ */
 class SettingsServiceTest extends TestCase {
 
 	private SettingsMapper $mapper;
@@ -24,7 +30,8 @@ class SettingsServiceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(SettingsMapper::class);
-		$this->service = new SettingsService($this->mapper);
+		$db = $this->createMock(IDBConnection::class);
+		$this->service = new SettingsService($this->mapper, $db);
 	}
 
 	public function testGetOrCreateInsertsDefaultsOnFirstAccess(): void {
@@ -56,33 +63,6 @@ class SettingsServiceTest extends TestCase {
 		$this->mapper->method('findByOwner')->willReturn($this->existing());
 		$this->expectException(ValidationException::class);
 		$this->service->save('alice', ['accentColor' => 'blau']);
-	}
-
-	public function testReserveNextNumberIncrementsWithinSameYear(): void {
-		$settings = $this->existing();
-		$settings->setNumberCounter(5);
-		$settings->setNumberCounterYear(2026);
-		$this->mapper->method('findByOwner')->willReturn($settings);
-		$this->mapper->method('update')->willReturnArgument(0);
-
-		$number = $this->service->reserveNextNumber('alice', 2026);
-
-		$this->assertSame('RE-2026-0006', $number);
-		$this->assertSame(6, $settings->getNumberCounter());
-	}
-
-	public function testReserveNextNumberResetsOnYearChange(): void {
-		$settings = $this->existing();
-		$settings->setNumberCounter(42);
-		$settings->setNumberCounterYear(2025);
-		$this->mapper->method('findByOwner')->willReturn($settings);
-		$this->mapper->method('update')->willReturnArgument(0);
-
-		$number = $this->service->reserveNextNumber('alice', 2026);
-
-		$this->assertSame('RE-2026-0001', $number);
-		$this->assertSame(1, $settings->getNumberCounter());
-		$this->assertSame(2026, $settings->getNumberCounterYear());
 	}
 
 	private function existing(): Settings {
