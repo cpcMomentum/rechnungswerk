@@ -173,14 +173,26 @@
 .app-rechnungswerk .rw-col-tax { width: 96px; }
 .app-rechnungswerk .rw-col-sum { width: 112px; }
 .app-rechnungswerk .rw-col-actions { width: 44px; }
-.app-rechnungswerk .rw-cell-stack {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	min-width: 0;
-}
 .app-rechnungswerk .rw-input--sub {
 	font-size: 0.9em;
+}
+/* Line total centered in its column (aligns visually with the VAT select). */
+.app-rechnungswerk .rw-table--positions .rw-sum {
+	text-align: center;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+.app-rechnungswerk .rw-table--positions th.rw-sum {
+	font-weight: 600;
+}
+/* Description spans the full table width as its own sub-row under each item. */
+.app-rechnungswerk .rw-pos-main > td {
+	border-bottom: none;
+	padding-bottom: 4px;
+}
+.app-rechnungswerk .rw-pos-desc > td {
+	padding-top: 0;
 }
 
 /* ---- KPI / totals cards (mockup .kpi-card) ---- */
@@ -213,32 +225,29 @@
 	font-size: 1.1em;
 }
 
-/* ---- Status chips (mockup, subtle NC variables) ---- */
+/* ---- Status chips: solid fills, white text, equal width (WorkTime badges) ---- */
 .app-rechnungswerk .rw-chip {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 132px;
 	font-size: 12px;
 	font-weight: 600;
-	padding: 3px 10px;
+	line-height: 1.4;
+	padding: 4px 12px;
 	border-radius: var(--border-radius-element, var(--border-radius));
-	border: 1px solid transparent;
+	color: #fff;
 	vertical-align: middle;
 }
 .app-rechnungswerk .rw-chip--draft {
-	background: var(--color-background-dark);
-	color: var(--color-text-maxcontrast);
-	border-color: var(--color-border-dark, var(--color-border));
+	background: #5b6770;
 }
 .app-rechnungswerk .rw-chip--committed {
-	background: color-mix(in srgb, var(--color-success, #46ba61) 14%, var(--color-main-background));
-	color: var(--color-success-text, #2d7d46);
-	border-color: color-mix(in srgb, var(--color-success, #46ba61) 35%, var(--color-border));
+	background: #4a9d63;
 }
 .app-rechnungswerk .rw-chip--cancelled {
-	background: var(--color-background-dark);
-	color: var(--color-error, #c62828);
-	border-color: var(--color-border-dark, var(--color-border));
+	background: #cc4b42;
 }
 
 /* ---- Sticky action bar ---- */

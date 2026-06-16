@@ -62,6 +62,14 @@
 				<input v-model="form.recipientVatId" class="rw-input" type="text" :readonly="readonly" /></label>
 		</section>
 
+		<!-- Einleitung (vor den Positionen) -->
+		<section class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Einleitung') }}</h3>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'Einleitungstext') }}</span>
+				<textarea v-model="form.greeting" class="rw-input" rows="2" :readonly="readonly"
+					:placeholder="t('rechnungswerk', 'Anrede und Einleitung – Vorgabe aus den Einstellungen')" /></label>
+		</section>
+
 		<!-- Positionen -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Positionen') }}</h3>
@@ -94,11 +102,9 @@
 			</div>
 		</section>
 
-		<!-- Texte -->
+		<!-- Schlusstext -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Texte') }}</h3>
-			<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede / Einleitung') }}</span>
-				<textarea v-model="form.greeting" class="rw-input" rows="2" :readonly="readonly" /></label>
+			<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
 			<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext / Anmerkungen') }}</span>
 				<textarea v-model="form.extraText" class="rw-input" rows="2" :readonly="readonly" /></label>
 		</section>

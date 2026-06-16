@@ -18,47 +18,51 @@
 						<th>{{ t('rechnungswerk', 'Einheit') }}</th>
 						<th class="num">{{ t('rechnungswerk', 'Einzelpreis (€)') }}</th>
 						<th class="num">{{ t('rechnungswerk', 'USt') }}</th>
-						<th class="num">{{ t('rechnungswerk', 'Summe netto') }}</th>
+						<th class="rw-sum">{{ t('rechnungswerk', 'Summe netto') }}</th>
 						<th v-if="!readonly" />
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="(item, i) in items" :key="i">
-						<td>
-							<div class="rw-cell-stack">
+					<template v-for="(item, i) in items" :key="i">
+						<tr class="rw-pos-main">
+							<td>
 								<input v-model="item.name" class="rw-input" type="text"
 									:readonly="readonly" :placeholder="t('rechnungswerk', 'Leistung')" />
+							</td>
+							<td class="num">
+								<input v-model="item.quantity" class="rw-input num" type="text"
+									inputmode="decimal" :readonly="readonly" />
+							</td>
+							<td>
+								<select v-model="item.unitCode" class="rw-input" :disabled="readonly">
+									<option v-for="code in UNIT_CODES" :key="code" :value="code">
+										{{ t('rechnungswerk', UNIT_CODE_LABELS[code]) }}
+									</option>
+								</select>
+							</td>
+							<td class="num">
+								<input v-model="item.priceInput" class="rw-input num" type="number"
+									step="0.01" :readonly="readonly" />
+							</td>
+							<td class="num">
+								<select v-model.number="item.taxRateBp" class="rw-input" :disabled="readonly || smallBusiness">
+									<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
+								</select>
+							</td>
+							<td class="rw-sum">{{ formatCents(lineTotal(item)) }}</td>
+							<td v-if="!readonly" class="num">
+								<NcButton variant="tertiary" :aria-label="t('rechnungswerk', 'Position entfernen')" @click="remove(i)">
+									<template #icon><DeleteIcon :size="20" /></template>
+								</NcButton>
+							</td>
+						</tr>
+						<tr v-if="!readonly || item.description" class="rw-pos-desc">
+							<td :colspan="readonly ? 6 : 7">
 								<input v-model="item.description" class="rw-input rw-input--sub" type="text"
 									:readonly="readonly" :placeholder="t('rechnungswerk', 'Beschreibung (optional)')" />
-							</div>
-						</td>
-						<td class="num">
-							<input v-model="item.quantity" class="rw-input num" type="text"
-								inputmode="decimal" :readonly="readonly" />
-						</td>
-						<td>
-							<select v-model="item.unitCode" class="rw-input" :disabled="readonly">
-								<option v-for="code in UNIT_CODES" :key="code" :value="code">
-									{{ t('rechnungswerk', UNIT_CODE_LABELS[code]) }}
-								</option>
-							</select>
-						</td>
-						<td class="num">
-							<input v-model="item.priceInput" class="rw-input num" type="number"
-								step="0.01" :readonly="readonly" />
-						</td>
-						<td class="num">
-							<select v-model.number="item.taxRateBp" class="rw-input" :disabled="readonly || smallBusiness">
-								<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
-							</select>
-						</td>
-						<td class="num strong">{{ formatCents(lineTotal(item)) }}</td>
-						<td v-if="!readonly" class="num">
-							<NcButton variant="tertiary" :aria-label="t('rechnungswerk', 'Position entfernen')" @click="remove(i)">
-								<template #icon><DeleteIcon :size="20" /></template>
-							</NcButton>
-						</td>
-					</tr>
+							</td>
+						</tr>
+					</template>
 					<tr v-if="items.length === 0">
 						<td :colspan="readonly ? 6 : 7" class="rw-muted" style="text-align: center; padding: 16px;">
 							{{ t('rechnungswerk', 'Noch keine Positionen.') }}
