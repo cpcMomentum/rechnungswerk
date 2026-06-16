@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcModal from '@nextcloud/vue/components/NcModal'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -65,6 +65,8 @@ const emit = defineEmits<{
 	close: []
 	save: [data: ProductCreate]
 }>()
+
+const nameInput = ref<HTMLInputElement | null>(null)
 
 const form = reactive<{ name: string, description: string, defaultUnitCode: UnitCode, defaultTaxRateBp: number }>({
 	name: '',
@@ -90,6 +92,7 @@ watch(() => props.open, (open) => {
 	form.defaultUnitCode = (p?.defaultUnitCode ?? 'C62') as UnitCode
 	form.defaultTaxRateBp = p?.defaultTaxRateBp ?? 1900
 	priceInput.value = centsToEuroInput(p?.defaultPriceCents ?? 0)
+	nextTick(() => nameInput.value?.focus())
 }, { immediate: true })
 
 function onSave() {
