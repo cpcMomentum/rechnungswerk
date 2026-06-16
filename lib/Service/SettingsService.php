@@ -53,12 +53,7 @@ class SettingsService {
 	 * @param array<string, mixed> $data
 	 */
 	public function save(string $userId, array $data): Settings {
-		if (array_key_exists('numberFormat', $data)) {
-			$format = trim((string)$data['numberFormat']);
-			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
-				throw new ValidationException('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
-			}
-		}
+		$this->validate($data);
 
 		$settings = $this->getOrCreate($userId);
 
@@ -88,6 +83,43 @@ class SettingsService {
 
 		$settings->setUpdatedAt(new DateTime());
 		return $this->mapper->update($settings);
+	}
+
+	/**
+	 * Validate incoming settings data against format and column-length limits.
+	 *
+	 * @param array<string, mixed> $data
+	 * @throws ValidationException
+	 */
+	private function validate(array $data): void {
+		if (array_key_exists('numberFormat', $data)) {
+			$format = trim((string)$data['numberFormat']);
+			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
+				throw new ValidationException('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
+			}
+		}
+
+		// Column-length limits mirror the migration schema.
+		$maxLengths = [
+			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'iban' => 34,
+			'bic' => 16, 'bankName' => 255, 'accentColor' => 9, 'numberFormat' => 64,
+			'datevUploadMail' => 255, 'smtpFromName' => 255, 'smtpFromEmail' => 255,
+		];
+		foreach ($maxLengths as $field => $max) {
+			if (array_key_exists($field, $data) && $data[$field] !== null && mb_strlen((string)$data[$field]) > $max) {
+				throw new ValidationException(sprintf('Feld "%s" darf höchstens %d Zeichen lang sein.', $field, $max));
+			}
+		}
+
+		if (!empty($data['accentColor']) && !preg_match('/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string)$data['accentColor'])) {
+			throw new ValidationException('Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein.');
+		}
+
+		foreach (['datevUploadMail', 'smtpFromEmail'] as $emailField) {
+			if (!empty($data[$emailField]) && filter_var((string)$data[$emailField], FILTER_VALIDATE_EMAIL) === false) {
+				throw new ValidationException('Bitte eine gültige E-Mail-Adresse angeben.');
+			}
+		}
 	}
 
 	/**

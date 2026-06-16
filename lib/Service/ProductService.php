@@ -90,8 +90,12 @@ class ProductService {
 	 */
 	private function validate(array $data, bool $partial = false): void {
 		if (!$partial || array_key_exists('name', $data)) {
-			if (trim((string)($data['name'] ?? '')) === '') {
+			$name = trim((string)($data['name'] ?? ''));
+			if ($name === '') {
 				throw new ValidationException('Ein Name ist erforderlich.');
+			}
+			if (mb_strlen($name) > 255) {
+				throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
 			}
 		}
 		if (array_key_exists('defaultTaxRateBp', $data) && (int)$data['defaultTaxRateBp'] < 0) {
