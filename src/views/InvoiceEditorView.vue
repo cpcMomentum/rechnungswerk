@@ -206,10 +206,13 @@ const dueDatePreview = computed(() => {
 	if (Number.isNaN(days)) {
 		return ''
 	}
+	// Parse "Y-m-d" at local noon so the preview never shifts a day in
+	// timezones west of UTC (the real due date is computed server-side anyway).
+	const atLocalNoon = (ymd: string): Date => new Date(`${ymd}T12:00:00`)
 	if (invoice.value?.dueDate) {
-		return new Date(invoice.value.dueDate).toLocaleDateString()
+		return atLocalNoon(invoice.value.dueDate).toLocaleDateString()
 	}
-	const base = invoice.value?.issueDate ? new Date(invoice.value.issueDate) : new Date()
+	const base = invoice.value?.issueDate ? atLocalNoon(invoice.value.issueDate) : new Date()
 	base.setDate(base.getDate() + days)
 	return base.toLocaleDateString()
 })
