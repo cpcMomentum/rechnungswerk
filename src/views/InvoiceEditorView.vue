@@ -1,14 +1,11 @@
 <template>
 	<div class="rw-view">
 		<div class="rw-editor-head">
-			<NcButton variant="tertiary" @click="backToList">
-				<template #icon><ArrowLeftIcon :size="20" /></template>
-				{{ t('rechnungswerk', 'Zurück') }}
-			</NcButton>
-			<h2>
-				{{ headerTitle }}
-				<span v-if="invoice" :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
-			</h2>
+			<NcBreadcrumbs>
+				<NcBreadcrumb :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }" />
+				<NcBreadcrumb :name="headerTitle" />
+			</NcBreadcrumbs>
+			<span v-if="invoice" :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
 		</div>
 
 		<NcNoteCard v-if="error" type="error" :text="error" />
@@ -155,7 +152,8 @@ import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue'
+import NcBreadcrumbs from '@nextcloud/vue/components/NcBreadcrumbs'
+import NcBreadcrumb from '@nextcloud/vue/components/NcBreadcrumb'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import ContactPicker from '@/components/ContactPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
@@ -357,16 +355,13 @@ function fail(e: unknown, fallback: string) {
 .rw-editor-head {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 12px;
 	margin-bottom: 16px;
 }
-.rw-editor-head h2 {
-	margin: 0;
-	font-size: 22px;
-	font-weight: 700;
-	display: flex;
-	align-items: center;
-	gap: 12px;
+.rw-editor-head :deep(.breadcrumb) {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 .more {
 	margin-top: 8px;
