@@ -12,6 +12,7 @@ namespace OCA\Rechnungswerk\Service;
 use DateTime;
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Db\SettingsMapper;
+use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 
 class SettingsService {
@@ -46,6 +47,13 @@ class SettingsService {
 	 * @param array<string, mixed> $data
 	 */
 	public function save(string $userId, array $data): Settings {
+		if (array_key_exists('numberFormat', $data)) {
+			$format = trim((string)$data['numberFormat']);
+			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
+				throw new ValidationException('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
+			}
+		}
+
 		$settings = $this->getOrCreate($userId);
 
 		$stringFields = [
