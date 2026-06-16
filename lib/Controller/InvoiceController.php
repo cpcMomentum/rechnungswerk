@@ -115,7 +115,7 @@ class InvoiceController extends Controller {
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
 		}
 		try {
-			return new DataResponse($this->invoiceService->cancel($id, $this->userId), Http::STATUS_CREATED);
+			return new DataResponse($this->invoiceService->cancel($id, $this->userId));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
