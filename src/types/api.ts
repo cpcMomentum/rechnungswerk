@@ -102,6 +102,9 @@ export interface Invoice {
 	greeting: string | null
 	extraText: string | null
 	customFields: CustomField[]
+	paymentTermDays: number | null
+	dueDate: string | null
+	discountTerms: string | null
 	committedAt: string | null
 	createdAt: string | null
 	updatedAt: string | null

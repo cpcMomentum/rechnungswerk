@@ -8,6 +8,9 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 ## [Unreleased]
 
 ### Added
+- Zahlungsbedingungen (It. 4a): Zahlungsziel (Tage), automatisch berechnetes
+  Fälligkeitsdatum beim Festschreiben und Skonto-Hinweis — Migration v0.1.1
+  (`payment_term_days`, `due_date`, `discount_terms`) + Editor-Sektion
 - Rechnungs-Editor + Liste (It. 3): `InvoicesView` mit Status-Chips und
   `InvoiceEditorView` (Rechnungsdaten · Empfänger · Positionen · Steuer&Summen · Texte)
 - Editierbare Positionstabelle mit Live-Summen + USt-Aufschlüsselung (Client-Vorschau,

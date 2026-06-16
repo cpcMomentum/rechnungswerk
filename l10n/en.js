@@ -42,6 +42,7 @@ OC.L10N.register(
     "Entwurf" : "Draft",
     "Entwurf löschen" : "Delete draft",
     "Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?" : "A cancellation document will be created and this invoice marked as cancelled. Continue?",
+    "Fällig am" : "Due on",
     "Festgeschrieben" : "Committed",
     "Festschreiben" : "Commit",
     "Festschreiben fehlgeschlagen" : "Commit failed",
@@ -93,6 +94,7 @@ OC.L10N.register(
     "Referenznummer" : "Reference number",
     "Schlusstext" : "Closing text",
     "Schlusstext / Anmerkungen" : "Closing text / notes",
+    "Skonto" : "Cash discount",
     "Speichern" : "Save",
     "Speichern fehlgeschlagen" : "Saving failed",
     "Standard-Preis (€)" : "Default price (€)",
@@ -119,7 +121,9 @@ OC.L10N.register(
     "Versand" : "Sending",
     "Vorschau: {preview}" : "Preview: {preview}",
     "Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)" : "More fields (reference, order number, Leitweg-ID)",
-    "Zurück" : "Back",
+    "z. B. 2 % bei Zahlung bis …" : "e.g. 2 % if paid by …",
+    "Zahlungsbedingungen" : "Payment terms",
+    "Zahlungsziel (Tage)" : "Payment term (days)",
     "Zwischensumme (netto)" : "Subtotal (net)"
 },
 "nplurals=2; plural=(n != 1);");

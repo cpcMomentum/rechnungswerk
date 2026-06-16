@@ -170,6 +170,12 @@ class InvoiceService {
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
 			$invoice->setIssueDate($now);
+			if ($invoice->getPaymentTermDays() !== null) {
+				$due = (clone $now);
+				$due->modify('+' . (int)$invoice->getPaymentTermDays() . ' days');
+				$due->setTime(0, 0, 0);
+				$invoice->setDueDate($due);
+			}
 			$invoice->setCommittedAt($now);
 			$invoice->setUpdatedAt($now);
 			$this->recomputeTotals($invoice);
@@ -299,12 +305,17 @@ class InvoiceService {
 			'recipientName', 'recipientContactId', 'recipientAddress', 'recipientPostalCode',
 			'recipientCity', 'recipientEmail', 'recipientVatId', 'referenceNumber',
 			'orderNumber', 'buyerReference', 'specialTaxCase', 'greeting', 'extraText',
+			'discountTerms',
 		];
 		foreach ($strings as $field) {
 			if (array_key_exists($field, $data)) {
 				$value = $data[$field];
 				$invoice->{'set' . ucfirst($field)}($value !== null && $value !== '' ? (string)$value : null);
 			}
+		}
+		if (array_key_exists('paymentTermDays', $data)) {
+			$days = $data['paymentTermDays'];
+			$invoice->setPaymentTermDays($days !== null && $days !== '' ? max(0, (int)$days) : null);
 		}
 		if (array_key_exists('recipientCountry', $data)) {
 			$country = $data['recipientCountry'];
