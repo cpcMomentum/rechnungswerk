@@ -317,9 +317,14 @@ class InvoiceService {
 			$unitPriceCents = (int)($row['unitPriceCents'] ?? 0);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
+			$name = (string)($row['name'] ?? '');
+			if (mb_strlen($name) > 255) {
+				throw new ValidationException('Positionsname darf maximal 255 Zeichen lang sein.');
+			}
+
 			$item = new InvoiceItem();
 			$item->setProductId(isset($row['productId']) && $row['productId'] !== null ? (int)$row['productId'] : null);
-			$item->setName((string)($row['name'] ?? ''));
+			$item->setName($name);
 			$item->setDescription(isset($row['description']) && $row['description'] !== '' ? (string)$row['description'] : null);
 			$item->setQuantity($quantity);
 			$item->setUnitCode((string)($row['unitCode'] ?? InvoiceItem::UNIT_PIECE));
