@@ -1,6 +1,6 @@
 <template>
-	<div class="rechnungswerk-view">
-		<div class="view-header">
+	<div class="rw-view">
+		<div class="rw-view__head">
 			<h2>{{ t('rechnungswerk', 'Produkte') }}</h2>
 			<NcButton variant="primary" @click="openCreate">
 				<template #icon><PlusIcon :size="20" /></template>
@@ -16,27 +16,27 @@
 			<template #icon><PackageVariantIcon :size="20" /></template>
 		</NcEmptyContent>
 
-		<div v-else-if="store.products.length > 0" class="rw-card">
-			<table class="rw-tbl">
+		<div v-else-if="store.products.length > 0" class="rw-table-wrap">
+			<table class="rw-table">
 				<thead>
 					<tr>
 						<th>{{ t('rechnungswerk', 'Name') }}</th>
 						<th>{{ t('rechnungswerk', 'Einheit') }}</th>
-						<th class="r">{{ t('rechnungswerk', 'Preis') }}</th>
-						<th class="r">{{ t('rechnungswerk', 'USt') }}</th>
-						<th class="r" />
+						<th class="num">{{ t('rechnungswerk', 'Preis') }}</th>
+						<th class="num">{{ t('rechnungswerk', 'USt') }}</th>
+						<th class="num" />
 					</tr>
 				</thead>
 				<tbody>
 					<tr v-for="p in store.products" :key="p.id">
 						<td>
 							<strong>{{ p.name }}</strong>
-							<div v-if="p.description" class="muted">{{ p.description }}</div>
+							<div v-if="p.description" class="rw-muted">{{ p.description }}</div>
 						</td>
 						<td>{{ t('rechnungswerk', unitLabel(p.defaultUnitCode)) }}</td>
-						<td class="r">{{ formatCents(p.defaultPriceCents) }}</td>
-						<td class="r">{{ formatTaxRate(p.defaultTaxRateBp) }}</td>
-						<td class="r">
+						<td class="num">{{ formatCents(p.defaultPriceCents) }}</td>
+						<td class="num">{{ formatTaxRate(p.defaultTaxRateBp) }}</td>
+						<td class="num">
 							<NcActions :aria-label="t('rechnungswerk', 'Aktionen')">
 								<NcActionButton @click="openEdit(p)">
 									<template #icon><PencilIcon :size="20" /></template>
@@ -150,50 +150,3 @@ async function confirmDelete() {
 	}
 }
 </script>
-
-<style scoped>
-.rechnungswerk-view {
-	padding: 20px;
-	padding-left: 50px;
-}
-.view-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	margin-bottom: 20px;
-}
-.view-header h2 {
-	margin: 0;
-}
-.rw-card {
-	border: 1px solid var(--color-border);
-	border-radius: var(--border-radius-large);
-	overflow: hidden;
-}
-.rw-tbl {
-	width: 100%;
-	border-collapse: collapse;
-}
-.rw-tbl th,
-.rw-tbl td {
-	padding: 10px 14px;
-	text-align: left;
-	border-bottom: 1px solid var(--color-border);
-}
-.rw-tbl tbody tr:last-child td {
-	border-bottom: none;
-}
-.rw-tbl th {
-	font-weight: 600;
-	color: var(--color-text-maxcontrast);
-	background: var(--color-background-hover);
-}
-.rw-tbl .r {
-	text-align: right;
-}
-.muted {
-	color: var(--color-text-maxcontrast);
-	font-size: 0.9em;
-}
-</style>

@@ -1,52 +1,52 @@
 <template>
-	<div class="rechnungswerk-view">
-		<h2>{{ t('rechnungswerk', 'Einstellungen') }}</h2>
+	<div class="rw-view">
+		<h2 class="rw-settings-title">{{ t('rechnungswerk', 'Einstellungen') }}</h2>
 
 		<NcNoteCard v-if="error" type="error" :text="error" />
 
 		<div v-if="form" class="settings-form">
 			<!-- Firma -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Firma') }}</h3>
-				<label class="field"><span>{{ t('rechnungswerk', 'Firmenname') }}</span>
-					<input v-model="form.companyName" class="input" type="text" /></label>
-				<label class="field"><span>{{ t('rechnungswerk', 'Adresse') }}</span>
-					<textarea v-model="form.companyAddress" class="input" rows="3" /></label>
-				<div class="field-row">
-					<label class="field"><span>{{ t('rechnungswerk', 'USt-IdNr.') }}</span>
-						<input v-model="form.vatId" class="input" type="text" /></label>
-					<label class="field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
-						<input v-model="form.taxNumber" class="input" type="text" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Firmenname') }}</span>
+					<input v-model="form.companyName" class="rw-input" type="text" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Adresse') }}</span>
+					<textarea v-model="form.companyAddress" class="rw-input" rows="3" /></label>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr.') }}</span>
+						<input v-model="form.vatId" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
+						<input v-model="form.taxNumber" class="rw-input" type="text" /></label>
 				</div>
 			</section>
 
 			<!-- Bank -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Bankverbindung') }}</h3>
-				<div class="field-row">
-					<label class="field"><span>{{ t('rechnungswerk', 'IBAN') }}</span>
-						<input v-model="form.iban" class="input" type="text" /></label>
-					<label class="field"><span>{{ t('rechnungswerk', 'BIC') }}</span>
-						<input v-model="form.bic" class="input" type="text" /></label>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'IBAN') }}</span>
+						<input v-model="form.iban" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'BIC') }}</span>
+						<input v-model="form.bic" class="rw-input" type="text" /></label>
 				</div>
-				<label class="field"><span>{{ t('rechnungswerk', 'Bankname') }}</span>
-					<input v-model="form.bankName" class="input" type="text" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Bankname') }}</span>
+					<input v-model="form.bankName" class="rw-input" type="text" /></label>
 			</section>
 
 			<!-- Branding -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Branding') }}</h3>
-				<label class="field field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
+				<label class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
 					<input v-model="form.accentColor" class="color-input" type="color" /></label>
-				<p class="hint">{{ t('rechnungswerk', 'Das Firmenlogo wird mit der PDF-Erzeugung in einer späteren Iteration ergänzt.') }}</p>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Das Firmenlogo wird mit der PDF-Erzeugung in einer späteren Iteration ergänzt.') }}</p>
 			</section>
 
 			<!-- Rechnungsnummer -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Rechnungsnummer') }}</h3>
-				<label class="field"><span>{{ t('rechnungswerk', 'Format') }}</span>
-					<input v-model="form.numberFormat" class="input" type="text" /></label>
-				<p class="hint">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
+					<input v-model="form.numberFormat" class="rw-input" type="text" /></label>
+				<p class="rw-hint">
 					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.') }}
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
@@ -54,7 +54,7 @@
 			</section>
 
 			<!-- Steuer -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Steuer') }}</h3>
 				<NcCheckboxRadioSwitch
 					type="switch"
@@ -62,39 +62,39 @@
 					@update:model-value="onToggleSmallBusiness">
 					{{ t('rechnungswerk', 'Kleinunternehmer nach §19 UStG (kein USt-Ausweis)') }}
 				</NcCheckboxRadioSwitch>
-				<label v-if="!form.smallBusiness" class="field" style="margin-top: 12px;">
+				<label v-if="!form.smallBusiness" class="rw-field" style="margin-top: 12px;">
 					<span>{{ t('rechnungswerk', 'Standard-USt-Satz') }}</span>
-					<select v-model.number="form.defaultTaxRateBp" class="input">
+					<select v-model.number="form.defaultTaxRateBp" class="rw-input">
 						<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
 					</select>
 				</label>
 			</section>
 
 			<!-- Versand -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Versand') }}</h3>
-				<label class="field"><span>{{ t('rechnungswerk', 'DATEV-Upload-Mail') }}</span>
-					<input v-model="form.datevUploadMail" class="input" type="email" /></label>
-				<div class="field-row">
-					<label class="field"><span>{{ t('rechnungswerk', 'Absender-Name') }}</span>
-						<input v-model="form.smtpFromName" class="input" type="text" /></label>
-					<label class="field"><span>{{ t('rechnungswerk', 'Absender-E-Mail') }}</span>
-						<input v-model="form.smtpFromEmail" class="input" type="email" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'DATEV-Upload-Mail') }}</span>
+					<input v-model="form.datevUploadMail" class="rw-input" type="email" /></label>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-Name') }}</span>
+						<input v-model="form.smtpFromName" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-E-Mail') }}</span>
+						<input v-model="form.smtpFromEmail" class="rw-input" type="email" /></label>
 				</div>
 			</section>
 
 			<!-- Standardtexte -->
-			<section class="settings-section">
+			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
-				<label class="field"><span>{{ t('rechnungswerk', 'Anrede') }}</span>
-					<textarea v-model="form.greetingDefault" class="input" rows="2" /></label>
-				<label class="field"><span>{{ t('rechnungswerk', 'Einleitung') }}</span>
-					<textarea v-model="form.introDefault" class="input" rows="2" /></label>
-				<label class="field"><span>{{ t('rechnungswerk', 'Schlusstext') }}</span>
-					<textarea v-model="form.closingDefault" class="input" rows="2" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede') }}</span>
+					<textarea v-model="form.greetingDefault" class="rw-input" rows="2" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Einleitung') }}</span>
+					<textarea v-model="form.introDefault" class="rw-input" rows="2" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext') }}</span>
+					<textarea v-model="form.closingDefault" class="rw-input" rows="2" /></label>
 			</section>
 
-			<div class="save-bar">
+			<div class="rw-action-bar">
 				<NcButton variant="primary" :disabled="store.saving" @click="onSave">
 					<template #icon><ContentSaveIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'Speichern') }}
@@ -220,51 +220,16 @@ function fail(e: unknown, fallback: string) {
 </script>
 
 <style scoped>
-.rechnungswerk-view {
-	padding: 20px;
-	padding-left: 50px;
-	max-width: 760px;
+/* Layout/cards/fields/inputs come from the shared src/css/app.css. */
+.rw-settings-title {
+	margin: 0 0 16px;
+	font-size: 22px;
+	font-weight: 700;
 }
 .settings-form {
 	display: flex;
 	flex-direction: column;
-	gap: 28px;
-}
-.settings-section {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-.settings-section h3 {
-	margin: 0 0 4px;
-	padding-bottom: 6px;
-	border-bottom: 1px solid var(--color-border);
-}
-.field {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-.field--inline {
-	flex-direction: row;
-	align-items: center;
-	gap: 12px;
-}
-.field > span {
-	font-weight: 600;
-	font-size: 0.9em;
-}
-.field-row {
-	display: flex;
 	gap: 16px;
-	flex-wrap: wrap;
-}
-.field-row .field {
-	flex: 1 1 200px;
-}
-.input {
-	width: 100%;
-	box-sizing: border-box;
 }
 .color-input {
 	width: 48px;
@@ -273,19 +238,5 @@ function fail(e: unknown, fallback: string) {
 	border: none;
 	background: none;
 	cursor: pointer;
-}
-.hint {
-	color: var(--color-text-maxcontrast);
-	font-size: 0.9em;
-	margin: 0;
-}
-.save-bar {
-	position: sticky;
-	bottom: 0;
-	display: flex;
-	justify-content: flex-end;
-	padding: 12px 0;
-	background: var(--color-main-background);
-	border-top: 1px solid var(--color-border);
 }
 </style>

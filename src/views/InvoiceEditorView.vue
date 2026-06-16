@@ -1,13 +1,13 @@
 <template>
-	<div class="rechnungswerk-view editor">
-		<div class="editor-top">
+	<div class="rw-view">
+		<div class="rw-editor-head">
 			<NcButton variant="tertiary" @click="backToList">
 				<template #icon><ArrowLeftIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Zurück') }}
 			</NcButton>
 			<h2>
 				{{ headerTitle }}
-				<span v-if="invoice" :class="['chip', `chip--${invoice.status}`]">{{ statusLabel }}</span>
+				<span v-if="invoice" :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
 			</h2>
 		</div>
 
@@ -16,54 +16,54 @@
 			:text="t('rechnungswerk', 'Diese Rechnung ist festgeschrieben und kann nicht mehr geändert werden.')" />
 
 		<!-- Rechnungsdaten -->
-		<section class="section">
+		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Rechnungsdaten') }}</h3>
-			<div class="form-row">
-				<label class="field"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
-					<input class="input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird beim Festschreiben vergeben)')" /></label>
-				<label class="field"><span>{{ t('rechnungswerk', 'Leistungsdatum') }}</span>
-					<input v-model="form.performanceDate" class="input" type="date" :readonly="readonly" /></label>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
+					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird beim Festschreiben vergeben)')" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum') }}</span>
+					<input v-model="form.performanceDate" class="rw-input" type="date" :readonly="readonly" /></label>
 			</div>
 			<details class="more">
 				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)') }}</summary>
-				<div class="form-row">
-					<label class="field"><span>{{ t('rechnungswerk', 'Referenznummer') }}</span>
-						<input v-model="form.referenceNumber" class="input" type="text" :readonly="readonly" /></label>
-					<label class="field"><span>{{ t('rechnungswerk', 'Bestellnummer') }}</span>
-						<input v-model="form.orderNumber" class="input" type="text" :readonly="readonly" /></label>
-					<label class="field"><span>{{ t('rechnungswerk', 'Käuferreferenz / Leitweg-ID (BT-10)') }}</span>
-						<input v-model="form.buyerReference" class="input" type="text" :readonly="readonly"
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Referenznummer') }}</span>
+						<input v-model="form.referenceNumber" class="rw-input" type="text" :readonly="readonly" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Bestellnummer') }}</span>
+						<input v-model="form.orderNumber" class="rw-input" type="text" :readonly="readonly" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Käuferreferenz / Leitweg-ID (BT-10)') }}</span>
+						<input v-model="form.buyerReference" class="rw-input" type="text" :readonly="readonly"
 							:placeholder="t('rechnungswerk', 'nur für öffentliche Auftraggeber')" /></label>
 				</div>
 			</details>
 		</section>
 
 		<!-- Empfänger -->
-		<section class="section">
+		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Empfänger') }}</h3>
-			<div class="form-row">
-				<label class="field"><span>{{ t('rechnungswerk', 'Name') }}</span>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Name') }}</span>
 					<ContactPicker v-if="!readonly" v-model="form.recipientName" @select="onContactSelect" />
-					<input v-else class="input" type="text" readonly :value="form.recipientName" /></label>
-				<label class="field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
-					<input v-model="form.recipientEmail" class="input" type="email" :readonly="readonly" /></label>
+					<input v-else class="rw-input" type="text" readonly :value="form.recipientName" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
+					<input v-model="form.recipientEmail" class="rw-input" type="email" :readonly="readonly" /></label>
 			</div>
-			<div class="form-row">
-				<label class="field"><span>{{ t('rechnungswerk', 'Straße') }}</span>
-					<input v-model="form.recipientAddress" class="input" type="text" :readonly="readonly" /></label>
-				<label class="field field--narrow"><span>{{ t('rechnungswerk', 'PLZ') }}</span>
-					<input v-model="form.recipientPostalCode" class="input" type="text" :readonly="readonly" /></label>
-				<label class="field"><span>{{ t('rechnungswerk', 'Ort') }}</span>
-					<input v-model="form.recipientCity" class="input" type="text" :readonly="readonly" /></label>
-				<label class="field field--narrow"><span>{{ t('rechnungswerk', 'Land') }}</span>
-					<input v-model="form.recipientCountry" class="input" type="text" :readonly="readonly" /></label>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Straße') }}</span>
+					<input v-model="form.recipientAddress" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'PLZ') }}</span>
+					<input v-model="form.recipientPostalCode" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Ort') }}</span>
+					<input v-model="form.recipientCity" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Land') }}</span>
+					<input v-model="form.recipientCountry" class="rw-input" type="text" :readonly="readonly" /></label>
 			</div>
-			<label class="field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
-				<input v-model="form.recipientVatId" class="input" type="text" :readonly="readonly" /></label>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
+				<input v-model="form.recipientVatId" class="rw-input" type="text" :readonly="readonly" /></label>
 		</section>
 
 		<!-- Positionen -->
-		<section class="section">
+		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Positionen') }}</h3>
 			<InvoiceItemsTable
 				v-model:items="items"
@@ -74,19 +74,19 @@
 		</section>
 
 		<!-- Steuer & Summen -->
-		<section class="section">
+		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Steuer & Summen') }}</h3>
-			<div class="totals">
-				<div class="totals__rows">
-					<div class="totals__row">
+			<div class="rw-totals">
+				<div class="rw-kpi-card">
+					<div class="rw-kpi-row">
 						<span>{{ t('rechnungswerk', 'Zwischensumme (netto)') }}</span>
 						<strong>{{ formatCents(totals.subtotalCents) }}</strong>
 					</div>
-					<div v-for="row in totals.taxBreakdown" :key="row.rateBp" class="totals__row muted">
+					<div v-for="row in totals.taxBreakdown" :key="row.rateBp" class="rw-kpi-row rw-kpi-row--muted">
 						<span>{{ t('rechnungswerk', 'USt {rate}', { rate: formatTaxRate(row.rateBp) }) }} ({{ formatCents(row.netCents) }})</span>
 						<span>{{ formatCents(row.taxCents) }}</span>
 					</div>
-					<div class="totals__row totals__row--grand">
+					<div class="rw-kpi-row rw-kpi-row--grand">
 						<span>{{ t('rechnungswerk', 'Gesamt (brutto)') }}</span>
 						<strong>{{ formatCents(totals.totalCents) }}</strong>
 					</div>
@@ -95,16 +95,16 @@
 		</section>
 
 		<!-- Texte -->
-		<section class="section">
+		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Texte') }}</h3>
-			<label class="field"><span>{{ t('rechnungswerk', 'Anrede / Einleitung') }}</span>
-				<textarea v-model="form.greeting" class="input" rows="2" :readonly="readonly" /></label>
-			<label class="field"><span>{{ t('rechnungswerk', 'Schlusstext / Anmerkungen') }}</span>
-				<textarea v-model="form.extraText" class="input" rows="2" :readonly="readonly" /></label>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede / Einleitung') }}</span>
+				<textarea v-model="form.greeting" class="rw-input" rows="2" :readonly="readonly" /></label>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext / Anmerkungen') }}</span>
+				<textarea v-model="form.extraText" class="rw-input" rows="2" :readonly="readonly" /></label>
 		</section>
 
 		<!-- Sticky actions -->
-		<div class="action-bar">
+		<div class="rw-action-bar">
 			<template v-if="!readonly">
 				<NcButton :disabled="saving" @click="save()">{{ t('rechnungswerk', 'Speichern') }}</NcButton>
 				<NcButton variant="primary" :disabled="saving" @click="askFinalize">
@@ -343,54 +343,21 @@ function fail(e: unknown, fallback: string) {
 </script>
 
 <style scoped>
-.rechnungswerk-view {
-	padding: 20px;
-	padding-left: 50px;
-	max-width: 900px;
-	padding-bottom: 80px;
-}
-.editor-top {
+/* Layout/cards/inputs/chips live in the shared src/css/app.css. Only the
+   editor-specific header and the optional-fields disclosure stay local. */
+.rw-editor-head {
 	display: flex;
 	align-items: center;
 	gap: 12px;
-	margin-bottom: 12px;
+	margin-bottom: 16px;
 }
-.editor-top h2 {
+.rw-editor-head h2 {
 	margin: 0;
+	font-size: 22px;
+	font-weight: 700;
 	display: flex;
 	align-items: center;
 	gap: 12px;
-}
-.section {
-	margin-bottom: 28px;
-}
-.section h3 {
-	margin: 0 0 12px;
-	padding-bottom: 6px;
-	border-bottom: 1px solid var(--color-border);
-}
-.form-row {
-	display: flex;
-	gap: 16px;
-	flex-wrap: wrap;
-	margin-bottom: 12px;
-}
-.field {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	flex: 1 1 220px;
-}
-.field--narrow {
-	flex: 0 1 120px;
-}
-.field > span {
-	font-weight: 600;
-	font-size: 0.9em;
-}
-.input {
-	width: 100%;
-	box-sizing: border-box;
 }
 .more {
 	margin-top: 8px;
@@ -398,49 +365,5 @@ function fail(e: unknown, fallback: string) {
 .more summary {
 	cursor: pointer;
 	color: var(--color-text-maxcontrast);
-	margin-bottom: 12px;
 }
-.totals {
-	display: flex;
-	justify-content: flex-end;
-}
-.totals__rows {
-	min-width: 320px;
-}
-.totals__row {
-	display: flex;
-	justify-content: space-between;
-	padding: 6px 0;
-}
-.totals__row.muted {
-	color: var(--color-text-maxcontrast);
-	font-size: 0.92em;
-}
-.totals__row--grand {
-	border-top: 2px solid var(--color-border);
-	margin-top: 4px;
-	font-size: 1.1em;
-}
-.action-bar {
-	position: sticky;
-	bottom: 0;
-	display: flex;
-	justify-content: flex-end;
-	gap: 8px;
-	padding: 12px 0;
-	background: var(--color-main-background);
-	border-top: 1px solid var(--color-border);
-}
-.chip {
-	display: inline-block;
-	padding: 2px 10px;
-	border-radius: 12px;
-	font-size: 0.6em;
-	font-weight: 600;
-	color: #fff;
-	vertical-align: middle;
-}
-.chip--draft { background: #6c757d; }
-.chip--committed { background: #2d7d46; }
-.chip--cancelled { background: #c62828; }
 </style>

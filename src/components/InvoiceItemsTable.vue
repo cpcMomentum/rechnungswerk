@@ -1,15 +1,15 @@
 <template>
 	<div>
-		<div class="rw-card">
-			<table class="items-tbl">
+		<div class="rw-table-wrap">
+			<table class="rw-table rw-table--positions">
 				<colgroup>
-					<col class="col-name">
-					<col class="col-qty">
-					<col class="col-unit">
-					<col class="col-price">
-					<col class="col-tax">
-					<col class="col-sum">
-					<col v-if="!readonly" class="col-actions">
+					<col>
+					<col class="rw-col-qty">
+					<col class="rw-col-unit">
+					<col class="rw-col-price">
+					<col class="rw-col-tax">
+					<col class="rw-col-sum">
+					<col v-if="!readonly" class="rw-col-actions">
 				</colgroup>
 				<thead>
 					<tr>
@@ -25,30 +25,30 @@
 				<tbody>
 					<tr v-for="(item, i) in items" :key="i">
 						<td>
-							<div class="cell-stack">
-								<input v-model="item.name" class="input" type="text"
+							<div class="rw-cell-stack">
+								<input v-model="item.name" class="rw-input" type="text"
 									:readonly="readonly" :placeholder="t('rechnungswerk', 'Leistung')" />
-								<input v-model="item.description" class="input input--sub" type="text"
+								<input v-model="item.description" class="rw-input rw-input--sub" type="text"
 									:readonly="readonly" :placeholder="t('rechnungswerk', 'Beschreibung (optional)')" />
 							</div>
 						</td>
 						<td class="num">
-							<input v-model="item.quantity" class="input input--num" type="text"
+							<input v-model="item.quantity" class="rw-input num" type="text"
 								inputmode="decimal" :readonly="readonly" />
 						</td>
 						<td>
-							<select v-model="item.unitCode" class="input" :disabled="readonly">
+							<select v-model="item.unitCode" class="rw-input" :disabled="readonly">
 								<option v-for="code in UNIT_CODES" :key="code" :value="code">
 									{{ t('rechnungswerk', UNIT_CODE_LABELS[code]) }}
 								</option>
 							</select>
 						</td>
 						<td class="num">
-							<input v-model="item.priceInput" class="input input--num" type="number"
+							<input v-model="item.priceInput" class="rw-input num" type="number"
 								step="0.01" :readonly="readonly" />
 						</td>
 						<td class="num">
-							<select v-model.number="item.taxRateBp" class="input" :disabled="readonly || smallBusiness">
+							<select v-model.number="item.taxRateBp" class="rw-input" :disabled="readonly || smallBusiness">
 								<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
 							</select>
 						</td>
@@ -60,13 +60,15 @@
 						</td>
 					</tr>
 					<tr v-if="items.length === 0">
-						<td :colspan="readonly ? 6 : 7" class="empty">{{ t('rechnungswerk', 'Noch keine Positionen.') }}</td>
+						<td :colspan="readonly ? 6 : 7" class="rw-muted" style="text-align: center; padding: 16px;">
+							{{ t('rechnungswerk', 'Noch keine Positionen.') }}
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 
-		<div v-if="!readonly" class="toolbar">
+		<div v-if="!readonly" class="rw-toolbar">
 			<NcButton @click="add">
 				<template #icon><PlusIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Position hinzufügen') }}
@@ -127,77 +129,3 @@ function remove(index: number) {
 	items.value.splice(index, 1)
 }
 </script>
-
-<style scoped>
-.rw-card {
-	border: 1px solid var(--color-border);
-	border-radius: var(--border-radius-large);
-	overflow-x: auto;
-}
-.items-tbl {
-	width: 100%;
-	min-width: 640px;
-	border-collapse: collapse;
-	table-layout: fixed;
-}
-/* Fixed column widths so the inputs never overlap on narrow viewports. */
-.col-qty { width: 72px; }
-.col-unit { width: 104px; }
-.col-price { width: 120px; }
-.col-tax { width: 88px; }
-.col-sum { width: 104px; }
-.col-actions { width: 48px; }
-.items-tbl th,
-.items-tbl td {
-	padding: 8px 10px;
-	text-align: left;
-	border-bottom: 1px solid var(--color-border);
-	vertical-align: top;
-	overflow: hidden;
-}
-.items-tbl tbody tr:last-child td {
-	border-bottom: none;
-}
-.items-tbl th {
-	font-weight: 600;
-	color: var(--color-text-maxcontrast);
-	background: var(--color-background-hover);
-}
-.items-tbl .num {
-	text-align: right;
-}
-.items-tbl .strong {
-	font-weight: 600;
-	white-space: nowrap;
-}
-/* Force inputs to fit their (fixed-width) cell — NC global input styles set an
-   intrinsic width that would otherwise overflow into the next column. */
-.cell-stack {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	min-width: 0;
-}
-.items-tbl .input {
-	width: 100%;
-	min-width: 0;
-	max-width: 100%;
-	box-sizing: border-box;
-}
-.input--sub {
-	font-size: 0.9em;
-}
-.input--num {
-	text-align: right;
-}
-.empty {
-	text-align: center;
-	color: var(--color-text-maxcontrast);
-	padding: 16px;
-}
-.toolbar {
-	display: flex;
-	gap: 8px;
-	margin-top: 12px;
-}
-</style>
