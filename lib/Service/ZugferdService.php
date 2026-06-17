@@ -384,9 +384,9 @@ class ZugferdService {
 			$rows .= '<tr>'
 				. '<td>' . $e($item->getName()) . $desc . '</td>'
 				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e($this->unitLabel($item->getUnitCode())) . '</td>'
-				. '<td class="num">' . $this->formatMoney($item->getUnitPriceCents()) . '</td>'
+				. '<td class="num">' . $this->formatMoney((int)$item->getUnitPriceCents()) . '</td>'
 				. '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>'
-				. '<td class="num">' . $this->formatMoney($item->getLineTotalCents()) . '</td>'
+				. '<td class="num">' . $this->formatMoney((int)$item->getLineTotalCents()) . '</td>'
 				. '</tr>';
 		}
 
@@ -463,9 +463,9 @@ table.items td.num, table.items th.num { text-align: right; }
   <tbody>{$rows}</tbody>
 </table>
 <div class="totals"><table>
-  <tr><td>Zwischensumme</td><td class="num">{$this->formatMoney($invoice->getSubtotalCents())}</td></tr>
+  <tr><td>Zwischensumme</td><td class="num">{$this->formatMoney((int)$invoice->getSubtotalCents())}</td></tr>
   {$taxRows}
-  <tr class="grand"><td>Gesamtbetrag</td><td class="num">{$this->formatMoney($invoice->getTotalCents())}</td></tr>
+  <tr class="grand"><td>Gesamtbetrag</td><td class="num">{$this->formatMoney((int)$invoice->getTotalCents())}</td></tr>
 </table></div>
 <div class="payment">
   {$greeting}
