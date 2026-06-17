@@ -19,6 +19,7 @@ use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
+use Psr\Log\LoggerInterface;
 
 class InvoiceService {
 
@@ -27,7 +28,9 @@ class InvoiceService {
 		private readonly InvoiceItemMapper $itemMapper,
 		private readonly SettingsService $settingsService,
 		private readonly ZugferdService $zugferdService,
+		private readonly MailService $mailService,
 		private readonly IDBConnection $db,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -187,7 +190,68 @@ class InvoiceService {
 			throw $e;
 		}
 
-		return $this->present($invoice);
+		// Fire-and-forget DATEV hand-off AFTER the invoice is committed: the
+		// invoice is already legally finalised, so a mail failure must never
+		// roll it back — it is only logged. The result is surfaced to the UI.
+		$result = $this->present($invoice);
+		$result['datevMailSent'] = $this->maybeSendToDatev($invoice, $userId);
+		return $result;
+	}
+
+	/**
+	 * Attempt the automatic DATEV hand-off for a freshly committed invoice.
+	 * Returns true if a mail was sent, false if skipped (toggle off / no
+	 * address), null if it was attempted but failed.
+	 */
+	private function maybeSendToDatev(Invoice $invoice, string $userId): ?bool {
+		try {
+			$settings = $this->settingsService->getOrCreate($userId);
+			$target = $settings->getDatevUploadMail();
+			if ($settings->getDatevAutoSend() !== 1 || $target === null || $target === '') {
+				return false;
+			}
+			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings);
+			$number = (string)$invoice->getNumber();
+			$this->mailService->sendInvoicePdf(
+				$target,
+				'ZUGFeRD-Rechnung ' . $number,
+				"Automatische DATEV-Übergabe aus Rechnungswerk.\n\nRechnung: " . $number
+					. "\n\nDie E-Rechnung (ZUGFeRD-PDF) ist als Anhang beigefügt.",
+				$pdf,
+				$number . '.pdf',
+				$settings,
+			);
+			return true;
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: DATEV-Auto-Versand fehlgeschlagen', [
+				'exception' => $e,
+				'invoice' => $invoice->getId(),
+			]);
+			return null;
+		}
+	}
+
+	/**
+	 * Send a committed invoice to a recipient as a ZUGFeRD-PDF mail attachment.
+	 *
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 * @throws ValidationException
+	 */
+	public function sendToCustomer(int $id, string $userId, string $to, string $subject, string $body): void {
+		$invoice = $this->findOwned($id, $userId);
+		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
+			throw new IllegalStateException('Nur festgeschriebene Rechnungen können versendet werden.');
+		}
+		if (trim($subject) === '') {
+			throw new ValidationException('Ein Betreff ist erforderlich.');
+		}
+		$settings = $this->settingsService->getOrCreate($userId);
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings);
+		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings);
 	}
 
 	/**

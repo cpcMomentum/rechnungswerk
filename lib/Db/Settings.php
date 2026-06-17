@@ -48,6 +48,8 @@ use OCP\DB\Types;
  * @method void setDefaultTaxRateBp(int $defaultTaxRateBp)
  * @method ?string getDatevUploadMail()
  * @method void setDatevUploadMail(?string $datevUploadMail)
+ * @method int getDatevAutoSend()
+ * @method void setDatevAutoSend(int $datevAutoSend)
  * @method ?string getSmtpFromName()
  * @method void setSmtpFromName(?string $smtpFromName)
  * @method ?string getSmtpFromEmail()
@@ -82,6 +84,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $smallBusiness = null;
 	protected ?int $defaultTaxRateBp = null;
 	protected ?string $datevUploadMail = null;
+	protected ?int $datevAutoSend = null;
 	protected ?string $smtpFromName = null;
 	protected ?string $smtpFromEmail = null;
 	protected ?string $greetingDefault = null;
@@ -107,6 +110,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
 		$this->addType('datevUploadMail', Types::STRING);
+		$this->addType('datevAutoSend', Types::SMALLINT);
 		$this->addType('smtpFromName', Types::STRING);
 		$this->addType('smtpFromEmail', Types::STRING);
 		$this->addType('greetingDefault', Types::TEXT);
@@ -134,6 +138,7 @@ class Settings extends Entity implements JsonSerializable {
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
 			'datevUploadMail' => $this->getDatevUploadMail(),
+			'datevAutoSend' => (bool)$this->getDatevAutoSend(),
 			'smtpFromName' => $this->getSmtpFromName(),
 			'smtpFromEmail' => $this->getSmtpFromEmail(),
 			'greetingDefault' => $this->getGreetingDefault(),

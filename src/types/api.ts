@@ -141,6 +141,7 @@ export interface Settings {
 	smallBusiness: boolean
 	defaultTaxRateBp: number
 	datevUploadMail: string | null
+	datevAutoSend: boolean
 	smtpFromName: string | null
 	smtpFromEmail: string | null
 	greetingDefault: string | null
