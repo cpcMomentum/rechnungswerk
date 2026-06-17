@@ -114,9 +114,10 @@ class InvoiceController extends Controller {
 		}
 	}
 
-	// GET download opened via a top-level browser navigation (window.open),
-	// which cannot send the CSRF request token. Safe here: read-only and
-	// owner-scoped — an authenticated session is still required (NoAdminRequired).
+	// GET download triggered via an <a download> click; browsers do not attach
+	// custom request headers (including CSRF tokens) on anchor navigations.
+	// Safe here: read-only and owner-scoped — an authenticated session is still
+	// required (NoAdminRequired).
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function download(int $id): Response {
