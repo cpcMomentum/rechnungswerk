@@ -22,6 +22,13 @@ class SettingsService {
 
 	private const SETTINGS_TABLE = 'rechnungswerk_settings';
 
+	/**
+	 * Single central company-settings row. The app is one company per Nextcloud
+	 * instance (It. 6); the per-user model of It. 1–5 is collapsed into one row
+	 * keyed by this constant in owner_user_id.
+	 */
+	public const COMPANY_KEY = '__company__';
+
 	public function __construct(
 		private readonly SettingsMapper $mapper,
 		private readonly IDBConnection $db,
@@ -29,14 +36,14 @@ class SettingsService {
 	}
 
 	/**
-	 * Return the owner's settings, creating a default row on first access.
+	 * Return the central company settings, creating a default row on first access.
 	 */
-	public function getOrCreate(string $userId): Settings {
+	public function getCompany(): Settings {
 		try {
-			return $this->mapper->findByOwner($userId);
+			return $this->mapper->findByOwner(self::COMPANY_KEY);
 		} catch (DoesNotExistException) {
 			$settings = new Settings();
-			$settings->setOwnerUserId($userId);
+			$settings->setOwnerUserId(self::COMPANY_KEY);
 			$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
 			$settings->setNumberCounter(0);
 			$settings->setNumberCounterYear(null);
@@ -50,7 +57,7 @@ class SettingsService {
 				return $this->mapper->insert($settings);
 			} catch (DBException) {
 				// Concurrent first-access: unique constraint hit; return the row that won.
-				return $this->mapper->findByOwner($userId);
+				return $this->mapper->findByOwner(self::COMPANY_KEY);
 			}
 		}
 	}
@@ -58,10 +65,10 @@ class SettingsService {
 	/**
 	 * @param array<string, mixed> $data
 	 */
-	public function save(string $userId, array $data): Settings {
+	public function save(array $data): Settings {
 		$this->validate($data);
 
-		$settings = $this->getOrCreate($userId);
+		$settings = $this->getCompany();
 
 		$stringFields = [
 			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
@@ -135,19 +142,19 @@ class SettingsService {
 	 * Reserve and return the next invoice number for the given year, persisting
 	 * the incremented counter. The counter resets per calendar year.
 	 *
-	 * MUST be called inside a DB transaction owned by the caller. The owner's
-	 * settings row is locked with SELECT ... FOR UPDATE so that concurrent
-	 * commits serialise and can never hand out the same sequential number
-	 * (a duplicate invoice number would violate GoBD).
+	 * MUST be called inside a DB transaction owned by the caller. The central
+	 * company settings row is locked with SELECT ... FOR UPDATE so that
+	 * concurrent commits serialise and can never hand out the same sequential
+	 * number (a duplicate invoice number would violate GoBD).
 	 */
-	public function reserveNextNumber(string $userId, int $year): string {
-		$this->getOrCreate($userId);
+	public function reserveNextNumber(int $year): string {
+		$this->getCompany();
 
-		// Lock the owner's settings row for the rest of the caller's transaction.
+		// Lock the company settings row for the rest of the caller's transaction.
 		$select = $this->db->getQueryBuilder();
 		$select->select('number_counter', 'number_counter_year', 'number_format')
 			->from(self::SETTINGS_TABLE)
-			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter($userId)))
+			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)))
 			->forUpdate();
 		$result = $select->executeQuery();
 		$row = $result->fetch();
@@ -168,7 +175,7 @@ class SettingsService {
 			->set('number_counter', $update->createNamedParameter($next, IQueryBuilder::PARAM_INT))
 			->set('number_counter_year', $update->createNamedParameter($year, IQueryBuilder::PARAM_INT))
 			->set('updated_at', $update->createNamedParameter(new DateTime(), IQueryBuilder::PARAM_DATETIME_MUTABLE))
-			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter($userId)));
+			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter(self::COMPANY_KEY)));
 		$update->executeStatement();
 
 		return InvoiceCalculator::formatNumber($format, $next, $year);

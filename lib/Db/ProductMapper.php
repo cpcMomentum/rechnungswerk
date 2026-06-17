@@ -22,11 +22,14 @@ class ProductMapper extends QBMapper {
 		parent::__construct($db, 'rechnungswerk_product', Product::class);
 	}
 
-	/** @return Product[] */
-	public function findByOwner(string $userId): array {
+	/**
+	 * The shared company product catalog. owner_user_id stays as "created by".
+	 *
+	 * @return Product[]
+	 */
+	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->tableName)
-			->where($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)))
 			->orderBy('name', 'ASC');
 		return $this->findEntities($qb);
 	}
@@ -34,11 +37,10 @@ class ProductMapper extends QBMapper {
 	/**
 	 * @throws DoesNotExistException
 	 */
-	public function findOneByOwner(int $id, string $userId): Product {
+	public function findOne(int $id): Product {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->tableName)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
-			->andWhere($qb->expr()->eq('owner_user_id', $qb->createNamedParameter($userId)));
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		return $this->findEntity($qb);
 	}
 }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Service\PermissionService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -23,6 +24,7 @@ class ContactController extends Controller {
 		IRequest $request,
 		private readonly ?string $userId,
 		private readonly IManager $contactsManager,
+		private readonly PermissionService $permissionService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -34,6 +36,9 @@ class ContactController extends Controller {
 	public function search(string $q = ''): DataResponse {
 		if ($this->userId === null) {
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->hasAccess($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
 		$pattern = trim($q);
 		if ($pattern === '' || !$this->contactsManager->isEnabled()) {
