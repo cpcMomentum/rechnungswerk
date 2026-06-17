@@ -236,6 +236,7 @@ class InvoiceService {
 				$pdf,
 				$number . '.pdf',
 				$settings,
+				$this->settingsService->getSmtpConfig(),
 			);
 			return true;
 		} catch (\Throwable $e) {
@@ -266,7 +267,7 @@ class InvoiceService {
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
-		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings);
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings, $this->settingsService->getSmtpConfig());
 	}
 
 	/**

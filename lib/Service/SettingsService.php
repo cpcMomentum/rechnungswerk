@@ -17,10 +17,13 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception as DBException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use OCP\Security\ICrypto;
 
 class SettingsService {
 
 	private const SETTINGS_TABLE = 'rechnungswerk_settings';
+
+	private const SMTP_SECURITIES = ['none', 'starttls', 'ssl'];
 
 	/**
 	 * Single central company-settings row. The app is one company per Nextcloud
@@ -32,7 +35,39 @@ class SettingsService {
 	public function __construct(
 		private readonly SettingsMapper $mapper,
 		private readonly IDBConnection $db,
+		private readonly ICrypto $crypto,
 	) {
+	}
+
+	/**
+	 * Decrypted SMTP server config for the mailer, or null if no own SMTP
+	 * account is configured (host empty) → caller falls back to Nextcloud's
+	 * system mailer.
+	 *
+	 * @return array{host: string, port: int, security: string, user: string, password: string}|null
+	 */
+	public function getSmtpConfig(): ?array {
+		$s = $this->getCompany();
+		$host = trim((string)$s->getSmtpHost());
+		if ($host === '') {
+			return null;
+		}
+		$password = '';
+		$stored = (string)$s->getSmtpPassword();
+		if ($stored !== '') {
+			try {
+				$password = $this->crypto->decrypt($stored);
+			} catch (\Throwable) {
+				$password = '';
+			}
+		}
+		return [
+			'host' => $host,
+			'port' => (int)($s->getSmtpPort() ?: 587),
+			'security' => $s->getSmtpSecurity() ?: 'starttls',
+			'user' => (string)$s->getSmtpUser(),
+			'password' => $password,
+		];
 	}
 
 	/**
@@ -73,7 +108,8 @@ class SettingsService {
 		$stringFields = [
 			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
 			'bankName', 'accentColor', 'numberFormat', 'datevUploadMail',
-			'smtpFromName', 'smtpFromEmail', 'greetingDefault', 'introDefault', 'closingDefault',
+			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
+			'greetingDefault', 'introDefault', 'closingDefault',
 		];
 		foreach ($stringFields as $field) {
 			if (array_key_exists($field, $data)) {
@@ -92,6 +128,19 @@ class SettingsService {
 		}
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$settings->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);
+		}
+		if (array_key_exists('smtpPort', $data)) {
+			$settings->setSmtpPort($data['smtpPort'] !== null && $data['smtpPort'] !== '' ? (int)$data['smtpPort'] : null);
+		}
+		if (array_key_exists('smtpSecurity', $data)) {
+			$settings->setSmtpSecurity(in_array($data['smtpSecurity'], self::SMTP_SECURITIES, true) ? (string)$data['smtpSecurity'] : 'starttls');
+		}
+		// The password is masked in the API; only overwrite it when a new,
+		// non-empty value is sent (encrypted at rest). An explicit empty string
+		// clears it.
+		if (array_key_exists('smtpPassword', $data)) {
+			$pw = (string)$data['smtpPassword'];
+			$settings->setSmtpPassword($pw !== '' ? $this->crypto->encrypt($pw) : '');
 		}
 		if (($settings->getNumberFormat() ?? '') === '') {
 			$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
@@ -120,6 +169,7 @@ class SettingsService {
 			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'iban' => 34,
 			'bic' => 16, 'bankName' => 255, 'accentColor' => 9, 'numberFormat' => 64,
 			'datevUploadMail' => 255, 'smtpFromName' => 255, 'smtpFromEmail' => 255,
+			'smtpHost' => 255, 'smtpUser' => 255,
 		];
 		foreach ($maxLengths as $field => $max) {
 			if (array_key_exists($field, $data) && $data[$field] !== null && mb_strlen((string)$data[$field]) > $max) {
@@ -129,6 +179,13 @@ class SettingsService {
 
 		if (!empty($data['accentColor']) && !preg_match('/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string)$data['accentColor'])) {
 			throw new ValidationException('Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein.');
+		}
+
+		if (array_key_exists('smtpPort', $data) && $data['smtpPort'] !== null && $data['smtpPort'] !== '') {
+			$port = (int)$data['smtpPort'];
+			if ($port < 1 || $port > 65535) {
+				throw new ValidationException('Der SMTP-Port muss zwischen 1 und 65535 liegen.');
+			}
 		}
 
 		foreach (['datevUploadMail', 'smtpFromEmail'] as $emailField) {

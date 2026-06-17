@@ -91,6 +91,37 @@
 				</div>
 			</section>
 
+			<!-- Eigenes SMTP-Konto -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'Eigenes SMTP-Konto (optional)') }}</h3>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).') }}</p>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Server (Host)') }}</span>
+						<input v-model="form.smtpHost" class="rw-input" type="text" placeholder="smtp.example.com" /></label>
+					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Port') }}</span>
+						<input v-model.number="form.smtpPort" class="rw-input" type="number" placeholder="587" /></label>
+					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Verschlüsselung') }}</span>
+						<select v-model="form.smtpSecurity" class="rw-input">
+							<option value="starttls">STARTTLS</option>
+							<option value="ssl">SSL/TLS</option>
+							<option value="none">{{ t('rechnungswerk', 'Keine') }}</option>
+						</select></label>
+				</div>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Benutzer') }}</span>
+						<input v-model="form.smtpUser" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Passwort') }}</span>
+						<input v-model="smtpPassword" class="rw-input" type="password"
+							:placeholder="form.smtpPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
+				</div>
+				<div class="smtp-test">
+					<NcButton :disabled="!form.smtpHost || testingSmtp" @click="onTestSmtp">
+						{{ t('rechnungswerk', 'Verbindung testen') }}
+					</NcButton>
+					<span v-if="smtpTestResult" :class="['smtp-test__result', smtpTestOk ? 'rw-ok' : 'rw-err']">{{ smtpTestResult }}</span>
+				</div>
+			</section>
+
 			<!-- Standardtexte -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
@@ -175,7 +206,7 @@ import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { TAX_RATES_BP, type Settings } from '@/types/api'
-import type { SettingsSave } from '@/api/settings'
+import { testSmtp, type SettingsSave } from '@/api/settings'
 import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
@@ -198,6 +229,11 @@ const searching = ref(false)
 const savingPerms = ref(false)
 const lastQuery = ref('')
 let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+const smtpPassword = ref('')
+const testingSmtp = ref(false)
+const smtpTestResult = ref('')
+const smtpTestOk = ref(false)
 
 /** Context-aware empty-state text so users know they have to type to search. */
 const noOptionsText = computed(() => {
@@ -285,6 +321,11 @@ function hydrate() {
 		datevAutoSend: s.datevAutoSend,
 		smtpFromName: s.smtpFromName,
 		smtpFromEmail: s.smtpFromEmail,
+		smtpHost: s.smtpHost,
+		smtpPort: s.smtpPort,
+		smtpSecurity: s.smtpSecurity || 'starttls',
+		smtpUser: s.smtpUser,
+		smtpPasswordSet: s.smtpPasswordSet,
 		greetingDefault: s.greetingDefault,
 		introDefault: s.introDefault,
 		closingDefault: s.closingDefault,
@@ -334,16 +375,57 @@ async function onSave() {
 	error.value = ''
 	savingPerms.value = true
 	try {
-		await store.save(form.value as SettingsSave)
-		await updatePermissions({
-			admins: appAdmins.value.map((p) => p.id),
-			users: appUsers.value.map((p) => p.id),
-		})
+		const payload = { ...form.value } as SettingsSave
+		// Only send the SMTP password when the admin typed a new one (it is
+		// masked; an empty field means "keep the stored one").
+		if (smtpPassword.value !== '') {
+			payload.smtpPassword = smtpPassword.value
+		}
+		// Two separate calls (company settings vs access lists). Report which
+		// step failed so a partial save is not silently misread as "all saved".
+		try {
+			await store.save(payload)
+		} catch (e) {
+			fail(e, t('rechnungswerk', 'Speichern der Einstellungen fehlgeschlagen.'))
+			return
+		}
+		try {
+			await updatePermissions({
+				admins: appAdmins.value.map((p) => p.id),
+				users: appUsers.value.map((p) => p.id),
+			})
+		} catch (e) {
+			fail(e, t('rechnungswerk', 'Einstellungen gespeichert, aber die Zugriffsrechte konnten nicht gespeichert werden. Bitte erneut speichern.'))
+			return
+		}
+		smtpPassword.value = ''
 		hydrate()
-	} catch (e) {
-		fail(e, t('rechnungswerk', 'Speichern fehlgeschlagen'))
 	} finally {
 		savingPerms.value = false
+	}
+}
+
+async function onTestSmtp() {
+	if (!form.value?.smtpHost) {
+		return
+	}
+	testingSmtp.value = true
+	smtpTestResult.value = ''
+	try {
+		await testSmtp({
+			host: form.value.smtpHost,
+			port: form.value.smtpPort ?? 587,
+			security: form.value.smtpSecurity || 'starttls',
+			user: form.value.smtpUser ?? '',
+			password: smtpPassword.value,
+		})
+		smtpTestOk.value = true
+		smtpTestResult.value = t('rechnungswerk', 'Verbindung erfolgreich.')
+	} catch (e) {
+		smtpTestOk.value = false
+		smtpTestResult.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Verbindung fehlgeschlagen.')
+	} finally {
+		testingSmtp.value = false
 	}
 }
 
@@ -393,5 +475,19 @@ function fail(e: unknown, fallback: string) {
 }
 .rw-access-desc {
 	margin: 0 0 4px;
+}
+.smtp-test {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 8px;
+}
+.smtp-test__result.rw-ok {
+	color: #2a8c4a;
+	font-weight: 600;
+}
+.smtp-test__result.rw-err {
+	color: #cc4b42;
+	font-weight: 600;
 }
 </style>

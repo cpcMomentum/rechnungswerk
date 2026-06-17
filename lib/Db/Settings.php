@@ -54,6 +54,16 @@ use OCP\DB\Types;
  * @method void setSmtpFromName(?string $smtpFromName)
  * @method ?string getSmtpFromEmail()
  * @method void setSmtpFromEmail(?string $smtpFromEmail)
+ * @method ?string getSmtpHost()
+ * @method void setSmtpHost(?string $smtpHost)
+ * @method ?int getSmtpPort()
+ * @method void setSmtpPort(?int $smtpPort)
+ * @method ?string getSmtpSecurity()
+ * @method void setSmtpSecurity(?string $smtpSecurity)
+ * @method ?string getSmtpUser()
+ * @method void setSmtpUser(?string $smtpUser)
+ * @method ?string getSmtpPassword()
+ * @method void setSmtpPassword(?string $smtpPassword)
  * @method ?string getGreetingDefault()
  * @method void setGreetingDefault(?string $greetingDefault)
  * @method ?string getIntroDefault()
@@ -87,6 +97,11 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $datevAutoSend = null;
 	protected ?string $smtpFromName = null;
 	protected ?string $smtpFromEmail = null;
+	protected ?string $smtpHost = null;
+	protected ?int $smtpPort = null;
+	protected ?string $smtpSecurity = null;
+	protected ?string $smtpUser = null;
+	protected ?string $smtpPassword = null;
 	protected ?string $greetingDefault = null;
 	protected ?string $introDefault = null;
 	protected ?string $closingDefault = null;
@@ -113,6 +128,11 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('datevAutoSend', Types::SMALLINT);
 		$this->addType('smtpFromName', Types::STRING);
 		$this->addType('smtpFromEmail', Types::STRING);
+		$this->addType('smtpHost', Types::STRING);
+		$this->addType('smtpPort', Types::INTEGER);
+		$this->addType('smtpSecurity', Types::STRING);
+		$this->addType('smtpUser', Types::STRING);
+		$this->addType('smtpPassword', Types::TEXT);
 		$this->addType('greetingDefault', Types::TEXT);
 		$this->addType('introDefault', Types::TEXT);
 		$this->addType('closingDefault', Types::TEXT);
@@ -141,6 +161,12 @@ class Settings extends Entity implements JsonSerializable {
 			'datevAutoSend' => (bool)$this->getDatevAutoSend(),
 			'smtpFromName' => $this->getSmtpFromName(),
 			'smtpFromEmail' => $this->getSmtpFromEmail(),
+			'smtpHost' => $this->getSmtpHost(),
+			'smtpPort' => $this->getSmtpPort(),
+			'smtpSecurity' => $this->getSmtpSecurity() ?? 'starttls',
+			'smtpUser' => $this->getSmtpUser(),
+			// Never expose the stored (encrypted) password; only whether one is set.
+			'smtpPasswordSet' => ($this->getSmtpPassword() ?? '') !== '',
 			'greetingDefault' => $this->getGreetingDefault(),
 			'introDefault' => $this->getIntroDefault(),
 			'closingDefault' => $this->getClosingDefault(),

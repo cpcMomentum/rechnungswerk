@@ -6,7 +6,8 @@
   "require": {
     "php": ">=8.2",
     "horstoeko/zugferd": "^1.0",
-    "dompdf/dompdf": "^3.0"
+    "dompdf/dompdf": "^3.0",
+    "phpmailer/phpmailer": "^6.9"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.5"

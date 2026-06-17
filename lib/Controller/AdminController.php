@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Service\MailService;
 use OCA\Rechnungswerk\Service\PermissionService;
+use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -30,10 +32,42 @@ class AdminController extends Controller {
 		IRequest $request,
 		private readonly ?string $userId,
 		private readonly PermissionService $permissionService,
+		private readonly SettingsService $settingsService,
+		private readonly MailService $mailService,
 		private readonly IUserManager $userManager,
 		private readonly IGroupManager $groupManager,
 	) {
 		parent::__construct(Application::APP_ID, $request);
+	}
+
+	/**
+	 * Test an SMTP account (app-admin only). Uses the posted password, or the
+	 * stored one when the field is left blank (it is masked in the API).
+	 */
+	#[NoAdminRequired]
+	public function testSmtp(string $host = '', int $port = 587, string $security = 'starttls', string $user = '', string $password = ''): DataResponse {
+		if (($resp = $this->requireAdmin()) !== null) {
+			return $resp;
+		}
+		if (trim($host) === '') {
+			return new DataResponse(['error' => 'Kein SMTP-Server angegeben.'], Http::STATUS_BAD_REQUEST);
+		}
+		if ($password === '') {
+			$stored = $this->settingsService->getSmtpConfig();
+			$password = $stored['password'] ?? '';
+		}
+		try {
+			$this->mailService->testSmtpConnection([
+				'host' => trim($host),
+				'port' => $port,
+				'security' => $security,
+				'user' => $user,
+				'password' => $password,
+			]);
+			return new DataResponse(['ok' => true]);
+		} catch (\Throwable $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
 	}
 
 	/** Current user's permissions — any logged-in user, so the UI can gate. */
