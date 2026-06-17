@@ -29,7 +29,7 @@ return [
 		['name' => 'product#update',  'url' => '/api/v1/products/{id}', 'verb' => 'PATCH'],
 		['name' => 'product#destroy', 'url' => '/api/v1/products/{id}', 'verb' => 'DELETE'],
 
-		// Settings (one row per owner)
+		// Settings (central company config)
 		['name' => 'settings#show', 'url' => '/api/v1/settings', 'verb' => 'GET'],
 		['name' => 'settings#save', 'url' => '/api/v1/settings', 'verb' => 'PUT'],
 
