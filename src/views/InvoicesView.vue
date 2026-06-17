@@ -33,7 +33,7 @@
 						<td><span :class="['rw-chip', `rw-chip--${inv.status}`]">{{ statusLabel(inv.status) }}</span></td>
 						<td>
 							{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}
-							<span v-if="inv.invoiceType !== 'invoice'" class="rw-pill" :title="typeTooltip(inv)">{{ typeLabel(inv.invoiceType) }}</span>
+							<span v-if="inv.invoiceType !== 'invoice'" v-tooltip="typeTooltip(inv)" class="rw-pill">{{ typeLabel(inv.invoiceType) }}</span>
 						</td>
 						<td>{{ inv.recipientName ?? '—' }}</td>
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>

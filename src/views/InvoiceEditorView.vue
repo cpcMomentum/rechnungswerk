@@ -7,7 +7,7 @@
 			</NcBreadcrumbs>
 			<span v-if="invoice" class="rw-status-group">
 				<span :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
-				<span v-if="invoice.invoiceType !== 'invoice'" class="rw-pill" :title="typeTooltip">{{ typeLabel }}</span>
+				<span v-if="invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
 			</span>
 		</div>
 
