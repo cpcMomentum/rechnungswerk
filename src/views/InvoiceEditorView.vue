@@ -5,7 +5,7 @@
 				<NcBreadcrumb :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }" />
 				<NcBreadcrumb :name="headerTitle" />
 			</NcBreadcrumbs>
-			<span v-if="invoice" :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
+			<span v-if="invoice" :class="['rw-chip', `rw-chip--${chip.variant}`]">{{ t('rechnungswerk', chip.label) }}</span>
 		</div>
 
 		<NcNoteCard v-if="error" type="error" :text="error" />
@@ -195,7 +195,7 @@ import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useProductStore } from '@/stores/productStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { INVOICE_STATUS_LABELS, type ContactMatch, type InvoiceDetail } from '@/types/api'
+import { invoiceChip, type ContactMatch, type InvoiceDetail } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
@@ -241,7 +241,7 @@ const dueDatePreview = computed(() => {
 })
 
 const readonly = computed(() => invoice.value !== null && invoice.value.status !== 'draft')
-const statusLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status]) : '')
+const chip = computed(() => invoice.value ? invoiceChip(invoice.value) : { label: '', variant: '' })
 
 const finalizeMessage = computed(() => {
 	let msg = t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')

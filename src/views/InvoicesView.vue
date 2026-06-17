@@ -30,7 +30,7 @@
 				</thead>
 				<tbody>
 					<tr v-for="inv in store.invoices" :key="inv.id" class="rw-row-clickable" @click="openInvoice(inv.id)">
-						<td><span :class="['rw-chip', `rw-chip--${inv.status}`]">{{ statusLabel(inv.status) }}</span></td>
+						<td><span :class="['rw-chip', `rw-chip--${chip(inv).variant}`]">{{ t('rechnungswerk', chip(inv).label) }}</span></td>
 						<td>{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}</td>
 						<td>{{ inv.recipientName ?? '—' }}</td>
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
@@ -63,14 +63,14 @@ import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { downloadInvoicePdf } from '@/api/invoices'
-import { INVOICE_STATUS_LABELS, type InvoiceStatus } from '@/types/api'
+import { invoiceChip, type Invoice } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
 const router = useRouter()
 const store = useInvoiceStore()
 const error = ref('')
 
-const statusLabel = (s: InvoiceStatus): string => t('rechnungswerk', INVOICE_STATUS_LABELS[s] ?? s)
+const chip = (inv: Invoice): { label: string, variant: string } => invoiceChip(inv)
 
 function formatDate(iso: string | null): string {
 	if (!iso) {

@@ -255,6 +255,9 @@
 .app-rechnungswerk .rw-chip--cancelled {
 	background: #cc4b42;
 }
+.app-rechnungswerk .rw-chip--cancellation {
+	background: #d98a2b;
+}
 
 /* ---- Sticky action bar ---- */
 .app-rechnungswerk .rw-action-bar {
