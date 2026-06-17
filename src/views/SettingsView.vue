@@ -75,6 +75,14 @@
 				<h3>{{ t('rechnungswerk', 'Versand') }}</h3>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'DATEV-Upload-Mail') }}</span>
 					<input v-model="form.datevUploadMail" class="rw-input" type="email" /></label>
+				<NcCheckboxRadioSwitch
+					type="switch"
+					:model-value="form.datevAutoSend"
+					:disabled="!form.datevUploadMail"
+					@update:model-value="onToggleDatevAutoSend">
+					{{ t('rechnungswerk', 'E-Rechnung beim Festschreiben automatisch an DATEV senden') }}
+				</NcCheckboxRadioSwitch>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.') }}</p>
 				<div class="rw-form-row">
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-Name') }}</span>
 						<input v-model="form.smtpFromName" class="rw-input" type="text" /></label>
@@ -109,6 +117,14 @@
 			:confirm-label="t('rechnungswerk', 'Aktivieren')"
 			@close="confirmSmallBusiness = false"
 			@confirm="applySmallBusiness" />
+
+		<ConfirmDialog
+			:open="confirmDatevAutoSend"
+			:name="t('rechnungswerk', 'Automatischen DATEV-Versand aktivieren')"
+			:message="t('rechnungswerk', 'Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?')"
+			:confirm-label="t('rechnungswerk', 'Aktivieren')"
+			@close="confirmDatevAutoSend = false"
+			@confirm="applyDatevAutoSend" />
 	</div>
 </template>
 
@@ -132,6 +148,7 @@ const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
 const error = ref('')
 const confirmSmallBusiness = ref(false)
+const confirmDatevAutoSend = ref(false)
 const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
 const currentYearFromSettings = ref<number | null>(null)
@@ -174,6 +191,7 @@ function hydrate() {
 		smallBusiness: s.smallBusiness,
 		defaultTaxRateBp: s.defaultTaxRateBp,
 		datevUploadMail: s.datevUploadMail,
+		datevAutoSend: s.datevAutoSend,
 		smtpFromName: s.smtpFromName,
 		smtpFromEmail: s.smtpFromEmail,
 		greetingDefault: s.greetingDefault,
@@ -197,6 +215,24 @@ function applySmallBusiness() {
 	confirmSmallBusiness.value = false
 	if (form.value) {
 		form.value.smallBusiness = true
+	}
+}
+
+function onToggleDatevAutoSend(value: boolean) {
+	if (!form.value) {
+		return
+	}
+	if (value) {
+		confirmDatevAutoSend.value = true
+	} else {
+		form.value.datevAutoSend = false
+	}
+}
+
+function applyDatevAutoSend() {
+	confirmDatevAutoSend.value = false
+	if (form.value) {
+		form.value.datevAutoSend = true
 	}
 }
 

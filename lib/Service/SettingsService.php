@@ -41,6 +41,7 @@ class SettingsService {
 			$settings->setNumberCounter(0);
 			$settings->setNumberCounterYear(null);
 			$settings->setSmallBusiness(0);
+			$settings->setDatevAutoSend(0);
 			$settings->setDefaultTaxRateBp(1900);
 			$now = new DateTime();
 			$settings->setCreatedAt($now);
@@ -78,6 +79,9 @@ class SettingsService {
 		}
 		if (array_key_exists('smallBusiness', $data)) {
 			$settings->setSmallBusiness(!empty($data['smallBusiness']) ? 1 : 0);
+		}
+		if (array_key_exists('datevAutoSend', $data)) {
+			$settings->setDatevAutoSend(!empty($data['datevAutoSend']) ? 1 : 0);
 		}
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$settings->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);

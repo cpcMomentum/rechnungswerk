@@ -137,6 +137,26 @@ class InvoiceController extends Controller {
 	}
 
 	#[NoAdminRequired]
+	public function send(int $id, string $to = '', string $subject = '', string $body = ''): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		try {
+			$this->invoiceService->sendToCustomer($id, $this->userId, $to, $subject, $body);
+			return new DataResponse(['sent' => true]);
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		} catch (ValidationException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: invoice mail failed', ['exception' => $e, 'invoice' => $id]);
+			return new DataResponse(['error' => 'Der Versand ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	#[NoAdminRequired]
 	public function cancel(int $id): DataResponse {
 		if ($this->userId === null) {
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);

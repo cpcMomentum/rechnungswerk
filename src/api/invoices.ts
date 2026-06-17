@@ -64,3 +64,12 @@ export const cancelInvoice = (id: number): Promise<InvoiceDetail> =>
 /** Same-origin URL of the ZUGFeRD PDF for a committed invoice (session-authenticated). */
 export const invoicePdfUrl = (id: number): string =>
 	apiUrl(`/invoices/${id}/pdf`)
+
+export interface InvoiceSendInput {
+	to: string
+	subject: string
+	body: string
+}
+
+export const sendInvoice = (id: number, data: InvoiceSendInput): Promise<{ sent: boolean }> =>
+	apiPost<{ sent: boolean }, InvoiceSendInput>(`/invoices/${id}/send`, data)

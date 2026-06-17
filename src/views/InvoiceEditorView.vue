@@ -9,6 +9,7 @@
 		</div>
 
 		<NcNoteCard v-if="error" type="error" :text="error" />
+		<NcNoteCard v-if="notice" type="success" :text="notice" />
 		<NcNoteCard v-if="readonly" type="info"
 			:text="t('rechnungswerk', 'Diese Rechnung ist festgeschrieben und kann nicht mehr geändert werden.')" />
 
@@ -136,9 +137,13 @@
 				</NcButton>
 			</template>
 			<template v-else-if="invoice">
-				<NcButton variant="primary" @click="downloadPdf">
+				<NcButton @click="downloadPdf">
 					<template #icon><DownloadIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'PDF herunterladen') }}
+				</NcButton>
+				<NcButton variant="primary" :disabled="sending" @click="sendDialogOpen = true">
+					<template #icon><SendIcon :size="20" /></template>
+					{{ t('rechnungswerk', 'An Kunde senden') }}
 				</NcButton>
 				<NcButton v-if="invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
 					{{ t('rechnungswerk', 'Stornieren') }}
@@ -148,7 +153,7 @@
 
 		<ConfirmDialog :open="dialog === 'finalize'"
 			:name="t('rechnungswerk', 'Rechnung festschreiben')"
-			:message="t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')"
+			:message="finalizeMessage"
 			:confirm-label="t('rechnungswerk', 'Festschreiben')"
 			@close="dialog = null" @confirm="doFinalize" />
 		<ConfirmDialog :open="dialog === 'delete'"
@@ -161,6 +166,14 @@
 			:message="t('rechnungswerk', 'Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?')"
 			:confirm-label="t('rechnungswerk', 'Stornieren')" destructive
 			@close="dialog = null" @confirm="doCancel" />
+
+		<SendInvoiceDialog
+			:open="sendDialogOpen"
+			:invoice="invoice"
+			:default-body="defaultMailBody"
+			:saving="sending"
+			@close="sendDialogOpen = false"
+			@send="doSend" />
 	</div>
 </template>
 
@@ -174,9 +187,11 @@ import NcBreadcrumbs from '@nextcloud/vue/components/NcBreadcrumbs'
 import NcBreadcrumb from '@nextcloud/vue/components/NcBreadcrumb'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import SendIcon from 'vue-material-design-icons/Send.vue'
 import ContactPicker from '@/components/ContactPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useProductStore } from '@/stores/productStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -184,7 +199,7 @@ import { INVOICE_STATUS_LABELS, type ContactMatch, type InvoiceDetail } from '@/
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
-import { invoicePdfUrl, type InvoiceInput } from '@/api/invoices'
+import { invoicePdfUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -195,7 +210,10 @@ const settingsStore = useSettingsStore()
 const invoice = ref<InvoiceDetail | null>(null)
 const items = ref<EditorItem[]>([emptyItem()])
 const error = ref('')
+const notice = ref('')
 const saving = ref(false)
+const sending = ref(false)
+const sendDialogOpen = ref(false)
 const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 
 const form = reactive({
@@ -224,6 +242,28 @@ const dueDatePreview = computed(() => {
 
 const readonly = computed(() => invoice.value !== null && invoice.value.status !== 'draft')
 const statusLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status]) : '')
+
+const finalizeMessage = computed(() => {
+	let msg = t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')
+	const s = settingsStore.settings
+	if (s?.datevAutoSend && s.datevUploadMail) {
+		msg += '\n\n' + t('rechnungswerk', 'Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet.', { mail: s.datevUploadMail })
+	}
+	return msg
+})
+
+const defaultMailBody = computed(() => {
+	const s = settingsStore.settings
+	const greeting = (invoice.value?.greeting ?? s?.greetingDefault ?? '').trim()
+	const intro = (s?.introDefault ?? '').trim()
+	const closing = (s?.closingDefault ?? '').trim()
+	const parts = [
+		greeting,
+		intro !== '' ? intro : t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).'),
+		closing,
+	].filter(p => p !== '')
+	return parts.join('\n\n')
+})
 const headerTitle = computed(() => invoice.value
 	? (invoice.value.number ?? t('rechnungswerk', 'Entwurf'))
 	: t('rechnungswerk', 'Neue Rechnung'))
@@ -344,11 +384,38 @@ async function doFinalize() {
 	}
 	saving.value = true
 	try {
-		invoice.value = await invoiceStore.commit(saved.id)
+		const committed = await invoiceStore.commit(saved.id)
+		invoice.value = committed
+		notice.value = ''
+		// The commit response carries a transient DATEV hand-off result that is
+		// not part of the persisted invoice — surface it as feedback.
+		const datevMailSent = (committed as InvoiceDetail & { datevMailSent?: boolean | null }).datevMailSent
+		if (datevMailSent === true) {
+			notice.value = t('rechnungswerk', 'Festgeschrieben. E-Rechnung wurde automatisch an DATEV gesendet.')
+		} else if (datevMailSent === null) {
+			error.value = t('rechnungswerk', 'Rechnung festgeschrieben, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden.')
+		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Festschreiben fehlgeschlagen'))
 	} finally {
 		saving.value = false
+	}
+}
+
+async function doSend(data: { to: string, subject: string, body: string }) {
+	if (!invoice.value) {
+		return
+	}
+	sending.value = true
+	error.value = ''
+	try {
+		await sendInvoice(invoice.value.id, data)
+		sendDialogOpen.value = false
+		notice.value = t('rechnungswerk', 'Rechnung an {to} gesendet.', { to: data.to })
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Versand fehlgeschlagen'))
+	} finally {
+		sending.value = false
 	}
 }
 
