@@ -30,8 +30,11 @@
 				</thead>
 				<tbody>
 					<tr v-for="inv in store.invoices" :key="inv.id" class="rw-row-clickable" @click="openInvoice(inv.id)">
-						<td><span :class="['rw-chip', `rw-chip--${chip(inv).variant}`]">{{ t('rechnungswerk', chip(inv).label) }}</span></td>
-						<td>{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}</td>
+						<td><span :class="['rw-chip', `rw-chip--${inv.status}`]">{{ statusLabel(inv.status) }}</span></td>
+						<td>
+							{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}
+							<span v-if="inv.invoiceType !== 'invoice'" class="rw-pill" :title="typeTooltip(inv)">{{ typeLabel(inv.invoiceType) }}</span>
+						</td>
 						<td>{{ inv.recipientName ?? '—' }}</td>
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
@@ -63,14 +66,18 @@ import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { downloadInvoicePdf } from '@/api/invoices'
-import { invoiceChip, type Invoice } from '@/types/api'
+import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type Invoice, type InvoiceStatus, type InvoiceType } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
 const router = useRouter()
 const store = useInvoiceStore()
 const error = ref('')
 
-const chip = (inv: Invoice): { label: string, variant: string } => invoiceChip(inv)
+const statusLabel = (s: InvoiceStatus): string => t('rechnungswerk', INVOICE_STATUS_LABELS[s] ?? s)
+const typeLabel = (type: InvoiceType): string => t('rechnungswerk', INVOICE_TYPE_LABELS[type] ?? type)
+const typeTooltip = (inv: Invoice): string => inv.relatedNumber
+	? t('rechnungswerk', '{type} zu Rechnung {number}', { type: typeLabel(inv.invoiceType), number: inv.relatedNumber })
+	: typeLabel(inv.invoiceType)
 
 function formatDate(iso: string | null): string {
 	if (!iso) {

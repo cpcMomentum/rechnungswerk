@@ -5,7 +5,10 @@
 				<NcBreadcrumb :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }" />
 				<NcBreadcrumb :name="headerTitle" />
 			</NcBreadcrumbs>
-			<span v-if="invoice" :class="['rw-chip', `rw-chip--${chip.variant}`]">{{ t('rechnungswerk', chip.label) }}</span>
+			<span v-if="invoice" class="rw-status-group">
+				<span :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
+				<span v-if="invoice.invoiceType !== 'invoice'" class="rw-pill" :title="typeTooltip">{{ typeLabel }}</span>
+			</span>
 		</div>
 
 		<NcNoteCard v-if="error" type="error" :text="error" />
@@ -195,7 +198,7 @@ import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useProductStore } from '@/stores/productStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { invoiceChip, type ContactMatch, type InvoiceDetail } from '@/types/api'
+import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type ContactMatch, type InvoiceDetail } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
@@ -241,7 +244,16 @@ const dueDatePreview = computed(() => {
 })
 
 const readonly = computed(() => invoice.value !== null && invoice.value.status !== 'draft')
-const chip = computed(() => invoice.value ? invoiceChip(invoice.value) : { label: '', variant: '' })
+const statusLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status]) : '')
+const typeLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_TYPE_LABELS[invoice.value.invoiceType]) : '')
+const typeTooltip = computed(() => {
+	if (!invoice.value) {
+		return ''
+	}
+	return invoice.value.relatedNumber
+		? t('rechnungswerk', '{type} zu Rechnung {number}', { type: typeLabel.value, number: invoice.value.relatedNumber })
+		: typeLabel.value
+})
 
 const finalizeMessage = computed(() => {
 	let msg = t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')

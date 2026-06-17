@@ -34,9 +34,24 @@ class InvoiceService {
 	) {
 	}
 
-	/** @return Invoice[] */
+	/**
+	 * @return array<int, array<string, mixed>> serialized invoices, each with a
+	 *   "relatedNumber" (the original invoice number a storno refers to, or null)
+	 */
 	public function list(string $userId): array {
-		return $this->invoiceMapper->findByOwner($userId);
+		$invoices = $this->invoiceMapper->findByOwner($userId);
+		// Build an id -> number lookup from the same result set so resolving the
+		// storno's original number needs no extra query (no N+1).
+		$numbersById = [];
+		foreach ($invoices as $invoice) {
+			$numbersById[(int)$invoice->getId()] = $invoice->getNumber();
+		}
+		return array_map(static function (Invoice $invoice) use ($numbersById): array {
+			$data = $invoice->jsonSerialize();
+			$relatedId = $invoice->getRelatedInvoiceId();
+			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? null) : null;
+			return $data;
+		}, $invoices);
 	}
 
 	/**
@@ -523,6 +538,7 @@ class InvoiceService {
 	private function present(Invoice $invoice): array {
 		$data = $invoice->jsonSerialize();
 		$data['items'] = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$data['relatedNumber'] = $this->relatedNumber($invoice);
 		return $data;
 	}
 

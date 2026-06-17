@@ -49,19 +49,6 @@ export const INVOICE_TYPE_LABELS: Record<InvoiceType, string> = {
 	credit_note: 'Gutschrift',
 }
 
-/**
- * Status chip shown in the list/editor. A committed storno/credit-note document
- * gets its own label + amber variant so it is not mistaken for a normal
- * committed invoice (only the negative total would otherwise hint at it).
- * Returns the untranslated label (used as a t() key) plus the chip variant.
- */
-export function invoiceChip(inv: { status: InvoiceStatus, invoiceType: InvoiceType }): { label: string, variant: string } {
-	if (inv.status === 'committed' && inv.invoiceType !== 'invoice') {
-		return { label: INVOICE_TYPE_LABELS[inv.invoiceType], variant: 'cancellation' }
-	}
-	return { label: INVOICE_STATUS_LABELS[inv.status], variant: inv.status }
-}
-
 export interface TaxBreakdownRow {
 	rateBp: number
 	netCents: number
@@ -108,6 +95,8 @@ export interface Invoice {
 	orderNumber: string | null
 	buyerReference: string | null
 	relatedInvoiceId: number | null
+	/** Number of the original invoice a storno/credit note refers to. */
+	relatedNumber: string | null
 	subtotalCents: number
 	totalCents: number
 	taxBreakdown: TaxBreakdownRow[]

@@ -4,6 +4,7 @@ OC.L10N.register(
     "„{name}“ wirklich löschen?" : "„{name}“ wirklich löschen?",
     "(Entwurf)" : "(Entwurf)",
     "(wird beim Festschreiben vergeben)" : "(wird beim Festschreiben vergeben)",
+    "{type} zu Rechnung {number}" : "{type} zu Rechnung {number}",
     "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?" : "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?",
     "Abbrechen" : "Abbrechen",
     "Absender-E-Mail" : "Absender-E-Mail",
