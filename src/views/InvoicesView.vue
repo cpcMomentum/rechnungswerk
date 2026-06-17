@@ -62,7 +62,7 @@ import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
-import { invoicePdfUrl } from '@/api/invoices'
+import { downloadInvoicePdf } from '@/api/invoices'
 import { INVOICE_STATUS_LABELS, type InvoiceStatus } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
@@ -94,6 +94,6 @@ function openInvoice(id: number) {
 }
 
 function downloadPdf(id: number) {
-	window.open(invoicePdfUrl(id), '_blank')
+	downloadInvoicePdf(id)
 }
 </script>

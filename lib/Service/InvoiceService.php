@@ -211,7 +211,7 @@ class InvoiceService {
 				return false;
 			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings);
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 			$number = (string)$invoice->getNumber();
 			$this->mailService->sendInvoicePdf(
 				$target,
@@ -249,7 +249,7 @@ class InvoiceService {
 		}
 		$settings = $this->settingsService->getOrCreate($userId);
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings);
+		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings);
 	}
@@ -344,12 +344,29 @@ class InvoiceService {
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getOrCreate($userId);
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings);
+		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
 
 	// --- internals -------------------------------------------------------
+
+	/**
+	 * Resolve the number of the invoice a storno/credit note refers to, so it
+	 * can be printed and embedded as the preceding-invoice reference (BG-3).
+	 */
+	private function relatedNumber(Invoice $invoice): ?string {
+		$relatedId = $invoice->getRelatedInvoiceId();
+		$owner = $invoice->getOwnerUserId();
+		if ($relatedId === null || $owner === null) {
+			return null;
+		}
+		try {
+			return $this->invoiceMapper->findOneByOwner($relatedId, $owner)->getNumber();
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
 
 	/**
 	 * @throws NotFoundException

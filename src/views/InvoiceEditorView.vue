@@ -199,7 +199,7 @@ import { INVOICE_STATUS_LABELS, type ContactMatch, type InvoiceDetail } from '@/
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
-import { invoicePdfUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
+import { downloadInvoicePdf, sendInvoice, type InvoiceInput } from '@/api/invoices'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -373,7 +373,7 @@ function downloadPdf() {
 	if (!invoice.value) {
 		return
 	}
-	window.open(invoicePdfUrl(invoice.value.id), '_blank')
+	downloadInvoicePdf(invoice.value.id)
 }
 
 async function doFinalize() {
