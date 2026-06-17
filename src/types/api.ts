@@ -146,6 +146,11 @@ export interface Settings {
 	datevAutoSend: boolean
 	smtpFromName: string | null
 	smtpFromEmail: string | null
+	smtpHost: string | null
+	smtpPort: number | null
+	smtpSecurity: string
+	smtpUser: string | null
+	smtpPasswordSet: boolean
 	greetingDefault: string | null
 	introDefault: string | null
 	closingDefault: string | null

@@ -41,5 +41,6 @@ return [
 		['name' => 'admin#getPermissions',     'url' => '/api/v1/permissions',         'verb' => 'GET'],
 		['name' => 'admin#updatePermissions',  'url' => '/api/v1/permissions',         'verb' => 'PUT'],
 		['name' => 'admin#searchPrincipals',   'url' => '/api/v1/principals/search',   'verb' => 'GET'],
+		['name' => 'admin#testSmtp',           'url' => '/api/v1/smtp/test',           'verb' => 'POST'],
 	],
 ];

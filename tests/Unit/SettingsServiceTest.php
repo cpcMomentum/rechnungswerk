@@ -15,6 +15,7 @@ use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
+use OCP\Security\ICrypto;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,7 +32,10 @@ class SettingsServiceTest extends TestCase {
 		parent::setUp();
 		$this->mapper = $this->createMock(SettingsMapper::class);
 		$db = $this->createMock(IDBConnection::class);
-		$this->service = new SettingsService($this->mapper, $db);
+		$crypto = $this->createMock(ICrypto::class);
+		$crypto->method('encrypt')->willReturnCallback(static fn (string $v): string => 'enc:' . $v);
+		$crypto->method('decrypt')->willReturnCallback(static fn (string $v): string => str_replace('enc:', '', $v));
+		$this->service = new SettingsService($this->mapper, $db, $crypto);
 	}
 
 	public function testGetCompanyInsertsDefaultsOnFirstAccess(): void {
@@ -63,6 +67,46 @@ class SettingsServiceTest extends TestCase {
 		$this->mapper->method('findByOwner')->willReturn($this->existing());
 		$this->expectException(ValidationException::class);
 		$this->service->save(['accentColor' => 'blau']);
+	}
+
+	public function testSavedSmtpPasswordIsEncryptedAndMasked(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save(['smtpHost' => 'smtp.example.com', 'smtpPassword' => 'secret']);
+
+		$this->assertSame('enc:secret', $saved->getSmtpPassword());
+		$json = $saved->jsonSerialize();
+		$this->assertArrayNotHasKey('smtpPassword', $json);
+		$this->assertTrue($json['smtpPasswordSet']);
+	}
+
+	public function testGetSmtpConfigDecryptsPassword(): void {
+		$s = $this->existing();
+		$s->setSmtpHost('smtp.example.com');
+		$s->setSmtpPort(465);
+		$s->setSmtpSecurity('ssl');
+		$s->setSmtpUser('it@example.com');
+		$s->setSmtpPassword('enc:secret');
+		$this->mapper->method('findByOwner')->willReturn($s);
+
+		$cfg = $this->service->getSmtpConfig();
+		$this->assertNotNull($cfg);
+		$this->assertSame('smtp.example.com', $cfg['host']);
+		$this->assertSame(465, $cfg['port']);
+		$this->assertSame('ssl', $cfg['security']);
+		$this->assertSame('secret', $cfg['password']);
+	}
+
+	public function testGetSmtpConfigIsNullWithoutHost(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->assertNull($this->service->getSmtpConfig());
+	}
+
+	public function testSaveRejectsOutOfRangeSmtpPort(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		$this->service->save(['smtpPort' => 99999]);
 	}
 
 	private function existing(): Settings {
