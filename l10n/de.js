@@ -73,6 +73,7 @@ OC.L10N.register(
     "Nummer" : "Nummer",
     "nur für öffentliche Auftraggeber" : "nur für öffentliche Auftraggeber",
     "Ort" : "Ort",
+    "PDF herunterladen" : "PDF herunterladen",
     "Pauschal" : "Pauschal",
     "Pflege wiederkehrende Leistungen, um sie schnell in Rechnungen zu übernehmen." : "Pflege wiederkehrende Leistungen, um sie schnell in Rechnungen zu übernehmen.",
     "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler." : "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.",

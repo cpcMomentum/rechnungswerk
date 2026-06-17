@@ -73,6 +73,7 @@ OC.L10N.register(
     "Nummer" : "Number",
     "nur für öffentliche Auftraggeber" : "public-sector customers only",
     "Ort" : "City",
+    "PDF herunterladen" : "Download PDF",
     "Pauschal" : "Lump sum",
     "Pflege wiederkehrende Leistungen, um sie schnell in Rechnungen zu übernehmen." : "Maintain recurring services to add them to invoices quickly.",
     "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler." : "Placeholders: {YYYY} year, {YY} 2-digit year, {####} sequential counter.",

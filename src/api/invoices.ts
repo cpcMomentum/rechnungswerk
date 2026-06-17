@@ -4,7 +4,7 @@
  */
 
 import type { Invoice, InvoiceDetail } from '@/types/api'
-import { apiDelete, apiGet, apiPatch, apiPost } from './client'
+import { apiDelete, apiGet, apiPatch, apiPost, apiUrl } from './client'
 
 export interface InvoiceItemInput {
 	productId?: number | null
@@ -60,3 +60,7 @@ export const commitInvoice = (id: number): Promise<InvoiceDetail> =>
 
 export const cancelInvoice = (id: number): Promise<InvoiceDetail> =>
 	apiPost<InvoiceDetail, Record<string, never>>(`/invoices/${id}/cancel`, {})
+
+/** Same-origin URL of the ZUGFeRD PDF for a committed invoice (session-authenticated). */
+export const invoicePdfUrl = (id: number): string =>
+	apiUrl(`/invoices/${id}/pdf`)

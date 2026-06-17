@@ -26,6 +26,7 @@ class InvoiceService {
 		private readonly InvoiceMapper $invoiceMapper,
 		private readonly InvoiceItemMapper $itemMapper,
 		private readonly SettingsService $settingsService,
+		private readonly ZugferdService $zugferdService,
 		private readonly IDBConnection $db,
 	) {
 	}
@@ -262,6 +263,26 @@ class InvoiceService {
 		}
 
 		return $this->present($storno);
+	}
+
+	/**
+	 * Render a committed invoice as a ZUGFeRD PDF/A-3 (visible layout plus the
+	 * embedded EN16931 CII-XML). Drafts have no final number and are rejected.
+	 *
+	 * @return array{filename: string, content: string}
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function generatePdf(int $id, string $userId): array {
+		$invoice = $this->findOwned($id, $userId);
+		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
+			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
+		}
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$settings = $this->settingsService->getOrCreate($userId);
+		$content = $this->zugferdService->generatePdf($invoice, $items, $settings);
+		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
+		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
 
 	// --- internals -------------------------------------------------------

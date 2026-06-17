@@ -25,6 +25,7 @@
 						<th>{{ t('rechnungswerk', 'Empfänger') }}</th>
 						<th>{{ t('rechnungswerk', 'Datum') }}</th>
 						<th class="num">{{ t('rechnungswerk', 'Brutto') }}</th>
+						<th class="rw-col-actions"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -34,6 +35,15 @@
 						<td>{{ inv.recipientName ?? '—' }}</td>
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
+						<td class="rw-col-actions">
+							<NcButton v-if="inv.status !== 'draft'"
+								type="tertiary"
+								:aria-label="t('rechnungswerk', 'PDF herunterladen')"
+								:title="t('rechnungswerk', 'PDF herunterladen')"
+								@click.stop="downloadPdf(inv.id)">
+								<template #icon><DownloadIcon :size="20" /></template>
+							</NcButton>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -50,7 +60,9 @@ import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
+import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
+import { invoicePdfUrl } from '@/api/invoices'
 import { INVOICE_STATUS_LABELS, type InvoiceStatus } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
@@ -79,5 +91,9 @@ function newInvoice() {
 
 function openInvoice(id: number) {
 	router.push({ name: 'invoice-detail', params: { id: String(id) } })
+}
+
+function downloadPdf(id: number) {
+	window.open(invoicePdfUrl(id), '_blank')
 }
 </script>

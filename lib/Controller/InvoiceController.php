@@ -17,8 +17,12 @@ use OCA\Rechnungswerk\Service\InvoiceService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\Response;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class InvoiceController extends Controller {
 
@@ -26,6 +30,7 @@ class InvoiceController extends Controller {
 		IRequest $request,
 		private readonly ?string $userId,
 		private readonly InvoiceService $invoiceService,
+		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -106,6 +111,28 @@ class InvoiceController extends Controller {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+	}
+
+	// GET download opened via a top-level browser navigation (window.open),
+	// which cannot send the CSRF request token. Safe here: read-only and
+	// owner-scoped — an authenticated session is still required (NoAdminRequired).
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function download(int $id): Response {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		try {
+			$pdf = $this->invoiceService->generatePdf($id, $this->userId);
+			return new DataDownloadResponse($pdf['content'], $pdf['filename'], 'application/pdf');
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: PDF generation failed', ['exception' => $e, 'invoice' => $id]);
+			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 

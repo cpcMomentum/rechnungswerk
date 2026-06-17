@@ -135,8 +135,12 @@
 					{{ t('rechnungswerk', 'Löschen') }}
 				</NcButton>
 			</template>
-			<template v-else-if="invoice && invoice.status === 'committed'">
-				<NcButton variant="error" :disabled="saving" @click="askCancel">
+			<template v-else-if="invoice">
+				<NcButton variant="primary" @click="downloadPdf">
+					<template #icon><DownloadIcon :size="20" /></template>
+					{{ t('rechnungswerk', 'PDF herunterladen') }}
+				</NcButton>
+				<NcButton v-if="invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
 					{{ t('rechnungswerk', 'Stornieren') }}
 				</NcButton>
 			</template>
@@ -169,6 +173,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcBreadcrumbs from '@nextcloud/vue/components/NcBreadcrumbs'
 import NcBreadcrumb from '@nextcloud/vue/components/NcBreadcrumb'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
+import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import ContactPicker from '@/components/ContactPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -179,7 +184,7 @@ import { INVOICE_STATUS_LABELS, type ContactMatch, type InvoiceDetail } from '@/
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
-import type { InvoiceInput } from '@/api/invoices'
+import { invoicePdfUrl, type InvoiceInput } from '@/api/invoices'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -322,6 +327,13 @@ function askDelete() {
 }
 function askCancel() {
 	dialog.value = 'cancel'
+}
+
+function downloadPdf() {
+	if (!invoice.value) {
+		return
+	}
+	window.open(invoicePdfUrl(invoice.value.id), '_blank')
 }
 
 async function doFinalize() {
