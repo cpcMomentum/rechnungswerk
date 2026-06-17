@@ -25,15 +25,15 @@ class ProductService {
 	}
 
 	/** @return Product[] */
-	public function list(string $userId): array {
-		return $this->mapper->findByOwner($userId);
+	public function list(): array {
+		return $this->mapper->findAll();
 	}
 
 	/**
 	 * @throws NotFoundException
 	 */
-	public function get(int $id, string $userId): Product {
-		return $this->findOwned($id, $userId);
+	public function get(int $id): Product {
+		return $this->findById($id);
 	}
 
 	/**
@@ -57,8 +57,8 @@ class ProductService {
 	 * @throws NotFoundException
 	 * @throws ValidationException
 	 */
-	public function update(int $id, string $userId, array $data): Product {
-		$product = $this->findOwned($id, $userId);
+	public function update(int $id, array $data): Product {
+		$product = $this->findById($id);
 		$this->validate($data, partial: true);
 		$this->apply($product, $data, false);
 		$product->setUpdatedAt(new DateTime());
@@ -68,17 +68,17 @@ class ProductService {
 	/**
 	 * @throws NotFoundException
 	 */
-	public function delete(int $id, string $userId): void {
-		$product = $this->findOwned($id, $userId);
+	public function delete(int $id): void {
+		$product = $this->findById($id);
 		$this->mapper->delete($product);
 	}
 
 	/**
 	 * @throws NotFoundException
 	 */
-	private function findOwned(int $id, string $userId): Product {
+	private function findById(int $id): Product {
 		try {
-			return $this->mapper->findOneByOwner($id, $userId);
+			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException('Produkt nicht gefunden.');
 		}

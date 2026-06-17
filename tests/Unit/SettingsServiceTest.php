@@ -34,13 +34,13 @@ class SettingsServiceTest extends TestCase {
 		$this->service = new SettingsService($this->mapper, $db);
 	}
 
-	public function testGetOrCreateInsertsDefaultsOnFirstAccess(): void {
+	public function testGetCompanyInsertsDefaultsOnFirstAccess(): void {
 		$this->mapper->method('findByOwner')->willThrowException(new DoesNotExistException('none'));
 		$this->mapper->method('insert')->willReturnArgument(0);
 
-		$settings = $this->service->getOrCreate('alice');
+		$settings = $this->service->getCompany();
 
-		$this->assertSame('alice', $settings->getOwnerUserId());
+		$this->assertSame(SettingsService::COMPANY_KEY, $settings->getOwnerUserId());
 		$this->assertSame(Settings::DEFAULT_NUMBER_FORMAT, $settings->getNumberFormat());
 		$this->assertSame(0, $settings->getNumberCounter());
 		$this->assertSame(0, $settings->getSmallBusiness());
@@ -50,19 +50,19 @@ class SettingsServiceTest extends TestCase {
 	public function testSaveRejectsNumberFormatWithoutCounter(): void {
 		$this->mapper->method('findByOwner')->willReturn($this->existing());
 		$this->expectException(ValidationException::class);
-		$this->service->save('alice', ['numberFormat' => 'RE-{YYYY}']);
+		$this->service->save(['numberFormat' => 'RE-{YYYY}']);
 	}
 
 	public function testSaveRejectsInvalidEmail(): void {
 		$this->mapper->method('findByOwner')->willReturn($this->existing());
 		$this->expectException(ValidationException::class);
-		$this->service->save('alice', ['datevUploadMail' => 'not-an-email']);
+		$this->service->save(['datevUploadMail' => 'not-an-email']);
 	}
 
 	public function testSaveRejectsInvalidAccentColor(): void {
 		$this->mapper->method('findByOwner')->willReturn($this->existing());
 		$this->expectException(ValidationException::class);
-		$this->service->save('alice', ['accentColor' => 'blau']);
+		$this->service->save(['accentColor' => 'blau']);
 	}
 
 	private function existing(): Settings {

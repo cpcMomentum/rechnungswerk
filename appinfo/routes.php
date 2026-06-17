@@ -29,11 +29,17 @@ return [
 		['name' => 'product#update',  'url' => '/api/v1/products/{id}', 'verb' => 'PATCH'],
 		['name' => 'product#destroy', 'url' => '/api/v1/products/{id}', 'verb' => 'DELETE'],
 
-		// Settings (one row per owner)
+		// Settings (central company config)
 		['name' => 'settings#show', 'url' => '/api/v1/settings', 'verb' => 'GET'],
 		['name' => 'settings#save', 'url' => '/api/v1/settings', 'verb' => 'PUT'],
 
 		// Contacts (recipient picker)
 		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],
+
+		// Access control / app admin
+		['name' => 'admin#permissionInfo',     'url' => '/api/v1/permission-info',     'verb' => 'GET'],
+		['name' => 'admin#getPermissions',     'url' => '/api/v1/permissions',         'verb' => 'GET'],
+		['name' => 'admin#updatePermissions',  'url' => '/api/v1/permissions',         'verb' => 'PUT'],
+		['name' => 'admin#searchPrincipals',   'url' => '/api/v1/principals/search',   'verb' => 'GET'],
 	],
 ];

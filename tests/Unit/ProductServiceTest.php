@@ -71,17 +71,17 @@ class ProductServiceTest extends TestCase {
 		$existing = new Product();
 		$existing->setOwnerUserId('alice');
 		$existing->setName('Alt');
-		$this->mapper->method('findOneByOwner')->willReturn($existing);
+		$this->mapper->method('findOne')->willReturn($existing);
 
 		$this->expectException(ValidationException::class);
-		$this->service->update(1, 'alice', ['name' => '']);
+		$this->service->update(1, ['name' => '']);
 	}
 
 	public function testGetUnknownThrowsNotFound(): void {
-		$this->mapper->method('findOneByOwner')
+		$this->mapper->method('findOne')
 			->willThrowException(new DoesNotExistException('nope'));
 
 		$this->expectException(NotFoundException::class);
-		$this->service->get(999, 'alice');
+		$this->service->get(999);
 	}
 }

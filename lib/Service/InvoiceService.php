@@ -38,8 +38,8 @@ class InvoiceService {
 	 * @return array<int, array<string, mixed>> serialized invoices, each with a
 	 *   "relatedNumber" (the original invoice number a storno refers to, or null)
 	 */
-	public function list(string $userId): array {
-		$invoices = $this->invoiceMapper->findByOwner($userId);
+	public function list(): array {
+		$invoices = $this->invoiceMapper->findAll();
 		// Build an id -> number lookup from the same result set so resolving the
 		// storno's original number needs no extra query (no N+1).
 		$numbersById = [];
@@ -58,8 +58,8 @@ class InvoiceService {
 	 * @return array<string, mixed> invoice fields plus an "items" list
 	 * @throws NotFoundException
 	 */
-	public function get(int $id, string $userId): array {
-		$invoice = $this->findOwned($id, $userId);
+	public function get(int $id): array {
+		$invoice = $this->findById($id);
 		return $this->present($invoice);
 	}
 
@@ -76,12 +76,12 @@ class InvoiceService {
 		$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
 		$invoice->setCreatedAt($now);
 		$invoice->setUpdatedAt($now);
-		$this->applyHeader($invoice, $data, $userId);
+		$this->applyHeader($invoice, $data);
 
 		$this->db->beginTransaction();
 		try {
 			$invoice = $this->invoiceMapper->insert($invoice);
-			$this->replaceItems($invoice, $this->extractItems($data, $userId));
+			$this->replaceItems($invoice, $this->extractItems($data));
 			$this->recomputeTotals($invoice);
 			$this->invoiceMapper->update($invoice);
 			$this->db->commit();
@@ -99,20 +99,20 @@ class InvoiceService {
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function update(int $id, string $userId, array $data): array {
+	public function update(int $id, array $data): array {
 		// Fast 404/409 outside the transaction for a quick user-visible error.
-		$this->assertDraft($this->findOwned($id, $userId));
+		$this->assertDraft($this->findById($id));
 
 		$this->db->beginTransaction();
 		try {
 			// Re-read under a row lock so a concurrent commit() cannot slip
 			// between our pre-check and this write and leave a committed
 			// invoice with its status overwritten back to draft.
-			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
-			$this->applyHeader($invoice, $data, $userId);
+			$this->applyHeader($invoice, $data);
 			if (array_key_exists('items', $data)) {
-				$this->replaceItems($invoice, $this->extractItems($data, $userId));
+				$this->replaceItems($invoice, $this->extractItems($data));
 			}
 			$this->recomputeTotals($invoice);
 			$invoice->setUpdatedAt(new DateTime());
@@ -130,15 +130,15 @@ class InvoiceService {
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function delete(int $id, string $userId): void {
-		$this->findOwned($id, $userId); // Fast 404 before opening a transaction.
+	public function delete(int $id): void {
+		$this->findById($id); // Fast 404 before opening a transaction.
 
 		$this->db->beginTransaction();
 		try {
 			// Re-read under a row lock to prevent a concurrent commit() from
 			// slipping through: without this a committed (GoBD-relevant)
 			// invoice could be deleted by a concurrent in-flight delete call.
-			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 			$this->itemMapper->deleteByInvoice((int)$invoice->getId());
 			$this->invoiceMapper->delete($invoice);
@@ -157,8 +157,8 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 * @throws ValidationException
 	 */
-	public function commit(int $id, string $userId): array {
-		$invoice = $this->findOwned($id, $userId);
+	public function commit(int $id): array {
+		$invoice = $this->findById($id);
 		$this->assertDraft($invoice);
 
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
@@ -171,7 +171,7 @@ class InvoiceService {
 
 		// Create the settings row outside the transaction: a failed INSERT would
 		// otherwise abort the commit transaction on PostgreSQL.
-		$this->settingsService->getOrCreate($userId);
+		$this->settingsService->getCompany();
 
 		$now = new DateTime();
 		$year = (int)$now->format('Y');
@@ -182,10 +182,10 @@ class InvoiceService {
 			// transaction. Two concurrent commits on the same draft would
 			// otherwise both pass the pre-check and each reserve a number,
 			// leaving a gap in the sequence (GoBD violation).
-			$invoice = $this->findOwnedForUpdate($id, $userId);
+			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 
-			$number = $this->settingsService->reserveNextNumber($userId, $year);
+			$number = $this->settingsService->reserveNextNumber($year);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
 			$invoice->setIssueDate($now);
@@ -209,7 +209,7 @@ class InvoiceService {
 		// invoice is already legally finalised, so a mail failure must never
 		// roll it back — it is only logged. The result is surfaced to the UI.
 		$result = $this->present($invoice);
-		$result['datevMailSent'] = $this->maybeSendToDatev($invoice, $userId);
+		$result['datevMailSent'] = $this->maybeSendToDatev($invoice);
 		return $result;
 	}
 
@@ -218,9 +218,9 @@ class InvoiceService {
 	 * Returns true if a mail was sent, false if skipped (toggle off / no
 	 * address), null if it was attempted but failed.
 	 */
-	private function maybeSendToDatev(Invoice $invoice, string $userId): ?bool {
+	private function maybeSendToDatev(Invoice $invoice): ?bool {
 		try {
-			$settings = $this->settingsService->getOrCreate($userId);
+			$settings = $this->settingsService->getCompany();
 			$target = $settings->getDatevUploadMail();
 			if ($settings->getDatevAutoSend() !== 1 || $target === null || $target === '') {
 				return false;
@@ -254,15 +254,15 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 * @throws ValidationException
 	 */
-	public function sendToCustomer(int $id, string $userId, string $to, string $subject, string $body): void {
-		$invoice = $this->findOwned($id, $userId);
+	public function sendToCustomer(int $id, string $to, string $subject, string $body): void {
+		$invoice = $this->findById($id);
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können versendet werden.');
 		}
 		if (trim($subject) === '') {
 			throw new ValidationException('Ein Betreff ist erforderlich.');
 		}
-		$settings = $this->settingsService->getOrCreate($userId);
+		$settings = $this->settingsService->getCompany();
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
@@ -278,12 +278,12 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function cancel(int $id, string $userId): array {
-		$original = $this->findOwned($id, $userId);
+		$original = $this->findById($id);
 		if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
 		}
 
-		$this->settingsService->getOrCreate($userId);
+		$this->settingsService->getCompany();
 
 		$now = new DateTime();
 		$year = (int)$now->format('Y');
@@ -292,7 +292,7 @@ class InvoiceService {
 		try {
 			// Lock the original and re-check inside the transaction so a double
 			// cancel cannot create two storno documents for the same invoice.
-			$original = $this->findOwnedForUpdate($id, $userId);
+			$original = $this->findByIdForUpdate($id);
 			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
 				throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
 			}
@@ -311,7 +311,7 @@ class InvoiceService {
 			$storno->setCommittedAt($now);
 			$storno->setCreatedAt($now);
 			$storno->setUpdatedAt($now);
-			$storno->setNumber($this->settingsService->reserveNextNumber($userId, $year));
+			$storno->setNumber($this->settingsService->reserveNextNumber($year));
 			$storno = $this->invoiceMapper->insert($storno);
 
 			foreach ($originalItems as $item) {
@@ -352,13 +352,13 @@ class InvoiceService {
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function generatePdf(int $id, string $userId): array {
-		$invoice = $this->findOwned($id, $userId);
+	public function generatePdf(int $id): array {
+		$invoice = $this->findById($id);
 		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$settings = $this->settingsService->getOrCreate($userId);
+		$settings = $this->settingsService->getCompany();
 		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		return ['filename' => $base . '.pdf', 'content' => $content];
@@ -372,12 +372,11 @@ class InvoiceService {
 	 */
 	private function relatedNumber(Invoice $invoice): ?string {
 		$relatedId = $invoice->getRelatedInvoiceId();
-		$owner = $invoice->getOwnerUserId();
-		if ($relatedId === null || $owner === null) {
+		if ($relatedId === null) {
 			return null;
 		}
 		try {
-			return $this->invoiceMapper->findOneByOwner($relatedId, $owner)->getNumber();
+			return $this->invoiceMapper->findOne($relatedId)->getNumber();
 		} catch (DoesNotExistException) {
 			return null;
 		}
@@ -386,9 +385,9 @@ class InvoiceService {
 	/**
 	 * @throws NotFoundException
 	 */
-	private function findOwned(int $id, string $userId): Invoice {
+	private function findById(int $id): Invoice {
 		try {
-			return $this->invoiceMapper->findOneByOwner($id, $userId);
+			return $this->invoiceMapper->findOne($id);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException('Rechnung nicht gefunden.');
 		}
@@ -397,9 +396,9 @@ class InvoiceService {
 	/**
 	 * @throws NotFoundException
 	 */
-	private function findOwnedForUpdate(int $id, string $userId): Invoice {
+	private function findByIdForUpdate(int $id): Invoice {
 		try {
-			return $this->invoiceMapper->findOneByOwnerForUpdate($id, $userId);
+			return $this->invoiceMapper->findOneForUpdate($id);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException('Rechnung nicht gefunden.');
 		}
@@ -417,7 +416,7 @@ class InvoiceService {
 	/**
 	 * @param array<string, mixed> $data
 	 */
-	private function applyHeader(Invoice $invoice, array $data, string $userId): void {
+	private function applyHeader(Invoice $invoice, array $data): void {
 		$strings = [
 			'recipientName', 'recipientContactId', 'recipientAddress', 'recipientPostalCode',
 			'recipientCity', 'recipientEmail', 'recipientVatId', 'referenceNumber',
@@ -468,12 +467,12 @@ class InvoiceService {
 	 * @param array<string, mixed> $data
 	 * @return InvoiceItem[]
 	 */
-	private function extractItems(array $data, string $userId): array {
+	private function extractItems(array $data): array {
 		$raw = $data['items'] ?? [];
 		if (!is_array($raw)) {
 			return [];
 		}
-		$smallBusiness = $this->settingsService->getOrCreate($userId)->getSmallBusiness() === 1;
+		$smallBusiness = $this->settingsService->getCompany()->getSmallBusiness() === 1;
 
 		$items = [];
 		$sort = 0;

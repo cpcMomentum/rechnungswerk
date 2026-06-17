@@ -14,6 +14,7 @@ use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\InvoiceService;
+use OCA\Rechnungswerk\Service\PermissionService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -30,6 +31,7 @@ class InvoiceController extends Controller {
 		IRequest $request,
 		private readonly ?string $userId,
 		private readonly InvoiceService $invoiceService,
+		private readonly PermissionService $permissionService,
 		private readonly LoggerInterface $logger,
 	) {
 		parent::__construct(Application::APP_ID, $request);
@@ -37,19 +39,19 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function index(): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardAccess()) !== null) {
+			return $r;
 		}
-		return new DataResponse($this->invoiceService->list($this->userId));
+		return new DataResponse($this->invoiceService->list());
 	}
 
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardAccess()) !== null) {
+			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->get($id, $this->userId));
+			return new DataResponse($this->invoiceService->get($id));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		}
@@ -57,8 +59,8 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function create(array $data = []): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
 		}
 		try {
 			return new DataResponse($this->invoiceService->create($this->userId, $data), Http::STATUS_CREATED);
@@ -69,11 +71,11 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function update(int $id, array $data = []): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->update($id, $this->userId, $data));
+			return new DataResponse($this->invoiceService->update($id, $data));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -85,11 +87,11 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
 		}
 		try {
-			$this->invoiceService->delete($id, $this->userId);
+			$this->invoiceService->delete($id);
 			return new DataResponse(null, Http::STATUS_NO_CONTENT);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
@@ -100,11 +102,11 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function commit(int $id): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->commit($id, $this->userId));
+			return new DataResponse($this->invoiceService->commit($id));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -116,16 +118,15 @@ class InvoiceController extends Controller {
 
 	// GET download triggered via an <a download> click; browsers do not attach
 	// custom request headers (including CSRF tokens) on anchor navigations.
-	// Safe here: read-only and owner-scoped — an authenticated session is still
-	// required (NoAdminRequired).
+	// Safe: read-only, access-gated below, authenticated session required.
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function download(int $id): Response {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardAccess()) !== null) {
+			return $r;
 		}
 		try {
-			$pdf = $this->invoiceService->generatePdf($id, $this->userId);
+			$pdf = $this->invoiceService->generatePdf($id);
 			return new DataDownloadResponse($pdf['content'], $pdf['filename'], 'application/pdf');
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
@@ -139,11 +140,11 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function send(int $id, string $to = '', string $subject = '', string $body = ''): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
 		}
 		try {
-			$this->invoiceService->sendToCustomer($id, $this->userId, $to, $subject, $body);
+			$this->invoiceService->sendToCustomer($id, $to, $subject, $body);
 			return new DataResponse(['sent' => true]);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
@@ -159,8 +160,8 @@ class InvoiceController extends Controller {
 
 	#[NoAdminRequired]
 	public function cancel(int $id): DataResponse {
-		if ($this->userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
 		}
 		try {
 			return new DataResponse($this->invoiceService->cancel($id, $this->userId));
@@ -169,5 +170,25 @@ class InvoiceController extends Controller {
 		} catch (IllegalStateException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		}
+	}
+
+	private function guardAccess(): ?DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->hasAccess($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		return null;
+	}
+
+	private function guardEdit(): ?DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->canEdit($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		return null;
 	}
 }

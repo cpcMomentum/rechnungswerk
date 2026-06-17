@@ -102,8 +102,44 @@
 					<textarea v-model="form.closingDefault" class="rw-input" rows="2" /></label>
 			</section>
 
+			<!-- Zugriff & Administration -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
+				<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer Rechnungswerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
+
+				<div class="rw-access-group">
+					<span class="rw-access-label">{{ t('rechnungswerk', 'App-Administratoren') }}</span>
+					<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.') }}</p>
+					<NcSelect v-model="appAdmins"
+						:options="searchResults"
+						:loading="searching"
+						:multiple="true"
+						:close-on-select="false"
+						label="displayName"
+						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+						@search="onPrincipalSearch">
+						<template #no-options>{{ noOptionsText }}</template>
+					</NcSelect>
+				</div>
+
+				<div class="rw-access-group">
+					<span class="rw-access-label">{{ t('rechnungswerk', 'Berechtigte Nutzer') }}</span>
+					<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.') }}</p>
+					<NcSelect v-model="appUsers"
+						:options="searchResults"
+						:loading="searching"
+						:multiple="true"
+						:close-on-select="false"
+						label="displayName"
+						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+						@search="onPrincipalSearch">
+						<template #no-options>{{ noOptionsText }}</template>
+					</NcSelect>
+				</div>
+			</section>
+
 			<div class="rw-action-bar">
-				<NcButton variant="primary" :disabled="store.saving" @click="onSave">
+				<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
 					<template #icon><ContentSaveIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'Speichern') }}
 				</NcButton>
@@ -134,11 +170,13 @@ import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { TAX_RATES_BP, type Settings } from '@/types/api'
 import type { SettingsSave } from '@/api/settings'
+import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
 
@@ -153,6 +191,25 @@ const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
 const currentYearFromSettings = ref<number | null>(null)
 
+const appAdmins = ref<Principal[]>([])
+const appUsers = ref<Principal[]>([])
+const searchResults = ref<Principal[]>([])
+const searching = ref(false)
+const savingPerms = ref(false)
+const lastQuery = ref('')
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+/** Context-aware empty-state text so users know they have to type to search. */
+const noOptionsText = computed(() => {
+	if (searching.value) {
+		return t('rechnungswerk', 'Suche läuft …')
+	}
+	if (lastQuery.value.trim().length < 2) {
+		return t('rechnungswerk', 'Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.')
+	}
+	return t('rechnungswerk', 'Keine Treffer.')
+})
+
 const preview = computed(() => {
 	if (!form.value) {
 		return ''
@@ -165,10 +222,44 @@ onMounted(async () => {
 	try {
 		await store.fetch()
 		hydrate()
+		const perms = await getPermissions()
+		appAdmins.value = idsToPrincipals(perms.admins)
+		appUsers.value = idsToPrincipals(perms.users)
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
 	}
 })
+
+/** Hydrate stored "user:x"/"group:y" ids into picker objects (label = id suffix). */
+function idsToPrincipals(ids: string[]): Principal[] {
+	return ids.map((id) => ({
+		id,
+		type: id.startsWith('group:') ? 'group' : 'user',
+		displayName: id.replace(/^(user|group):/, ''),
+	}))
+}
+
+function onPrincipalSearch(query: string) {
+	lastQuery.value = query
+	if (searchTimer) {
+		clearTimeout(searchTimer)
+	}
+	if (query.trim().length < 2) {
+		searchResults.value = []
+		searching.value = false
+		return
+	}
+	searching.value = true
+	searchTimer = setTimeout(async () => {
+		try {
+			searchResults.value = await searchPrincipals(query.trim())
+		} catch {
+			searchResults.value = []
+		} finally {
+			searching.value = false
+		}
+	}, 300)
+}
 
 function hydrate() {
 	const s = store.settings
@@ -241,11 +332,18 @@ async function onSave() {
 		return
 	}
 	error.value = ''
+	savingPerms.value = true
 	try {
 		await store.save(form.value as SettingsSave)
+		await updatePermissions({
+			admins: appAdmins.value.map((p) => p.id),
+			users: appUsers.value.map((p) => p.id),
+		})
 		hydrate()
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Speichern fehlgeschlagen'))
+	} finally {
+		savingPerms.value = false
 	}
 }
 
@@ -277,5 +375,23 @@ function fail(e: unknown, fallback: string) {
 	border: none;
 	background: none;
 	cursor: pointer;
+}
+/* Access section: description above the picker, clear spacing between groups. */
+.rw-access-intro {
+	margin-bottom: 16px;
+}
+.rw-access-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+.rw-access-group + .rw-access-group {
+	margin-top: 20px;
+}
+.rw-access-label {
+	font-weight: 600;
+}
+.rw-access-desc {
+	margin: 0 0 4px;
 }
 </style>
