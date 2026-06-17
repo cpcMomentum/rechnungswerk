@@ -4,7 +4,9 @@
   "license": "AGPL-3.0-or-later",
   "type": "project",
   "require": {
-    "php": ">=8.2"
+    "php": ">=8.2",
+    "horstoeko/zugferd": "^1.0",
+    "dompdf/dompdf": "^3.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.5"
@@ -24,6 +26,9 @@
   },
   "config": {
     "sort-packages": true,
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2"
+    }
   }
 }

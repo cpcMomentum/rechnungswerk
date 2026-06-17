@@ -19,6 +19,7 @@ return [
 		['name' => 'invoice#destroy', 'url' => '/api/v1/invoices/{id}',        'verb' => 'DELETE'],
 		['name' => 'invoice#commit',  'url' => '/api/v1/invoices/{id}/commit', 'verb' => 'POST'],
 		['name' => 'invoice#cancel',  'url' => '/api/v1/invoices/{id}/cancel', 'verb' => 'POST'],
+		['name' => 'invoice#download', 'url' => '/api/v1/invoices/{id}/pdf',   'verb' => 'GET'],
 
 		// Products
 		['name' => 'product#index',   'url' => '/api/v1/products',      'verb' => 'GET'],
