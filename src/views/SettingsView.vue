@@ -105,27 +105,37 @@
 			<!-- Zugriff & Administration -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Lege fest, wer Rechnungswerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'App-Administratoren') }}</span>
+				<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer Rechnungswerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
+
+				<div class="rw-access-group">
+					<span class="rw-access-label">{{ t('rechnungswerk', 'App-Administratoren') }}</span>
+					<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.') }}</p>
 					<NcSelect v-model="appAdmins"
 						:options="searchResults"
 						:loading="searching"
 						:multiple="true"
 						:close-on-select="false"
 						label="displayName"
-						:placeholder="t('rechnungswerk', 'Benutzer oder Gruppe suchen …')"
-						@search="onPrincipalSearch" /></label>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.') }}</p>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Berechtigte Nutzer') }}</span>
+						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+						@search="onPrincipalSearch">
+						<template #no-options>{{ noOptionsText }}</template>
+					</NcSelect>
+				</div>
+
+				<div class="rw-access-group">
+					<span class="rw-access-label">{{ t('rechnungswerk', 'Berechtigte Nutzer') }}</span>
+					<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.') }}</p>
 					<NcSelect v-model="appUsers"
 						:options="searchResults"
 						:loading="searching"
 						:multiple="true"
 						:close-on-select="false"
 						label="displayName"
-						:placeholder="t('rechnungswerk', 'Benutzer oder Gruppe suchen …')"
-						@search="onPrincipalSearch" /></label>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.') }}</p>
+						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+						@search="onPrincipalSearch">
+						<template #no-options>{{ noOptionsText }}</template>
+					</NcSelect>
+				</div>
 			</section>
 
 			<div class="rw-action-bar">
@@ -186,7 +196,19 @@ const appUsers = ref<Principal[]>([])
 const searchResults = ref<Principal[]>([])
 const searching = ref(false)
 const savingPerms = ref(false)
+const lastQuery = ref('')
 let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+/** Context-aware empty-state text so users know they have to type to search. */
+const noOptionsText = computed(() => {
+	if (searching.value) {
+		return t('rechnungswerk', 'Suche läuft …')
+	}
+	if (lastQuery.value.trim().length < 2) {
+		return t('rechnungswerk', 'Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.')
+	}
+	return t('rechnungswerk', 'Keine Treffer.')
+})
 
 const preview = computed(() => {
 	if (!form.value) {
@@ -218,11 +240,13 @@ function idsToPrincipals(ids: string[]): Principal[] {
 }
 
 function onPrincipalSearch(query: string) {
+	lastQuery.value = query
 	if (searchTimer) {
 		clearTimeout(searchTimer)
 	}
 	if (query.trim().length < 2) {
 		searchResults.value = []
+		searching.value = false
 		return
 	}
 	searching.value = true
@@ -351,5 +375,23 @@ function fail(e: unknown, fallback: string) {
 	border: none;
 	background: none;
 	cursor: pointer;
+}
+/* Access section: description above the picker, clear spacing between groups. */
+.rw-access-intro {
+	margin-bottom: 16px;
+}
+.rw-access-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+.rw-access-group + .rw-access-group {
+	margin-top: 20px;
+}
+.rw-access-label {
+	font-weight: 600;
+}
+.rw-access-desc {
+	margin: 0 0 4px;
 }
 </style>
