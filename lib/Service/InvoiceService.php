@@ -241,7 +241,7 @@ class InvoiceService {
 	 */
 	public function sendToCustomer(int $id, string $userId, string $to, string $subject, string $body): void {
 		$invoice = $this->findOwned($id, $userId);
-		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
+		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können versendet werden.');
 		}
 		if (trim($subject) === '') {
