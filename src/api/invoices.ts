@@ -65,6 +65,23 @@ export const cancelInvoice = (id: number): Promise<InvoiceDetail> =>
 export const invoicePdfUrl = (id: number): string =>
 	apiUrl(`/invoices/${id}/pdf`)
 
+/**
+ * Trigger a browser download of the invoice PDF. Uses a transient anchor with
+ * the `download` attribute rather than window.open() — the latter flickers a
+ * blank tab and is throttled by popup blockers; the anchor lets the server's
+ * `Content-Disposition: attachment` save the file in place.
+ */
+export const downloadInvoicePdf = (id: number): void => {
+	const a = document.createElement('a')
+	a.href = invoicePdfUrl(id)
+	a.download = ''
+	a.rel = 'noopener'
+	a.style.display = 'none'
+	document.body.appendChild(a)
+	a.click()
+	a.remove()
+}
+
 export interface InvoiceSendInput {
 	to: string
 	subject: string

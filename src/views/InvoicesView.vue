@@ -31,7 +31,10 @@
 				<tbody>
 					<tr v-for="inv in store.invoices" :key="inv.id" class="rw-row-clickable" @click="openInvoice(inv.id)">
 						<td><span :class="['rw-chip', `rw-chip--${inv.status}`]">{{ statusLabel(inv.status) }}</span></td>
-						<td>{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}</td>
+						<td>
+							{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}
+							<span v-if="inv.invoiceType !== 'invoice'" v-tooltip="typeTooltip(inv)" class="rw-pill">{{ typeLabel(inv.invoiceType) }}</span>
+						</td>
 						<td>{{ inv.recipientName ?? '—' }}</td>
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
@@ -62,8 +65,8 @@ import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
-import { invoicePdfUrl } from '@/api/invoices'
-import { INVOICE_STATUS_LABELS, type InvoiceStatus } from '@/types/api'
+import { downloadInvoicePdf } from '@/api/invoices'
+import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type Invoice, type InvoiceStatus, type InvoiceType } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
 const router = useRouter()
@@ -71,6 +74,10 @@ const store = useInvoiceStore()
 const error = ref('')
 
 const statusLabel = (s: InvoiceStatus): string => t('rechnungswerk', INVOICE_STATUS_LABELS[s] ?? s)
+const typeLabel = (type: InvoiceType): string => t('rechnungswerk', INVOICE_TYPE_LABELS[type] ?? type)
+const typeTooltip = (inv: Invoice): string => inv.relatedNumber
+	? t('rechnungswerk', '{type} zu Rechnung {number}', { type: typeLabel(inv.invoiceType), number: inv.relatedNumber })
+	: typeLabel(inv.invoiceType)
 
 function formatDate(iso: string | null): string {
 	if (!iso) {
@@ -94,6 +101,6 @@ function openInvoice(id: number) {
 }
 
 function downloadPdf(id: number) {
-	window.open(invoicePdfUrl(id), '_blank')
+	downloadInvoicePdf(id)
 }
 </script>

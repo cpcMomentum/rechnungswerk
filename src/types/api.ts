@@ -95,6 +95,8 @@ export interface Invoice {
 	orderNumber: string | null
 	buyerReference: string | null
 	relatedInvoiceId: number | null
+	/** Number of the original invoice a storno/credit note refers to. */
+	relatedNumber: string | null
 	subtotalCents: number
 	totalCents: number
 	taxBreakdown: TaxBreakdownRow[]

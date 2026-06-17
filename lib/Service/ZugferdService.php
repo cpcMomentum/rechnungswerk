@@ -54,8 +54,8 @@ class ZugferdService {
 	 *
 	 * @param InvoiceItem[] $items
 	 */
-	public function buildXml(Invoice $invoice, array $items, Settings $settings): string {
-		return $this->buildDocument($invoice, $items, $settings)->getContent();
+	public function buildXml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
+		return $this->buildDocument($invoice, $items, $settings, $relatedNumber)->getContent();
 	}
 
 	/**
@@ -63,7 +63,7 @@ class ZugferdService {
 	 *
 	 * @param InvoiceItem[] $items
 	 */
-	public function generatePdf(Invoice $invoice, array $items, Settings $settings): string {
+	public function generatePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
 		// Nextcloud's bootstrap installs a libxml external-entity loader that
 		// returns null for every resolution (base.php), which makes the
 		// simplexml_load_file() call inside horstoeko's PDF metadata builder —
@@ -71,9 +71,9 @@ class ZugferdService {
 		// default loader for the duration of the (fully trusted: our own XML and
 		// the library's shipped assets) PDF assembly, then re-apply the
 		// hardening immediately afterwards.
-		return $this->withDefaultEntityLoader(function () use ($invoice, $items, $settings): string {
-			$document = $this->buildDocument($invoice, $items, $settings);
-			$visiblePdf = $this->renderVisiblePdf($invoice, $items, $settings);
+		return $this->withDefaultEntityLoader(function () use ($invoice, $items, $settings, $relatedNumber): string {
+			$document = $this->buildDocument($invoice, $items, $settings, $relatedNumber);
+			$visiblePdf = $this->renderVisiblePdf($invoice, $items, $settings, $relatedNumber);
 
 			$pdfBuilder = ZugferdDocumentPdfBuilder::fromPdfString($document, $visiblePdf);
 			$pdfBuilder->setAdditionalCreatorTool('Rechnungswerk');
@@ -111,7 +111,7 @@ class ZugferdService {
 	 *
 	 * @param InvoiceItem[] $items
 	 */
-	private function buildDocument(Invoice $invoice, array $items, Settings $settings): ZugferdDocumentBuilder {
+	private function buildDocument(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): ZugferdDocumentBuilder {
 		$smallBusiness = $settings->getSmallBusiness() === 1;
 		$builder = ZugferdDocumentBuilder::createNew(ZugferdProfiles::PROFILE_EN16931);
 
@@ -132,6 +132,11 @@ class ZugferdService {
 			$issueDate,
 			ZugferdCurrencyCodes::EURO,
 		);
+
+		// BG-3 / BT-25: reference to the preceding invoice (storno/credit note).
+		if ($relatedNumber !== null && $relatedNumber !== '') {
+			$builder->setDocumentInvoiceReferencedDocument($relatedNumber);
+		}
 
 		$this->applySeller($builder, $settings);
 		$this->applyBuyer($builder, $invoice);
@@ -326,8 +331,8 @@ class ZugferdService {
 	/**
 	 * @param InvoiceItem[] $items
 	 */
-	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings): string {
-		$html = $this->renderHtml($invoice, $items, $settings);
+	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
+		$html = $this->renderHtml($invoice, $items, $settings, $relatedNumber);
 		$options = new Options();
 		$options->set('defaultFont', 'DejaVu Sans');
 		$options->set('isRemoteEnabled', false);
@@ -341,7 +346,7 @@ class ZugferdService {
 	/**
 	 * @param InvoiceItem[] $items
 	 */
-	private function renderHtml(Invoice $invoice, array $items, Settings $settings): string {
+	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
 		$accent = $this->sanitizeColor($settings->getAccentColor()) ?? '#2c3e50';
 		$logo = $this->loadLogoDataUri($settings);
 		$e = static fn (?string $s): string => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
@@ -369,6 +374,9 @@ class ZugferdService {
 		}
 		if (($invoice->getBuyerReference() ?? '') !== '') {
 			$meta[] = ['Leitweg-ID', $e($invoice->getBuyerReference())];
+		}
+		if ($relatedNumber !== null && $relatedNumber !== '') {
+			$meta[] = ['Storno zu Rechnung', $e($relatedNumber)];
 		}
 		$metaHtml = '';
 		foreach ($meta as [$label, $value]) {

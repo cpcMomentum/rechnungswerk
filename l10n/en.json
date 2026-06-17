@@ -3,6 +3,7 @@
         "„{name}“ wirklich löschen?": "Really delete “{name}”?",
         "(Entwurf)": "(draft)",
         "(wird beim Festschreiben vergeben)": "(assigned on commit)",
+        "{type} zu Rechnung {number}": "{type} for invoice {number}",
         "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?": "From now on, every finalisation will automatically email the e-invoice to the configured DATEV upload address. Continue?",
         "Abbrechen": "Cancel",
         "Absender-E-Mail": "Sender e-mail",

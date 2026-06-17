@@ -143,4 +143,18 @@ class ZugferdServiceTest extends TestCase {
 
 		$this->assertStringContainsString('<ram:TypeCode>381</ram:TypeCode>', $xml);
 	}
+
+	public function testCancellationReferencesOriginalInvoice(): void {
+		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
+		$invoice->setSubtotalCents(-20000);
+		$invoice->setTotalCents(-23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
+		$items = [$this->item(-10000, 1900, -20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings(), 'RE-2026-0001');
+
+		// BG-3 preceding-invoice reference carries the original invoice number.
+		$this->assertStringContainsString('InvoiceReferencedDocument', $xml);
+		$this->assertMatchesRegularExpression('/InvoiceReferencedDocument>.*RE-2026-0001/s', $xml);
+	}
 }

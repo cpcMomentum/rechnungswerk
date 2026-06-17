@@ -34,9 +34,24 @@ class InvoiceService {
 	) {
 	}
 
-	/** @return Invoice[] */
+	/**
+	 * @return array<int, array<string, mixed>> serialized invoices, each with a
+	 *   "relatedNumber" (the original invoice number a storno refers to, or null)
+	 */
 	public function list(string $userId): array {
-		return $this->invoiceMapper->findByOwner($userId);
+		$invoices = $this->invoiceMapper->findByOwner($userId);
+		// Build an id -> number lookup from the same result set so resolving the
+		// storno's original number needs no extra query (no N+1).
+		$numbersById = [];
+		foreach ($invoices as $invoice) {
+			$numbersById[(int)$invoice->getId()] = $invoice->getNumber();
+		}
+		return array_map(static function (Invoice $invoice) use ($numbersById): array {
+			$data = $invoice->jsonSerialize();
+			$relatedId = $invoice->getRelatedInvoiceId();
+			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? null) : null;
+			return $data;
+		}, $invoices);
 	}
 
 	/**
@@ -211,7 +226,7 @@ class InvoiceService {
 				return false;
 			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings);
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 			$number = (string)$invoice->getNumber();
 			$this->mailService->sendInvoicePdf(
 				$target,
@@ -249,7 +264,7 @@ class InvoiceService {
 		}
 		$settings = $this->settingsService->getOrCreate($userId);
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings);
+		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings);
 	}
@@ -344,12 +359,29 @@ class InvoiceService {
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getOrCreate($userId);
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings);
+		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
 
 	// --- internals -------------------------------------------------------
+
+	/**
+	 * Resolve the number of the invoice a storno/credit note refers to, so it
+	 * can be printed and embedded as the preceding-invoice reference (BG-3).
+	 */
+	private function relatedNumber(Invoice $invoice): ?string {
+		$relatedId = $invoice->getRelatedInvoiceId();
+		$owner = $invoice->getOwnerUserId();
+		if ($relatedId === null || $owner === null) {
+			return null;
+		}
+		try {
+			return $this->invoiceMapper->findOneByOwner($relatedId, $owner)->getNumber();
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
 
 	/**
 	 * @throws NotFoundException
@@ -506,6 +538,7 @@ class InvoiceService {
 	private function present(Invoice $invoice): array {
 		$data = $invoice->jsonSerialize();
 		$data['items'] = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$data['relatedNumber'] = $this->relatedNumber($invoice);
 		return $data;
 	}
 
