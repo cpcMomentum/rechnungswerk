@@ -503,7 +503,7 @@ HTML;
 				return null;
 			}
 			$mime = $node->getMimeType();
-			if (!str_starts_with($mime, 'image/')) {
+			if (!in_array($mime, ['image/png', 'image/jpeg', 'image/gif'], true)) {
 				return null;
 			}
 			$content = $node->getContent();
