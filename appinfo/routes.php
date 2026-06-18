@@ -32,6 +32,9 @@ return [
 		// Settings (central company config)
 		['name' => 'settings#show', 'url' => '/api/v1/settings', 'verb' => 'GET'],
 		['name' => 'settings#save', 'url' => '/api/v1/settings', 'verb' => 'PUT'],
+		['name' => 'settings#getLogo',    'url' => '/api/v1/settings/logo', 'verb' => 'GET'],
+		['name' => 'settings#setLogo',    'url' => '/api/v1/settings/logo', 'verb' => 'PUT'],
+		['name' => 'settings#deleteLogo', 'url' => '/api/v1/settings/logo', 'verb' => 'DELETE'],
 
 		// Contacts (recipient picker)
 		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],

@@ -38,7 +38,23 @@
 				<h3>{{ t('rechnungswerk', 'Branding') }}</h3>
 				<label class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
 					<input v-model="form.accentColor" class="color-input" type="color" /></label>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Das Firmenlogo wird mit der PDF-Erzeugung in einer späteren Iteration ergänzt.') }}</p>
+
+				<div class="rw-field">
+					<span>{{ t('rechnungswerk', 'Firmenlogo') }}</span>
+					<div class="rw-logo">
+						<img v-if="form.logoFileId" :src="logoSrc" :alt="t('rechnungswerk', 'Firmenlogo')" class="rw-logo__preview" />
+						<span v-else class="rw-logo__empty">{{ t('rechnungswerk', 'Kein Logo gewählt') }}</span>
+						<div class="rw-logo__actions">
+							<NcButton :disabled="logoBusy" @click="onPickLogo">
+								{{ form.logoFileId ? t('rechnungswerk', 'Logo ändern') : t('rechnungswerk', 'Logo wählen') }}
+							</NcButton>
+							<NcButton v-if="form.logoFileId" variant="tertiary" :disabled="logoBusy" @click="onRemoveLogo">
+								{{ t('rechnungswerk', 'Entfernen') }}
+							</NcButton>
+						</div>
+					</div>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.') }}</p>
+				</div>
 			</section>
 
 			<!-- Rechnungsnummer -->
@@ -206,7 +222,7 @@ import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { TAX_RATES_BP, type Settings } from '@/types/api'
-import { testSmtp, type SettingsSave } from '@/api/settings'
+import { testSmtp, setLogo, deleteLogo, logoUrl, type SettingsSave } from '@/api/settings'
 import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
@@ -234,6 +250,10 @@ const smtpPassword = ref('')
 const testingSmtp = ref(false)
 const smtpTestResult = ref('')
 const smtpTestOk = ref(false)
+
+const logoBusy = ref(false)
+/** Logo preview URL; the file id doubles as a cache-buster so it reloads on change. */
+const logoSrc = computed(() => (form.value?.logoFileId ? logoUrl(form.value.logoFileId) : ''))
 
 /** Context-aware empty-state text so users know they have to type to search. */
 const noOptionsText = computed(() => {
@@ -368,6 +388,50 @@ function applyDatevAutoSend() {
 	}
 }
 
+/** Pick a logo from the user's files (raster image) and store it immediately. */
+function onPickLogo() {
+	OC.dialogs.filepicker(
+		t('rechnungswerk', 'Firmenlogo wählen'),
+		async (path: string) => {
+			if (!path) {
+				return
+			}
+			logoBusy.value = true
+			error.value = ''
+			try {
+				const res = await setLogo(path)
+				if (form.value) {
+					form.value.logoFileId = res.logoFileId
+				}
+			} catch (e) {
+				fail(e, t('rechnungswerk', 'Logo konnte nicht gesetzt werden.'))
+			} finally {
+				logoBusy.value = false
+			}
+		},
+		false,
+		['image/png', 'image/jpeg', 'image/gif'],
+		true,
+		OC.dialogs.FILEPICKER_TYPE_CHOOSE,
+	)
+}
+
+/** Remove the company logo immediately. */
+async function onRemoveLogo() {
+	logoBusy.value = true
+	error.value = ''
+	try {
+		await deleteLogo()
+		if (form.value) {
+			form.value.logoFileId = null
+		}
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Logo konnte nicht entfernt werden.'))
+	} finally {
+		logoBusy.value = false
+	}
+}
+
 async function onSave() {
 	if (!form.value) {
 		return
@@ -489,5 +553,28 @@ function fail(e: unknown, fallback: string) {
 .smtp-test__result.rw-err {
 	color: #cc4b42;
 	font-weight: 600;
+}
+.rw-logo {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-top: 4px;
+}
+.rw-logo__preview {
+	max-width: 180px;
+	max-height: 72px;
+	object-fit: contain;
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius);
+	padding: 6px;
+	background: #ffffff;
+}
+.rw-logo__empty {
+	color: var(--color-text-maxcontrast);
+	font-style: italic;
+}
+.rw-logo__actions {
+	display: flex;
+	gap: 8px;
 }
 </style>

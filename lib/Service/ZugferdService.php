@@ -489,12 +489,15 @@ HTML;
 
 	private function loadLogoDataUri(Settings $settings): ?string {
 		$fileId = $settings->getLogoFileId();
-		if ($fileId === null || $settings->getOwnerUserId() === null) {
+		if ($fileId === null) {
 			return null;
 		}
 		try {
-			$userFolder = $this->rootFolder->getUserFolder($settings->getOwnerUserId());
-			$nodes = $userFolder->getById($fileId);
+			// Resolve globally, not via getUserFolder(): the central company
+			// settings are owned by the COMPANY_KEY sentinel (not a real user),
+			// and the logo is picked from the admin's files. getById() on the
+			// root folder finds the node regardless of owner.
+			$nodes = $this->rootFolder->getById($fileId);
 			$node = $nodes[0] ?? null;
 			if (!$node instanceof File) {
 				return null;
