@@ -197,6 +197,18 @@ class SettingsService {
 	}
 
 	/**
+	 * Persist the company logo file id (or null to clear it). Called only from
+	 * the dedicated logo endpoints, which have already validated that the file
+	 * exists and is an allowed image type.
+	 */
+	public function saveLogoFileId(?int $fileId): Settings {
+		$settings = $this->getCompany();
+		$settings->setLogoFileId($fileId);
+		$settings->setUpdatedAt(new DateTime());
+		return $this->mapper->update($settings);
+	}
+
+	/**
 	 * Reserve and return the next invoice number for the given year, persisting
 	 * the incremented counter. The counter resets per calendar year.
 	 *

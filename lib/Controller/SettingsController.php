@@ -94,7 +94,7 @@ class SettingsController extends Controller {
 		if (!$node instanceof File || !in_array($node->getMimeType(), self::LOGO_MIMES, true)) {
 			return new DataResponse(['error' => 'Bitte ein PNG-, JPEG- oder GIF-Bild wählen.'], Http::STATUS_BAD_REQUEST);
 		}
-		$settings = $this->settingsService->save(['logoFileId' => $node->getId()]);
+		$settings = $this->settingsService->saveLogoFileId($node->getId());
 		return new DataResponse(['logoFileId' => $settings->getLogoFileId()]);
 	}
 
@@ -107,7 +107,7 @@ class SettingsController extends Controller {
 		if (!$this->permissionService->isAdmin($this->userId)) {
 			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
-		$this->settingsService->save(['logoFileId' => null]);
+		$this->settingsService->saveLogoFileId(null);
 		return new DataResponse(['logoFileId' => null]);
 	}
 
