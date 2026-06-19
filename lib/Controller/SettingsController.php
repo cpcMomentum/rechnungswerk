@@ -132,10 +132,16 @@ class SettingsController extends Controller {
 		if (!$node instanceof File) {
 			return new DataResponse(['error' => 'Logo-Datei nicht gefunden.'], Http::STATUS_NOT_FOUND);
 		}
+		// Re-check the type at read time: the underlying file content could have
+		// been replaced after it was picked (the file id stays the same).
+		$mime = $node->getMimeType();
+		if (!in_array($mime, self::LOGO_MIMES, true)) {
+			return new DataResponse(['error' => 'Logo ist kein gültiges Bild.'], Http::STATUS_NOT_FOUND);
+		}
 		return new DataDisplayResponse(
 			$node->getContent(),
 			Http::STATUS_OK,
-			['Content-Type' => $node->getMimeType()],
+			['Content-Type' => $mime],
 		);
 	}
 }

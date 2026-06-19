@@ -440,6 +440,9 @@ async function onSave() {
 	savingPerms.value = true
 	try {
 		const payload = { ...form.value } as SettingsSave
+		// The logo is managed via its own endpoints (setLogo/deleteLogo), not the
+		// generic save — the server ignores logoFileId here, so don't send it.
+		delete payload.logoFileId
 		// Only send the SMTP password when the admin typed a new one (it is
 		// masked; an empty field means "keep the stored one").
 		if (smtpPassword.value !== '') {

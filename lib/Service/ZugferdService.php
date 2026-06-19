@@ -503,6 +503,7 @@ HTML;
 				return null;
 			}
 			$mime = $node->getMimeType();
+			// Match the formats the picker allows and dompdf can embed reliably.
 			if (!in_array($mime, ['image/png', 'image/jpeg', 'image/gif'], true)) {
 				return null;
 			}

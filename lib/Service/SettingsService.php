@@ -117,9 +117,10 @@ class SettingsService {
 				$settings->{'set' . ucfirst($field)}($value !== null ? (string)$value : null);
 			}
 		}
-		if (array_key_exists('logoFileId', $data)) {
-			$settings->setLogoFileId($data['logoFileId'] !== null ? (int)$data['logoFileId'] : null);
-		}
+		// logoFileId is intentionally NOT writable here. The logo is managed only
+		// via the dedicated, validated endpoints (SettingsController::setLogo /
+		// deleteLogo), which verify the file exists and is an allowed image type.
+		// Accepting it on the generic save path would bypass that validation.
 		if (array_key_exists('smallBusiness', $data)) {
 			$settings->setSmallBusiness(!empty($data['smallBusiness']) ? 1 : 0);
 		}
