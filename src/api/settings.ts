@@ -4,7 +4,7 @@
  */
 
 import type { Settings } from '@/types/api'
-import { apiGet, apiPost, apiPut } from './client'
+import { apiDelete, apiGet, apiPost, apiPut, apiUrl } from './client'
 
 export interface SmtpTestInput {
 	host: string
@@ -26,3 +26,18 @@ export const getSettings = (): Promise<Settings> =>
 
 export const saveSettings = (data: SettingsSave): Promise<Settings> =>
 	apiPut<Settings, { data: SettingsSave }>('/settings', { data })
+
+/** Set the company logo from a file path in the admin's Nextcloud files. */
+export const setLogo = (path: string): Promise<{ logoFileId: number | null }> =>
+	apiPut<{ logoFileId: number | null }, { path: string }>('/settings/logo', { path })
+
+/** Remove the company logo. */
+export const deleteLogo = (): Promise<{ logoFileId: number | null }> =>
+	apiDelete<{ logoFileId: number | null }>('/settings/logo')
+
+/**
+ * Absolute URL of the company logo for use in <img src>. The cacheBuster
+ * (the current file id) forces the browser to reload after the logo changes.
+ */
+export const logoUrl = (cacheBuster: number | string): string =>
+	`${apiUrl('/settings/logo')}?v=${cacheBuster}`

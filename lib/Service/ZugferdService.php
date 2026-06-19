@@ -489,18 +489,22 @@ HTML;
 
 	private function loadLogoDataUri(Settings $settings): ?string {
 		$fileId = $settings->getLogoFileId();
-		if ($fileId === null || $settings->getOwnerUserId() === null) {
+		if ($fileId === null) {
 			return null;
 		}
 		try {
-			$userFolder = $this->rootFolder->getUserFolder($settings->getOwnerUserId());
-			$nodes = $userFolder->getById($fileId);
+			// Resolve globally, not via getUserFolder(): the central company
+			// settings are owned by the COMPANY_KEY sentinel (not a real user),
+			// and the logo is picked from the admin's files. getById() on the
+			// root folder finds the node regardless of owner.
+			$nodes = $this->rootFolder->getById($fileId);
 			$node = $nodes[0] ?? null;
 			if (!$node instanceof File) {
 				return null;
 			}
 			$mime = $node->getMimeType();
-			if (!str_starts_with($mime, 'image/')) {
+			// Match the formats the picker allows and dompdf can embed reliably.
+			if (!in_array($mime, ['image/png', 'image/jpeg', 'image/gif'], true)) {
 				return null;
 			}
 			$content = $node->getContent();
