@@ -525,7 +525,14 @@ async function doCancel() {
 	saving.value = true
 	try {
 		const storno = await invoiceStore.cancel(invoice.value.id)
+		const datevMailSent = (storno as InvoiceDetail & { datevMailSent?: boolean | null }).datevMailSent
 		await load(storno.id)
+		notice.value = ''
+		if (datevMailSent === true) {
+			notice.value = t('rechnungswerk', 'Storniert. Der Stornobeleg wurde automatisch an DATEV gesendet.')
+		} else if (datevMailSent === null) {
+			error.value = t('rechnungswerk', 'Storno erstellt, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden.')
+		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Stornieren fehlgeschlagen'))
 	} finally {

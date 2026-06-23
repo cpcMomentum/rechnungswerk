@@ -345,7 +345,13 @@ class InvoiceService {
 			throw $e;
 		}
 
-		return $this->present($storno);
+		// Hand the cancellation document to DATEV as well (same fire-and-forget
+		// rule as commit): the original was already transmitted, so the storno
+		// must follow to keep the DATEV beleg state consistent. A mail failure is
+		// only logged, never rolls back the (legally final) storno.
+		$result = $this->present($storno);
+		$result['datevMailSent'] = $this->maybeSendToDatev($storno);
+		return $result;
 	}
 
 	/**
