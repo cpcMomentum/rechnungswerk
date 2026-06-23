@@ -22,7 +22,7 @@
 			<div class="rw-form-row">
 				<label class="rw-field invoice-no"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
 					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird vergeben)')" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum / von') }}</span>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
 					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'bis (optional)') }}</span>
 					<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
