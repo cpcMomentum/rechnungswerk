@@ -22,28 +22,12 @@
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
 					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird beim Festschreiben vergeben)')" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistung') }}</span>
-					<div class="rw-segmented">
-						<label :class="['rw-seg', { 'rw-seg--active': dateMode === 'date' }]">
-							<input v-model="dateMode" type="radio" value="date" :disabled="readonly" />
-							{{ t('rechnungswerk', 'Datum') }}</label>
-						<label :class="['rw-seg', { 'rw-seg--active': dateMode === 'period' }]">
-							<input v-model="dateMode" type="radio" value="period" :disabled="readonly" />
-							{{ t('rechnungswerk', 'Zeitraum') }}</label>
-					</div></label>
+				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Leistungsdatum / von') }}</span>
+					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
+				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'bis (optional)') }}</span>
+					<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
 			</div>
-			<div class="rw-form-row">
-				<label v-if="dateMode === 'date'" class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Leistungsdatum') }}</span>
-					<input v-model="form.performanceDate" class="rw-input" type="date" :readonly="readonly" /></label>
-				<template v-else>
-					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Leistungszeitraum von') }}</span>
-						<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
-					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'bis') }}</span>
-						<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
-				</template>
-				<span class="rw-field" aria-hidden="true" />
-			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Leistungsdatum oder Leistungszeitraum.') }}</p>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
 			<details class="more">
 				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)') }}</summary>
 				<div class="rw-form-row">
@@ -283,9 +267,6 @@ const TAX_EXEMPT_CASES = ['reverse_charge', 'intra_community', 'export']
 const taxExempt = computed(() =>
 	(settingsStore.settings?.smallBusiness ?? false) || TAX_EXEMPT_CASES.includes(form.specialTaxCase))
 
-// Leistung: entweder ein Einzeldatum oder ein Zeitraum (von/bis) – nie beides.
-const dateMode = ref<'date' | 'period'>('date')
-
 const dueDatePreview = computed(() => {
 	const days = Number.parseInt(String(form.paymentTermDays), 10)
 	if (Number.isNaN(days)) {
@@ -384,10 +365,9 @@ async function load(id: number) {
 	form.sellerContactPerson = detail.sellerContactPerson ?? ''
 	form.sellerContactPhone = detail.sellerContactPhone ?? ''
 	form.sellerContactEmail = detail.sellerContactEmail ?? ''
-	form.performanceDate = detail.performanceDate ?? ''
-	form.performancePeriodStart = detail.performancePeriodStart ?? ''
+	// Single date lives in the first ("von") field; a filled "bis" makes it a period.
+	form.performancePeriodStart = detail.performancePeriodStart ?? detail.performanceDate ?? ''
 	form.performancePeriodEnd = detail.performancePeriodEnd ?? ''
-	dateMode.value = (detail.performancePeriodStart || detail.performancePeriodEnd) ? 'period' : 'date'
 	form.referenceNumber = detail.referenceNumber ?? ''
 	form.orderNumber = detail.orderNumber ?? ''
 	form.buyerReference = detail.buyerReference ?? ''
@@ -414,10 +394,13 @@ function onContactSelect(c: ContactMatch) {
 }
 
 function buildInput(): InvoiceInput {
-	// Send only the active variant so date and period never persist together.
-	const dates = dateMode.value === 'period'
-		? { performanceDate: '', performancePeriodStart: form.performancePeriodStart, performancePeriodEnd: form.performancePeriodEnd }
-		: { performanceDate: form.performanceDate, performancePeriodStart: '', performancePeriodEnd: '' }
+	// Only the first field set → single performance date (BT-72); both fields set
+	// → billing period (BG-14). Never persist both shapes at once.
+	const von = form.performancePeriodStart
+	const bis = form.performancePeriodEnd
+	const dates = (von && bis)
+		? { performanceDate: '', performancePeriodStart: von, performancePeriodEnd: bis }
+		: { performanceDate: von || bis || '', performancePeriodStart: '', performancePeriodEnd: '' }
 	return {
 		...form,
 		...dates,
@@ -588,30 +571,5 @@ function fail(e: unknown, fallback: string) {
 }
 .payterm-days > span {
 	white-space: nowrap;
-}
-/* Compact "Datum / Zeitraum" segmented toggle for the performance date. */
-.rw-segmented {
-	display: inline-flex;
-	gap: 4px;
-	background: var(--color-background-dark);
-	border-radius: var(--border-radius-large, 8px);
-	padding: 3px;
-}
-.rw-seg {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	padding: 4px 12px;
-	border-radius: var(--border-radius, 6px);
-	cursor: pointer;
-	font-size: 0.9em;
-	white-space: nowrap;
-}
-.rw-seg input {
-	margin: 0;
-}
-.rw-seg--active {
-	background: var(--color-main-background);
-	font-weight: bold;
 }
 </style>
