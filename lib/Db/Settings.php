@@ -32,6 +32,12 @@ use OCP\DB\Types;
  * @method void setBic(?string $bic)
  * @method ?string getBankName()
  * @method void setBankName(?string $bankName)
+ * @method ?string getContactPerson()
+ * @method void setContactPerson(?string $contactPerson)
+ * @method ?string getContactPhone()
+ * @method void setContactPhone(?string $contactPhone)
+ * @method ?string getContactEmail()
+ * @method void setContactEmail(?string $contactEmail)
  * @method ?int getLogoFileId()
  * @method void setLogoFileId(?int $logoFileId)
  * @method ?string getAccentColor()
@@ -86,6 +92,9 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?string $iban = null;
 	protected ?string $bic = null;
 	protected ?string $bankName = null;
+	protected ?string $contactPerson = null;
+	protected ?string $contactPhone = null;
+	protected ?string $contactEmail = null;
 	protected ?int $logoFileId = null;
 	protected ?string $accentColor = null;
 	protected ?string $numberFormat = null;
@@ -117,6 +126,9 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('iban', Types::STRING);
 		$this->addType('bic', Types::STRING);
 		$this->addType('bankName', Types::STRING);
+		$this->addType('contactPerson', Types::STRING);
+		$this->addType('contactPhone', Types::STRING);
+		$this->addType('contactEmail', Types::STRING);
 		$this->addType('logoFileId', Types::INTEGER);
 		$this->addType('accentColor', Types::STRING);
 		$this->addType('numberFormat', Types::STRING);
@@ -150,6 +162,9 @@ class Settings extends Entity implements JsonSerializable {
 			'iban' => $this->getIban(),
 			'bic' => $this->getBic(),
 			'bankName' => $this->getBankName(),
+			'contactPerson' => $this->getContactPerson(),
+			'contactPhone' => $this->getContactPhone(),
+			'contactEmail' => $this->getContactEmail(),
 			'logoFileId' => $this->getLogoFileId(),
 			'accentColor' => $this->getAccentColor(),
 			'numberFormat' => $this->getNumberFormat(),

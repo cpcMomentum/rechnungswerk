@@ -138,14 +138,45 @@ class ZugferdService {
 			$builder->setDocumentInvoiceReferencedDocument($relatedNumber);
 		}
 
+		// §19 small business and the special tax cases (reverse charge /
+		// intra-community / export) are all VAT-exempt: one tax category, 0 %.
+		$taxExempt = $smallBusiness || $invoice->isTaxExemptCase();
+		[$exemptCategory, $exemptReason] = $taxExempt
+			? $this->exemptCategoryAndReason($invoice, $smallBusiness)
+			: [null, null];
+
 		$this->applySeller($builder, $settings);
 		$this->applyBuyer($builder, $invoice);
+		$this->applyReferences($builder, $invoice);
 		$this->applyPayment($builder, $invoice, $settings);
-		$this->applyPositions($builder, $items, $smallBusiness);
-		$this->applyTaxBreakdown($builder, $invoice, $smallBusiness);
+		$this->applyPositions($builder, $items, $exemptCategory);
+		$this->applyTaxBreakdown($builder, $invoice, $exemptCategory, $exemptReason);
 		$this->applySummation($builder, $invoice);
 
 		return $builder;
+	}
+
+	/**
+	 * Document-level references and dates: performance date (BT-72), billing
+	 * period (BG-14), buyer order ref (BT-13) and seller/our reference (BT-14).
+	 */
+	private function applyReferences(ZugferdDocumentBuilder $builder, Invoice $invoice): void {
+		$start = $invoice->getPerformancePeriodStart();
+		$end = $invoice->getPerformancePeriodEnd();
+		if ($start !== null && $end !== null) {
+			$builder->setDocumentBillingPeriod($start, $end, null);
+		} elseif ($invoice->getPerformanceDate() !== null) {
+			// BT-72: actual delivery / performance date.
+			$builder->setDocumentSupplyChainEvent($invoice->getPerformanceDate());
+		}
+		if (($invoice->getOrderNumber() ?? '') !== '') {
+			// BT-13: purchase order reference (from the buyer).
+			$builder->setDocumentBuyerOrderReferencedDocument($invoice->getOrderNumber());
+		}
+		if (($invoice->getReferenceNumber() ?? '') !== '') {
+			// BT-14: sales order reference (our own reference).
+			$builder->setDocumentSellerOrderReferencedDocument($invoice->getReferenceNumber());
+		}
 	}
 
 	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings): void {
@@ -165,6 +196,19 @@ class ZugferdService {
 			$addr['city'],
 			ZugferdCountryCodes::GERMANY,
 		);
+		// BG-6: seller contact (name BT-41, phone BT-42, email BT-43).
+		$person = $settings->getContactPerson();
+		$phone = $settings->getContactPhone();
+		$email = $settings->getContactEmail();
+		if (($person ?? '') !== '' || ($phone ?? '') !== '' || ($email ?? '') !== '') {
+			$builder->setDocumentSellerContact(
+				($person ?? '') !== '' ? $person : null,
+				null,
+				($phone ?? '') !== '' ? $phone : null,
+				null,
+				($email ?? '') !== '' ? $email : null,
+			);
+		}
 	}
 
 	private function applyBuyer(ZugferdDocumentBuilder $builder, Invoice $invoice): void {
@@ -183,6 +227,19 @@ class ZugferdService {
 		// BT-10: Leitweg-ID / buyer reference (B2G).
 		if (($invoice->getBuyerReference() ?? '') !== '') {
 			$builder->setDocumentBuyerReference($invoice->getBuyerReference());
+		}
+		// BG-9: buyer contact (name BT-56, phone BT-57, email BT-58).
+		$person = $invoice->getRecipientContactPerson();
+		$phone = $invoice->getRecipientPhone();
+		$email = $invoice->getRecipientEmail();
+		if (($person ?? '') !== '' || ($phone ?? '') !== '' || ($email ?? '') !== '') {
+			$builder->setDocumentBuyerContact(
+				($person ?? '') !== '' ? $person : null,
+				null,
+				($phone ?? '') !== '' ? $phone : null,
+				null,
+				($email ?? '') !== '' ? $email : null,
+			);
 		}
 	}
 
@@ -204,8 +261,9 @@ class ZugferdService {
 
 	/**
 	 * @param InvoiceItem[] $items
+	 * @param ?string $exemptCategory non-null = VAT-exempt case; this category at 0 % is used for every line
 	 */
-	private function applyPositions(ZugferdDocumentBuilder $builder, array $items, bool $smallBusiness): void {
+	private function applyPositions(ZugferdDocumentBuilder $builder, array $items, ?string $exemptCategory): void {
 		$line = 0;
 		foreach ($items as $item) {
 			$line++;
@@ -219,24 +277,39 @@ class ZugferdService {
 				$this->quantityToFloat($item->getQuantity()),
 				$item->getUnitCode() ?? InvoiceItem::UNIT_PIECE,
 			);
-			[$category, $rate] = $this->vatCategory((int)$item->getTaxRateBp(), $smallBusiness);
-			$builder->addDocumentPositionTax($category, ZugferdVatTypeCodes::VALUE_ADDED_TAX, $rate);
+			if ($exemptCategory !== null) {
+				$builder->addDocumentPositionTax($exemptCategory, ZugferdVatTypeCodes::VALUE_ADDED_TAX, 0.0);
+			} else {
+				[$category, $rate] = $this->vatCategory((int)$item->getTaxRateBp());
+				$builder->addDocumentPositionTax($category, ZugferdVatTypeCodes::VALUE_ADDED_TAX, $rate);
+			}
 			$builder->setDocumentPositionLineSummation($this->toEuro($item->getLineTotalCents()));
 		}
 	}
 
-	private function applyTaxBreakdown(ZugferdDocumentBuilder $builder, Invoice $invoice, bool $smallBusiness): void {
+	private function applyTaxBreakdown(ZugferdDocumentBuilder $builder, Invoice $invoice, ?string $exemptCategory, ?string $exemptReason): void {
+		if ($exemptCategory !== null) {
+			// VAT-exempt: a single tax group over the whole net amount at 0 %,
+			// with the EN16931 exemption reason text.
+			$builder->addDocumentTax(
+				$exemptCategory,
+				ZugferdVatTypeCodes::VALUE_ADDED_TAX,
+				$this->toEuro((int)$invoice->getSubtotalCents()),
+				0.0,
+				0.0,
+				$exemptReason,
+			);
+			return;
+		}
 		foreach ($invoice->getTaxBreakdownArray() as $group) {
-			$rateBp = (int)$group['rateBp'];
-			[$category, $rate] = $this->vatCategory($rateBp, $smallBusiness);
-			$reason = ($category === ZugferdVatCategoryCodes::EXEM_FROM_TAX) ? self::SMALL_BUSINESS_REASON : null;
+			[$category, $rate] = $this->vatCategory((int)$group['rateBp']);
 			$builder->addDocumentTax(
 				$category,
 				ZugferdVatTypeCodes::VALUE_ADDED_TAX,
 				$this->toEuro((int)$group['netCents']),
 				$this->toEuro((int)$group['taxCents']),
 				$rate,
-				$reason,
+				null,
 			);
 		}
 	}
@@ -256,19 +329,54 @@ class ZugferdService {
 	}
 
 	/**
-	 * Pick the EN16931 VAT category code and percentage for a tax group.
+	 * Pick the EN16931 VAT category code and percentage for a normally-taxed
+	 * group. VAT-exempt cases are handled separately via exemptCategoryAndReason.
 	 *
 	 * @return array{0: string, 1: float} [categoryCode, ratePercent]
 	 */
-	private function vatCategory(int $rateBp, bool $smallBusiness): array {
-		if ($smallBusiness) {
-			// §19 small business: tax-exempt regardless of the stored rate.
-			return [ZugferdVatCategoryCodes::EXEM_FROM_TAX, 0.0];
-		}
+	private function vatCategory(int $rateBp): array {
 		if ($rateBp === 0) {
 			return [ZugferdVatCategoryCodes::ZERO_RATE_GOOD, 0.0];
 		}
 		return [ZugferdVatCategoryCodes::STAN_RATE, $rateBp / 100.0];
+	}
+
+	/**
+	 * EN16931 VAT category code + exemption reason for a VAT-exempt invoice:
+	 * §19 small business, reverse charge, intra-community supply or export.
+	 *
+	 * @return array{0: string, 1: ?string} [categoryCode, exemptionReason]
+	 */
+	private function exemptCategoryAndReason(Invoice $invoice, bool $smallBusiness): array {
+		if ($smallBusiness) {
+			return [ZugferdVatCategoryCodes::EXEM_FROM_TAX, self::SMALL_BUSINESS_REASON];
+		}
+		return match ($invoice->getSpecialTaxCase()) {
+			Invoice::SPECIAL_TAX_REVERSE_CHARGE => [ZugferdVatCategoryCodes::VAT_REVE_CHAR, 'Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge)'],
+			Invoice::SPECIAL_TAX_INTRA_COMMUNITY => [ZugferdVatCategoryCodes::VAT_EXEM_FOR_EEA_INTR_SUPP_OF_GOOD_AND_SERV, 'Steuerfreie innergemeinschaftliche Lieferung'],
+			Invoice::SPECIAL_TAX_EXPORT => [ZugferdVatCategoryCodes::FREE_EXPO_ITEM_TAX_NOT_CHAR, 'Steuerfreie Ausfuhrlieferung'],
+			default => [ZugferdVatCategoryCodes::EXEM_FROM_TAX, null],
+		};
+	}
+
+	/** Short label for the special tax case used in the totals tax row, or null. */
+	private function specialTaxCaseShort(Invoice $invoice): ?string {
+		return match ($invoice->getSpecialTaxCase()) {
+			Invoice::SPECIAL_TAX_REVERSE_CHARGE => 'Reverse Charge (0 %)',
+			Invoice::SPECIAL_TAX_INTRA_COMMUNITY => 'Innergem. Lieferung (steuerfrei)',
+			Invoice::SPECIAL_TAX_EXPORT => 'Ausfuhr (steuerfrei)',
+			default => null,
+		};
+	}
+
+	/** Human-readable label for the special tax case (PDF), or null if none/regular. */
+	private function specialTaxCaseLabel(Invoice $invoice): ?string {
+		return match ($invoice->getSpecialTaxCase()) {
+			Invoice::SPECIAL_TAX_REVERSE_CHARGE => 'Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge).',
+			Invoice::SPECIAL_TAX_INTRA_COMMUNITY => 'Steuerfreie innergemeinschaftliche Lieferung.',
+			Invoice::SPECIAL_TAX_EXPORT => 'Steuerfreie Ausfuhrlieferung.',
+			default => null,
+		};
 	}
 
 	private function paymentTermDescription(Invoice $invoice): ?string {
@@ -355,10 +463,22 @@ class ZugferdService {
 		$companyAddr = nl2br($e($settings->getCompanyAddress()));
 		$logoHtml = $logo !== null ? '<img src="' . $logo . '" class="logo" alt="">' : '';
 
+		// BG-6 seller contact line in the company block.
+		$sellerContact = array_filter([
+			($settings->getContactPerson() ?? '') !== '' ? 'Ansprechpartner: ' . $e($settings->getContactPerson()) : null,
+			($settings->getContactPhone() ?? '') !== '' ? 'Tel.: ' . $e($settings->getContactPhone()) : null,
+			($settings->getContactEmail() ?? '') !== '' ? 'E-Mail: ' . $e($settings->getContactEmail()) : null,
+		]);
+		$sellerContactHtml = $sellerContact !== []
+			? '<div class="company-contact">' . implode(' &middot; ', $sellerContact) . '</div>' : '';
+
+		$country = (string)$invoice->getRecipientCountry();
 		$recipientLines = array_filter([
 			$invoice->getRecipientName(),
+			($invoice->getRecipientContactPerson() ?? '') !== '' ? 'z. Hd. ' . $invoice->getRecipientContactPerson() : null,
 			$invoice->getRecipientAddress(),
 			trim((string)$invoice->getRecipientPostalCode() . ' ' . (string)$invoice->getRecipientCity()),
+			($country !== '' && $country !== 'DE') ? $country : null,
 		], static fn ($l) => trim((string)$l) !== '');
 		$recipient = implode('<br>', array_map($e, $recipientLines));
 
@@ -369,11 +489,28 @@ class ZugferdService {
 		if ($issueDate !== null) {
 			$meta[] = ['Rechnungsdatum', $issueDate->format('d.m.Y')];
 		}
+		// BT-72 / BG-14: performance date or period.
+		$ps = $invoice->getPerformancePeriodStart();
+		$pe = $invoice->getPerformancePeriodEnd();
+		if ($ps !== null && $pe !== null) {
+			$meta[] = ['Leistungszeitraum', $ps->format('d.m.Y') . ' – ' . $pe->format('d.m.Y')];
+		} elseif ($invoice->getPerformanceDate() !== null) {
+			$meta[] = ['Leistungsdatum', $invoice->getPerformanceDate()->format('d.m.Y')];
+		}
 		if ($invoice->getDueDate() !== null) {
 			$meta[] = ['Fällig am', $invoice->getDueDate()->format('d.m.Y')];
 		}
+		if (($invoice->getOrderNumber() ?? '') !== '') {
+			$meta[] = ['Bestellnummer', $e($invoice->getOrderNumber())];
+		}
+		if (($invoice->getReferenceNumber() ?? '') !== '') {
+			$meta[] = ['Referenznummer', $e($invoice->getReferenceNumber())];
+		}
 		if (($invoice->getBuyerReference() ?? '') !== '') {
 			$meta[] = ['Leitweg-ID', $e($invoice->getBuyerReference())];
+		}
+		if (($invoice->getRecipientVatId() ?? '') !== '') {
+			$meta[] = ['USt-IdNr. (Kunde)', $e($invoice->getRecipientVatId())];
 		}
 		if ($relatedNumber !== null && $relatedNumber !== '') {
 			$meta[] = ['Storno zu Rechnung', $e($relatedNumber)];
@@ -383,12 +520,14 @@ class ZugferdService {
 			$metaHtml .= '<tr><td class="meta-label">' . $label . '</td><td>' . $value . '</td></tr>';
 		}
 
-		$rows = '';
 		$smallBusiness = $settings->getSmallBusiness() === 1;
+		$exempt = $smallBusiness || $invoice->isTaxExemptCase();
+
+		$rows = '';
 		foreach ($items as $item) {
 			$desc = ($item->getDescription() ?? '') !== ''
 				? '<div class="item-desc">' . nl2br($e($item->getDescription())) . '</div>' : '';
-			$ratePercent = $smallBusiness ? 0 : (int)$item->getTaxRateBp() / 100;
+			$ratePercent = $exempt ? 0 : (int)$item->getTaxRateBp() / 100;
 			$rows .= '<tr>'
 				. '<td>' . $e($item->getName()) . $desc . '</td>'
 				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e($this->unitLabel($item->getUnitCode())) . '</td>'
@@ -399,12 +538,15 @@ class ZugferdService {
 		}
 
 		$taxRows = '';
-		foreach ($invoice->getTaxBreakdownArray() as $group) {
-			$ratePercent = (int)$group['rateBp'] / 100;
-			$label = $smallBusiness
-				? 'Steuerfrei (§ 19 UStG)'
-				: 'USt ' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' % auf ' . $this->formatMoney((int)$group['netCents']);
-			$taxRows .= '<tr><td>' . $label . '</td><td class="num">' . $this->formatMoney((int)$group['taxCents']) . '</td></tr>';
+		if ($exempt) {
+			$label = $smallBusiness ? 'Steuerfrei (§ 19 UStG)' : ($this->specialTaxCaseShort($invoice) ?? 'Steuerfrei');
+			$taxRows = '<tr><td>' . $e($label) . '</td><td class="num">' . $this->formatMoney(0) . '</td></tr>';
+		} else {
+			foreach ($invoice->getTaxBreakdownArray() as $group) {
+				$ratePercent = (int)$group['rateBp'] / 100;
+				$label = 'USt ' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' % auf ' . $this->formatMoney((int)$group['netCents']);
+				$taxRows .= '<tr><td>' . $label . '</td><td class="num">' . $this->formatMoney((int)$group['taxCents']) . '</td></tr>';
+			}
 		}
 
 		$paymentInfo = '';
@@ -419,9 +561,15 @@ class ZugferdService {
 		$termDesc = $this->paymentTermDescription($invoice);
 		$termHtml = $termDesc !== null ? '<p>' . $e($termDesc) . '</p>' : '';
 
+		// VAT-exemption note (only for the special tax cases; §19 is already on the tax row).
+		$exemptNote = (!$smallBusiness && $invoice->isTaxExemptCase()) ? $this->specialTaxCaseLabel($invoice) : null;
+		$exemptNoteHtml = $exemptNote !== null ? '<p class="exempt-note">' . $e($exemptNote) . '</p>' : '';
+
+		// Salutation + intro text belong ABOVE the line items.
 		$greeting = ($invoice->getGreeting() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getGreeting())) . '</p>' : '';
-		$closing = ($settings->getClosingDefault() ?? '') !== '' ? '<p>' . nl2br($e($settings->getClosingDefault())) . '</p>' : '';
 		$extra = ($invoice->getExtraText() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getExtraText())) . '</p>' : '';
+		$introHtml = ($greeting !== '' || $extra !== '') ? '<div class="intro">' . $greeting . $extra . '</div>' : '';
+		$closing = ($settings->getClosingDefault() ?? '') !== '' ? '<p>' . nl2br($e($settings->getClosingDefault())) . '</p>' : '';
 
 		$taxIds = array_filter([
 			($settings->getVatId() ?? '') !== '' ? 'USt-IdNr.: ' . $e($settings->getVatId()) : null,
@@ -449,6 +597,10 @@ table.items th { background: {$accent}; color: #fff; text-align: left; padding: 
 table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
 table.items td.num, table.items th.num { text-align: right; }
 .item-desc { color: #666; font-size: 8.5pt; margin-top: 2px; }
+.company-contact { font-size: 8.5pt; color: #555; margin-top: 2px; }
+.intro { margin: 0 0 14px; font-size: 9.5pt; }
+.intro p { margin: 4px 0; }
+.exempt-note { background: #f5f5f5; padding: 6px 8px; font-weight: bold; }
 .totals { width: 45%; float: right; margin-top: 8px; }
 .totals table { width: 100%; border-collapse: collapse; }
 .totals td { padding: 3px 8px; }
@@ -460,12 +612,13 @@ table.items td.num, table.items th.num { text-align: right; }
 </style></head><body>
 <div class="header">
   {$logoHtml}
-  <div class="company"><span class="name">{$company}</span><br>{$companyAddr}</div>
+  <div class="company"><span class="name">{$company}</span><br>{$companyAddr}{$sellerContactHtml}</div>
 </div>
 <div class="sender-line">{$company}</div>
 <div class="recipient">{$recipient}</div>
 <h1>{$title}</h1>
 <table class="meta">{$metaHtml}</table>
+{$introHtml}
 <table class="items">
   <thead><tr><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th></tr></thead>
   <tbody>{$rows}</tbody>
@@ -476,10 +629,9 @@ table.items td.num, table.items th.num { text-align: right; }
   <tr class="grand"><td>Gesamtbetrag</td><td class="num">{$this->formatMoney((int)$invoice->getTotalCents())}</td></tr>
 </table></div>
 <div class="payment">
-  {$greeting}
+  {$exemptNoteHtml}
   {$termHtml}
   {$paymentInfo}
-  {$extra}
   {$closing}
 </div>
 {$footer}

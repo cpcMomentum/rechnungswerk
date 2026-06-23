@@ -107,7 +107,8 @@ class SettingsService {
 
 		$stringFields = [
 			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
-			'bankName', 'accentColor', 'numberFormat', 'datevUploadMail',
+			'bankName', 'contactPerson', 'contactPhone', 'contactEmail',
+			'accentColor', 'numberFormat', 'datevUploadMail',
 			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
 			'greetingDefault', 'introDefault', 'closingDefault',
 		];
@@ -169,6 +170,7 @@ class SettingsService {
 		$maxLengths = [
 			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'iban' => 34,
 			'bic' => 16, 'bankName' => 255, 'accentColor' => 9, 'numberFormat' => 64,
+			'contactPerson' => 255, 'contactPhone' => 64, 'contactEmail' => 255,
 			'datevUploadMail' => 255, 'smtpFromName' => 255, 'smtpFromEmail' => 255,
 			'smtpHost' => 255, 'smtpUser' => 255,
 		];
@@ -189,7 +191,7 @@ class SettingsService {
 			}
 		}
 
-		foreach (['datevUploadMail', 'smtpFromEmail'] as $emailField) {
+		foreach (['datevUploadMail', 'smtpFromEmail', 'contactEmail'] as $emailField) {
 			if (!empty($data[$emailField]) && filter_var((string)$data[$emailField], FILTER_VALIDATE_EMAIL) === false) {
 				throw new ValidationException('Bitte eine gültige E-Mail-Adresse angeben.');
 			}

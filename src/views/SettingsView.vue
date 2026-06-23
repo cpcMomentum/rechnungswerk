@@ -18,6 +18,15 @@
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
 						<input v-model="form.taxNumber" class="rw-input" type="text" /></label>
 				</div>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
+						<input v-model="form.contactPerson" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon') }}</span>
+						<input v-model="form.contactPhone" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Kontakt-E-Mail') }}</span>
+						<input v-model="form.contactEmail" class="rw-input" type="email" /></label>
+				</div>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).') }}</p>
 			</section>
 
 			<!-- Bank -->
@@ -332,6 +341,9 @@ function hydrate() {
 		iban: s.iban,
 		bic: s.bic,
 		bankName: s.bankName,
+		contactPerson: s.contactPerson,
+		contactPhone: s.contactPhone,
+		contactEmail: s.contactEmail,
 		logoFileId: s.logoFileId,
 		accentColor: s.accentColor,
 		numberFormat: s.numberFormat,

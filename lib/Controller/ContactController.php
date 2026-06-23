@@ -62,6 +62,7 @@ class ContactController extends Controller {
 			$results[] = [
 				'name' => $name,
 				'email' => $this->firstValue($contact['EMAIL'] ?? null),
+				'phone' => $this->firstValue($contact['TEL'] ?? null),
 				'address' => $adr['street'],
 				'postalCode' => $adr['postalCode'],
 				'city' => $adr['city'],

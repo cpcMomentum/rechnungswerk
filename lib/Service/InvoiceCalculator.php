@@ -35,6 +35,11 @@ final class InvoiceCalculator {
 	/**
 	 * Aggregate line totals into subtotal, per-rate tax breakdown and gross total.
 	 *
+	 * When $taxExempt is true (§19 small business or a special tax case such as
+	 * reverse charge / intra-community supply / export) no VAT is charged: every
+	 * group's tax is 0 and the gross total equals the net subtotal. The per-rate
+	 * net grouping is preserved for display.
+	 *
 	 * @param list<array{taxRateBp: int, lineTotalCents: int}> $lines
 	 * @return array{
 	 *     subtotalCents: int,
@@ -42,7 +47,7 @@ final class InvoiceCalculator {
 	 *     totalCents: int
 	 * }
 	 */
-	public static function computeTotals(array $lines): array {
+	public static function computeTotals(array $lines, bool $taxExempt = false): array {
 		/** @var array<int, int> $netByRate */
 		$netByRate = [];
 		$subtotal = 0;
@@ -57,7 +62,7 @@ final class InvoiceCalculator {
 		$breakdown = [];
 		$totalTax = 0;
 		foreach ($netByRate as $rateBp => $netCents) {
-			$taxCents = (int)round(($netCents * $rateBp) / 10000);
+			$taxCents = $taxExempt ? 0 : (int)round(($netCents * $rateBp) / 10000);
 			$totalTax += $taxCents;
 			$breakdown[] = [
 				'rateBp' => $rateBp,

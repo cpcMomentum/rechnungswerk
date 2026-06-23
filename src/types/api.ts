@@ -87,6 +87,8 @@ export interface Invoice {
 	recipientCountry: string | null
 	recipientEmail: string | null
 	recipientVatId: string | null
+	recipientContactPerson: string | null
+	recipientPhone: string | null
 	issueDate: string | null
 	performanceDate: string | null
 	performancePeriodStart: string | null
@@ -120,6 +122,7 @@ export interface InvoiceDetail extends Invoice {
 export interface ContactMatch {
 	name: string
 	email: string
+	phone: string
 	address: string
 	postalCode: string
 	city: string
@@ -135,6 +138,9 @@ export interface Settings {
 	iban: string | null
 	bic: string | null
 	bankName: string | null
+	contactPerson: string | null
+	contactPhone: string | null
+	contactEmail: string | null
 	logoFileId: number | null
 	accentColor: string | null
 	numberFormat: string

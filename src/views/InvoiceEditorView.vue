@@ -25,6 +25,13 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum') }}</span>
 					<input v-model="form.performanceDate" class="rw-input" type="date" :readonly="readonly" /></label>
 			</div>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungszeitraum von') }}</span>
+					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungszeitraum bis') }}</span>
+					<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
+			</div>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Leistungsdatum ODER Leistungszeitraum. Ein gesetzter Zeitraum (von + bis) hat Vorrang vor dem Einzeldatum.') }}</p>
 			<details class="more">
 				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)') }}</summary>
 				<div class="rw-form-row">
@@ -62,7 +69,10 @@
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
 					<input v-model="form.recipientVatId" class="rw-input" type="text" :readonly="readonly" /></label>
-				<span class="rw-field" aria-hidden="true" />
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner (optional)') }}</span>
+					<input v-model="form.recipientContactPerson" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon (optional)') }}</span>
+					<input v-model="form.recipientPhone" class="rw-input" type="text" :readonly="readonly" /></label>
 			</div>
 		</section>
 
@@ -88,6 +98,18 @@
 		<!-- Steuer & Summen -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Steuer & Summen') }}</h3>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuerfall') }}</span>
+					<select v-model="form.specialTaxCase" class="rw-input" :disabled="readonly">
+						<option value="">{{ t('rechnungswerk', 'Regelbesteuerung') }}</option>
+						<option value="reverse_charge">{{ t('rechnungswerk', 'Reverse Charge (§ 13b – Steuerschuldnerschaft des Leistungsempfängers)') }}</option>
+						<option value="intra_community">{{ t('rechnungswerk', 'Innergemeinschaftliche Lieferung (steuerfrei)') }}</option>
+						<option value="export">{{ t('rechnungswerk', 'Ausfuhrlieferung Drittland (steuerfrei)') }}</option>
+					</select></label>
+				<span class="rw-field" aria-hidden="true" />
+			</div>
+			<NcNoteCard v-if="form.specialTaxCase !== ''" type="info"
+				:text="t('rechnungswerk', 'Für diesen Steuerfall wird keine Umsatzsteuer berechnet (0 %). Ein entsprechender Hinweis erscheint auf der Rechnung.')" />
 			<div class="rw-totals">
 				<div class="rw-kpi-card">
 					<div class="rw-kpi-row">
@@ -222,10 +244,16 @@ const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 const form = reactive({
 	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
-	performanceDate: '', referenceNumber: '', orderNumber: '', buyerReference: '',
+	recipientContactPerson: '', recipientPhone: '',
+	performanceDate: '', performancePeriodStart: '', performancePeriodEnd: '',
+	referenceNumber: '', orderNumber: '', buyerReference: '', specialTaxCase: '',
 	greeting: '', extraText: '',
 	paymentTermDays: '' as string | number, discountTerms: '',
 })
+
+const TAX_EXEMPT_CASES = ['reverse_charge', 'intra_community', 'export']
+const taxExempt = computed(() =>
+	(settingsStore.settings?.smallBusiness ?? false) || TAX_EXEMPT_CASES.includes(form.specialTaxCase))
 
 const dueDatePreview = computed(() => {
 	const days = Number.parseInt(String(form.paymentTermDays), 10)
@@ -283,7 +311,7 @@ const headerTitle = computed(() => invoice.value
 const totals = computed(() => computeTotals(items.value.map(i => ({
 	taxRateBp: i.taxRateBp,
 	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
-}))))
+})), taxExempt.value))
 
 onMounted(async () => {
 	try {
@@ -310,10 +338,15 @@ async function load(id: number) {
 	form.recipientCountry = detail.recipientCountry ?? 'DE'
 	form.recipientVatId = detail.recipientVatId ?? ''
 	form.recipientContactId = detail.recipientContactId ?? ''
+	form.recipientContactPerson = detail.recipientContactPerson ?? ''
+	form.recipientPhone = detail.recipientPhone ?? ''
 	form.performanceDate = detail.performanceDate ?? ''
+	form.performancePeriodStart = detail.performancePeriodStart ?? ''
+	form.performancePeriodEnd = detail.performancePeriodEnd ?? ''
 	form.referenceNumber = detail.referenceNumber ?? ''
 	form.orderNumber = detail.orderNumber ?? ''
 	form.buyerReference = detail.buyerReference ?? ''
+	form.specialTaxCase = detail.specialTaxCase ?? ''
 	form.greeting = detail.greeting ?? ''
 	form.extraText = detail.extraText ?? ''
 	form.paymentTermDays = detail.paymentTermDays ?? ''
@@ -324,6 +357,9 @@ async function load(id: number) {
 function onContactSelect(c: ContactMatch) {
 	form.recipientName = c.name
 	form.recipientEmail = c.email
+	if (c.phone) {
+		form.recipientPhone = c.phone
+	}
 	form.recipientAddress = c.address
 	form.recipientPostalCode = c.postalCode
 	form.recipientCity = c.city
