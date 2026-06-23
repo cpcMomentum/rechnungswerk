@@ -76,6 +76,20 @@
 			</div>
 		</section>
 
+		<!-- Rechnungssteller / Ansprechpartner (Verkäuferseite) -->
+		<section class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Ansprechpartner (für diese Rechnung)') }}</h3>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Name') }}</span>
+					<input v-model="form.sellerContactPerson" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon') }}</span>
+					<input v-model="form.sellerContactPhone" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
+					<input v-model="form.sellerContactEmail" class="rw-input" type="email" :readonly="readonly" /></label>
+			</div>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem Nextcloud-Konto. Du kannst es für diese Rechnung ändern. Leer lassen → es greift der zentrale Firmenkontakt aus den Einstellungen.') }}</p>
+		</section>
+
 		<!-- Einleitung (vor den Positionen) -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Einleitung') }}</h3>
@@ -225,6 +239,7 @@ import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, sendInvoice, type InvoiceInput } from '@/api/invoices'
+import { getMyContactDefaults } from '@/api/contacts'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -245,6 +260,7 @@ const form = reactive({
 	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
 	recipientContactPerson: '', recipientPhone: '',
+	sellerContactPerson: '', sellerContactPhone: '', sellerContactEmail: '',
 	performanceDate: '', performancePeriodStart: '', performancePeriodEnd: '',
 	referenceNumber: '', orderNumber: '', buyerReference: '', specialTaxCase: '',
 	greeting: '', extraText: '',
@@ -321,6 +337,16 @@ onMounted(async () => {
 		} else {
 			form.greeting = settingsStore.settings?.greetingDefault ?? ''
 			form.extraText = settingsStore.settings?.closingDefault ?? ''
+			// Pre-fill the seller contact from the current user's NC account.
+			// Left empty → backend falls back to the central company contact.
+			try {
+				const me = await getMyContactDefaults()
+				form.sellerContactPerson = me.person
+				form.sellerContactPhone = me.phone
+				form.sellerContactEmail = me.email
+			} catch {
+				// ignore — company contact will be used
+			}
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
@@ -340,6 +366,9 @@ async function load(id: number) {
 	form.recipientContactId = detail.recipientContactId ?? ''
 	form.recipientContactPerson = detail.recipientContactPerson ?? ''
 	form.recipientPhone = detail.recipientPhone ?? ''
+	form.sellerContactPerson = detail.sellerContactPerson ?? ''
+	form.sellerContactPhone = detail.sellerContactPhone ?? ''
+	form.sellerContactEmail = detail.sellerContactEmail ?? ''
 	form.performanceDate = detail.performanceDate ?? ''
 	form.performancePeriodStart = detail.performancePeriodStart ?? ''
 	form.performancePeriodEnd = detail.performancePeriodEnd ?? ''

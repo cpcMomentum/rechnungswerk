@@ -42,6 +42,12 @@ use OCP\DB\Types;
  * @method void setRecipientContactPerson(?string $recipientContactPerson)
  * @method ?string getRecipientPhone()
  * @method void setRecipientPhone(?string $recipientPhone)
+ * @method ?string getSellerContactPerson()
+ * @method void setSellerContactPerson(?string $sellerContactPerson)
+ * @method ?string getSellerContactPhone()
+ * @method void setSellerContactPhone(?string $sellerContactPhone)
+ * @method ?string getSellerContactEmail()
+ * @method void setSellerContactEmail(?string $sellerContactEmail)
  * @method ?\DateTime getIssueDate()
  * @method void setIssueDate(?\DateTime $issueDate)
  * @method ?\DateTime getPerformanceDate()
@@ -132,6 +138,9 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $recipientVatId = null;
 	protected ?string $recipientContactPerson = null;
 	protected ?string $recipientPhone = null;
+	protected ?string $sellerContactPerson = null;
+	protected ?string $sellerContactPhone = null;
+	protected ?string $sellerContactEmail = null;
 	protected ?\DateTime $issueDate = null;
 	protected ?\DateTime $performanceDate = null;
 	protected ?\DateTime $performancePeriodStart = null;
@@ -169,6 +178,9 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('recipientVatId', Types::STRING);
 		$this->addType('recipientContactPerson', Types::STRING);
 		$this->addType('recipientPhone', Types::STRING);
+		$this->addType('sellerContactPerson', Types::STRING);
+		$this->addType('sellerContactPhone', Types::STRING);
+		$this->addType('sellerContactEmail', Types::STRING);
 		$this->addType('issueDate', Types::DATE);
 		$this->addType('performanceDate', Types::DATE);
 		$this->addType('performancePeriodStart', Types::DATE);
@@ -242,6 +254,9 @@ class Invoice extends Entity implements JsonSerializable {
 			'recipientVatId' => $this->getRecipientVatId(),
 			'recipientContactPerson' => $this->getRecipientContactPerson(),
 			'recipientPhone' => $this->getRecipientPhone(),
+			'sellerContactPerson' => $this->getSellerContactPerson(),
+			'sellerContactPhone' => $this->getSellerContactPhone(),
+			'sellerContactEmail' => $this->getSellerContactEmail(),
 			'issueDate' => $this->formatDate($this->getIssueDate()),
 			'performanceDate' => $this->formatDate($this->getPerformanceDate()),
 			'performancePeriodStart' => $this->formatDate($this->getPerformancePeriodStart()),

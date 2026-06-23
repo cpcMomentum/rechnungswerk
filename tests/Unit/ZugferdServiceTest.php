@@ -202,6 +202,26 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('einkauf@kunde.de', $xml);
 	}
 
+	public function testSellerContactOverrideWinsOverCompany(): void {
+		$settings = $this->settings();
+		$settings->setContactPerson('Firma Zentral');
+		$settings->setContactEmail('zentrale@muster.de');
+		$invoice = $this->invoice();
+		$invoice->setSellerContactPerson('Axel Override');
+		$invoice->setSellerContactEmail('axel@muster.de');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('Axel Override', $xml);
+		$this->assertStringContainsString('axel@muster.de', $xml);
+		$this->assertStringNotContainsString('Firma Zentral', $xml);
+		$this->assertStringNotContainsString('zentrale@muster.de', $xml);
+	}
+
 	public function testCancellationIsCreditNoteType381(): void {
 		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
 		$invoice->setSubtotalCents(-20000);

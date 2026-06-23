@@ -89,6 +89,9 @@ export interface Invoice {
 	recipientVatId: string | null
 	recipientContactPerson: string | null
 	recipientPhone: string | null
+	sellerContactPerson: string | null
+	sellerContactPhone: string | null
+	sellerContactEmail: string | null
 	issueDate: string | null
 	performanceDate: string | null
 	performancePeriodStart: string | null
@@ -117,6 +120,13 @@ export interface Invoice {
 /** Detail response from GET /invoices/{id}: header fields plus line items. */
 export interface InvoiceDetail extends Invoice {
 	items: InvoiceItem[]
+}
+
+/** Seller-contact defaults for the current user (from their Nextcloud account). */
+export interface MeContactDefaults {
+	person: string
+	phone: string
+	email: string
 }
 
 export interface ContactMatch {

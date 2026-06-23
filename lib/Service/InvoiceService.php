@@ -305,6 +305,9 @@ class InvoiceService {
 			$storno->setInvoiceType(Invoice::TYPE_CANCELLATION);
 			$storno->setRelatedInvoiceId((int)$original->getId());
 			$this->copyRecipient($original, $storno);
+			$storno->setSellerContactPerson($original->getSellerContactPerson());
+			$storno->setSellerContactPhone($original->getSellerContactPhone());
+			$storno->setSellerContactEmail($original->getSellerContactEmail());
 			$storno->setSpecialTaxCase($original->getSpecialTaxCase());
 			$storno->setGreeting($original->getGreeting());
 			$storno->setCustomFields($original->getCustomFields());
@@ -421,7 +424,8 @@ class InvoiceService {
 		$strings = [
 			'recipientName', 'recipientContactId', 'recipientAddress', 'recipientPostalCode',
 			'recipientCity', 'recipientEmail', 'recipientVatId', 'recipientContactPerson',
-			'recipientPhone', 'referenceNumber',
+			'recipientPhone', 'sellerContactPerson', 'sellerContactPhone', 'sellerContactEmail',
+			'referenceNumber',
 			'orderNumber', 'buyerReference', 'specialTaxCase', 'greeting', 'extraText',
 			'discountTerms',
 		];

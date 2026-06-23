@@ -15,8 +15,10 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\Accounts\IAccountManager;
 use OCP\Contacts\IManager;
 use OCP\IRequest;
+use OCP\IUserManager;
 
 class ContactController extends Controller {
 
@@ -25,8 +27,41 @@ class ContactController extends Controller {
 		private readonly ?string $userId,
 		private readonly IManager $contactsManager,
 		private readonly PermissionService $permissionService,
+		private readonly IUserManager $userManager,
+		private readonly IAccountManager $accountManager,
 	) {
 		parent::__construct(Application::APP_ID, $request);
+	}
+
+	/**
+	 * Seller-contact defaults for the current user, taken from their Nextcloud
+	 * account (display name, email, phone). Used to pre-fill the per-invoice
+	 * seller contact in the editor; falls back to the central company contact
+	 * if left empty.
+	 */
+	#[NoAdminRequired]
+	public function me(): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->hasAccess($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		$user = $this->userManager->get($this->userId);
+		$phone = '';
+		if ($user !== null) {
+			try {
+				$phone = $this->accountManager->getAccount($user)
+					->getProperty(IAccountManager::PROPERTY_PHONE)->getValue();
+			} catch (\Throwable) {
+				$phone = '';
+			}
+		}
+		return new DataResponse([
+			'person' => $user?->getDisplayName() ?? '',
+			'phone' => $phone,
+			'email' => $user?->getEMailAddress() ?? '',
+		]);
 	}
 
 	/**

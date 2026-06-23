@@ -145,7 +145,7 @@ class ZugferdService {
 			? $this->exemptCategoryAndReason($invoice, $smallBusiness)
 			: [null, null];
 
-		$this->applySeller($builder, $settings);
+		$this->applySeller($builder, $settings, $invoice);
 		$this->applyBuyer($builder, $invoice);
 		$this->applyReferences($builder, $invoice);
 		$this->applyPayment($builder, $invoice, $settings);
@@ -179,7 +179,7 @@ class ZugferdService {
 		}
 	}
 
-	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings): void {
+	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings, Invoice $invoice): void {
 		$builder->setDocumentSeller($settings->getCompanyName() ?? '');
 		if (($settings->getVatId() ?? '') !== '') {
 			$builder->addDocumentSellerVATRegistrationNumber($settings->getVatId());
@@ -197,18 +197,28 @@ class ZugferdService {
 			ZugferdCountryCodes::GERMANY,
 		);
 		// BG-6: seller contact (name BT-41, phone BT-42, email BT-43).
-		$person = $settings->getContactPerson();
-		$phone = $settings->getContactPhone();
-		$email = $settings->getContactEmail();
-		if (($person ?? '') !== '' || ($phone ?? '') !== '' || ($email ?? '') !== '') {
-			$builder->setDocumentSellerContact(
-				($person ?? '') !== '' ? $person : null,
-				null,
-				($phone ?? '') !== '' ? $phone : null,
-				null,
-				($email ?? '') !== '' ? $email : null,
-			);
+		// Cascade: per-invoice override → issuing user's NC account → company.
+		[$person, $phone, $email] = $this->effectiveSellerContact($invoice, $settings);
+		if ($person !== null || $phone !== null || $email !== null) {
+			$builder->setDocumentSellerContact($person, null, $phone, null, $email);
 		}
+	}
+
+	/**
+	 * Effective seller contact for an invoice: per-invoice override wins, else
+	 * the central company contact. (The per-user NC-account default is baked in
+	 * at editor time, so it arrives as the invoice override.)
+	 *
+	 * @return array{0: ?string, 1: ?string, 2: ?string} [person, phone, email]
+	 */
+	private function effectiveSellerContact(Invoice $invoice, Settings $settings): array {
+		$pick = static fn (?string $override, ?string $fallback): ?string
+			=> ($override ?? '') !== '' ? $override : (($fallback ?? '') !== '' ? $fallback : null);
+		return [
+			$pick($invoice->getSellerContactPerson(), $settings->getContactPerson()),
+			$pick($invoice->getSellerContactPhone(), $settings->getContactPhone()),
+			$pick($invoice->getSellerContactEmail(), $settings->getContactEmail()),
+		];
 	}
 
 	private function applyBuyer(ZugferdDocumentBuilder $builder, Invoice $invoice): void {
@@ -463,11 +473,12 @@ class ZugferdService {
 		$companyAddr = nl2br($e($settings->getCompanyAddress()));
 		$logoHtml = $logo !== null ? '<img src="' . $logo . '" class="logo" alt="">' : '';
 
-		// BG-6 seller contact line in the company block.
+		// BG-6 seller contact line in the company block (invoice override → company).
+		[$scPerson, $scPhone, $scEmail] = $this->effectiveSellerContact($invoice, $settings);
 		$sellerContact = array_filter([
-			($settings->getContactPerson() ?? '') !== '' ? 'Ansprechpartner: ' . $e($settings->getContactPerson()) : null,
-			($settings->getContactPhone() ?? '') !== '' ? 'Tel.: ' . $e($settings->getContactPhone()) : null,
-			($settings->getContactEmail() ?? '') !== '' ? 'E-Mail: ' . $e($settings->getContactEmail()) : null,
+			$scPerson !== null ? 'Ansprechpartner: ' . $e($scPerson) : null,
+			$scPhone !== null ? 'Tel.: ' . $e($scPhone) : null,
+			$scEmail !== null ? 'E-Mail: ' . $e($scEmail) : null,
 		]);
 		$sellerContactHtml = $sellerContact !== []
 			? '<div class="company-contact">' . implode(' &middot; ', $sellerContact) . '</div>' : '';

@@ -27,6 +27,9 @@ export interface InvoiceInput {
 	recipientVatId?: string | null
 	recipientContactPerson?: string | null
 	recipientPhone?: string | null
+	sellerContactPerson?: string | null
+	sellerContactPhone?: string | null
+	sellerContactEmail?: string | null
 	performanceDate?: string | null
 	performancePeriodStart?: string | null
 	performancePeriodEnd?: string | null
