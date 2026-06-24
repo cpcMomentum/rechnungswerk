@@ -170,6 +170,12 @@
 						<input v-model="imapPassword" class="rw-input" type="password"
 							:placeholder="form.imapPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
 				</div>
+				<NcCheckboxRadioSwitch
+					:model-value="form.imapCleanup"
+					:disabled="!form.imapHost"
+					@update:model-value="(v) => form.imapCleanup = v">
+					{{ t('rechnungswerk', 'Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)') }}
+				</NcCheckboxRadioSwitch>
 			</section>
 
 			<!-- Standardtexte -->
@@ -389,6 +395,7 @@ function hydrate() {
 		imapSecurity: s.imapSecurity || 'ssl',
 		imapUser: s.imapUser,
 		imapPasswordSet: s.imapPasswordSet,
+		imapCleanup: s.imapCleanup,
 		greetingDefault: s.greetingDefault,
 		introDefault: s.introDefault,
 		closingDefault: s.closingDefault,

@@ -161,6 +161,9 @@ class SettingsService {
 		if (array_key_exists('datevAutoSend', $data)) {
 			$settings->setDatevAutoSend(!empty($data['datevAutoSend']) ? 1 : 0);
 		}
+		if (array_key_exists('imapCleanup', $data)) {
+			$settings->setImapCleanup(!empty($data['imapCleanup']) ? 1 : 0);
+		}
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$settings->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);
 		}

@@ -46,6 +46,8 @@ class DatevConfirmationService {
 		if ($cfg === null) {
 			return ['skipped' => 'no imap config'];
 		}
+		// Opt-in: move our own, confirmed confirmations to Trash after processing.
+		$cleanup = $this->settingsService->getCompany()->getImapCleanup() === 1;
 
 		$pending = $this->invoiceMapper->findPendingDatev();
 		if ($pending === []) {
@@ -113,6 +115,17 @@ class DatevConfirmationService {
 				$invoice->setDatevResponseRaw(mb_substr($body, 0, 2000));
 			}
 			$this->invoiceMapper->update($invoice);
+
+			// Opt-in cleanup: only our own (matched) AND confirmed mails go to Trash.
+			// Unknown replies are kept for analysis; n8n's incoming confirmations are
+			// never matched, so they are never touched.
+			if ($success && $cleanup) {
+				try {
+					$message->move('Trash', true);
+				} catch (\Throwable $e) {
+					$this->logger->warning('Rechnungswerk: Verschieben der DATEV-Quittung in den Papierkorb fehlgeschlagen', ['exception' => $e]);
+				}
+			}
 
 			// Drop from the indices so a later message cannot re-match it.
 			unset($byMsgId[$this->normalizeId($invoice->getDatevMessageId())], $byNumber[(string)$invoice->getNumber()]);

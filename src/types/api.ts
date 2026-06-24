@@ -174,6 +174,7 @@ export interface Settings {
 	imapSecurity: string
 	imapUser: string | null
 	imapPasswordSet: boolean
+	imapCleanup: boolean
 	greetingDefault: string | null
 	introDefault: string | null
 	closingDefault: string | null

@@ -80,6 +80,8 @@ use OCP\DB\Types;
  * @method void setImapUser(?string $imapUser)
  * @method ?string getImapPassword()
  * @method void setImapPassword(?string $imapPassword)
+ * @method int getImapCleanup()
+ * @method void setImapCleanup(int $imapCleanup)
  * @method ?string getGreetingDefault()
  * @method void setGreetingDefault(?string $greetingDefault)
  * @method ?string getIntroDefault()
@@ -126,6 +128,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?string $imapSecurity = null;
 	protected ?string $imapUser = null;
 	protected ?string $imapPassword = null;
+	protected ?int $imapCleanup = null;
 	protected ?string $greetingDefault = null;
 	protected ?string $introDefault = null;
 	protected ?string $closingDefault = null;
@@ -165,6 +168,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('imapSecurity', Types::STRING);
 		$this->addType('imapUser', Types::STRING);
 		$this->addType('imapPassword', Types::TEXT);
+		$this->addType('imapCleanup', Types::SMALLINT);
 		$this->addType('greetingDefault', Types::TEXT);
 		$this->addType('introDefault', Types::TEXT);
 		$this->addType('closingDefault', Types::TEXT);
@@ -207,6 +211,7 @@ class Settings extends Entity implements JsonSerializable {
 			'imapSecurity' => $this->getImapSecurity() ?? 'ssl',
 			'imapUser' => $this->getImapUser(),
 			'imapPasswordSet' => ($this->getImapPassword() ?? '') !== '',
+			'imapCleanup' => (bool)$this->getImapCleanup(),
 			'greetingDefault' => $this->getGreetingDefault(),
 			'introDefault' => $this->getIntroDefault(),
 			'closingDefault' => $this->getClosingDefault(),
