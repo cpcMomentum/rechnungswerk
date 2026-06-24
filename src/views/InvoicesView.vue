@@ -30,7 +30,10 @@
 				</thead>
 				<tbody>
 					<tr v-for="inv in store.invoices" :key="inv.id" class="rw-row-clickable" @click="openInvoice(inv.id)">
-						<td><span :class="['rw-chip', `rw-chip--${inv.status}`]">{{ statusLabel(inv.status) }}</span></td>
+						<td>
+							<span :class="['rw-chip', `rw-chip--${inv.status}`]">{{ statusLabel(inv.status) }}</span>
+							<span v-if="inv.datevStatus" :class="['rw-datev', `rw-datev--${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)">{{ datevShort(inv.datevStatus) }}</span>
+						</td>
 						<td>
 							{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}
 							<span v-if="inv.invoiceType !== 'invoice'" v-tooltip="typeTooltip(inv)" class="rw-pill">{{ typeLabel(inv.invoiceType) }}</span>
@@ -72,6 +75,21 @@ import { formatCents } from '@/utils/money'
 const router = useRouter()
 const store = useInvoiceStore()
 const error = ref('')
+
+const DATEV_SHORT: Record<string, string> = {
+	pending: t('rechnungswerk', 'DATEV ↑'),
+	confirmed: t('rechnungswerk', 'DATEV ✓'),
+	unknown: t('rechnungswerk', 'DATEV ?'),
+	failed: t('rechnungswerk', 'DATEV ✗'),
+}
+const DATEV_TITLE: Record<string, string> = {
+	pending: t('rechnungswerk', 'An DATEV gesendet – Bestätigung ausstehend'),
+	confirmed: t('rechnungswerk', 'Von DATEV bestätigt (Beleg angenommen)'),
+	unknown: t('rechnungswerk', 'DATEV-Antwort prüfen'),
+	failed: t('rechnungswerk', 'Von DATEV abgelehnt'),
+}
+const datevShort = (s: string): string => DATEV_SHORT[s] ?? ''
+const datevTitle = (s: string): string => DATEV_TITLE[s] ?? ''
 
 const statusLabel = (s: InvoiceStatus): string => t('rechnungswerk', INVOICE_STATUS_LABELS[s] ?? s)
 const typeLabel = (type: InvoiceType): string => t('rechnungswerk', INVOICE_TYPE_LABELS[type] ?? type)

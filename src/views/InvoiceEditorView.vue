@@ -8,7 +8,7 @@
 			<span v-if="invoice" class="rw-status-group">
 				<span :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
 				<span v-if="invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
-				<span v-if="datevStatusLabel" class="rw-pill" :title="t('rechnungswerk', 'DATEV-Übergabe')">{{ datevStatusLabel }}</span>
+				<span v-if="invoice.datevStatus && datevStatusLabel" :class="['rw-datev', `rw-datev--${invoice.datevStatus}`]" :title="t('rechnungswerk', 'DATEV-Übergabe')">{{ datevStatusLabel }}</span>
 			</span>
 		</div>
 

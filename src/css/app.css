@@ -271,6 +271,32 @@
 	border: 1px solid #e0a96b;
 	vertical-align: middle;
 }
+/* DATEV hand-off status badge (#36) — solid colour for at-a-glance scanning. */
+.app-rechnungswerk .rw-datev {
+	display: inline-block;
+	margin-left: 8px;
+	padding: 1px 8px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.5;
+	border-radius: 999px;
+	color: #fff;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+.app-rechnungswerk .rw-datev--pending {
+	background: #5b6770;
+}
+.app-rechnungswerk .rw-datev--confirmed {
+	background: #2f8a4e;
+}
+.app-rechnungswerk .rw-datev--unknown {
+	background: #d9822b;
+}
+.app-rechnungswerk .rw-datev--failed {
+	background: #cc4b42;
+}
+
 .app-rechnungswerk .rw-status-group {
 	display: inline-flex;
 	align-items: center;
