@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\AppInfo;
 
+use OCA\Rechnungswerk\BackgroundJob\DatevConfirmationJob;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\BackgroundJob\IJobList;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'rechnungswerk';
@@ -33,5 +35,8 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
+		// Register the DATEV confirmation poller. IJobList::add is idempotent,
+		// so re-adding on every boot is safe.
+		$context->getServerContainer()->get(IJobList::class)->add(DatevConfirmationJob::class);
 	}
 }

@@ -112,6 +112,8 @@ export interface Invoice {
 	paymentTermDays: number | null
 	dueDate: string | null
 	discountTerms: string | null
+	datevStatus: string | null
+	datevStatusAt: string | null
 	committedAt: string | null
 	createdAt: string | null
 	updatedAt: string | null
@@ -167,6 +169,11 @@ export interface Settings {
 	smtpSecurity: string
 	smtpUser: string | null
 	smtpPasswordSet: boolean
+	imapHost: string | null
+	imapPort: number | null
+	imapSecurity: string
+	imapUser: string | null
+	imapPasswordSet: boolean
 	greetingDefault: string | null
 	introDefault: string | null
 	closingDefault: string | null

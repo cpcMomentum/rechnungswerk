@@ -37,6 +37,18 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * Invoices handed to DATEV that are still awaiting a confirmation (#36).
+	 *
+	 * @return Invoice[]
+	 */
+	public function findPendingDatev(): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->eq('datev_status', $qb->createNamedParameter(Invoice::DATEV_PENDING)));
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @throws DoesNotExistException
 	 */
 	public function findOne(int $id): Invoice {

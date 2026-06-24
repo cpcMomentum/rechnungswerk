@@ -8,6 +8,7 @@
 			<span v-if="invoice" class="rw-status-group">
 				<span :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
 				<span v-if="invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
+				<span v-if="datevStatusLabel" class="rw-pill" :title="t('rechnungswerk', 'DATEV-Übergabe')">{{ datevStatusLabel }}</span>
 			</span>
 		</div>
 
@@ -286,6 +287,16 @@ const dueDatePreview = computed(() => {
 const readonly = computed(() => invoice.value !== null && invoice.value.status !== 'draft')
 const statusLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status]) : '')
 const typeLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_TYPE_LABELS[invoice.value.invoiceType]) : '')
+const datevStatusLabel = computed(() => {
+	const map: Record<string, string> = {
+		pending: t('rechnungswerk', 'DATEV: gesendet'),
+		confirmed: t('rechnungswerk', 'DATEV: bestätigt'),
+		failed: t('rechnungswerk', 'DATEV: abgelehnt'),
+		unknown: t('rechnungswerk', 'DATEV: Antwort prüfen'),
+	}
+	const s = invoice.value?.datevStatus
+	return s ? (map[s] ?? '') : ''
+})
 const typeTooltip = computed(() => {
 	if (!invoice.value) {
 		return ''
