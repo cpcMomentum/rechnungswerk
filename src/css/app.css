@@ -271,6 +271,76 @@
 	border: 1px solid #e0a96b;
 	vertical-align: middle;
 }
+/* Flat status icons (WorkTime style): coloured MDI glyphs + tooltip, no loud
+   pills. NOT scoped to .app-rechnungswerk: the legend popover is teleported to
+   <body>, so these must resolve globally too. The rw- prefix keeps them ours. */
+.rw-sicon {
+	display: inline-flex;
+	vertical-align: middle;
+}
+.rw-status-cell {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.rw-sicon--draft {
+	color: #8a929b;
+}
+.rw-sicon--committed {
+	color: #4a9d63;
+}
+.rw-sicon--cancelled {
+	color: #cc4b42;
+}
+.rw-sicon--datev-confirmed {
+	color: #2f8a4e;
+}
+.rw-sicon--datev-pending {
+	color: #6b7178;
+}
+.rw-sicon--datev-unknown {
+	color: #d9822b;
+}
+.rw-sicon--datev-failed {
+	color: #cc4b42;
+}
+/* "Status" column header gets a quiet ⓘ that opens the legend as a popover —
+   no permanent legend bar, stays put even on long lists. */
+.rw-th-info {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+.rw-info-popup {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.rw-info-popup__hint {
+	margin: 0;
+	color: var(--color-text-maxcontrast);
+}
+.rw-info-popup__group {
+	display: flex;
+	flex-direction: column;
+}
+.rw-legend__label {
+	margin-bottom: 2px;
+	font-weight: 600;
+	color: var(--color-main-text);
+}
+/* Hairline-separated rows (WorkTime AuditDetailModal principle), compact. */
+.rw-legend__item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 3px 0;
+	border-bottom: 1px solid var(--color-border);
+}
+.rw-info-popup__group .rw-legend__item:last-child {
+	border-bottom: none;
+}
+
 /* DATEV hand-off status badge (#36) — solid colour for at-a-glance scanning. */
 .app-rechnungswerk .rw-datev {
 	display: inline-block;
