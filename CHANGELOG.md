@@ -7,6 +7,11 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-26
+
+### Added
+- Spendenlink (Ko-fi) in der App-Beschreibung / im App Store
+
 ## [0.1.0] - 2026-06-25
 
 Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
@@ -58,5 +63,6 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cpcMomentum/rechnungswerk/releases/tag/v0.1.0
