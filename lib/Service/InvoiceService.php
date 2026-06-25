@@ -228,7 +228,7 @@ class InvoiceService {
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
 			$number = (string)$invoice->getNumber();
-			$this->mailService->sendInvoicePdf(
+			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
 				'ZUGFeRD-Rechnung ' . $number,
 				"Automatische DATEV-Übergabe aus Rechnungswerk.\n\nRechnung: " . $number
@@ -238,6 +238,14 @@ class InvoiceService {
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
+			// Record the hand-off so the DATEV confirmation channel (#36) can match
+			// the reply (via In-Reply-To = this Message-ID) and flip the status.
+			$invoice->setDatevStatus(Invoice::DATEV_PENDING);
+			$invoice->setDatevStatusAt(new \DateTime());
+			if ($messageId !== null && $messageId !== '') {
+				$invoice->setDatevMessageId($messageId);
+			}
+			$this->invoiceMapper->update($invoice);
 			return true;
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: DATEV-Auto-Versand fehlgeschlagen', [

@@ -45,17 +45,16 @@ class MailService {
 		string $pdfFilename,
 		Settings $settings,
 		?array $smtpConfig = null,
-	): void {
+	): ?string {
 		if (!$this->mailer->validateMailAddress($to)) {
 			throw new ValidationException('Die Empfängeradresse ist ungültig.');
 		}
 
 		if ($smtpConfig !== null) {
-			$this->sendViaPhpMailer($to, $subject, $body, $pdfContent, $pdfFilename, $settings, $smtpConfig);
-			return;
+			return $this->sendViaPhpMailer($to, $subject, $body, $pdfContent, $pdfFilename, $settings, $smtpConfig);
 		}
 
-		$this->sendViaNextcloud($to, $subject, $body, $pdfContent, $pdfFilename, $settings);
+		return $this->sendViaNextcloud($to, $subject, $body, $pdfContent, $pdfFilename, $settings);
 	}
 
 	/**
@@ -86,7 +85,7 @@ class MailService {
 		string $pdfContent,
 		string $pdfFilename,
 		Settings $settings,
-	): void {
+	): ?string {
 		$message = $this->mailer->createMessage();
 		$message->setTo([$to]);
 		$from = $this->resolveNextcloudFrom($settings);
@@ -102,6 +101,9 @@ class MailService {
 		if (count($failed) > 0) {
 			throw new \RuntimeException('Die E-Mail konnte nicht an alle Empfänger zugestellt werden: ' . implode(', ', $failed));
 		}
+		// The NC system mailer does not expose the generated Message-ID; the DATEV
+		// confirmation channel therefore relies on the dedicated SMTP path below.
+		return null;
 	}
 
 	/**
@@ -129,7 +131,7 @@ class MailService {
 		string $pdfFilename,
 		Settings $settings,
 		array $cfg,
-	): void {
+	): ?string {
 		$fromEmail = trim((string)$settings->getSmtpFromEmail());
 		if ($fromEmail === '') {
 			$fromEmail = $cfg['user'];
@@ -149,6 +151,9 @@ class MailService {
 			$mail->Body = $body;
 			$mail->addStringAttachment($pdfContent, $pdfFilename, PHPMailer::ENCODING_BASE64, 'application/pdf');
 			$mail->send();
+			// Message-ID of the sent mail (e.g. "<id@host>"); the DATEV confirmation
+			// references it via In-Reply-To, so we persist it for matching.
+			return $mail->getLastMessageID();
 		} catch (\PHPMailer\PHPMailer\Exception $e) {
 			throw new \RuntimeException('Der SMTP-Versand ist fehlgeschlagen: ' . $e->getMessage(), 0, $e);
 		}

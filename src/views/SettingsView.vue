@@ -147,6 +147,37 @@
 				</div>
 			</section>
 
+			<!-- IMAP-Konto für DATEV-Empfangsbestätigung -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'DATEV-Rückmeldung (IMAP, optional)') }}</h3>
+				<p class="rw-hint">{{ t('rechnungswerk', 'DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.') }}</p>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Server (Host)') }}</span>
+						<input v-model="form.imapHost" class="rw-input" type="text" placeholder="imap.example.com" /></label>
+					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Port') }}</span>
+						<input v-model.number="form.imapPort" class="rw-input" type="number" placeholder="993" /></label>
+					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Verschlüsselung') }}</span>
+						<select v-model="form.imapSecurity" class="rw-input">
+							<option value="ssl">SSL/TLS</option>
+							<option value="starttls">STARTTLS</option>
+							<option value="tls">TLS</option>
+						</select></label>
+				</div>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Benutzer') }}</span>
+						<input v-model="form.imapUser" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Passwort') }}</span>
+						<input v-model="imapPassword" class="rw-input" type="password"
+							:placeholder="form.imapPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
+				</div>
+				<NcCheckboxRadioSwitch
+					:model-value="form.imapCleanup"
+					:disabled="!form.imapHost"
+					@update:model-value="(v) => form.imapCleanup = v">
+					{{ t('rechnungswerk', 'Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)') }}
+				</NcCheckboxRadioSwitch>
+			</section>
+
 			<!-- Standardtexte -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
@@ -256,6 +287,7 @@ const lastQuery = ref('')
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 const smtpPassword = ref('')
+const imapPassword = ref('')
 const testingSmtp = ref(false)
 const smtpTestResult = ref('')
 const smtpTestOk = ref(false)
@@ -358,6 +390,12 @@ function hydrate() {
 		smtpSecurity: s.smtpSecurity || 'starttls',
 		smtpUser: s.smtpUser,
 		smtpPasswordSet: s.smtpPasswordSet,
+		imapHost: s.imapHost,
+		imapPort: s.imapPort,
+		imapSecurity: s.imapSecurity || 'ssl',
+		imapUser: s.imapUser,
+		imapPasswordSet: s.imapPasswordSet,
+		imapCleanup: s.imapCleanup,
 		greetingDefault: s.greetingDefault,
 		introDefault: s.introDefault,
 		closingDefault: s.closingDefault,
@@ -460,6 +498,9 @@ async function onSave() {
 		if (smtpPassword.value !== '') {
 			payload.smtpPassword = smtpPassword.value
 		}
+		if (imapPassword.value !== '') {
+			payload.imapPassword = imapPassword.value
+		}
 		// Two separate calls (company settings vs access lists). Report which
 		// step failed so a partial save is not silently misread as "all saved".
 		try {
@@ -478,6 +519,7 @@ async function onSave() {
 			return
 		}
 		smtpPassword.value = ''
+		imapPassword.value = ''
 		hydrate()
 	} finally {
 		savingPerms.value = false

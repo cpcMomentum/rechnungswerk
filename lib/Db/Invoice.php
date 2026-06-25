@@ -84,6 +84,14 @@ use OCP\DB\Types;
  * @method void setDueDate(?\DateTime $dueDate)
  * @method ?string getDiscountTerms()
  * @method void setDiscountTerms(?string $discountTerms)
+ * @method ?string getDatevMessageId()
+ * @method void setDatevMessageId(?string $datevMessageId)
+ * @method ?string getDatevStatus()
+ * @method void setDatevStatus(?string $datevStatus)
+ * @method ?\DateTime getDatevStatusAt()
+ * @method void setDatevStatusAt(?\DateTime $datevStatusAt)
+ * @method ?string getDatevResponseRaw()
+ * @method void setDatevResponseRaw(?string $datevResponseRaw)
  * @method ?\DateTime getCommittedAt()
  * @method void setCommittedAt(?\DateTime $committedAt)
  * @method ?\DateTime getCreatedAt()
@@ -124,6 +132,12 @@ class Invoice extends Entity implements JsonSerializable {
 		self::SPECIAL_TAX_EXPORT,
 	];
 
+	/** DATEV hand-off status (fed by the upload-mail confirmation channel, #36). */
+	public const DATEV_PENDING = 'pending';
+	public const DATEV_CONFIRMED = 'confirmed';
+	public const DATEV_FAILED = 'failed';
+	public const DATEV_UNKNOWN = 'unknown';
+
 	protected ?string $ownerUserId = null;
 	protected ?string $number = null;
 	protected ?string $status = null;
@@ -159,6 +173,10 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?int $paymentTermDays = null;
 	protected ?\DateTime $dueDate = null;
 	protected ?string $discountTerms = null;
+	protected ?string $datevMessageId = null;
+	protected ?string $datevStatus = null;
+	protected ?\DateTime $datevStatusAt = null;
+	protected ?string $datevResponseRaw = null;
 	protected ?\DateTime $committedAt = null;
 	protected ?\DateTime $createdAt = null;
 	protected ?\DateTime $updatedAt = null;
@@ -199,6 +217,10 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('paymentTermDays', Types::INTEGER);
 		$this->addType('dueDate', Types::DATE);
 		$this->addType('discountTerms', Types::STRING);
+		$this->addType('datevMessageId', Types::STRING);
+		$this->addType('datevStatus', Types::STRING);
+		$this->addType('datevStatusAt', Types::DATETIME);
+		$this->addType('datevResponseRaw', Types::TEXT);
 		$this->addType('committedAt', Types::DATETIME);
 		$this->addType('createdAt', Types::DATETIME);
 		$this->addType('updatedAt', Types::DATETIME);
@@ -275,6 +297,8 @@ class Invoice extends Entity implements JsonSerializable {
 			'paymentTermDays' => $this->getPaymentTermDays(),
 			'dueDate' => $this->formatDate($this->getDueDate()),
 			'discountTerms' => $this->getDiscountTerms(),
+			'datevStatus' => $this->getDatevStatus(),
+			'datevStatusAt' => $this->formatDateTime($this->getDatevStatusAt()),
 			'committedAt' => $this->formatDateTime($this->getCommittedAt()),
 			'createdAt' => $this->formatDateTime($this->getCreatedAt()),
 			'updatedAt' => $this->formatDateTime($this->getUpdatedAt()),

@@ -25,6 +25,8 @@ class SettingsService {
 
 	private const SMTP_SECURITIES = ['none', 'starttls', 'ssl'];
 
+	private const IMAP_SECURITIES = ['ssl', 'starttls', 'tls'];
+
 	/**
 	 * Single central company-settings row. The app is one company per Nextcloud
 	 * instance (It. 6); the per-user model of It. 1–5 is collapsed into one row
@@ -71,6 +73,36 @@ class SettingsService {
 	}
 
 	/**
+	 * Decrypted IMAP config for the DATEV confirmation poller (#36), or null if
+	 * no IMAP account is configured (host empty).
+	 *
+	 * @return array{host: string, port: int, security: string, user: string, password: string}|null
+	 */
+	public function getImapConfig(): ?array {
+		$s = $this->getCompany();
+		$host = trim((string)$s->getImapHost());
+		if ($host === '') {
+			return null;
+		}
+		$password = '';
+		$stored = (string)$s->getImapPassword();
+		if ($stored !== '') {
+			try {
+				$password = $this->crypto->decrypt($stored);
+			} catch (\Throwable) {
+				$password = '';
+			}
+		}
+		return [
+			'host' => $host,
+			'port' => (int)($s->getImapPort() ?: 993),
+			'security' => $s->getImapSecurity() ?: 'ssl',
+			'user' => (string)$s->getImapUser(),
+			'password' => $password,
+		];
+	}
+
+	/**
 	 * Return the central company settings, creating a default row on first access.
 	 */
 	public function getCompany(): Settings {
@@ -110,6 +142,7 @@ class SettingsService {
 			'bankName', 'contactPerson', 'contactPhone', 'contactEmail',
 			'accentColor', 'numberFormat', 'datevUploadMail',
 			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
+			'imapHost', 'imapUser',
 			'greetingDefault', 'introDefault', 'closingDefault',
 		];
 		foreach ($stringFields as $field) {
@@ -128,6 +161,9 @@ class SettingsService {
 		if (array_key_exists('datevAutoSend', $data)) {
 			$settings->setDatevAutoSend(!empty($data['datevAutoSend']) ? 1 : 0);
 		}
+		if (array_key_exists('imapCleanup', $data)) {
+			$settings->setImapCleanup(!empty($data['imapCleanup']) ? 1 : 0);
+		}
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$settings->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);
 		}
@@ -143,6 +179,16 @@ class SettingsService {
 		if (array_key_exists('smtpPassword', $data)) {
 			$pw = (string)$data['smtpPassword'];
 			$settings->setSmtpPassword($pw !== '' ? $this->crypto->encrypt($pw) : '');
+		}
+		if (array_key_exists('imapPort', $data)) {
+			$settings->setImapPort($data['imapPort'] !== null && $data['imapPort'] !== '' ? (int)$data['imapPort'] : null);
+		}
+		if (array_key_exists('imapSecurity', $data)) {
+			$settings->setImapSecurity(in_array($data['imapSecurity'], self::IMAP_SECURITIES, true) ? (string)$data['imapSecurity'] : 'ssl');
+		}
+		if (array_key_exists('imapPassword', $data)) {
+			$pw = (string)$data['imapPassword'];
+			$settings->setImapPassword($pw !== '' ? $this->crypto->encrypt($pw) : '');
 		}
 		if (($settings->getNumberFormat() ?? '') === '') {
 			$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
@@ -173,6 +219,7 @@ class SettingsService {
 			'contactPerson' => 255, 'contactPhone' => 64, 'contactEmail' => 255,
 			'datevUploadMail' => 255, 'smtpFromName' => 255, 'smtpFromEmail' => 255,
 			'smtpHost' => 255, 'smtpUser' => 255,
+			'imapHost' => 255, 'imapUser' => 255,
 		];
 		foreach ($maxLengths as $field => $max) {
 			if (array_key_exists($field, $data) && $data[$field] !== null && mb_strlen((string)$data[$field]) > $max) {

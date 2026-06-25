@@ -6,8 +6,15 @@
 				<NcBreadcrumb :name="headerTitle" />
 			</NcBreadcrumbs>
 			<span v-if="invoice" class="rw-status-group">
-				<span :class="['rw-chip', `rw-chip--${invoice.status}`]">{{ statusLabel }}</span>
+				<span class="rw-status-tag">
+					<component :is="statusIcon(invoice.status)" :size="18" :class="['rw-sicon', `rw-sicon--${invoice.status}`]" />
+					{{ statusLabel }}
+				</span>
 				<span v-if="invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
+				<span v-if="invoice.datevStatus && datevStatusLabel" class="rw-status-tag" :title="t('rechnungswerk', 'DATEV-Übergabe')">
+					<component :is="datevIcon(invoice.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${invoice.datevStatus}`]" />
+					{{ datevStatusLabel }}
+				</span>
 			</span>
 		</div>
 
@@ -223,6 +230,11 @@ import NcBreadcrumb from '@nextcloud/vue/components/NcBreadcrumb'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import SendIcon from 'vue-material-design-icons/Send.vue'
+import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
+import CloseCircleIcon from 'vue-material-design-icons/CloseCircle.vue'
+import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
+import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
+import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import ContactPicker from '@/components/ContactPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -284,8 +296,22 @@ const dueDatePreview = computed(() => {
 })
 
 const readonly = computed(() => invoice.value !== null && invoice.value.status !== 'draft')
+const STATUS_ICON: Record<string, unknown> = { draft: PencilOutlineIcon, committed: LockIcon, cancelled: CloseCircleIcon }
+const DATEV_ICON: Record<string, unknown> = { pending: ClockOutlineIcon, confirmed: CheckCircleIcon, unknown: HelpCircleOutlineIcon, failed: CloseCircleIcon }
+const statusIcon = (s: string): unknown => STATUS_ICON[s] ?? PencilOutlineIcon
+const datevIcon = (s: string): unknown => DATEV_ICON[s] ?? HelpCircleOutlineIcon
 const statusLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status]) : '')
 const typeLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_TYPE_LABELS[invoice.value.invoiceType]) : '')
+const datevStatusLabel = computed(() => {
+	const map: Record<string, string> = {
+		pending: t('rechnungswerk', 'DATEV: gesendet'),
+		confirmed: t('rechnungswerk', 'DATEV: bestätigt'),
+		failed: t('rechnungswerk', 'DATEV: abgelehnt'),
+		unknown: t('rechnungswerk', 'DATEV: Antwort prüfen'),
+	}
+	const s = invoice.value?.datevStatus
+	return s ? (map[s] ?? '') : ''
+})
 const typeTooltip = computed(() => {
 	if (!invoice.value) {
 		return ''

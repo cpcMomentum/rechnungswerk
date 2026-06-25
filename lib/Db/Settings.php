@@ -70,6 +70,18 @@ use OCP\DB\Types;
  * @method void setSmtpUser(?string $smtpUser)
  * @method ?string getSmtpPassword()
  * @method void setSmtpPassword(?string $smtpPassword)
+ * @method ?string getImapHost()
+ * @method void setImapHost(?string $imapHost)
+ * @method ?int getImapPort()
+ * @method void setImapPort(?int $imapPort)
+ * @method ?string getImapSecurity()
+ * @method void setImapSecurity(?string $imapSecurity)
+ * @method ?string getImapUser()
+ * @method void setImapUser(?string $imapUser)
+ * @method ?string getImapPassword()
+ * @method void setImapPassword(?string $imapPassword)
+ * @method int getImapCleanup()
+ * @method void setImapCleanup(int $imapCleanup)
  * @method ?string getGreetingDefault()
  * @method void setGreetingDefault(?string $greetingDefault)
  * @method ?string getIntroDefault()
@@ -111,6 +123,12 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?string $smtpSecurity = null;
 	protected ?string $smtpUser = null;
 	protected ?string $smtpPassword = null;
+	protected ?string $imapHost = null;
+	protected ?int $imapPort = null;
+	protected ?string $imapSecurity = null;
+	protected ?string $imapUser = null;
+	protected ?string $imapPassword = null;
+	protected ?int $imapCleanup = null;
 	protected ?string $greetingDefault = null;
 	protected ?string $introDefault = null;
 	protected ?string $closingDefault = null;
@@ -145,6 +163,12 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('smtpSecurity', Types::STRING);
 		$this->addType('smtpUser', Types::STRING);
 		$this->addType('smtpPassword', Types::TEXT);
+		$this->addType('imapHost', Types::STRING);
+		$this->addType('imapPort', Types::INTEGER);
+		$this->addType('imapSecurity', Types::STRING);
+		$this->addType('imapUser', Types::STRING);
+		$this->addType('imapPassword', Types::TEXT);
+		$this->addType('imapCleanup', Types::SMALLINT);
 		$this->addType('greetingDefault', Types::TEXT);
 		$this->addType('introDefault', Types::TEXT);
 		$this->addType('closingDefault', Types::TEXT);
@@ -182,6 +206,12 @@ class Settings extends Entity implements JsonSerializable {
 			'smtpUser' => $this->getSmtpUser(),
 			// Never expose the stored (encrypted) password; only whether one is set.
 			'smtpPasswordSet' => ($this->getSmtpPassword() ?? '') !== '',
+			'imapHost' => $this->getImapHost(),
+			'imapPort' => $this->getImapPort(),
+			'imapSecurity' => $this->getImapSecurity() ?? 'ssl',
+			'imapUser' => $this->getImapUser(),
+			'imapPasswordSet' => ($this->getImapPassword() ?? '') !== '',
+			'imapCleanup' => (bool)$this->getImapCleanup(),
 			'greetingDefault' => $this->getGreetingDefault(),
 			'introDefault' => $this->getIntroDefault(),
 			'closingDefault' => $this->getClosingDefault(),
