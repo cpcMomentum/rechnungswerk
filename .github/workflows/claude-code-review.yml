@@ -76,6 +76,11 @@ jobs:
             Du bist ein Code-Reviewer.
             Dies ist Review-Zyklus ${{ steps.cycles.outputs.count }} von maximal 3.
 
+            Der zu reviewende Pull Request ist #${{ github.event.pull_request.number }} im Repository ${{ github.repository }}.
+            WICHTIG: Verwende fuer ALLE gh-Befehle ausschliesslich diese PR-Nummer (${{ github.event.pull_request.number }}).
+            Ignoriere Issue-Referenzen wie "Fixes #NN" oder Nummern im Titel/Diff — das ist NICHT die PR-Nummer.
+            Hol dir den Diff mit:  gh pr diff ${{ github.event.pull_request.number }}
+
             ## Schritt 1: Review
             Reviewe den KOMPLETTEN PR-Diff und pruefe:
             - Code-Qualitaet und Best Practices
@@ -95,7 +100,12 @@ jobs:
             oder unklaren Anforderungen NUR kommentieren.
 
             ## Schritt 3: Zusammenfassung
-            Poste einen Review-Kommentar auf dem PR mit exakt diesem Format:
+            Poste deinen Review als Kommentar auf den PR mit GENAU diesem Befehl
+            (exakt diese PR-Nummer verwenden, keine Issue-Nummer):
+
+               gh pr comment ${{ github.event.pull_request.number }} --body "<REVIEW>"
+
+            <REVIEW> hat exakt dieses Format:
 
             ### Claude Code Review - Zyklus ${{ steps.cycles.outputs.count }}
             **Geprueft:** [Liste was geprueft wurde]
@@ -108,4 +118,4 @@ jobs:
 
           claude_args: |
             --max-turns 50
-            --allowedTools "Edit,MultiEdit,Glob,Grep,LS,Read,Write,Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git rm:*),Bash(gh pr comment:*),Bash(gh pr review:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(npm run:*),Bash(npx:*),Bash(cd:*),Bash(ls:*),Bash(ruff:*),Bash(pip:*),Bash(python:*),mcp__github_comment__update_claude_comment"
+            --allowedTools "Edit,MultiEdit,Glob,Grep,LS,Read,Write,Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git rm:*),Bash(gh pr comment:*),Bash(gh pr review:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm run:*),Bash(npx:*),Bash(cd:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(head:*),Bash(tail:*),Bash(ruff:*),Bash(pip:*),Bash(python:*),mcp__github_comment__update_claude_comment"

@@ -36,6 +36,11 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
     <bugs>https://github.com/cpcMomentum/rechnungswerk/issues</bugs>
     <repository type="git">https://github.com/cpcMomentum/rechnungswerk.git</repository>
 
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/01-rechnungsliste.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/02-rechnung-editor.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/03-stammdaten.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/04-produktkatalog.png</screenshot>
+
     <dependencies>
         <nextcloud min-version="30" max-version="33"/>
         <php min-version="8.2"/>
