@@ -231,31 +231,6 @@
 	font-size: 1.1em;
 }
 
-/* ---- Status chips: solid fills, white text, equal width (WorkTime badges) ---- */
-.app-rechnungswerk .rw-chip {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	box-sizing: border-box;
-	min-width: 132px;
-	font-size: 12px;
-	font-weight: 600;
-	line-height: 1.4;
-	padding: 4px 12px;
-	border-radius: var(--border-radius-element, var(--border-radius));
-	color: #fff;
-	vertical-align: middle;
-}
-.app-rechnungswerk .rw-chip--draft {
-	background: #5b6770;
-}
-.app-rechnungswerk .rw-chip--committed {
-	background: #4a9d63;
-}
-.app-rechnungswerk .rw-chip--cancelled {
-	background: #cc4b42;
-}
-
 /* Document-type pill (Storno/Gutschrift) — subtle marker next to the number,
    a separate dimension from the lifecycle status chip. */
 .app-rechnungswerk .rw-pill {
@@ -341,36 +316,21 @@
 	border-bottom: none;
 }
 
-/* DATEV hand-off status badge (#36) — solid colour for at-a-glance scanning. */
-.app-rechnungswerk .rw-datev {
-	display: inline-block;
-	margin-left: 8px;
-	padding: 1px 8px;
-	font-size: 11px;
-	font-weight: 600;
-	line-height: 1.5;
-	border-radius: 999px;
-	color: #fff;
-	white-space: nowrap;
-	vertical-align: middle;
-}
-.app-rechnungswerk .rw-datev--pending {
-	background: #5b6770;
-}
-.app-rechnungswerk .rw-datev--confirmed {
-	background: #2f8a4e;
-}
-.app-rechnungswerk .rw-datev--unknown {
-	background: #d9822b;
-}
-.app-rechnungswerk .rw-datev--failed {
-	background: #cc4b42;
-}
-
 .app-rechnungswerk .rw-status-group {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
+	gap: 12px;
+}
+
+/* Detail header status: flat icon + label (same icon language as the list, but
+   labelled because the detail view has the room and shows a single invoice). */
+.app-rechnungswerk .rw-status-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--color-main-text);
 }
 
 /* ---- Sticky action bar ---- */

@@ -23,9 +23,11 @@
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Produkte')" :to="{ name: 'products' }">
 					<template #icon><PackageVariantIcon :size="20" /></template>
 				</NcAppNavigationItem>
-				<NcAppNavigationItem v-if="isAdmin" :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'settings' }">
-					<template #icon><CogIcon :size="20" /></template>
-				</NcAppNavigationItem>
+				<template v-if="isAdmin" #footer>
+					<NcAppNavigationItem :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'settings' }">
+						<template #icon><CogIcon :size="20" /></template>
+					</NcAppNavigationItem>
+				</template>
 			</NcAppNavigation>
 			<NcAppContent>
 				<router-view />
