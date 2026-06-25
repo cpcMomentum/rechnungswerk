@@ -132,6 +132,96 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringNotContainsString('<ram:CategoryCode>S</ram:CategoryCode>', $xml);
 	}
 
+	public function testReverseChargeIsCategoryAEWithZeroTax(): void {
+		$invoice = $this->invoice();
+		$invoice->setSpecialTaxCase(Invoice::SPECIAL_TAX_REVERSE_CHARGE);
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(20000); // no VAT charged under reverse charge
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 0]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		$this->assertStringContainsString('<ram:CategoryCode>AE</ram:CategoryCode>', $xml);
+		$this->assertStringContainsString('<ram:GrandTotalAmount>200.00</ram:GrandTotalAmount>', $xml);
+		$this->assertStringContainsString('Steuerschuldnerschaft des Leistungsempfängers', $xml);
+		$this->assertStringNotContainsString('<ram:CategoryCode>S</ram:CategoryCode>', $xml);
+	}
+
+	public function testReferencesAndPerformanceDateInXml(): void {
+		$invoice = $this->invoice();
+		$invoice->setPerformanceDate(new DateTime('2026-06-10'));
+		$invoice->setOrderNumber('BEST-77');
+		$invoice->setReferenceNumber('REF-55');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		$this->assertStringContainsString('BEST-77', $xml); // BT-13 buyer order ref
+		$this->assertStringContainsString('REF-55', $xml);  // BT-14 seller order ref
+		$this->assertStringContainsString('20260610', $xml); // BT-72 delivery date (CII format 102)
+	}
+
+	public function testPerformancePeriodInXml(): void {
+		$invoice = $this->invoice();
+		$invoice->setPerformancePeriodStart(new DateTime('2026-06-01'));
+		$invoice->setPerformancePeriodEnd(new DateTime('2026-06-30'));
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		$this->assertStringContainsString('20260601', $xml); // BG-14 start
+		$this->assertStringContainsString('20260630', $xml); // BG-14 end
+	}
+
+	public function testSellerAndBuyerContactInXml(): void {
+		$settings = $this->settings();
+		$settings->setContactPerson('Erika Muster');
+		$settings->setContactPhone('+49 30 111');
+		$settings->setContactEmail('kontakt@muster.de');
+		$invoice = $this->invoice();
+		$invoice->setRecipientContactPerson('Max Kunde');
+		$invoice->setRecipientPhone('+49 89 222');
+		$invoice->setRecipientEmail('einkauf@kunde.de');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('Erika Muster', $xml);    // BG-6 seller contact
+		$this->assertStringContainsString('kontakt@muster.de', $xml);
+		$this->assertStringContainsString('Max Kunde', $xml);       // BG-9 buyer contact
+		$this->assertStringContainsString('einkauf@kunde.de', $xml);
+	}
+
+	public function testSellerContactOverrideWinsOverCompany(): void {
+		$settings = $this->settings();
+		$settings->setContactPerson('Firma Zentral');
+		$settings->setContactEmail('zentrale@muster.de');
+		$invoice = $this->invoice();
+		$invoice->setSellerContactPerson('Axel Override');
+		$invoice->setSellerContactEmail('axel@muster.de');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('Axel Override', $xml);
+		$this->assertStringContainsString('axel@muster.de', $xml);
+		$this->assertStringNotContainsString('Firma Zentral', $xml);
+		$this->assertStringNotContainsString('zentrale@muster.de', $xml);
+	}
+
 	public function testCancellationIsCreditNoteType381(): void {
 		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
 		$invoice->setSubtotalCents(-20000);

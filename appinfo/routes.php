@@ -38,6 +38,8 @@ return [
 
 		// Contacts (recipient picker)
 		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],
+		// Current user's seller-contact defaults (from NC account)
+		['name' => 'contact#me', 'url' => '/api/v1/me', 'verb' => 'GET'],
 
 		// Access control / app admin
 		['name' => 'admin#permissionInfo',     'url' => '/api/v1/permission-info',     'verb' => 'GET'],

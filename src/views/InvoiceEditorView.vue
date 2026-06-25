@@ -20,11 +20,14 @@
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Rechnungsdaten') }}</h3>
 			<div class="rw-form-row">
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
-					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird beim Festschreiben vergeben)')" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum') }}</span>
-					<input v-model="form.performanceDate" class="rw-input" type="date" :readonly="readonly" /></label>
+				<label class="rw-field invoice-no"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
+					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird vergeben)')" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
+					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'bis (optional)') }}</span>
+					<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
 			</div>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
 			<details class="more">
 				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)') }}</summary>
 				<div class="rw-form-row">
@@ -62,8 +65,25 @@
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
 					<input v-model="form.recipientVatId" class="rw-input" type="text" :readonly="readonly" /></label>
-				<span class="rw-field" aria-hidden="true" />
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner (optional)') }}</span>
+					<input v-model="form.recipientContactPerson" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon (optional)') }}</span>
+					<input v-model="form.recipientPhone" class="rw-input" type="text" :readonly="readonly" /></label>
 			</div>
+		</section>
+
+		<!-- Rechnungssteller / Ansprechpartner (Verkäuferseite) -->
+		<section class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Ansprechpartner (für diese Rechnung)') }}</h3>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Name') }}</span>
+					<input v-model="form.sellerContactPerson" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon') }}</span>
+					<input v-model="form.sellerContactPhone" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
+					<input v-model="form.sellerContactEmail" class="rw-input" type="email" :readonly="readonly" /></label>
+			</div>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem Nextcloud-Konto. Du kannst es für diese Rechnung ändern. Leer lassen → es greift der zentrale Firmenkontakt aus den Einstellungen.') }}</p>
 		</section>
 
 		<!-- Einleitung (vor den Positionen) -->
@@ -88,6 +108,18 @@
 		<!-- Steuer & Summen -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Steuer & Summen') }}</h3>
+			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuerfall') }}</span>
+					<select v-model="form.specialTaxCase" class="rw-input" :disabled="readonly">
+						<option value="">{{ t('rechnungswerk', 'Regelbesteuerung') }}</option>
+						<option value="reverse_charge">{{ t('rechnungswerk', 'Reverse Charge (§ 13b – Steuerschuldnerschaft des Leistungsempfängers)') }}</option>
+						<option value="intra_community">{{ t('rechnungswerk', 'Innergemeinschaftliche Lieferung (steuerfrei)') }}</option>
+						<option value="export">{{ t('rechnungswerk', 'Ausfuhrlieferung Drittland (steuerfrei)') }}</option>
+					</select></label>
+				<span class="rw-field" aria-hidden="true" />
+			</div>
+			<NcNoteCard v-if="form.specialTaxCase !== ''" type="info"
+				:text="t('rechnungswerk', 'Für diesen Steuerfall wird keine Umsatzsteuer berechnet (0 %). Ein entsprechender Hinweis erscheint auf der Rechnung.')" />
 			<div class="rw-totals">
 				<div class="rw-kpi-card">
 					<div class="rw-kpi-row">
@@ -203,6 +235,7 @@ import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, sendInvoice, type InvoiceInput } from '@/api/invoices'
+import { getMyContactDefaults } from '@/api/contacts'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -222,10 +255,17 @@ const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 const form = reactive({
 	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
-	performanceDate: '', referenceNumber: '', orderNumber: '', buyerReference: '',
+	recipientContactPerson: '', recipientPhone: '',
+	sellerContactPerson: '', sellerContactPhone: '', sellerContactEmail: '',
+	performanceDate: '', performancePeriodStart: '', performancePeriodEnd: '',
+	referenceNumber: '', orderNumber: '', buyerReference: '', specialTaxCase: '',
 	greeting: '', extraText: '',
 	paymentTermDays: '' as string | number, discountTerms: '',
 })
+
+const TAX_EXEMPT_CASES = ['reverse_charge', 'intra_community', 'export']
+const taxExempt = computed(() =>
+	(settingsStore.settings?.smallBusiness ?? false) || TAX_EXEMPT_CASES.includes(form.specialTaxCase))
 
 const dueDatePreview = computed(() => {
 	const days = Number.parseInt(String(form.paymentTermDays), 10)
@@ -283,7 +323,7 @@ const headerTitle = computed(() => invoice.value
 const totals = computed(() => computeTotals(items.value.map(i => ({
 	taxRateBp: i.taxRateBp,
 	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
-}))))
+})), taxExempt.value))
 
 onMounted(async () => {
 	try {
@@ -293,6 +333,16 @@ onMounted(async () => {
 		} else {
 			form.greeting = settingsStore.settings?.greetingDefault ?? ''
 			form.extraText = settingsStore.settings?.closingDefault ?? ''
+			// Pre-fill the seller contact from the current user's NC account.
+			// Left empty → backend falls back to the central company contact.
+			try {
+				const me = await getMyContactDefaults()
+				form.sellerContactPerson = me.person
+				form.sellerContactPhone = me.phone
+				form.sellerContactEmail = me.email
+			} catch {
+				// ignore — company contact will be used
+			}
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
@@ -310,10 +360,18 @@ async function load(id: number) {
 	form.recipientCountry = detail.recipientCountry ?? 'DE'
 	form.recipientVatId = detail.recipientVatId ?? ''
 	form.recipientContactId = detail.recipientContactId ?? ''
-	form.performanceDate = detail.performanceDate ?? ''
+	form.recipientContactPerson = detail.recipientContactPerson ?? ''
+	form.recipientPhone = detail.recipientPhone ?? ''
+	form.sellerContactPerson = detail.sellerContactPerson ?? ''
+	form.sellerContactPhone = detail.sellerContactPhone ?? ''
+	form.sellerContactEmail = detail.sellerContactEmail ?? ''
+	// Single date lives in the first ("von") field; a filled "bis" makes it a period.
+	form.performancePeriodStart = detail.performancePeriodStart ?? detail.performanceDate ?? ''
+	form.performancePeriodEnd = detail.performancePeriodEnd ?? ''
 	form.referenceNumber = detail.referenceNumber ?? ''
 	form.orderNumber = detail.orderNumber ?? ''
 	form.buyerReference = detail.buyerReference ?? ''
+	form.specialTaxCase = detail.specialTaxCase ?? ''
 	form.greeting = detail.greeting ?? ''
 	form.extraText = detail.extraText ?? ''
 	form.paymentTermDays = detail.paymentTermDays ?? ''
@@ -324,6 +382,9 @@ async function load(id: number) {
 function onContactSelect(c: ContactMatch) {
 	form.recipientName = c.name
 	form.recipientEmail = c.email
+	if (c.phone) {
+		form.recipientPhone = c.phone
+	}
 	form.recipientAddress = c.address
 	form.recipientPostalCode = c.postalCode
 	form.recipientCity = c.city
@@ -333,8 +394,16 @@ function onContactSelect(c: ContactMatch) {
 }
 
 function buildInput(): InvoiceInput {
+	// Only the first field set → single performance date (BT-72); both fields set
+	// → billing period (BG-14). Never persist both shapes at once.
+	const von = form.performancePeriodStart
+	const bis = form.performancePeriodEnd
+	const dates = (von && bis)
+		? { performanceDate: '', performancePeriodStart: von, performancePeriodEnd: bis }
+		: { performanceDate: von || bis || '', performancePeriodStart: '', performancePeriodEnd: '' }
 	return {
 		...form,
+		...dates,
 		paymentTermDays: form.paymentTermDays === '' ? null : Number(form.paymentTermDays),
 		items: items.value
 			.filter(i => i.name.trim() !== '')
@@ -456,7 +525,14 @@ async function doCancel() {
 	saving.value = true
 	try {
 		const storno = await invoiceStore.cancel(invoice.value.id)
+		const datevMailSent = (storno as InvoiceDetail & { datevMailSent?: boolean | null }).datevMailSent
 		await load(storno.id)
+		notice.value = ''
+		if (datevMailSent === true) {
+			notice.value = t('rechnungswerk', 'Storniert. Der Stornobeleg wurde automatisch an DATEV gesendet.')
+		} else if (datevMailSent === null) {
+			error.value = t('rechnungswerk', 'Storno erstellt, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden.')
+		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Stornieren fehlgeschlagen'))
 	} finally {
@@ -502,5 +578,9 @@ function fail(e: unknown, fallback: string) {
 }
 .payterm-days > span {
 	white-space: nowrap;
+}
+/* Keep the read-only invoice number compact so the date pickers get the room. */
+.invoice-no {
+	flex: 0 1 180px;
 }
 </style>

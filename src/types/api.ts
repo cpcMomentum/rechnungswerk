@@ -87,6 +87,11 @@ export interface Invoice {
 	recipientCountry: string | null
 	recipientEmail: string | null
 	recipientVatId: string | null
+	recipientContactPerson: string | null
+	recipientPhone: string | null
+	sellerContactPerson: string | null
+	sellerContactPhone: string | null
+	sellerContactEmail: string | null
 	issueDate: string | null
 	performanceDate: string | null
 	performancePeriodStart: string | null
@@ -117,9 +122,17 @@ export interface InvoiceDetail extends Invoice {
 	items: InvoiceItem[]
 }
 
+/** Seller-contact defaults for the current user (from their Nextcloud account). */
+export interface MeContactDefaults {
+	person: string
+	phone: string
+	email: string
+}
+
 export interface ContactMatch {
 	name: string
 	email: string
+	phone: string
 	address: string
 	postalCode: string
 	city: string
@@ -135,6 +148,9 @@ export interface Settings {
 	iban: string | null
 	bic: string | null
 	bankName: string | null
+	contactPerson: string | null
+	contactPhone: string | null
+	contactEmail: string | null
 	logoFileId: number | null
 	accentColor: string | null
 	numberFormat: string

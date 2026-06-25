@@ -84,6 +84,29 @@ class InvoiceCalculatorTest extends TestCase {
 		$this->assertSame([['rateBp' => 0, 'netCents' => 10000, 'taxCents' => 0]], $result['taxBreakdown']);
 	}
 
+	public function testComputeTotalsTaxExemptDropsTaxToZero(): void {
+		// Special tax case (e.g. reverse charge): net stays, no VAT charged,
+		// gross == net, but the per-rate net grouping is preserved.
+		$result = InvoiceCalculator::computeTotals([
+			['taxRateBp' => 1900, 'lineTotalCents' => 100000],
+			['taxRateBp' => 700, 'lineTotalCents' => 9900],
+		], true);
+		$this->assertSame(109900, $result['subtotalCents']);
+		$this->assertSame(109900, $result['totalCents']);
+		$this->assertSame([
+			['rateBp' => 700, 'netCents' => 9900, 'taxCents' => 0],
+			['rateBp' => 1900, 'netCents' => 100000, 'taxCents' => 0],
+		], $result['taxBreakdown']);
+	}
+
+	public function testComputeTotalsExemptFlagDefaultsToTaxed(): void {
+		// Regression guard: without the flag the 19% tax must still be charged.
+		$result = InvoiceCalculator::computeTotals([
+			['taxRateBp' => 1900, 'lineTotalCents' => 100000],
+		]);
+		$this->assertSame(119000, $result['totalCents']);
+	}
+
 	public function testComputeTotalsEmptyInvoice(): void {
 		$result = InvoiceCalculator::computeTotals([]);
 		$this->assertSame(0, $result['subtotalCents']);

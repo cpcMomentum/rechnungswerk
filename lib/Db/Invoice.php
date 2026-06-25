@@ -38,6 +38,16 @@ use OCP\DB\Types;
  * @method void setRecipientEmail(?string $recipientEmail)
  * @method ?string getRecipientVatId()
  * @method void setRecipientVatId(?string $recipientVatId)
+ * @method ?string getRecipientContactPerson()
+ * @method void setRecipientContactPerson(?string $recipientContactPerson)
+ * @method ?string getRecipientPhone()
+ * @method void setRecipientPhone(?string $recipientPhone)
+ * @method ?string getSellerContactPerson()
+ * @method void setSellerContactPerson(?string $sellerContactPerson)
+ * @method ?string getSellerContactPhone()
+ * @method void setSellerContactPhone(?string $sellerContactPhone)
+ * @method ?string getSellerContactEmail()
+ * @method void setSellerContactEmail(?string $sellerContactEmail)
  * @method ?\DateTime getIssueDate()
  * @method void setIssueDate(?\DateTime $issueDate)
  * @method ?\DateTime getPerformanceDate()
@@ -102,6 +112,18 @@ class Invoice extends Entity implements JsonSerializable {
 		self::TYPE_CREDIT_NOTE,
 	];
 
+	/** Special VAT treatment (document level). Empty/null = regular taxation. */
+	public const SPECIAL_TAX_REVERSE_CHARGE = 'reverse_charge';
+	public const SPECIAL_TAX_INTRA_COMMUNITY = 'intra_community';
+	public const SPECIAL_TAX_EXPORT = 'export';
+
+	/** Special cases that make the whole invoice VAT-exempt (0 % tax charged). */
+	public const SPECIAL_TAX_EXEMPT_CASES = [
+		self::SPECIAL_TAX_REVERSE_CHARGE,
+		self::SPECIAL_TAX_INTRA_COMMUNITY,
+		self::SPECIAL_TAX_EXPORT,
+	];
+
 	protected ?string $ownerUserId = null;
 	protected ?string $number = null;
 	protected ?string $status = null;
@@ -114,6 +136,11 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $recipientCountry = null;
 	protected ?string $recipientEmail = null;
 	protected ?string $recipientVatId = null;
+	protected ?string $recipientContactPerson = null;
+	protected ?string $recipientPhone = null;
+	protected ?string $sellerContactPerson = null;
+	protected ?string $sellerContactPhone = null;
+	protected ?string $sellerContactEmail = null;
 	protected ?\DateTime $issueDate = null;
 	protected ?\DateTime $performanceDate = null;
 	protected ?\DateTime $performancePeriodStart = null;
@@ -149,6 +176,11 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('recipientCountry', Types::STRING);
 		$this->addType('recipientEmail', Types::STRING);
 		$this->addType('recipientVatId', Types::STRING);
+		$this->addType('recipientContactPerson', Types::STRING);
+		$this->addType('recipientPhone', Types::STRING);
+		$this->addType('sellerContactPerson', Types::STRING);
+		$this->addType('sellerContactPhone', Types::STRING);
+		$this->addType('sellerContactEmail', Types::STRING);
 		$this->addType('issueDate', Types::DATE);
 		$this->addType('performanceDate', Types::DATE);
 		$this->addType('performancePeriodStart', Types::DATE);
@@ -179,6 +211,14 @@ class Invoice extends Entity implements JsonSerializable {
 		}
 		$decoded = json_decode($this->taxBreakdown, true);
 		return is_array($decoded) ? $decoded : [];
+	}
+
+	/**
+	 * Whether this invoice carries a VAT-exempt special case (reverse charge,
+	 * intra-community supply or export) and therefore charges no VAT.
+	 */
+	public function isTaxExemptCase(): bool {
+		return in_array($this->getSpecialTaxCase(), self::SPECIAL_TAX_EXEMPT_CASES, true);
 	}
 
 	/** @return list<array{label: string, value: string}> */
@@ -212,6 +252,11 @@ class Invoice extends Entity implements JsonSerializable {
 			'recipientCountry' => $this->getRecipientCountry(),
 			'recipientEmail' => $this->getRecipientEmail(),
 			'recipientVatId' => $this->getRecipientVatId(),
+			'recipientContactPerson' => $this->getRecipientContactPerson(),
+			'recipientPhone' => $this->getRecipientPhone(),
+			'sellerContactPerson' => $this->getSellerContactPerson(),
+			'sellerContactPhone' => $this->getSellerContactPhone(),
+			'sellerContactEmail' => $this->getSellerContactEmail(),
 			'issueDate' => $this->formatDate($this->getIssueDate()),
 			'performanceDate' => $this->formatDate($this->getPerformanceDate()),
 			'performancePeriodStart' => $this->formatDate($this->getPerformancePeriodStart()),

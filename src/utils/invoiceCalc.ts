@@ -24,8 +24,12 @@ export interface Totals {
 	totalCents: number
 }
 
-/** Aggregate lines into subtotal, per-rate tax breakdown and gross total. */
-export function computeTotals(lines: Array<{ taxRateBp: number, lineTotalCents: number }>): Totals {
+/**
+ * Aggregate lines into subtotal, per-rate tax breakdown and gross total.
+ * When taxExempt is true (§19 small business or a special tax case) no VAT is
+ * charged: every group's tax is 0 and the gross total equals the net subtotal.
+ */
+export function computeTotals(lines: Array<{ taxRateBp: number, lineTotalCents: number }>, taxExempt = false): Totals {
 	const netByRate = new Map<number, number>()
 	let subtotal = 0
 	for (const line of lines) {
@@ -40,7 +44,7 @@ export function computeTotals(lines: Array<{ taxRateBp: number, lineTotalCents: 
 		.map(([rateBp, netCents]) => ({
 			rateBp,
 			netCents,
-			taxCents: Math.round((netCents * rateBp) / 10000),
+			taxCents: taxExempt ? 0 : Math.round((netCents * rateBp) / 10000),
 		}))
 
 	const totalTax = breakdown.reduce((sum, row) => sum + row.taxCents, 0)

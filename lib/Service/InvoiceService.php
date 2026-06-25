@@ -305,6 +305,9 @@ class InvoiceService {
 			$storno->setInvoiceType(Invoice::TYPE_CANCELLATION);
 			$storno->setRelatedInvoiceId((int)$original->getId());
 			$this->copyRecipient($original, $storno);
+			$storno->setSellerContactPerson($original->getSellerContactPerson());
+			$storno->setSellerContactPhone($original->getSellerContactPhone());
+			$storno->setSellerContactEmail($original->getSellerContactEmail());
 			$storno->setSpecialTaxCase($original->getSpecialTaxCase());
 			$storno->setGreeting($original->getGreeting());
 			$storno->setCustomFields($original->getCustomFields());
@@ -342,7 +345,13 @@ class InvoiceService {
 			throw $e;
 		}
 
-		return $this->present($storno);
+		// Hand the cancellation document to DATEV as well (same fire-and-forget
+		// rule as commit): the original was already transmitted, so the storno
+		// must follow to keep the DATEV beleg state consistent. A mail failure is
+		// only logged, never rolls back the (legally final) storno.
+		$result = $this->present($storno);
+		$result['datevMailSent'] = $this->maybeSendToDatev($storno);
+		return $result;
 	}
 
 	/**
@@ -420,7 +429,9 @@ class InvoiceService {
 	private function applyHeader(Invoice $invoice, array $data): void {
 		$strings = [
 			'recipientName', 'recipientContactId', 'recipientAddress', 'recipientPostalCode',
-			'recipientCity', 'recipientEmail', 'recipientVatId', 'referenceNumber',
+			'recipientCity', 'recipientEmail', 'recipientVatId', 'recipientContactPerson',
+			'recipientPhone', 'sellerContactPerson', 'sellerContactPhone', 'sellerContactEmail',
+			'referenceNumber',
 			'orderNumber', 'buyerReference', 'specialTaxCase', 'greeting', 'extraText',
 			'discountTerms',
 		];
@@ -459,6 +470,8 @@ class InvoiceService {
 		$to->setRecipientCountry($from->getRecipientCountry());
 		$to->setRecipientEmail($from->getRecipientEmail());
 		$to->setRecipientVatId($from->getRecipientVatId());
+		$to->setRecipientContactPerson($from->getRecipientContactPerson());
+		$to->setRecipientPhone($from->getRecipientPhone());
 	}
 
 	/**
@@ -526,7 +539,12 @@ class InvoiceService {
 			],
 			$items,
 		);
-		$totals = InvoiceCalculator::computeTotals($lines);
+		// VAT is dropped to 0 for §19 small businesses and for special tax cases
+		// (reverse charge / intra-community / export) — see ZugferdService for the
+		// matching EN16931 category codes and exemption reasons.
+		$smallBusiness = $this->settingsService->getCompany()->getSmallBusiness() === 1;
+		$taxExempt = $smallBusiness || $invoice->isTaxExemptCase();
+		$totals = InvoiceCalculator::computeTotals($lines, $taxExempt);
 		$invoice->setSubtotalCents($totals['subtotalCents']);
 		$invoice->setTotalCents($totals['totalCents']);
 		$invoice->setTaxBreakdown(json_encode($totals['taxBreakdown']) ?: '[]');
