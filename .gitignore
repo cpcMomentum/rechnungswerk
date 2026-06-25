@@ -34,11 +34,7 @@ CLAUDE.md
 .claude/
 archive/
 sessions/
-docs/produktbeschreibung.md
-docs/plan.md
-docs/*produktbeschreibung*.md
-docs/erechnung-app-konzept-*.md
-docs/erechnung-editor-mockup-*.html
+docs/
 
 # App Store Tarballs
 *.tar.gz
