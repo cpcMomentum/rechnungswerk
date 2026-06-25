@@ -7,7 +7,24 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-25
+
+Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
+(ZUGFeRD/EN16931) erstellen, an Kunden versenden und automatisch an DATEV übergeben.
+
 ### Added
+- E-Rechnung (ZUGFeRD/EN16931): CII-XML + branded PDF/A-3 (`ZugferdService`),
+  vollständiger Feldexport — Leistungsdatum/-zeitraum (BT-72/BG-14),
+  Bestell-/Referenznummern (BT-13/14), Verkäufer-/Käufer-Ansprechpartner (BG-6/BG-9),
+  USt-Sonderfälle (Reverse-Charge, innergemeinschaftlich, Ausfuhr)
+- DATEV-Übergabe: automatischer E-Mail-Versand der ZUGFeRD-PDF an die DATEV-Upload-Mail
+  beim Festschreiben und beim Stornieren; optionales eigenes SMTP-Konto
+- DATEV-Rückkanal (IMAP): Background-Job wertet Empfangsbestätigungen aus
+  (In-Reply-To-Matching), Status gesendet → bestätigt; optionaler Papierkorb-Cleanup
+  bestätigter Quittungen (Admin-Einstellung, Default aus)
+- Verkäufer-Ansprechpartner pro Rechnung (Kaskade Rechnung → NC-Konto → Firmenkontakt)
+- Status-Anzeige als flache Icons + Legende in Liste und Editor; Einstellungen
+  in der Navigation unten links (NC-Konvention)
 - Zahlungsbedingungen (It. 4a): Zahlungsziel (Tage), automatisch berechnetes
   Fälligkeitsdatum beim Festschreiben und Skonto-Hinweis — Migration v0.1.1
   (`payment_term_days`, `due_date`, `discount_terms`) + Editor-Sektion
@@ -40,3 +57,6 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 - `InvoiceService` mit Lifecycle (Entwurf → Festschreiben → Storno) und
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
+
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/cpcMomentum/rechnungswerk/releases/tag/v0.1.0
