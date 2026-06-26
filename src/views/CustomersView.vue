@@ -62,7 +62,7 @@
 		<CustomerEditModal
 			:open="editorOpen"
 			:customer="editing"
-			:saving="store.loading"
+			:saving="saving"
 			:taken-numbers="takenNumbers"
 			:prefill="prefill"
 			@close="editorOpen = false"
@@ -117,6 +117,7 @@ const deleteTarget = ref<Customer | null>(null)
 const importOpen = ref(false)
 const contactQuery = ref('')
 const error = ref('')
+const saving = ref(false)
 
 const takenNumbers = computed(() => store.customers
 	.filter(c => c.id !== editing.value?.id)
@@ -165,6 +166,7 @@ function onContactSelected(contact: ContactMatch) {
 
 async function onSave(data: CustomerCreate) {
 	error.value = ''
+	saving.value = true
 	try {
 		if (editing.value) {
 			await store.update(editing.value.id, data)
@@ -175,6 +177,8 @@ async function onSave(data: CustomerCreate) {
 		prefill.value = null
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Speichern fehlgeschlagen'))
+	} finally {
+		saving.value = false
 	}
 }
 
