@@ -1,4 +1,4 @@
-# Rechnungswerk
+# RechnungsWerk
 
 Schlanke Nextcloud-App zum Erstellen von Rechnungen und **E-Rechnungen** (ZUGFeRD/EN16931)
 für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und automatischer

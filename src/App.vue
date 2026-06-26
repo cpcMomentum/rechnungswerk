@@ -9,7 +9,7 @@
 		<template v-else-if="!hasAccess">
 			<NcAppContent>
 				<NcEmptyContent :name="t('rechnungswerk', 'Kein Zugriff')"
-					:description="t('rechnungswerk', 'Du bist für Rechnungswerk nicht freigeschaltet. Wende dich an einen Administrator.')">
+					:description="t('rechnungswerk', 'Du bist für RechnungsWerk nicht freigeschaltet. Wende dich an einen Administrator.')">
 					<template #icon><LockIcon :size="20" /></template>
 				</NcEmptyContent>
 			</NcAppContent>
