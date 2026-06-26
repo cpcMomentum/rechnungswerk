@@ -1,6 +1,7 @@
 OC.L10N.register(
     "rechnungswerk",
     {
+    "Stammdaten" : "Stammdaten",
     "Aus Kontakten importieren" : "Aus Kontakten importieren",
     "Anschrift" : "Anschrift",
     "Ansprechpartner" : "Ansprechpartner",

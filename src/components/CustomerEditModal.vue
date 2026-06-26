@@ -3,98 +3,112 @@
 		<div class="customer-modal">
 			<h2>{{ title }}</h2>
 
-			<div class="field-row">
+			<div class="form-section">
+				<h3>{{ t('rechnungswerk', 'Stammdaten') }}</h3>
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Kundennr.') }} *</span>
+						<input ref="numberInput" v-model="form.customerNumber" class="input" type="text" />
+					</label>
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Name / Firma') }} *</span>
+						<input v-model="form.name" class="input" type="text" />
+					</label>
+				</div>
+				<NcNoteCard v-if="duplicateNumber" type="error"
+					:text="t('rechnungswerk', 'Die Kundennummer {number} ist bereits vergeben. Bitte eine andere wählen.', { number: form.customerNumber.trim() })" />
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'USt-IdNr.') }}</span>
+						<input v-model="form.vatId" class="input" type="text" />
+					</label>
+				</div>
+			</div>
+
+			<div class="form-section">
+				<h3>{{ t('rechnungswerk', 'Anschrift') }}</h3>
 				<label class="field">
-					<span>{{ t('rechnungswerk', 'Kundennr.') }} *</span>
-					<input ref="numberInput" v-model="form.customerNumber" class="input" type="text" />
+					<span>{{ t('rechnungswerk', 'Straße & Hausnummer') }}</span>
+					<input v-model="form.address" class="input" type="text" />
 				</label>
-				<label class="field field--grow">
-					<span>{{ t('rechnungswerk', 'Name / Firma') }} *</span>
-					<input v-model="form.name" class="input" type="text" />
-				</label>
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'PLZ') }}</span>
+						<input v-model="form.postalCode" class="input" type="text" />
+					</label>
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Ort') }}</span>
+						<input v-model="form.city" class="input" type="text" />
+					</label>
+				</div>
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Land') }}</span>
+						<input v-model="form.country" class="input" type="text" maxlength="2" />
+					</label>
+				</div>
+			</div>
+
+			<div class="form-section">
+				<h3>{{ t('rechnungswerk', 'Ansprechpartner & Kontakt') }}</h3>
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
+						<input v-model="form.contactPerson" class="input" type="text" />
+					</label>
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Telefon') }}</span>
+						<input v-model="form.phone" class="input" type="text" />
+					</label>
+				</div>
 				<label class="field">
-					<span>{{ t('rechnungswerk', 'USt-IdNr.') }}</span>
-					<input v-model="form.vatId" class="input" type="text" />
+					<span>{{ t('rechnungswerk', 'E-Mail (für Rechnungsversand)') }}</span>
+					<input v-model="form.email" class="input" type="email" />
 				</label>
 			</div>
 
-			<NcNoteCard v-if="duplicateNumber" type="error"
-				:text="t('rechnungswerk', 'Die Kundennummer {number} ist bereits vergeben. Bitte eine andere wählen.', { number: form.customerNumber.trim() })" />
-
-			<h3 class="section">{{ t('rechnungswerk', 'Anschrift') }}</h3>
-			<label class="field">
-				<span>{{ t('rechnungswerk', 'Straße & Hausnummer') }}</span>
-				<input v-model="form.address" class="input" type="text" />
-			</label>
-			<div class="field-row">
+			<div class="form-section">
+				<h3>{{ t('rechnungswerk', 'Bankverbindung') }}</h3>
 				<label class="field">
-					<span>{{ t('rechnungswerk', 'PLZ') }}</span>
-					<input v-model="form.postalCode" class="input" type="text" />
+					<span>{{ t('rechnungswerk', 'Kontoinhaber') }}</span>
+					<input v-model="form.bankAccountHolder" class="input" type="text" />
 				</label>
-				<label class="field field--grow">
-					<span>{{ t('rechnungswerk', 'Ort') }}</span>
-					<input v-model="form.city" class="input" type="text" />
-				</label>
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'IBAN') }}</span>
+						<input v-model="form.iban" class="input" type="text" />
+					</label>
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'BIC') }}</span>
+						<input v-model="form.bic" class="input" type="text" />
+					</label>
+				</div>
 				<label class="field">
-					<span>{{ t('rechnungswerk', 'Land') }}</span>
-					<input v-model="form.country" class="input" type="text" maxlength="2" />
+					<span>{{ t('rechnungswerk', 'Bank') }}</span>
+					<input v-model="form.bankName" class="input" type="text" />
 				</label>
 			</div>
 
-			<h3 class="section">{{ t('rechnungswerk', 'Ansprechpartner & Kontakt') }}</h3>
-			<div class="field-row">
-				<label class="field field--grow">
-					<span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
-					<input v-model="form.contactPerson" class="input" type="text" />
-				</label>
+			<div class="form-section">
+				<h3>{{ t('rechnungswerk', 'Vorgaben für neue Rechnungen') }}</h3>
+				<div class="row">
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Zahlungsziel (Tage)') }}</span>
+						<input v-model="paymentTermInput" class="input" type="number" min="0" inputmode="numeric" />
+					</label>
+					<label class="field">
+						<span>{{ t('rechnungswerk', 'Standard-Steuersatz') }}</span>
+						<select v-model="taxRateInput" class="input">
+							<option value="">{{ t('rechnungswerk', '— keine Vorgabe —') }}</option>
+							<option v-for="bp in TAX_RATES_BP" :key="bp" :value="String(bp)">{{ formatTaxRate(bp) }}</option>
+						</select>
+					</label>
+				</div>
 				<label class="field">
-					<span>{{ t('rechnungswerk', 'Telefon') }}</span>
-					<input v-model="form.phone" class="input" type="text" />
+					<span>{{ t('rechnungswerk', 'Notiz (intern, nicht auf der Rechnung)') }}</span>
+					<textarea v-model="form.note" class="input" rows="2" />
 				</label>
 			</div>
-			<label class="field">
-				<span>{{ t('rechnungswerk', 'E-Mail (für Rechnungsversand)') }}</span>
-				<input v-model="form.email" class="input" type="email" />
-			</label>
-
-			<h3 class="section">{{ t('rechnungswerk', 'Bankverbindung') }}</h3>
-			<label class="field">
-				<span>{{ t('rechnungswerk', 'Kontoinhaber') }}</span>
-				<input v-model="form.bankAccountHolder" class="input" type="text" />
-			</label>
-			<div class="field-row">
-				<label class="field field--grow">
-					<span>{{ t('rechnungswerk', 'IBAN') }}</span>
-					<input v-model="form.iban" class="input" type="text" />
-				</label>
-				<label class="field">
-					<span>{{ t('rechnungswerk', 'BIC') }}</span>
-					<input v-model="form.bic" class="input" type="text" />
-				</label>
-			</div>
-			<label class="field">
-				<span>{{ t('rechnungswerk', 'Bank') }}</span>
-				<input v-model="form.bankName" class="input" type="text" />
-			</label>
-
-			<h3 class="section">{{ t('rechnungswerk', 'Vorgaben für neue Rechnungen') }}</h3>
-			<div class="field-row">
-				<label class="field">
-					<span>{{ t('rechnungswerk', 'Zahlungsziel (Tage)') }}</span>
-					<input v-model="paymentTermInput" class="input" type="number" min="0" inputmode="numeric" />
-				</label>
-				<label class="field field--grow">
-					<span>{{ t('rechnungswerk', 'Standard-Steuersatz') }}</span>
-					<select v-model="taxRateInput" class="input">
-						<option value="">{{ t('rechnungswerk', '— keine Vorgabe —') }}</option>
-						<option v-for="bp in TAX_RATES_BP" :key="bp" :value="String(bp)">{{ formatTaxRate(bp) }}</option>
-					</select>
-				</label>
-			</div>
-			<label class="field">
-				<span>{{ t('rechnungswerk', 'Notiz (intern, nicht auf der Rechnung)') }}</span>
-				<textarea v-model="form.note" class="input" rows="2" />
-			</label>
 
 			<div class="actions">
 				<NcButton @click="$emit('close')">{{ t('rechnungswerk', 'Abbrechen') }}</NcButton>
@@ -246,18 +260,24 @@ function onSave() {
 
 <style scoped>
 .customer-modal {
-	padding: 24px;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+	padding: 4px 22px 18px;
 	min-width: 0;
 }
 .customer-modal h2 {
-	margin: 0 0 8px;
+	margin: 12px 0 4px;
 }
-.section {
-	margin: 20px 0 2px;
-	font-size: 13px;
+/* Sektionen mit Trennlinie, angelehnt an contractmanager ContractForm */
+.form-section {
+	padding: 16px 0;
+	border-top: 1px solid var(--color-border-light, var(--color-border));
+}
+.form-section:first-of-type {
+	border-top: none;
+	padding-top: 4px;
+}
+.form-section > h3 {
+	margin: 0 0 14px;
+	font-size: 12px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
@@ -267,21 +287,23 @@ function onSave() {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
+	margin-bottom: 14px;
 }
 .field > span {
 	font-weight: 600;
 	font-size: 0.9em;
 }
-.field-row {
-	display: flex;
-	gap: 12px;
-	flex-wrap: wrap;
+.row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px;
+	margin-bottom: 14px;
 }
-.field-row .field {
-	flex: 1 1 120px;
+.row .field {
+	margin-bottom: 0;
 }
-.field-row .field--grow {
-	flex: 2 1 200px;
+.form-section > :last-child {
+	margin-bottom: 0;
 }
 .input {
 	width: 100%;
@@ -291,6 +313,8 @@ function onSave() {
 	display: flex;
 	justify-content: flex-end;
 	gap: 8px;
-	margin-top: 12px;
+	padding-top: 16px;
+	margin-top: 4px;
+	border-top: 1px solid var(--color-border-light, var(--color-border));
 }
 </style>
