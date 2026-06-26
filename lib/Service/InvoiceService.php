@@ -453,6 +453,10 @@ class InvoiceService {
 			$days = $data['paymentTermDays'];
 			$invoice->setPaymentTermDays($days !== null && $days !== '' ? max(0, (int)$days) : null);
 		}
+		if (array_key_exists('customerId', $data)) {
+			$customerId = $data['customerId'];
+			$invoice->setCustomerId($customerId !== null && $customerId !== '' ? (int)$customerId : null);
+		}
 		if (array_key_exists('recipientCountry', $data)) {
 			$country = $data['recipientCountry'];
 			$invoice->setRecipientCountry($country !== null && $country !== '' ? (string)$country : 'DE');
@@ -472,6 +476,7 @@ class InvoiceService {
 	private function copyRecipient(Invoice $from, Invoice $to): void {
 		$to->setRecipientName($from->getRecipientName());
 		$to->setRecipientContactId($from->getRecipientContactId());
+		$to->setCustomerId($from->getCustomerId());
 		$to->setRecipientAddress($from->getRecipientAddress());
 		$to->setRecipientPostalCode($from->getRecipientPostalCode());
 		$to->setRecipientCity($from->getRecipientCity());

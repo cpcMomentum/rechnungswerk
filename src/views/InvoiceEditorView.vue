@@ -52,6 +52,11 @@
 		<!-- Empfänger -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Empfänger') }}</h3>
+			<div v-if="!readonly" class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Kunde übernehmen') }}</span>
+					<CustomerPicker @select="onCustomerSelect" />
+					<span class="rw-hint">{{ t('rechnungswerk', 'Kunde auswählen, um die Empfängerdaten automatisch zu übernehmen.') }}</span></label>
+			</div>
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Name') }}</span>
 					<ContactPicker v-if="!readonly" v-model="form.recipientName" @select="onContactSelect" />
@@ -236,13 +241,14 @@ import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import ContactPicker from '@/components/ContactPicker.vue'
+import CustomerPicker from '@/components/CustomerPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useProductStore } from '@/stores/productStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type ContactMatch, type InvoiceDetail } from '@/types/api'
+import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type ContactMatch, type Customer, type InvoiceDetail } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
@@ -265,6 +271,7 @@ const sendDialogOpen = ref(false)
 const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 
 const form = reactive({
+	customerId: null as number | null,
 	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
 	recipientContactPerson: '', recipientPhone: '',
@@ -378,6 +385,7 @@ onMounted(async () => {
 async function load(id: number) {
 	const detail = await invoiceStore.get(id)
 	invoice.value = detail
+	form.customerId = detail.customerId ?? null
 	form.recipientName = detail.recipientName ?? ''
 	form.recipientEmail = detail.recipientEmail ?? ''
 	form.recipientAddress = detail.recipientAddress ?? ''
@@ -405,7 +413,27 @@ async function load(id: number) {
 	items.value = detail.items.length > 0 ? detail.items.map(itemFromInvoiceItem) : [emptyItem()]
 }
 
+function onCustomerSelect(c: Customer) {
+	form.customerId = c.id
+	form.recipientName = c.name
+	form.recipientContactId = ''
+	form.recipientEmail = c.email ?? ''
+	form.recipientAddress = c.address ?? ''
+	form.recipientPostalCode = c.postalCode ?? ''
+	form.recipientCity = c.city ?? ''
+	form.recipientCountry = c.country ?? 'DE'
+	form.recipientVatId = c.vatId ?? ''
+	form.recipientContactPerson = c.contactPerson ?? ''
+	form.recipientPhone = c.phone ?? ''
+	// Customer default carries over to the invoice header (per-line tax stays per item).
+	if (c.defaultPaymentTermDays != null) {
+		form.paymentTermDays = c.defaultPaymentTermDays
+	}
+}
+
 function onContactSelect(c: ContactMatch) {
+	// Ad-hoc Nextcloud contact: no longer tied to a saved customer.
+	form.customerId = null
 	form.recipientName = c.name
 	form.recipientEmail = c.email
 	if (c.phone) {

@@ -20,6 +20,9 @@
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }">
 					<template #icon><FileDocumentIcon :size="20" /></template>
 				</NcAppNavigationItem>
+				<NcAppNavigationItem :name="t('rechnungswerk', 'Kunden')" :to="{ name: 'customers' }">
+					<template #icon><AccountGroupIcon :size="20" /></template>
+				</NcAppNavigationItem>
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Produkte')" :to="{ name: 'products' }">
 					<template #icon><PackageVariantIcon :size="20" /></template>
 				</NcAppNavigationItem>
@@ -46,6 +49,7 @@ import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
+import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
