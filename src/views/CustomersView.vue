@@ -5,7 +5,7 @@
 			<div class="rw-view__actions">
 				<NcButton @click="openImport">
 					<template #icon><AccountArrowRightIcon :size="20" /></template>
-					{{ t('rechnungswerk', 'Aus Nextcloud-Kontakten importieren') }}
+					{{ t('rechnungswerk', 'Aus Kontakten importieren') }}
 				</NcButton>
 				<NcButton variant="primary" @click="openCreate">
 					<template #icon><PlusIcon :size="20" /></template>
@@ -204,8 +204,10 @@ async function confirmDelete() {
 <style scoped>
 .rw-view__actions {
 	display: flex;
+	flex-shrink: 0;
+	flex-wrap: nowrap;
+	align-items: center;
 	gap: 8px;
-	flex-wrap: wrap;
 }
 .rw-import {
 	padding: 20px 24px 28px;
