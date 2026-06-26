@@ -256,8 +256,11 @@ function onSave() {
 	margin: 0 0 8px;
 }
 .section {
-	margin: 14px 0 0;
-	font-size: 0.95em;
+	margin: 20px 0 2px;
+	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
 	color: var(--color-text-maxcontrast);
 }
 .field {
