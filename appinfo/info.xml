@@ -3,10 +3,10 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 
     <id>rechnungswerk</id>
-    <name>Rechnungswerk</name>
+    <name>RechnungsWerk</name>
     <summary>Rechnungen und E-Rechnungen schreiben mit automatischer DATEV-Übergabe</summary>
     <description><![CDATA[
-# Rechnungswerk
+# RechnungsWerk
 
 Schlanke Nextcloud-App zum Erstellen von Rechnungen und **E-Rechnungen** (ZUGFeRD/EN16931)
 für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und automatischer
@@ -49,7 +49,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 
     <navigations>
         <navigation>
-            <name>Rechnungswerk</name>
+            <name>RechnungsWerk</name>
             <route>rechnungswerk.page.index</route>
             <icon>app.svg</icon>
             <order>10</order>

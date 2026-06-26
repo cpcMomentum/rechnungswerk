@@ -192,7 +192,7 @@
 			<!-- Zugriff & Administration -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
-				<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer Rechnungswerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
+				<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
 
 				<div class="rw-access-group">
 					<span class="rw-access-label">{{ t('rechnungswerk', 'App-Administratoren') }}</span>
