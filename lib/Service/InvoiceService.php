@@ -231,7 +231,7 @@ class InvoiceService {
 			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
 				'ZUGFeRD-Rechnung ' . $number,
-				"Automatische DATEV-Übergabe aus Rechnungswerk.\n\nRechnung: " . $number
+				"Automatische DATEV-Übergabe aus RechnungsWerk.\n\nRechnung: " . $number
 					. "\n\nDie E-Rechnung (ZUGFeRD-PDF) ist als Anhang beigefügt.",
 				$pdf,
 				$number . '.pdf',

@@ -76,7 +76,7 @@ class ZugferdService {
 			$visiblePdf = $this->renderVisiblePdf($invoice, $items, $settings, $relatedNumber);
 
 			$pdfBuilder = ZugferdDocumentPdfBuilder::fromPdfString($document, $visiblePdf);
-			$pdfBuilder->setAdditionalCreatorTool('Rechnungswerk');
+			$pdfBuilder->setAdditionalCreatorTool('RechnungsWerk');
 			// In Germany only the 'Alternative' relationship is permitted for the
 			// embedded e-invoice XML.
 			$pdfBuilder->setAttachmentRelationshipTypeToAlternative();
