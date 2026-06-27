@@ -206,7 +206,7 @@ final class MimeMessage {
 		$charset = strtolower(self::charset($headers['content-type'] ?? ''));
 		if ($charset !== '' && $charset !== 'utf-8' && $charset !== 'us-ascii' && $charset !== 'ascii') {
 			$converted = @mb_convert_encoding($decoded, 'UTF-8', $charset);
-			if ($converted !== false && $converted !== '') {
+			if ($converted !== false) {
 				$decoded = $converted;
 			}
 		}

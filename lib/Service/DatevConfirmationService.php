@@ -71,75 +71,79 @@ class DatevConfirmationService {
 
 		$client = new ImapClient($cfg['host'], $cfg['port'], $cfg['security'], true);
 		$client->connect();
-		$client->login($cfg['user'], $cfg['password']);
-
-		// Confirmations may not stay in INBOX (mail rules / external automations
-		// archive them), so search across folders — but skip the obvious noise.
-		// The sender + 30-day filters run server-side and keep this bounded.
-		$since = (new DateTime())->modify('-30 days');
-		$criteria = 'FROM "' . self::DATEV_SENDER . '" SINCE ' . $since->format('j-M-Y');
-		$skipFolders = ['Trash', 'Junk', 'Drafts', 'Sent'];
 
 		$seen = 0;
 		$matched = 0;
-		foreach ($client->listFolders() as $folder) {
-			if (in_array($folder, $skipFolders, true)) {
-				continue;
-			}
-			try {
-				$client->select($folder);
-				$uids = $client->uidSearch($criteria);
-			} catch (\Throwable $e) {
-				$this->logger->debug('Rechnungswerk: IMAP-Ordner übersprungen: ' . $folder, ['exception' => $e]);
-				continue;
-			}
+		try {
+			$client->login($cfg['user'], $cfg['password']);
 
-			foreach ($uids as $uid) {
+			// Confirmations may not stay in INBOX (mail rules / external automations
+			// archive them), so search across folders — but skip the obvious noise.
+			// The sender + 30-day filters run server-side and keep this bounded.
+			$since = (new DateTime())->modify('-30 days');
+			$criteria = 'FROM "' . self::DATEV_SENDER . '" SINCE ' . $since->format('j-M-Y');
+			$skipFolders = ['Trash', 'Junk', 'Drafts', 'Sent'];
+
+			foreach ($client->listFolders() as $folder) {
+				if (in_array($folder, $skipFolders, true)) {
+					continue;
+				}
 				try {
-					$raw = $client->uidFetchRaw($uid);
+					$client->select($folder);
+					$uids = $client->uidSearch($criteria);
 				} catch (\Throwable $e) {
-					// A single unreadable message must not abort the whole run.
-					$this->logger->debug('Rechnungswerk: IMAP-Nachricht übersprungen (UID ' . $uid . ')', ['exception' => $e]);
+					$this->logger->debug('Rechnungswerk: IMAP-Ordner übersprungen: ' . $folder, ['exception' => $e]);
 					continue;
 				}
-				if ($raw === '') {
-					continue;
-				}
-				$seen++;
-				$parsed = MimeMessage::parse($raw);
-				$invoice = self::resolve($parsed['inReplyTo'], $parsed['subject'], $parsed['text'], $byMsgId, $byNumber);
-				if ($invoice === null) {
-					continue;
-				}
-				$body = $parsed['text'];
-				$success = self::isSuccess($body);
-				$invoice->setDatevStatus($success ? Invoice::DATEV_CONFIRMED : Invoice::DATEV_UNKNOWN);
-				$invoice->setDatevStatusAt(new DateTime());
-				if (!$success) {
-					// Error/rejection format is not yet known — keep the raw text for
-					// later analysis instead of guessing a 'failed' parse.
-					$invoice->setDatevResponseRaw(mb_substr($body, 0, 2000));
-				}
-				$this->invoiceMapper->update($invoice);
 
-				// Opt-in cleanup: only our own (matched) AND confirmed mails go to
-				// Trash. Unknown replies are kept for analysis; n8n's incoming
-				// confirmations are never matched, so they are never touched.
-				if ($success && $cleanup) {
+				foreach ($uids as $uid) {
 					try {
-						$client->uidMove($uid, 'Trash');
+						$raw = $client->uidFetchRaw($uid);
 					} catch (\Throwable $e) {
-						$this->logger->warning('Rechnungswerk: Verschieben der DATEV-Quittung in den Papierkorb fehlgeschlagen', ['exception' => $e]);
+						// A single unreadable message must not abort the whole run.
+						$this->logger->debug('Rechnungswerk: IMAP-Nachricht übersprungen (UID ' . $uid . ')', ['exception' => $e]);
+						continue;
 					}
-				}
+					if ($raw === '') {
+						continue;
+					}
+					$seen++;
+					$parsed = MimeMessage::parse($raw);
+					$invoice = self::resolve($parsed['inReplyTo'], $parsed['subject'], $parsed['text'], $byMsgId, $byNumber);
+					if ($invoice === null) {
+						continue;
+					}
+					$body = $parsed['text'];
+					$success = self::isSuccess($body);
+					$invoice->setDatevStatus($success ? Invoice::DATEV_CONFIRMED : Invoice::DATEV_UNKNOWN);
+					$invoice->setDatevStatusAt(new DateTime());
+					if (!$success) {
+						// Error/rejection format is not yet known — keep the raw text for
+						// later analysis instead of guessing a 'failed' parse.
+						$invoice->setDatevResponseRaw(mb_substr($body, 0, 2000));
+					}
+					$this->invoiceMapper->update($invoice);
 
-				// Drop from the indices so a later message cannot re-match it.
-				unset($byMsgId[$this->normalizeId($invoice->getDatevMessageId())], $byNumber[(string)$invoice->getNumber()]);
-				$matched++;
+					// Opt-in cleanup: only our own (matched) AND confirmed mails go to
+					// Trash. Unknown replies are kept for analysis; n8n's incoming
+					// confirmations are never matched, so they are never touched.
+					if ($success && $cleanup) {
+						try {
+							$client->uidMove($uid, 'Trash');
+						} catch (\Throwable $e) {
+							$this->logger->warning('Rechnungswerk: Verschieben der DATEV-Quittung in den Papierkorb fehlgeschlagen', ['exception' => $e]);
+						}
+					}
+
+					// Drop from the indices so a later message cannot re-match it.
+					unset($byMsgId[$this->normalizeId($invoice->getDatevMessageId())], $byNumber[(string)$invoice->getNumber()]);
+					$matched++;
+				}
 			}
+		} finally {
+			$client->logout();
 		}
 
-		$client->logout();
 		return ['pending' => count($pending), 'messages' => $seen, 'matched' => $matched];
 	}
 

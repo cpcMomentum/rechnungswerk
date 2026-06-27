@@ -67,16 +67,22 @@ class ImapClient {
 		stream_set_timeout($stream, $this->timeout);
 		$this->stream = $stream;
 
-		$greeting = $this->readLine();
-		if (!str_starts_with($greeting, '* OK') && !str_starts_with($greeting, '* PREAUTH')) {
-			throw new ImapException('IMAP-Greeting unerwartet: ' . trim($greeting));
-		}
-
-		if ($sec === 'starttls') {
-			$this->command('STARTTLS');
-			if (!stream_socket_enable_crypto($this->stream, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-				throw new ImapException('IMAP STARTTLS-Upgrade fehlgeschlagen');
+		try {
+			$greeting = $this->readLine();
+			if (!str_starts_with($greeting, '* OK') && !str_starts_with($greeting, '* PREAUTH')) {
+				throw new ImapException('IMAP-Greeting unerwartet: ' . trim($greeting));
 			}
+
+			if ($sec === 'starttls') {
+				$this->command('STARTTLS');
+				if (!stream_socket_enable_crypto($this->stream, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+					throw new ImapException('IMAP STARTTLS-Upgrade fehlgeschlagen');
+				}
+			}
+		} catch (\Throwable $e) {
+			fclose($this->stream);
+			$this->stream = null;
+			throw $e;
 		}
 	}
 
@@ -187,8 +193,15 @@ class ImapClient {
 		if ($this->stream === null) {
 			throw new ImapException('IMAP: nicht verbunden');
 		}
+		if (str_contains($command, "\r") || str_contains($command, "\n")) {
+			throw new ImapException('IMAP: ungültiges Steuerzeichen im Befehl');
+		}
 		$tag = sprintf('A%03d', ++$this->tagCounter);
-		fwrite($this->stream, $tag . ' ' . $command . "\r\n");
+		$line = $tag . ' ' . $command . "\r\n";
+		$written = fwrite($this->stream, $line);
+		if ($written === false || $written < strlen($line)) {
+			throw new ImapException('IMAP: Schreibfehler auf Socket');
+		}
 		return $this->readResponse($tag);
 	}
 
@@ -231,6 +244,9 @@ class ImapClient {
 	}
 
 	private function readBytes(int $length): string {
+		if ($length > 10 * 1024 * 1024) {
+			throw new ImapException(sprintf('IMAP: Literal-Größe %d überschreitet Limit', $length));
+		}
 		$data = '';
 		while (strlen($data) < $length) {
 			$chunk = fread($this->stream, $length - strlen($data));
