@@ -29,6 +29,14 @@ return [
 		['name' => 'product#update',  'url' => '/api/v1/products/{id}', 'verb' => 'PATCH'],
 		['name' => 'product#destroy', 'url' => '/api/v1/products/{id}', 'verb' => 'DELETE'],
 
+		// Customers
+		['name' => 'customer#index',    'url' => '/api/v1/customers',               'verb' => 'GET'],
+		['name' => 'customer#show',     'url' => '/api/v1/customers/{id}',          'verb' => 'GET'],
+		['name' => 'customer#invoices', 'url' => '/api/v1/customers/{id}/invoices', 'verb' => 'GET'],
+		['name' => 'customer#create',   'url' => '/api/v1/customers',               'verb' => 'POST'],
+		['name' => 'customer#update',   'url' => '/api/v1/customers/{id}',          'verb' => 'PATCH'],
+		['name' => 'customer#destroy',  'url' => '/api/v1/customers/{id}',          'verb' => 'DELETE'],
+
 		// Settings (central company config)
 		['name' => 'settings#show', 'url' => '/api/v1/settings', 'verb' => 'GET'],
 		['name' => 'settings#save', 'url' => '/api/v1/settings', 'verb' => 'PUT'],

@@ -37,6 +37,20 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * All invoices referencing a given customer (newest first), for the customer view (#60).
+	 *
+	 * @return Invoice[]
+	 */
+	public function findByCustomerId(int $customerId): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->eq('customer_id', $qb->createNamedParameter($customerId, IQueryBuilder::PARAM_INT)))
+			->orderBy('created_at', 'DESC')
+			->addOrderBy('id', 'DESC');
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * Invoices handed to DATEV that are still awaiting a confirmation (#36).
 	 *
 	 * @return Invoice[]
