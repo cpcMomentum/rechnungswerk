@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
-	bootstrap="bootstrap.php"
+	bootstrap="bootstrap-unit.php"
 	colors="true"
 	cacheDirectory=".phpunit.cache"
 	failOnRisky="true"
