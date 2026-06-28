@@ -16,6 +16,16 @@ use PHPUnit\Framework\TestCase;
 
 class AppFrameworkTest extends TestCase {
 
+	protected function setUp(): void {
+		parent::setUp();
+		// Diese Integrationstests instanziieren das echte App-Framework
+		// (OCP\AppFramework\App -> OC-Bootstrap). Container-frei gegen die
+		// ocp-Stubs fehlt die private OC-Klasse — dann ueberspringen.
+		if (!class_exists('OC')) {
+			$this->markTestSkipped('Benoetigt eine laufende Nextcloud-Instanz (OC-Bootstrap).');
+		}
+	}
+
 	public function testApplicationRegistersWithoutErrors(): void {
 		$app = new Application();
 
