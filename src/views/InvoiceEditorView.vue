@@ -211,7 +211,7 @@
 		<ConfirmDialog :open="dialog === 'cancel'"
 			:name="t('rechnungswerk', 'Rechnung stornieren')"
 			:message="t('rechnungswerk', 'Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Stornieren')" destructive
+			:confirm-label="t('rechnungswerk', 'Stornorechnung erstellen')" destructive
 			@close="dialog = null" @confirm="doCancel" />
 
 		<SendInvoiceDialog

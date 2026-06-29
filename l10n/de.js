@@ -188,6 +188,7 @@ OC.L10N.register(
     "Stornieren fehlgeschlagen" : "Stornieren fehlgeschlagen",
     "Storniert" : "Storniert",
     "Storno" : "Storno",
+    "Stornorechnung erstellen" : "Stornorechnung erstellen",
     "Straße" : "Straße",
     "Stück" : "Stück",
     "Stunde" : "Stunde",
