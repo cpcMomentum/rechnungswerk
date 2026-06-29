@@ -279,8 +279,10 @@ class InvoiceService {
 	}
 
 	/**
-	 * Storno: cancel a committed invoice by creating a negated cancellation
-	 * document (own number) and marking the original as cancelled.
+	 * Storno: cancel a committed invoice by creating a cancellation document
+	 * (EN16931 credit note / typeCode 381, own number, positive amounts) and
+	 * marking the original as cancelled. The reversal is conveyed by the
+	 * document type plus the reference to the original, not by a negative sign.
 	 *
 	 * @return array<string, mixed> the cancellation document
 	 * @throws NotFoundException
@@ -334,9 +336,9 @@ class InvoiceService {
 				$copy->setDescription($item->getDescription());
 				$copy->setQuantity($item->getQuantity());
 				$copy->setUnitCode($item->getUnitCode());
-				$copy->setUnitPriceCents(-$item->getUnitPriceCents());
+				$copy->setUnitPriceCents($item->getUnitPriceCents());
 				$copy->setTaxRateBp($item->getTaxRateBp());
-				$copy->setLineTotalCents(-$item->getLineTotalCents());
+				$copy->setLineTotalCents($item->getLineTotalCents());
 				$copy->setSortOrder($item->getSortOrder());
 				$this->itemMapper->insert($copy);
 			}

@@ -114,7 +114,6 @@ OC.L10N.register(
     "Firmenname" : "Company name",
     "Format" : "Format",
     "Gesamt (brutto)" : "Total (gross)",
-    "Gutschrift" : "Credit note",
     "IBAN" : "IBAN",
     "Ihre Rechnung" : "Your invoice",
     "Käuferreferenz / Leitweg-ID (BT-10)" : "Buyer reference / Leitweg-ID (BT-10)",
