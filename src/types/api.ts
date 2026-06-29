@@ -58,7 +58,7 @@ export interface Customer {
 }
 
 export type InvoiceStatus = 'draft' | 'committed' | 'cancelled'
-export type InvoiceType = 'invoice' | 'cancellation' | 'credit_note'
+export type InvoiceType = 'invoice' | 'cancellation'
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 	draft: 'Entwurf',
@@ -69,7 +69,6 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 export const INVOICE_TYPE_LABELS: Record<InvoiceType, string> = {
 	invoice: 'Rechnung',
 	cancellation: 'Storno',
-	credit_note: 'Gutschrift',
 }
 
 export interface TaxBreakdownRow {

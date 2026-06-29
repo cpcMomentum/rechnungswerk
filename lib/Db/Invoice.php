@@ -114,12 +114,10 @@ class Invoice extends Entity implements JsonSerializable {
 
 	public const TYPE_INVOICE = 'invoice';
 	public const TYPE_CANCELLATION = 'cancellation';
-	public const TYPE_CREDIT_NOTE = 'credit_note';
 
 	public const TYPES = [
 		self::TYPE_INVOICE,
 		self::TYPE_CANCELLATION,
-		self::TYPE_CREDIT_NOTE,
 	];
 
 	/** Special VAT treatment (document level). Empty/null = regular taxation. */

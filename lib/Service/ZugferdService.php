@@ -115,12 +115,10 @@ class ZugferdService {
 		$smallBusiness = $settings->getSmallBusiness() === 1;
 		$builder = ZugferdDocumentBuilder::createNew(ZugferdProfiles::PROFILE_EN16931);
 
-		// Document type: 380 invoice, 381 for cancellation/credit-note documents.
-		// The embedded XML deliberately mirrors the stored document 1:1 — including
-		// the sign of the amounts — so the machine-readable part always matches the
-		// visible PDF (a storno is stored, and shown, with negative amounts). Strict
-		// KoSIT/EN16931 conformance of the storno (381) path is a later milestone;
-		// normal invoices (380) are the validated happy path for this iteration.
+		// Document type: 380 for invoices, 381 (EN16931 credit note) for storno
+		// documents. A storno carries positive amounts — the reversal is conveyed
+		// by the document type plus the BT-25 reference to the original invoice,
+		// not by a negative sign (negative amounts are invalid on a 381).
 		$typeCode = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE
 			? ZugferdInvoiceType::INVOICE
 			: ZugferdInvoiceType::CREDITNOTE;
@@ -493,7 +491,7 @@ class ZugferdService {
 		], static fn ($l) => trim((string)$l) !== '');
 		$recipient = implode('<br>', array_map($e, $recipientLines));
 
-		$title = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE ? 'Rechnung' : 'Storno / Gutschrift';
+		$title = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE ? 'Rechnung' : 'Stornorechnung';
 		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt();
 		$meta = [];
 		$meta[] = ['Rechnungsnummer', $e($invoice->getNumber())];

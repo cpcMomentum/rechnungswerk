@@ -222,24 +222,30 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringNotContainsString('zentrale@muster.de', $xml);
 	}
 
-	public function testCancellationIsCreditNoteType381(): void {
+	public function testCancellationIsCreditNote381WithPositiveAmounts(): void {
 		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
-		$invoice->setSubtotalCents(-20000);
-		$invoice->setTotalCents(-23800);
-		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
-		$items = [$this->item(-10000, 1900, -20000)];
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
+		// A storno is an EN16931 credit note (381) and carries positive amounts —
+		// the reversal is conveyed by the type plus the original reference, not by
+		// a negative sign (negative amounts are invalid on a 381).
 		$this->assertStringContainsString('<ram:TypeCode>381</ram:TypeCode>', $xml);
+		$this->assertStringContainsString('200.00', $xml);
+		$this->assertStringNotContainsString('-200.00', $xml);
+		$this->assertStringNotContainsString('-238.00', $xml);
 	}
 
 	public function testCancellationReferencesOriginalInvoice(): void {
 		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
-		$invoice->setSubtotalCents(-20000);
-		$invoice->setTotalCents(-23800);
-		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
-		$items = [$this->item(-10000, 1900, -20000)];
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings(), 'RE-2026-0001');
 
