@@ -96,7 +96,13 @@ final class MimeMessage {
 		if (!str_contains($value, '=?')) {
 			return $value;
 		}
-		$decoded = mb_decode_mimeheader($value);
+		// iconv_mime_decode dekodiert das RFC-2047-"Q"-Encoding korrekt inkl.
+		// "_" -> Leerzeichen auf allen PHP-Versionen; mb_decode_mimeheader liess
+		// das "_" in PHP < 8.3 stehen (versionsabhaengiger Bug). mb als Fallback.
+		$decoded = iconv_mime_decode($value, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
+		if ($decoded === false || $decoded === '') {
+			$decoded = mb_decode_mimeheader($value);
+		}
 		return $decoded !== '' ? $decoded : $value;
 	}
 
