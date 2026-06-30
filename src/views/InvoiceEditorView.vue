@@ -93,11 +93,11 @@
 			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem Nextcloud-Konto. Du kannst es für diese Rechnung ändern. Leer lassen → es greift der zentrale Firmenkontakt aus den Einstellungen.') }}</p>
 		</section>
 
-		<!-- Einleitung (vor den Positionen) -->
+		<!-- Anrede & Einleitung (vor den Positionen) -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Einleitung') }}</h3>
-			<label class="rw-field"><span>{{ t('rechnungswerk', 'Einleitungstext') }}</span>
-				<textarea v-model="form.greeting" class="rw-input" rows="2" :readonly="readonly"
+			<h3>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</h3>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</span>
+				<textarea v-model="form.greeting" class="rw-input" rows="3" :readonly="readonly"
 					:placeholder="t('rechnungswerk', 'Anrede und Einleitung – Vorgabe aus den Einstellungen')" /></label>
 		</section>
 
@@ -163,7 +163,8 @@
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
 			<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext / Anmerkungen') }}</span>
-				<textarea v-model="form.extraText" class="rw-input" rows="2" :readonly="readonly" /></label>
+				<textarea v-model="form.extraText" class="rw-input" rows="3" :readonly="readonly"
+					:placeholder="t('rechnungswerk', 'Schlusstext – Vorgabe aus den Einstellungen')" /></label>
 		</section>
 
 		<!-- Sticky actions -->
@@ -332,12 +333,12 @@ const finalizeMessage = computed(() => {
 
 const defaultMailBody = computed(() => {
 	const s = settingsStore.settings
-	const greeting = (invoice.value?.greeting ?? s?.greetingDefault ?? '').trim()
-	const intro = (s?.introDefault ?? '').trim()
-	const closing = (s?.closingDefault ?? '').trim()
+	// Opening already bundles salutation + intro (see onMounted / invoice.greeting).
+	const opening = (invoice.value?.greeting
+		?? [s?.greetingDefault, s?.introDefault].filter(p => (p ?? '').trim() !== '').join('\n\n')).trim()
+	const closing = (invoice.value?.extraText ?? s?.closingDefault ?? '').trim()
 	const parts = [
-		greeting,
-		intro !== '' ? intro : t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).'),
+		opening !== '' ? opening : t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).'),
 		closing,
 	].filter(p => p !== '')
 	return parts.join('\n\n')
@@ -357,8 +358,11 @@ onMounted(async () => {
 		if (props.id) {
 			await load(Number(props.id))
 		} else {
-			form.greeting = settingsStore.settings?.greetingDefault ?? ''
-			form.extraText = settingsStore.settings?.closingDefault ?? ''
+			const cfg = settingsStore.settings
+			// Opening = salutation + intro; closing text is edited separately below.
+			form.greeting = [cfg?.greetingDefault, cfg?.introDefault]
+				.filter(p => (p ?? '').trim() !== '').join('\n\n')
+			form.extraText = cfg?.closingDefault ?? ''
 			// Pre-fill the seller contact from the current user's NC account.
 			// Left empty → backend falls back to the central company contact.
 			try {
