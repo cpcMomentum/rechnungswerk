@@ -9,13 +9,14 @@ export interface ApiError {
 }
 
 /** UN/ECE Rec. 20 unit codes used in EN16931. Labels are translated at render time. */
-export const UNIT_CODES = ['C62', 'HUR', 'DAY', 'KGM', 'LS'] as const
+export const UNIT_CODES = ['C62', 'HUR', 'DAY', 'MON', 'KGM', 'LS'] as const
 export type UnitCode = typeof UNIT_CODES[number]
 
 export const UNIT_CODE_LABELS: Record<UnitCode, string> = {
 	C62: 'Stück',
 	HUR: 'Stunde',
 	DAY: 'Tag',
+	MON: 'Monat',
 	KGM: 'kg',
 	LS: 'Pauschal',
 }

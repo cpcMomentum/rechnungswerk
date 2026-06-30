@@ -578,9 +578,10 @@ class ZugferdService {
 
 		// Salutation + intro text belong ABOVE the line items.
 		$greeting = ($invoice->getGreeting() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getGreeting())) . '</p>' : '';
-		$extra = ($invoice->getExtraText() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getExtraText())) . '</p>' : '';
-		$introHtml = ($greeting !== '' || $extra !== '') ? '<div class="intro">' . $greeting . $extra . '</div>' : '';
-		$closing = ($settings->getClosingDefault() ?? '') !== '' ? '<p>' . nl2br($e($settings->getClosingDefault())) . '</p>' : '';
+		$introHtml = $greeting !== '' ? '<div class="intro">' . $greeting . '</div>' : '';
+		// Closing text belongs at the BOTTOM: per-invoice extraText, falling back to the configured default.
+		$closingText = ($invoice->getExtraText() ?? '') !== '' ? $invoice->getExtraText() : ($settings->getClosingDefault() ?? '');
+		$closing = $closingText !== '' ? '<p>' . nl2br($e($closingText)) . '</p>' : '';
 
 		$taxIds = array_filter([
 			($settings->getVatId() ?? '') !== '' ? 'USt-IdNr.: ' . $e($settings->getVatId()) : null,
@@ -701,6 +702,7 @@ HTML;
 		return match ($unitCode) {
 			InvoiceItem::UNIT_HOUR => 'Std.',
 			InvoiceItem::UNIT_DAY => 'Tag(e)',
+			InvoiceItem::UNIT_MONTH => 'Monat(e)',
 			InvoiceItem::UNIT_KILOGRAM => 'kg',
 			InvoiceItem::UNIT_LUMP_SUM => 'Pausch.',
 			default => 'Stk.',
