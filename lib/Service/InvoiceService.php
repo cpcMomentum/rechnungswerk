@@ -226,7 +226,8 @@ class InvoiceService {
 				return false;
 			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, ($rel = $this->relatedInvoice($invoice))?->getNumber(), $rel?->getIssueDate());
+			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
 			$number = (string)$invoice->getNumber();
 			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
@@ -273,7 +274,8 @@ class InvoiceService {
 		}
 		$settings = $this->settingsService->getCompany();
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, ($rel = $this->relatedInvoice($invoice))?->getNumber(), $rel?->getIssueDate());
+		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings, $this->settingsService->getSmtpConfig());
 	}
@@ -383,7 +385,8 @@ class InvoiceService {
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getCompany();
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, ($rel = $this->relatedInvoice($invoice))?->getNumber(), $rel?->getIssueDate());
+		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
@@ -408,6 +411,14 @@ class InvoiceService {
 
 	private function relatedNumber(Invoice $invoice): ?string {
 		return $this->relatedInvoice($invoice)?->getNumber();
+	}
+
+	/**
+	 * @return array{0: ?string, 1: ?\DateTime} [number, issueDate] of the related invoice, or [null, null].
+	 */
+	private function relatedReference(Invoice $invoice): array {
+		$related = $this->relatedInvoice($invoice);
+		return [$related?->getNumber(), $related?->getIssueDate()];
 	}
 
 	/**
