@@ -226,7 +226,7 @@ class InvoiceService {
 				return false;
 			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice), $this->relatedIssueDate($invoice));
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, ($rel = $this->relatedInvoice($invoice))?->getNumber(), $rel?->getIssueDate());
 			$number = (string)$invoice->getNumber();
 			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
@@ -273,7 +273,7 @@ class InvoiceService {
 		}
 		$settings = $this->settingsService->getCompany();
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice), $this->relatedIssueDate($invoice));
+		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, ($rel = $this->relatedInvoice($invoice))?->getNumber(), $rel?->getIssueDate());
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings, $this->settingsService->getSmtpConfig());
 	}
@@ -338,7 +338,7 @@ class InvoiceService {
 				// Reverse via a negative quantity (BT-129); the net price stays
 				// positive (BR-27) so the line net amount — and thus subtotal and
 				// VAT — become negative.
-				$copy->setQuantity($this->negateQuantity($item->getQuantity()));
+				$copy->setQuantity(InvoiceCalculator::negateQuantity($item->getQuantity()));
 				$copy->setUnitCode($item->getUnitCode());
 				$copy->setUnitPriceCents($item->getUnitPriceCents());
 				$copy->setTaxRateBp($item->getTaxRateBp());
@@ -383,7 +383,7 @@ class InvoiceService {
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getCompany();
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice), $this->relatedIssueDate($invoice));
+		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, ($rel = $this->relatedInvoice($invoice))?->getNumber(), $rel?->getIssueDate());
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
@@ -394,41 +394,20 @@ class InvoiceService {
 	 * Resolve the number of the invoice a storno/credit note refers to, so it
 	 * can be printed and embedded as the preceding-invoice reference (BG-3).
 	 */
+	private function relatedInvoice(Invoice $invoice): ?Invoice {
+		$relatedId = $invoice->getRelatedInvoiceId();
+		if ($relatedId === null) {
+			return null;
+		}
+		try {
+			return $this->invoiceMapper->findOne($relatedId);
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
+
 	private function relatedNumber(Invoice $invoice): ?string {
-		$relatedId = $invoice->getRelatedInvoiceId();
-		if ($relatedId === null) {
-			return null;
-		}
-		try {
-			return $this->invoiceMapper->findOne($relatedId)->getNumber();
-		} catch (DoesNotExistException) {
-			return null;
-		}
-	}
-
-	private function relatedIssueDate(Invoice $invoice): ?\DateTimeInterface {
-		$relatedId = $invoice->getRelatedInvoiceId();
-		if ($relatedId === null) {
-			return null;
-		}
-		try {
-			return $this->invoiceMapper->findOne($relatedId)->getIssueDate();
-		} catch (DoesNotExistException) {
-			return null;
-		}
-	}
-
-	/**
-	 * Negate a positive decimal quantity string for a storno line, preserving the
-	 * original formatting (e.g. "2.000" -> "-2.000"). Non-numeric input is
-	 * returned unchanged.
-	 */
-	private function negateQuantity(string $quantity): string {
-		$q = trim($quantity);
-		if ($q === '' || !is_numeric(str_replace(',', '.', $q))) {
-			return $quantity;
-		}
-		return str_starts_with($q, '-') ? ltrim(substr($q, 1)) : '-' . ltrim($q, '+');
+		return $this->relatedInvoice($invoice)?->getNumber();
 	}
 
 	/**

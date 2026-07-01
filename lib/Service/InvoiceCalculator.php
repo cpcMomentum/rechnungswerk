@@ -79,6 +79,20 @@ final class InvoiceCalculator {
 	}
 
 	/**
+	 * Negate a decimal quantity string for a storno line, preserving the original
+	 * formatting: "2.000" -> "-2.000", "2,5" -> "-2,5". A leading "+" is dropped,
+	 * an already-negative value is made positive, non-numeric input is returned
+	 * unchanged.
+	 */
+	public static function negateQuantity(string $quantity): string {
+		$q = trim($quantity);
+		if ($q === '' || !is_numeric(str_replace(',', '.', $q))) {
+			return $quantity;
+		}
+		return str_starts_with($q, '-') ? ltrim(substr($q, 1)) : '-' . ltrim($q, '+');
+	}
+
+	/**
 	 * Render an invoice number from a format template.
 	 * Supported placeholders: {YYYY}, {YY} and {#…#} (zero-padded counter, width = number of '#').
 	 * Example: "RE-{YYYY}-{####}" with counter 7, year 2026 -> "RE-2026-0007".

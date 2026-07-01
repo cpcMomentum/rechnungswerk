@@ -125,4 +125,35 @@ class InvoiceCalculatorTest extends TestCase {
 	public function testFormatNumberCounterExceedingWidthIsNotTruncated(): void {
 		$this->assertSame('RE-2026-12345', InvoiceCalculator::formatNumber('RE-{YYYY}-{####}', 12345, 2026));
 	}
+
+	public function testNegateQuantityPrependsMinusPreservingFormat(): void {
+		$this->assertSame('-2.000', InvoiceCalculator::negateQuantity('2.000'));
+		$this->assertSame('-10', InvoiceCalculator::negateQuantity('10'));
+		$this->assertSame('-35', InvoiceCalculator::negateQuantity('35'));
+	}
+
+	public function testNegateQuantityHandlesCommaDecimalAndPlusSign(): void {
+		$this->assertSame('-2,5', InvoiceCalculator::negateQuantity('2,5'));
+		$this->assertSame('-3', InvoiceCalculator::negateQuantity('+3'));
+	}
+
+	public function testNegateQuantityAlreadyNegativeBecomesPositive(): void {
+		$this->assertSame('2.000', InvoiceCalculator::negateQuantity('-2.000'));
+	}
+
+	public function testNegateQuantityNonNumericReturnedUnchanged(): void {
+		$this->assertSame('', InvoiceCalculator::negateQuantity(''));
+		$this->assertSame('abc', InvoiceCalculator::negateQuantity('abc'));
+	}
+
+	public function testComputeTotalsWithNegativeLinesYieldsNegativeSubtotalTaxAndTotal(): void {
+		// Storno aggregation: negative line totals must produce negative subtotal,
+		// negative VAT and negative gross total (no abs/clamping).
+		$result = InvoiceCalculator::computeTotals([
+			['taxRateBp' => 1900, 'lineTotalCents' => -20000],
+		]);
+		$this->assertSame(-20000, $result['subtotalCents']);
+		$this->assertSame(-3800, $result['taxBreakdown'][0]['taxCents']);
+		$this->assertSame(-23800, $result['totalCents']);
+	}
 }
