@@ -226,7 +226,7 @@ class InvoiceService {
 				return false;
 			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice), $this->relatedIssueDate($invoice));
 			$number = (string)$invoice->getNumber();
 			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
@@ -273,16 +273,17 @@ class InvoiceService {
 		}
 		$settings = $this->settingsService->getCompany();
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
+		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice), $this->relatedIssueDate($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings, $this->settingsService->getSmtpConfig());
 	}
 
 	/**
-	 * Storno: cancel a committed invoice by creating a cancellation document
-	 * (EN16931 credit note / typeCode 381, own number, positive amounts) and
-	 * marking the original as cancelled. The reversal is conveyed by the
-	 * document type plus the reference to the original, not by a negative sign.
+	 * Storno: cancel a committed invoice by creating a correction document
+	 * (EN16931 corrected invoice / typeCode 384, own number, negative amounts)
+	 * and marking the original as cancelled. The reversal is expressed by a
+	 * negative quantity per line (net price stays positive, BR-27) plus the
+	 * mandatory reference to the original invoice.
 	 *
 	 * @return array<string, mixed> the cancellation document
 	 * @throws NotFoundException
@@ -334,11 +335,14 @@ class InvoiceService {
 				$copy->setProductId($item->getProductId());
 				$copy->setName($item->getName());
 				$copy->setDescription($item->getDescription());
-				$copy->setQuantity($item->getQuantity());
+				// Reverse via a negative quantity (BT-129); the net price stays
+				// positive (BR-27) so the line net amount — and thus subtotal and
+				// VAT — become negative.
+				$copy->setQuantity($this->negateQuantity($item->getQuantity()));
 				$copy->setUnitCode($item->getUnitCode());
 				$copy->setUnitPriceCents($item->getUnitPriceCents());
 				$copy->setTaxRateBp($item->getTaxRateBp());
-				$copy->setLineTotalCents($item->getLineTotalCents());
+				$copy->setLineTotalCents(-$item->getLineTotalCents());
 				$copy->setSortOrder($item->getSortOrder());
 				$this->itemMapper->insert($copy);
 			}
@@ -379,7 +383,7 @@ class InvoiceService {
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getCompany();
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice));
+		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $this->relatedNumber($invoice), $this->relatedIssueDate($invoice));
 		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
 		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
@@ -400,6 +404,31 @@ class InvoiceService {
 		} catch (DoesNotExistException) {
 			return null;
 		}
+	}
+
+	private function relatedIssueDate(Invoice $invoice): ?\DateTimeInterface {
+		$relatedId = $invoice->getRelatedInvoiceId();
+		if ($relatedId === null) {
+			return null;
+		}
+		try {
+			return $this->invoiceMapper->findOne($relatedId)->getIssueDate();
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
+
+	/**
+	 * Negate a positive decimal quantity string for a storno line, preserving the
+	 * original formatting (e.g. "2.000" -> "-2.000"). Non-numeric input is
+	 * returned unchanged.
+	 */
+	private function negateQuantity(string $quantity): string {
+		$q = trim($quantity);
+		if ($q === '' || !is_numeric(str_replace(',', '.', $q))) {
+			return $quantity;
+		}
+		return str_starts_with($q, '-') ? ltrim(substr($q, 1)) : '-' . ltrim($q, '+');
 	}
 
 	/**

@@ -54,8 +54,8 @@ class ZugferdService {
 	 *
 	 * @param InvoiceItem[] $items
 	 */
-	public function buildXml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
-		return $this->buildDocument($invoice, $items, $settings, $relatedNumber)->getContent();
+	public function buildXml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): string {
+		return $this->buildDocument($invoice, $items, $settings, $relatedNumber, $relatedIssueDate)->getContent();
 	}
 
 	/**
@@ -63,7 +63,7 @@ class ZugferdService {
 	 *
 	 * @param InvoiceItem[] $items
 	 */
-	public function generatePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
+	public function generatePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): string {
 		// Nextcloud's bootstrap installs a libxml external-entity loader that
 		// returns null for every resolution (base.php), which makes the
 		// simplexml_load_file() call inside horstoeko's PDF metadata builder —
@@ -71,9 +71,9 @@ class ZugferdService {
 		// default loader for the duration of the (fully trusted: our own XML and
 		// the library's shipped assets) PDF assembly, then re-apply the
 		// hardening immediately afterwards.
-		return $this->withDefaultEntityLoader(function () use ($invoice, $items, $settings, $relatedNumber): string {
-			$document = $this->buildDocument($invoice, $items, $settings, $relatedNumber);
-			$visiblePdf = $this->renderVisiblePdf($invoice, $items, $settings, $relatedNumber);
+		return $this->withDefaultEntityLoader(function () use ($invoice, $items, $settings, $relatedNumber, $relatedIssueDate): string {
+			$document = $this->buildDocument($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+			$visiblePdf = $this->renderVisiblePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
 
 			$pdfBuilder = ZugferdDocumentPdfBuilder::fromPdfString($document, $visiblePdf);
 			$pdfBuilder->setAdditionalCreatorTool('RechnungsWerk');
@@ -111,17 +111,18 @@ class ZugferdService {
 	 *
 	 * @param InvoiceItem[] $items
 	 */
-	private function buildDocument(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): ZugferdDocumentBuilder {
+	private function buildDocument(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): ZugferdDocumentBuilder {
 		$smallBusiness = $settings->getSmallBusiness() === 1;
 		$builder = ZugferdDocumentBuilder::createNew(ZugferdProfiles::PROFILE_EN16931);
 
-		// Document type: 380 for invoices, 381 (EN16931 credit note) for storno
-		// documents. A storno carries positive amounts — the reversal is conveyed
-		// by the document type plus the BT-25 reference to the original invoice,
-		// not by a negative sign (negative amounts are invalid on a 381).
+		// Document type: 380 for invoices, 384 (EN16931 corrected invoice) for
+		// storno documents. A storno reverses the original with NEGATIVE amounts,
+		// expressed by a negative quantity per line (the net price stays positive,
+		// BR-27). The mandatory BT-25 reference to the original invoice makes the
+		// document identifiable as the correction of that specific invoice.
 		$typeCode = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE
 			? ZugferdInvoiceType::INVOICE
-			: ZugferdInvoiceType::CREDITNOTE;
+			: ZugferdInvoiceType::CORRECTION;
 		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? new DateTime();
 
 		$builder->setDocumentInformation(
@@ -131,9 +132,10 @@ class ZugferdService {
 			ZugferdCurrencyCodes::EURO,
 		);
 
-		// BG-3 / BT-25: reference to the preceding invoice (storno/credit note).
+		// BG-3 / BT-25 (+ BT-26 issue date): reference to the preceding invoice
+		// this storno corrects. Mandatory for a corrected invoice (384).
 		if ($relatedNumber !== null && $relatedNumber !== '') {
-			$builder->setDocumentInvoiceReferencedDocument($relatedNumber);
+			$builder->setDocumentInvoiceReferencedDocument($relatedNumber, null, $relatedIssueDate);
 		}
 
 		// §19 small business and the special tax cases (reverse charge /
@@ -447,8 +449,8 @@ class ZugferdService {
 	/**
 	 * @param InvoiceItem[] $items
 	 */
-	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
-		$html = $this->renderHtml($invoice, $items, $settings, $relatedNumber);
+	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): string {
+		$html = $this->renderHtml($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
 		$options = new Options();
 		$options->set('defaultFont', 'DejaVu Sans');
 		$options->set('isRemoteEnabled', false);
@@ -462,7 +464,7 @@ class ZugferdService {
 	/**
 	 * @param InvoiceItem[] $items
 	 */
-	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null): string {
+	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): string {
 		$accent = $this->sanitizeColor($settings->getAccentColor()) ?? '#2c3e50';
 		$logo = $this->loadLogoDataUri($settings);
 		$e = static fn (?string $s): string => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
@@ -522,7 +524,10 @@ class ZugferdService {
 			$meta[] = ['USt-IdNr. (Kunde)', $e($invoice->getRecipientVatId())];
 		}
 		if ($relatedNumber !== null && $relatedNumber !== '') {
-			$meta[] = ['Storno zu Rechnung', $e($relatedNumber)];
+			$reference = $relatedIssueDate !== null
+				? $e($relatedNumber) . ' vom ' . $relatedIssueDate->format('d.m.Y')
+				: $e($relatedNumber);
+			$meta[] = ['Storno zu Rechnung', $reference];
 		}
 		$metaHtml = '';
 		foreach ($meta as [$label, $value]) {
