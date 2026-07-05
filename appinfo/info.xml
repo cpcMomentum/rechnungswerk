@@ -23,7 +23,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - **Stammdaten** — Firmendaten, Logo, Standardtexte, Nummernformat, Kleinunternehmer §19
     ]]></description>
 
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <licence>AGPL-3.0-or-later</licence>
 
     <author mail="axel.deffner@cpcmomentum.com" homepage="https://github.com/cpcMomentum">Axel Deffner</author>
@@ -43,7 +43,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/04-produktkatalog.png</screenshot>
 
     <dependencies>
-        <nextcloud min-version="30" max-version="34"/>
+        <nextcloud min-version="31" max-version="34"/>
         <php min-version="8.2"/>
     </dependencies>
 
