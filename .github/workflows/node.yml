@@ -1,0 +1,42 @@
+name: node
+
+# Frontend-Gate: Typecheck + vitest + Produktions-Build muessen gruen sein.
+# Laeuft auf ALLEN PRs (kein paths-Filter): als Required-Status-Check muss der
+# Workflow immer melden, sonst blockiert ein nie-startender Check den Merge.
+# (Kein lint-Script in package.json; --passWithNoTests, da noch keine
+# Frontend-Tests existieren — der Schritt bleibt vorbereitet.)
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Abhaengigkeiten installieren
+        # npm/cli#4828: ein auf anderem OS erzeugter Lock laesst das plattform-
+        # spezifische rollup-Binary fehlen. Lock entfernen erzwingt frische,
+        # plattform-korrekte Aufloesung auf dem Linux-Runner.
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Frontend-Unit-Tests (vitest)
+        run: npm test -- --passWithNoTests
+
+      - name: Produktions-Build
+        run: npm run build

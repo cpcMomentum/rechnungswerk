@@ -222,29 +222,39 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringNotContainsString('zentrale@muster.de', $xml);
 	}
 
-	public function testCancellationIsCreditNoteType381(): void {
+	public function testCancellationIsCorrectedInvoice384WithNegativeAmounts(): void {
 		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
 		$invoice->setSubtotalCents(-20000);
 		$invoice->setTotalCents(-23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
-		$items = [$this->item(-10000, 1900, -20000)];
+		// Storno line: negative quantity, positive net price, negative line total.
+		$items = [$this->item(10000, 1900, -20000, '-2')];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
-		$this->assertStringContainsString('<ram:TypeCode>381</ram:TypeCode>', $xml);
+		// A storno is an EN16931 corrected invoice (384). The reversal is carried
+		// by NEGATIVE amounts (subtotal + VAT), expressed via a negative quantity,
+		// while the net price stays positive (BR-27).
+		$this->assertStringContainsString('<ram:TypeCode>384</ram:TypeCode>', $xml);
+		$this->assertStringContainsString('-200.00', $xml);   // negative line / subtotal
+		$this->assertStringContainsString('-238.00', $xml);   // negative grand total
+		$this->assertMatchesRegularExpression('/BilledQuantity[^>]*>-2/', $xml); // negative quantity
+		$this->assertStringNotContainsString('-100.00', $xml); // net price stays positive
 	}
 
-	public function testCancellationReferencesOriginalInvoice(): void {
+	public function testCancellationReferencesOriginalInvoiceWithDate(): void {
 		$invoice = $this->invoice(Invoice::TYPE_CANCELLATION);
 		$invoice->setSubtotalCents(-20000);
 		$invoice->setTotalCents(-23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
-		$items = [$this->item(-10000, 1900, -20000)];
+		$items = [$this->item(10000, 1900, -20000, '-2')];
 
-		$xml = $this->service->buildXml($invoice, $items, $this->settings(), 'RE-2026-0001');
+		$xml = $this->service->buildXml($invoice, $items, $this->settings(), 'RE-2026-0001', new DateTime('2026-05-16'));
 
-		// BG-3 preceding-invoice reference carries the original invoice number.
+		// BG-3 preceding-invoice reference carries the original number (BT-25) and
+		// issue date (BT-26).
 		$this->assertStringContainsString('InvoiceReferencedDocument', $xml);
 		$this->assertMatchesRegularExpression('/InvoiceReferencedDocument>.*RE-2026-0001/s', $xml);
+		$this->assertStringContainsString('20260516', $xml);
 	}
 }

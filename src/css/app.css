@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2026 cpcMomentum
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
- * Central design language for Rechnungswerk, lifted from the editor mockup
+ * Central design language for RechnungsWerk, lifted from the editor mockup
  * (docs/erechnung-editor-mockup-v1.html) which in turn mirrors the WorkTime /
  * Vinarium look. Scoped under .app-rechnungswerk so it never leaks into the
  * rest of Nextcloud. Views use these classes instead of bespoke per-component

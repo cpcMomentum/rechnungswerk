@@ -26,6 +26,8 @@ use OCP\DB\Types;
  * @method void setRecipientName(?string $recipientName)
  * @method ?string getRecipientContactId()
  * @method void setRecipientContactId(?string $recipientContactId)
+ * @method ?int getCustomerId()
+ * @method void setCustomerId(?int $customerId)
  * @method ?string getRecipientAddress()
  * @method void setRecipientAddress(?string $recipientAddress)
  * @method ?string getRecipientPostalCode()
@@ -112,12 +114,10 @@ class Invoice extends Entity implements JsonSerializable {
 
 	public const TYPE_INVOICE = 'invoice';
 	public const TYPE_CANCELLATION = 'cancellation';
-	public const TYPE_CREDIT_NOTE = 'credit_note';
 
 	public const TYPES = [
 		self::TYPE_INVOICE,
 		self::TYPE_CANCELLATION,
-		self::TYPE_CREDIT_NOTE,
 	];
 
 	/** Special VAT treatment (document level). Empty/null = regular taxation. */
@@ -144,6 +144,7 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $invoiceType = null;
 	protected ?string $recipientName = null;
 	protected ?string $recipientContactId = null;
+	protected ?int $customerId = null;
 	protected ?string $recipientAddress = null;
 	protected ?string $recipientPostalCode = null;
 	protected ?string $recipientCity = null;
@@ -188,6 +189,7 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('invoiceType', Types::STRING);
 		$this->addType('recipientName', Types::STRING);
 		$this->addType('recipientContactId', Types::STRING);
+		$this->addType('customerId', Types::INTEGER);
 		$this->addType('recipientAddress', Types::TEXT);
 		$this->addType('recipientPostalCode', Types::STRING);
 		$this->addType('recipientCity', Types::STRING);
@@ -268,6 +270,7 @@ class Invoice extends Entity implements JsonSerializable {
 			'invoiceType' => $this->getInvoiceType(),
 			'recipientName' => $this->getRecipientName(),
 			'recipientContactId' => $this->getRecipientContactId(),
+			'customerId' => $this->getCustomerId(),
 			'recipientAddress' => $this->getRecipientAddress(),
 			'recipientPostalCode' => $this->getRecipientPostalCode(),
 			'recipientCity' => $this->getRecipientCity(),

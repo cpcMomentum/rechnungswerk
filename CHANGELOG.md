@@ -1,11 +1,30 @@
 # Changelog
 
-Alle nennenswerten Änderungen an Rechnungswerk werden hier dokumentiert.
+Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [0.1.2] - 2026-07-05
+
+### Added
+- Nextcloud 34 wird unterstützt (`max-version` auf 34 angehoben)
+- Kundenverwaltung: eigene Customer-Entität mit Erfassung, Bearbeitung und Übernahme
+  in die Rechnung
+
+### Fixed
+- Storno als rechtssichere E-Rechnung: Korrekturrechnung mit typeCode **384**
+  und negativen Beträgen (EN16931 / §14c UStG), Referenz auf die stornierte Rechnung
+  (BT-25/BT-26); Beleg heißt „Stornorechnung" statt „Gutschrift" (#64, #65)
+- Storno-Dialog eindeutig beschriftet, doppeltes „Cancel" behoben (#64)
+- DATEV-Rückkanal (IMAP): RFC-2047-Q-Encoding wird versionsstabil dekodiert (PHP 8.2)
+
+### Changed
+- DATEV-Rückkanal nutzt einen eigenen schlanken IMAP-Client statt `webklex/php-imap`
+  (deutlich kleineres Release, unter dem App-Store-Größenlimit) (#51)
+- Anzeigename und Marken-Strings durchgängig auf „RechnungsWerk" vereinheitlicht
 
 ## [0.1.1] - 2026-06-26
 
@@ -63,6 +82,7 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cpcMomentum/rechnungswerk/releases/tag/v0.1.0

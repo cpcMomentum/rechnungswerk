@@ -34,8 +34,31 @@ export interface Product {
 	updatedAt: string | null
 }
 
+export interface Customer {
+	id: number
+	customerNumber: string
+	name: string
+	vatId: string | null
+	address: string | null
+	postalCode: string | null
+	city: string | null
+	country: string | null
+	contactPerson: string | null
+	phone: string | null
+	email: string | null
+	bankAccountHolder: string | null
+	iban: string | null
+	bic: string | null
+	bankName: string | null
+	defaultPaymentTermDays: number | null
+	defaultTaxRateBp: number | null
+	note: string | null
+	createdAt: string | null
+	updatedAt: string | null
+}
+
 export type InvoiceStatus = 'draft' | 'committed' | 'cancelled'
-export type InvoiceType = 'invoice' | 'cancellation' | 'credit_note'
+export type InvoiceType = 'invoice' | 'cancellation'
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 	draft: 'Entwurf',
@@ -46,7 +69,6 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 export const INVOICE_TYPE_LABELS: Record<InvoiceType, string> = {
 	invoice: 'Rechnung',
 	cancellation: 'Storno',
-	credit_note: 'Gutschrift',
 }
 
 export interface TaxBreakdownRow {
@@ -81,6 +103,7 @@ export interface Invoice {
 	invoiceType: InvoiceType
 	recipientName: string | null
 	recipientContactId: string | null
+	customerId: number | null
 	recipientAddress: string | null
 	recipientPostalCode: string | null
 	recipientCity: string | null
