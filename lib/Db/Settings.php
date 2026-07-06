@@ -48,6 +48,8 @@ use OCP\DB\Types;
  * @method void setNumberCounter(int $numberCounter)
  * @method ?int getNumberCounterYear()
  * @method void setNumberCounterYear(?int $numberCounterYear)
+ * @method string getNumberResetMode()
+ * @method void setNumberResetMode(string $numberResetMode)
  * @method int getSmallBusiness()
  * @method void setSmallBusiness(int $smallBusiness)
  * @method int getDefaultTaxRateBp()
@@ -96,6 +98,13 @@ use OCP\DB\Types;
 class Settings extends Entity implements JsonSerializable {
 	public const DEFAULT_NUMBER_FORMAT = 'RE-{YYYY}-{####}';
 
+	/** Counter resets to 1 each calendar year (needs a year component in the format). */
+	public const RESET_MODE_YEARLY = 'yearly';
+	/** Counter runs continuously across years (year component optional). */
+	public const RESET_MODE_CONTINUOUS = 'continuous';
+	public const RESET_MODES = [self::RESET_MODE_YEARLY, self::RESET_MODE_CONTINUOUS];
+	public const DEFAULT_RESET_MODE = self::RESET_MODE_YEARLY;
+
 	protected ?string $ownerUserId = null;
 	protected ?string $companyName = null;
 	protected ?string $companyAddress = null;
@@ -112,6 +121,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?string $numberFormat = null;
 	protected ?int $numberCounter = null;
 	protected ?int $numberCounterYear = null;
+	protected ?string $numberResetMode = null;
 	protected ?int $smallBusiness = null;
 	protected ?int $defaultTaxRateBp = null;
 	protected ?string $datevUploadMail = null;
@@ -152,6 +162,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('numberFormat', Types::STRING);
 		$this->addType('numberCounter', Types::INTEGER);
 		$this->addType('numberCounterYear', Types::INTEGER);
+		$this->addType('numberResetMode', Types::STRING);
 		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
 		$this->addType('datevUploadMail', Types::STRING);
@@ -194,6 +205,7 @@ class Settings extends Entity implements JsonSerializable {
 			'numberFormat' => $this->getNumberFormat(),
 			'numberCounter' => $this->getNumberCounter(),
 			'numberCounterYear' => $this->getNumberCounterYear(),
+			'numberResetMode' => $this->getNumberResetMode() ?: self::DEFAULT_RESET_MODE,
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
 			'datevUploadMail' => $this->getDatevUploadMail(),

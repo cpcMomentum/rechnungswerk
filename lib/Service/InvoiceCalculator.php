@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
+use OCA\Rechnungswerk\Db\Settings;
+
 /**
  * Pure, side-effect-free money/tax/number arithmetic.
  *
@@ -108,5 +110,37 @@ final class InvoiceCalculator {
 			static fn (array $m): string => str_pad((string)$counter, strlen($m[1]), '0', STR_PAD_LEFT),
 			$result,
 		);
+	}
+
+	/**
+	 * Decide the next sequential counter value from the current state.
+	 *
+	 * - 'continuous': always $counter + 1 — the counter never resets, so a
+	 *   year-less format stays collision-free across calendar years.
+	 * - 'yearly': $counter + 1 while still in the same calendar year, otherwise
+	 *   restart at 1. A year component in the format keeps numbers unique.
+	 *
+	 * Pure and side-effect-free so the numbering decision can be unit-tested
+	 * without a database (persistence and row locking live in SettingsService).
+	 *
+	 * @param string $mode one of Settings::RESET_MODES
+	 */
+	public static function nextCounter(string $mode, int $counter, ?int $counterYear, int $year): int {
+		if ($mode === Settings::RESET_MODE_CONTINUOUS) {
+			return $counter + 1;
+		}
+		return ($counterYear === $year) ? $counter + 1 : 1;
+	}
+
+	/**
+	 * Whether a number format carries a year component ({YYYY} or {YY}).
+	 *
+	 * A yearly-resetting counter is only collision-free if the rendered number
+	 * changes with the year; without one, the counter would repeat every Jan 1.
+	 * Used both to validate the mode<->format combination on the write path and
+	 * to defend the invariant when handing out a number.
+	 */
+	public static function formatHasYear(string $format): bool {
+		return preg_match('/\{YYYY\}|\{YY\}/', $format) === 1;
 	}
 }

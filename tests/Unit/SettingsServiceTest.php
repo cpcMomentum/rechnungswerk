@@ -109,11 +109,60 @@ class SettingsServiceTest extends TestCase {
 		$this->service->save(['smtpPort' => 99999]);
 	}
 
+	public function testSaveRejectsYearlyModeWithoutYearComponent(): void {
+		// Cross-field rule: yearly reset + a year-less format would repeat the
+		// number every Jan 1 (unique-index violation). The counter placeholder is
+		// present, so this must be caught by the mode<->format check, not the
+		// existing placeholder check.
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		$this->service->save(['numberFormat' => '{####}']);
+	}
+
+	public function testSaveAllowsYearlessFormatWhenContinuous(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save(['numberFormat' => '{######}', 'numberResetMode' => 'continuous']);
+
+		$this->assertSame('continuous', $saved->getNumberResetMode());
+		$this->assertSame('{######}', $saved->getNumberFormat());
+	}
+
+	public function testSaveRejectsUnknownResetMode(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		$this->service->save(['numberResetMode' => 'monthly']);
+	}
+
+	public function testSwitchingContinuousToYearlyAnchorsYearWithoutResettingCounter(): void {
+		// Mid-year continuous -> yearly must NOT restart the series now; it anchors
+		// the counter year to the current year (so the rest of the year keeps
+		// running) and only the next Jan 1 resets.
+		$s = $this->existing();
+		$s->setNumberResetMode('continuous');
+		$s->setNumberCounter(1234);
+		$s->setNumberCounterYear(2019);
+		$this->mapper->method('findByOwner')->willReturn($s);
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save([
+			'numberResetMode' => 'yearly',
+			'numberFormat' => 'RE-{YYYY}-{####}',
+		]);
+
+		$currentYear = (int)(new \DateTime())->format('Y');
+		$this->assertSame('yearly', $saved->getNumberResetMode());
+		$this->assertSame(1234, $saved->getNumberCounter(), 'counter must not be reset on switch');
+		$this->assertSame($currentYear, $saved->getNumberCounterYear(), 'counter year is anchored to the current year');
+	}
+
 	private function existing(): Settings {
 		$settings = new Settings();
 		$settings->setOwnerUserId('alice');
 		$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
 		$settings->setNumberCounter(0);
+		$settings->setNumberResetMode(Settings::DEFAULT_RESET_MODE);
 		$settings->setSmallBusiness(0);
 		$settings->setDefaultTaxRateBp(1900);
 		return $settings;

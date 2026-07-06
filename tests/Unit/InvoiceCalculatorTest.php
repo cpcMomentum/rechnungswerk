@@ -156,4 +156,42 @@ class InvoiceCalculatorTest extends TestCase {
 		$this->assertSame(-3800, $result['taxBreakdown'][0]['taxCents']);
 		$this->assertSame(-23800, $result['totalCents']);
 	}
+
+	public function testNextCounterYearlyIncrementsWithinSameYear(): void {
+		$this->assertSame(8, InvoiceCalculator::nextCounter('yearly', 7, 2026, 2026));
+	}
+
+	public function testNextCounterYearlyResetsOnNewYear(): void {
+		// Dec 2026 counter 41 -> first invoice of 2027 restarts at 1.
+		$this->assertSame(1, InvoiceCalculator::nextCounter('yearly', 41, 2026, 2027));
+	}
+
+	public function testNextCounterYearlyFirstEverInvoice(): void {
+		// Fresh company: counter 0, no anchored year yet.
+		$this->assertSame(1, InvoiceCalculator::nextCounter('yearly', 0, null, 2026));
+	}
+
+	public function testNextCounterContinuousIgnoresYearBoundary(): void {
+		// Continuous must NOT reset across the year boundary — that is the whole
+		// point of #39 and keeps a year-less format collision-free.
+		$this->assertSame(1235, InvoiceCalculator::nextCounter('continuous', 1234, 2026, 2027));
+	}
+
+	public function testNextCounterContinuousIncrementsWithinYear(): void {
+		$this->assertSame(1235, InvoiceCalculator::nextCounter('continuous', 1234, 2026, 2026));
+	}
+
+	public function testNextCounterContinuousFirstEverInvoice(): void {
+		$this->assertSame(1, InvoiceCalculator::nextCounter('continuous', 0, null, 2026));
+	}
+
+	public function testFormatHasYearDetectsFourAndTwoDigitYear(): void {
+		$this->assertTrue(InvoiceCalculator::formatHasYear('RE-{YYYY}-{####}'));
+		$this->assertTrue(InvoiceCalculator::formatHasYear('{YY}-{##}'));
+	}
+
+	public function testFormatHasYearFalseForYearlessFormat(): void {
+		$this->assertFalse(InvoiceCalculator::formatHasYear('RE-{####}'));
+		$this->assertFalse(InvoiceCalculator::formatHasYear('{######}'));
+	}
 }

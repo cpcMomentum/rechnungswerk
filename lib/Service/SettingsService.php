@@ -114,6 +114,7 @@ class SettingsService {
 			$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
 			$settings->setNumberCounter(0);
 			$settings->setNumberCounterYear(null);
+			$settings->setNumberResetMode(Settings::DEFAULT_RESET_MODE);
 			$settings->setSmallBusiness(0);
 			$settings->setDatevAutoSend(0);
 			$settings->setDefaultTaxRateBp(1900);
@@ -133,9 +134,8 @@ class SettingsService {
 	 * @param array<string, mixed> $data
 	 */
 	public function save(array $data): Settings {
-		$this->validate($data);
-
 		$settings = $this->getCompany();
+		$this->validate($data, $settings);
 
 		$stringFields = [
 			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
@@ -193,6 +193,19 @@ class SettingsService {
 		if (($settings->getNumberFormat() ?? '') === '') {
 			$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
 		}
+		if (array_key_exists('numberResetMode', $data)) {
+			// validate() has already ensured the value is one of RESET_MODES.
+			$oldMode = $settings->getNumberResetMode() ?: Settings::DEFAULT_RESET_MODE;
+			$newMode = (string)$data['numberResetMode'];
+			$settings->setNumberResetMode($newMode);
+			// Mid-year switch continuous -> yearly: never restart the series
+			// immediately (that could collide on the unique number index).
+			// Anchor the counter to the current year so it keeps running for the
+			// rest of the year; only the next Jan 1 resets to 1.
+			if ($oldMode === Settings::RESET_MODE_CONTINUOUS && $newMode === Settings::RESET_MODE_YEARLY) {
+				$settings->setNumberCounterYear((int)(new DateTime())->format('Y'));
+			}
+		}
 
 		$settings->setUpdatedAt(new DateTime());
 		return $this->mapper->update($settings);
@@ -201,14 +214,43 @@ class SettingsService {
 	/**
 	 * Validate incoming settings data against format and column-length limits.
 	 *
+	 * The number format and the reset mode are validated together against the
+	 * effective (merged) state — a change to either can make the combination
+	 * invalid, even if the other field is not part of this request.
+	 *
 	 * @param array<string, mixed> $data
+	 * @param Settings $current the persisted settings the request is applied onto
 	 * @throws ValidationException
 	 */
-	private function validate(array $data): void {
+	private function validate(array $data, Settings $current): void {
+		if (array_key_exists('numberResetMode', $data)
+			&& !in_array((string)$data['numberResetMode'], Settings::RESET_MODES, true)) {
+			throw new ValidationException('Ungültiger Nummernkreis-Modus.');
+		}
+
 		if (array_key_exists('numberFormat', $data)) {
 			$format = trim((string)$data['numberFormat']);
 			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
 				throw new ValidationException('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
+			}
+		}
+
+		// Cross-field: a yearly-resetting counter needs a year component in the
+		// format, otherwise the number repeats every Jan 1 and violates the
+		// unique index over `number`. Checked whenever either field changes.
+		if (array_key_exists('numberFormat', $data) || array_key_exists('numberResetMode', $data)) {
+			$effectiveFormat = array_key_exists('numberFormat', $data)
+				? trim((string)$data['numberFormat'])
+				: (string)$current->getNumberFormat();
+			if ($effectiveFormat === '') {
+				$effectiveFormat = Settings::DEFAULT_NUMBER_FORMAT;
+			}
+			$effectiveMode = array_key_exists('numberResetMode', $data)
+				? (string)$data['numberResetMode']
+				: ($current->getNumberResetMode() ?: Settings::DEFAULT_RESET_MODE);
+			if ($effectiveMode === Settings::RESET_MODE_YEARLY
+				&& !InvoiceCalculator::formatHasYear($effectiveFormat)) {
+				throw new ValidationException('Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern.');
 			}
 		}
 
@@ -259,7 +301,12 @@ class SettingsService {
 
 	/**
 	 * Reserve and return the next invoice number for the given year, persisting
-	 * the incremented counter. The counter resets per calendar year.
+	 * the incremented counter.
+	 *
+	 * The counter either resets per calendar year ('yearly') or runs
+	 * continuously across years ('continuous'), depending on number_reset_mode
+	 * (see InvoiceCalculator::nextCounter). number_counter_year is always kept
+	 * in sync so switching back to 'yearly' has a correct anchor.
 	 *
 	 * MUST be called inside a DB transaction owned by the caller. The central
 	 * company settings row is locked with SELECT ... FOR UPDATE so that
@@ -271,7 +318,7 @@ class SettingsService {
 
 		// Lock the company settings row for the rest of the caller's transaction.
 		$select = $this->db->getQueryBuilder();
-		$select->select('number_counter', 'number_counter_year', 'number_format')
+		$select->select('number_counter', 'number_counter_year', 'number_format', 'number_reset_mode')
 			->from(self::SETTINGS_TABLE)
 			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)))
 			->forUpdate();
@@ -286,8 +333,20 @@ class SettingsService {
 		if ($format === '') {
 			$format = Settings::DEFAULT_NUMBER_FORMAT;
 		}
+		$mode = (string)($row['number_reset_mode'] ?? Settings::DEFAULT_RESET_MODE);
+		if (!in_array($mode, Settings::RESET_MODES, true)) {
+			$mode = Settings::DEFAULT_RESET_MODE;
+		}
+		// Defence in depth: a yearly reset with a year-less format repeats the
+		// number every Jan 1 (unique-index collision). validate() blocks this on
+		// the write path, but a row migrated from a pre-#39 install can still hold
+		// this combination — never reset in that case (continuous is collision-free
+		// with a year-less format).
+		if ($mode === Settings::RESET_MODE_YEARLY && !InvoiceCalculator::formatHasYear($format)) {
+			$mode = Settings::RESET_MODE_CONTINUOUS;
+		}
 
-		$next = ($counterYear === $year) ? $counter + 1 : 1;
+		$next = InvoiceCalculator::nextCounter($mode, $counter, $counterYear, $year);
 
 		$update = $this->db->getQueryBuilder();
 		$update->update(self::SETTINGS_TABLE)
