@@ -181,6 +181,7 @@ export interface Settings {
 	numberFormat: string
 	numberCounter: number
 	numberCounterYear: number | null
+	numberResetMode: 'yearly' | 'continuous'
 	smallBusiness: boolean
 	defaultTaxRateBp: number
 	datevUploadMail: string | null
