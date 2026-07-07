@@ -364,18 +364,23 @@ onMounted(async () => {
 		if (props.id) {
 			await load(Number(props.id))
 		} else {
-			form.greeting = settingsStore.settings?.greetingDefault ?? ''
-			form.extraText = settingsStore.settings?.closingDefault ?? ''
-			// Pre-fill the seller contact from the current user's NC account.
-			// Left empty → backend falls back to the central company contact.
+			const s = settingsStore.settings
+			form.greeting = s?.greetingDefault ?? ''
+			form.extraText = s?.closingDefault ?? ''
+			// Pre-fill the seller contact from the configured company contact
+			// (Settings) first, falling back per field to the current user's NC
+			// account only where Settings has no value (#86 — the account default
+			// was silently overriding the admin-configured contact e-mail).
+			// Left fully empty → backend uses the central company contact.
+			let me = { person: '', phone: '', email: '' }
 			try {
-				const me = await getMyContactDefaults()
-				form.sellerContactPerson = me.person
-				form.sellerContactPhone = me.phone
-				form.sellerContactEmail = me.email
+				me = await getMyContactDefaults()
 			} catch {
-				// ignore — company contact will be used
+				// ignore — Settings / company contact will be used
 			}
+			form.sellerContactPerson = (s?.contactPerson ?? '') || me.person
+			form.sellerContactPhone = (s?.contactPhone ?? '') || me.phone
+			form.sellerContactEmail = (s?.contactEmail ?? '') || me.email
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
