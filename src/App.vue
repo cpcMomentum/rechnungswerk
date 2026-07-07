@@ -26,8 +26,11 @@
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Produkte')" :to="{ name: 'products' }">
 					<template #icon><PackageVariantIcon :size="20" /></template>
 				</NcAppNavigationItem>
-				<template v-if="isAdmin" #footer>
-					<NcAppNavigationItem :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'settings' }">
+				<template #footer>
+					<NcAppNavigationItem :name="t('rechnungswerk', 'Mein Kontakt')" :to="{ name: 'my-contact' }">
+						<template #icon><AccountIcon :size="20" /></template>
+					</NcAppNavigationItem>
+					<NcAppNavigationItem v-if="isAdmin" :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'settings' }">
 						<template #icon><CogIcon :size="20" /></template>
 					</NcAppNavigationItem>
 				</template>
@@ -50,6 +53,7 @@ import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
+import AccountIcon from 'vue-material-design-icons/Account.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
