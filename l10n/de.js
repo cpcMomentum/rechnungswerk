@@ -131,6 +131,7 @@ OC.L10N.register(
     "Löschen" : "Löschen",
     "Löschen fehlgeschlagen" : "Löschen fehlgeschlagen",
     "Menge" : "Menge",
+    "Monat" : "Monat",
     "Nachricht" : "Nachricht",
     "Name" : "Name",
     "Name eingeben oder Kontakt wählen …" : "Name eingeben oder Kontakt wählen …",
