@@ -48,6 +48,9 @@ return [
 		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],
 		// Current user's seller-contact defaults (from NC account)
 		['name' => 'contact#me', 'url' => '/api/v1/me', 'verb' => 'GET'],
+		// Current user's personal seller-contact default (#47)
+		['name' => 'contact#getMyContact', 'url' => '/api/v1/me/contact', 'verb' => 'GET'],
+		['name' => 'contact#saveMyContact', 'url' => '/api/v1/me/contact', 'verb' => 'PUT'],
 
 		// Access control / app admin
 		['name' => 'admin#permissionInfo',     'url' => '/api/v1/permission-info',     'verb' => 'GET'],

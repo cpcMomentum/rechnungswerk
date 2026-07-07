@@ -95,7 +95,7 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
 					<input v-model="form.sellerContactEmail" class="rw-input" type="email" :readonly="readonly" /></label>
 			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem Nextcloud-Konto. Du kannst es für diese Rechnung ändern. Leer lassen → es greift der zentrale Firmenkontakt aus den Einstellungen.') }}</p>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.') }}</p>
 		</section>
 
 		<!-- Anrede & Einleitung (vor den Positionen) -->
@@ -254,7 +254,7 @@ import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, sendInvoice, type InvoiceInput } from '@/api/invoices'
-import { getMyContactDefaults } from '@/api/contacts'
+import { getMyContact } from '@/api/me'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -371,20 +371,20 @@ onMounted(async () => {
 			form.greeting = [s?.greetingDefault, s?.introDefault]
 				.filter(p => (p ?? '').trim() !== '').join('\n\n')
 			form.extraText = s?.closingDefault ?? ''
-			// Pre-fill the seller contact from the configured company contact
-			// (Settings) first, falling back per field to the current user's NC
-			// account only where Settings has no value (#86 — the account default
-			// was silently overriding the admin-configured contact e-mail).
-			// Left fully empty → backend uses the central company contact.
-			let me = { person: '', phone: '', email: '' }
+			// Seller-contact cascade (#47): the user's personal default ("Mein
+			// Kontakt") first, falling back per field to the central company
+			// contact when unset. Left fully empty → backend uses the company
+			// contact. The NC account is no longer pulled automatically; it is a
+			// manual import in the "Mein Kontakt" area.
+			let mine = { person: '', phone: '', email: '' }
 			try {
-				me = await getMyContactDefaults()
+				mine = await getMyContact()
 			} catch {
-				// ignore — Settings / company contact will be used
+				// ignore — company contact will be used
 			}
-			form.sellerContactPerson = (s?.contactPerson ?? '') || me.person
-			form.sellerContactPhone = (s?.contactPhone ?? '') || me.phone
-			form.sellerContactEmail = (s?.contactEmail ?? '') || me.email
+			form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
+			form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
+			form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))

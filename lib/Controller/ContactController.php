@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\PermissionService;
+use OCA\Rechnungswerk\Service\UserContactService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -29,6 +31,7 @@ class ContactController extends Controller {
 		private readonly PermissionService $permissionService,
 		private readonly IUserManager $userManager,
 		private readonly IAccountManager $accountManager,
+		private readonly UserContactService $userContactService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -62,6 +65,40 @@ class ContactController extends Controller {
 			'phone' => $phone,
 			'email' => $user?->getEMailAddress() ?? '',
 		]);
+	}
+
+	/**
+	 * The current user's personal seller-contact default (#47, cascade level 2).
+	 */
+	#[NoAdminRequired]
+	public function getMyContact(): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->hasAccess($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		return new DataResponse($this->userContactService->get($this->userId));
+	}
+
+	/**
+	 * Save the current user's personal seller-contact default.
+	 *
+	 * @param array<string, mixed> $data
+	 */
+	#[NoAdminRequired]
+	public function saveMyContact(array $data = []): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->hasAccess($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		try {
+			return new DataResponse($this->userContactService->save($this->userId, $data));
+		} catch (ValidationException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
 	}
 
 	/**

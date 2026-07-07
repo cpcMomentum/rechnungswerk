@@ -8,6 +8,7 @@ import InvoicesView from '@/views/InvoicesView.vue'
 import InvoiceEditorView from '@/views/InvoiceEditorView.vue'
 import ProductsView from '@/views/ProductsView.vue'
 import CustomersView from '@/views/CustomersView.vue'
+import MyContactView from '@/views/MyContactView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
 const routes: RouteRecordRaw[] = [
@@ -17,6 +18,7 @@ const routes: RouteRecordRaw[] = [
 	{ path: '/invoices/:id', name: 'invoice-detail', component: InvoiceEditorView, props: true },
 	{ path: '/customers', name: 'customers', component: CustomersView },
 	{ path: '/products', name: 'products', component: ProductsView },
+	{ path: '/me', name: 'my-contact', component: MyContactView },
 	{ path: '/settings', name: 'settings', component: SettingsView },
 ]
 
