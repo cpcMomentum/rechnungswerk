@@ -40,6 +40,7 @@ class InvoiceItem extends Entity implements JsonSerializable {
 	public const UNIT_PIECE = 'C62';  // Stück / one
 	public const UNIT_HOUR = 'HUR';   // Stunde
 	public const UNIT_DAY = 'DAY';    // Tag
+	public const UNIT_MONTH = 'MON';  // Monat
 	public const UNIT_KILOGRAM = 'KGM'; // kg
 	public const UNIT_LUMP_SUM = 'LS'; // Pauschal
 
@@ -47,6 +48,7 @@ class InvoiceItem extends Entity implements JsonSerializable {
 		self::UNIT_PIECE,
 		self::UNIT_HOUR,
 		self::UNIT_DAY,
+		self::UNIT_MONTH,
 		self::UNIT_KILOGRAM,
 		self::UNIT_LUMP_SUM,
 	];

@@ -178,6 +178,8 @@ OC.L10N.register(
     "Referenznummer" : "Reference number",
     "Schlusstext" : "Closing text",
     "Schlusstext / Anmerkungen" : "Closing text / notes",
+    "Anrede & Einleitung" : "Salutation & introduction",
+    "Schlusstext – Vorgabe aus den Einstellungen" : "Closing text – default from settings",
     "Senden" : "Send",
     "Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail." : "Sends an email with the ZUGFeRD PDF to the DATEV upload address on every finalisation.",
     "Server (Host)" : "Server (host)",
