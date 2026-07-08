@@ -391,6 +391,26 @@ class InvoiceService {
 		return ['filename' => $base . '.pdf', 'content' => $content];
 	}
 
+	/**
+	 * Render a DRAFT invoice as a watermarked preview PDF (visible layout
+	 * only, no embedded e-invoice XML). Committed invoices already have the
+	 * real ZUGFeRD download and are rejected here — the two must not mix.
+	 *
+	 * @return array{filename: string, content: string}
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function generatePreviewPdf(int $id): array {
+		$invoice = $this->findById($id);
+		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
+			throw new IllegalStateException('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
+		}
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$settings = $this->settingsService->getCompany();
+		$content = $this->zugferdService->generateDraftPreviewPdf($invoice, $items, $settings);
+		return ['filename' => 'entwurf-' . $invoice->getId() . '.pdf', 'content' => $content];
+	}
+
 	// --- internals -------------------------------------------------------
 
 	/**

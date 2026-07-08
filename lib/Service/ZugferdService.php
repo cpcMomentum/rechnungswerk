@@ -87,6 +87,18 @@ class ZugferdService {
 	}
 
 	/**
+	 * Render a DRAFT invoice as a plain preview PDF: the visible layout only,
+	 * clearly watermarked as ENTWURF and WITHOUT the embedded EN16931 XML — a
+	 * draft has no final number, so an e-invoice XML would be invalid and the
+	 * file must not be mistakable for a real invoice.
+	 *
+	 * @param InvoiceItem[] $items
+	 */
+	public function generateDraftPreviewPdf(Invoice $invoice, array $items, Settings $settings): string {
+		return $this->renderVisiblePdf($invoice, $items, $settings, preview: true);
+	}
+
+	/**
 	 * Run $fn with libxml's default external-entity loader, restoring
 	 * Nextcloud's blocking loader afterwards (see base.php).
 	 *
@@ -449,8 +461,8 @@ class ZugferdService {
 	/**
 	 * @param InvoiceItem[] $items
 	 */
-	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): string {
-		$html = $this->renderHtml($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null, bool $preview = false): string {
+		$html = $this->renderHtml($invoice, $items, $settings, $relatedNumber, $relatedIssueDate, $preview);
 		$options = new Options();
 		$options->set('defaultFont', 'DejaVu Sans');
 		$options->set('isRemoteEnabled', false);
@@ -464,7 +476,7 @@ class ZugferdService {
 	/**
 	 * @param InvoiceItem[] $items
 	 */
-	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): string {
+	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null, bool $preview = false): string {
 		$accent = $this->sanitizeColor($settings->getAccentColor()) ?? '#2c3e50';
 		$logo = $this->loadLogoDataUri($settings);
 		$e = static fn (?string $s): string => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
@@ -496,7 +508,10 @@ class ZugferdService {
 		$title = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE ? 'Rechnung' : 'Stornorechnung';
 		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt();
 		$meta = [];
-		$meta[] = ['Rechnungsnummer', $e($invoice->getNumber())];
+		$number = $preview && ($invoice->getNumber() ?? '') === ''
+			? 'wird beim Festschreiben vergeben'
+			: $e($invoice->getNumber());
+		$meta[] = ['Rechnungsnummer', $number];
 		if ($issueDate !== null) {
 			$meta[] = ['Rechnungsdatum', $issueDate->format('d.m.Y')];
 		}
@@ -592,6 +607,14 @@ class ZugferdService {
 		]);
 		$footer = $taxIds !== [] ? '<div class="footer">' . implode(' &middot; ', $taxIds) . '</div>' : '';
 
+		// Preview marking: diagonal ENTWURF watermark on every page (position:
+		// fixed repeats per page in dompdf) plus an explicit banner — the
+		// preview must never be mistakable for a real, committed invoice.
+		$watermarkHtml = $preview
+			? '<div class="draft-watermark">ENTWURF</div>'
+			. '<div class="draft-banner">Entwurf &ndash; Vorschau, keine g&uuml;ltige Rechnung</div>'
+			: '';
+
 		return <<<HTML
 <!DOCTYPE html>
 <html lang="de"><head><meta charset="UTF-8"><style>
@@ -624,7 +647,10 @@ table.items td.num, table.items th.num { text-align: right; }
 .payment { clear: both; padding-top: 24px; font-size: 9.5pt; }
 .bank { background: #f5f5f5; padding: 6px 8px; }
 .footer { margin-top: 28px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 8pt; color: #777; text-align: center; }
+.draft-watermark { position: fixed; top: 38%; left: -10%; width: 120%; text-align: center; font-size: 84pt; font-weight: bold; letter-spacing: 14pt; color: #f0d5d5; transform: rotate(-30deg); }
+.draft-banner { background: #fdecec; color: #b93a3a; border: 1px solid #e8b4b4; padding: 6px 10px; margin-bottom: 14px; font-weight: bold; font-size: 10pt; text-align: center; }
 </style></head><body>
+{$watermarkHtml}
 <div class="header">
   {$logoHtml}
   <div class="company"><span class="name">{$company}</span><br>{$companyAddr}{$sellerContactHtml}</div>

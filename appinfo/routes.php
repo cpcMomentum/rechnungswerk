@@ -20,6 +20,7 @@ return [
 		['name' => 'invoice#commit',  'url' => '/api/v1/invoices/{id}/commit', 'verb' => 'POST'],
 		['name' => 'invoice#cancel',  'url' => '/api/v1/invoices/{id}/cancel', 'verb' => 'POST'],
 		['name' => 'invoice#download', 'url' => '/api/v1/invoices/{id}/pdf',   'verb' => 'GET'],
+		['name' => 'invoice#preview', 'url' => '/api/v1/invoices/{id}/preview', 'verb' => 'GET'],
 		['name' => 'invoice#send',    'url' => '/api/v1/invoices/{id}/send',  'verb' => 'POST'],
 
 		// Products

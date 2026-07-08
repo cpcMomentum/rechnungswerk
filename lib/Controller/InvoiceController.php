@@ -19,6 +19,8 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\Response;
@@ -134,6 +136,34 @@ class InvoiceController extends Controller {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: PDF generation failed', ['exception' => $e, 'invoice' => $id]);
+			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	// GET rendered inline inside the preview dialog's <iframe>; iframe
+	// navigations cannot carry custom request headers (CSRF token) either.
+	// Safe: read-only, access-gated below, authenticated session required.
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function preview(int $id): Response {
+		if (($r = $this->guardAccess()) !== null) {
+			return $r;
+		}
+		try {
+			$pdf = $this->invoiceService->generatePreviewPdf($id);
+			$response = new DataDisplayResponse($pdf['content'], Http::STATUS_OK, ['Content-Type' => 'application/pdf']);
+			// The default CSP ships frame-ancestors 'none', which blocks the
+			// preview dialog's same-origin <iframe>. Relax exactly that.
+			$csp = new ContentSecurityPolicy();
+			$csp->addAllowedFrameAncestorDomain("'self'");
+			$response->setContentSecurityPolicy($csp);
+			return $response;
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: preview PDF generation failed', ['exception' => $e, 'invoice' => $id]);
 			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
