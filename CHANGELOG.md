@@ -7,6 +7,25 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-07-08
+
+### Added
+- Nummernkreis-Modus: fortlaufend über Jahre vs. jährlicher Reset, umschaltbar
+  in den Einstellungen (#39)
+- Persönlicher Bereich „Mein Kontakt": eigener Verkäufer-Ansprechpartner pro
+  Nutzer, füllt neue Rechnungen automatisch vor (#47)
+- Einheit „Monat" für Rechnungspositionen (#76)
+
+### Fixed
+- Kontakt-E-Mail aus den Einstellungen wird auf Rechnung und E-Rechnung korrekt
+  verwendet, statt der Nextcloud-Konto-Mail (#86)
+- Rechnungstexte: Einleitung erscheint wieder, Schlusstext steht genau einmal
+  unten (keine Dopplung, korrekte Platzierung) (#76)
+
+### Security
+- Sicherheitsupdates der Frontend-Abhängigkeiten: dompurify, js-yaml,
+  vite/esbuild (Advisories behoben, npm audit clean)
+
 ## [0.1.2] - 2026-07-05
 
 ### Added
@@ -82,7 +101,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cpcMomentum/rechnungswerk/releases/tag/v0.1.0

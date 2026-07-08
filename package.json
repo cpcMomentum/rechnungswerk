@@ -1,6 +1,6 @@
 {
   "name": "rechnungswerk",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Rechnungen und E-Rechnungen schreiben mit automatischer DATEV-Übergabe",
   "license": "AGPL-3.0-or-later",
   "author": "cpcMomentum",
