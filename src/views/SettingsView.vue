@@ -76,6 +76,28 @@
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
 				</p>
+				<div class="rw-field rw-reset-mode">
+					<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
+					<NcCheckboxRadioSwitch
+						type="radio"
+						name="rw-reset-mode"
+						value="yearly"
+						:model-value="form.numberResetMode"
+						@update:model-value="onSelectResetMode">
+						{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
+					</NcCheckboxRadioSwitch>
+					<NcCheckboxRadioSwitch
+						type="radio"
+						name="rw-reset-mode"
+						value="continuous"
+						:model-value="form.numberResetMode"
+						@update:model-value="onSelectResetMode">
+						{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
+					</NcCheckboxRadioSwitch>
+				</div>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.') }}
+				</p>
 			</section>
 
 			<!-- Steuer -->
@@ -248,6 +270,14 @@
 			:confirm-label="t('rechnungswerk', 'Aktivieren')"
 			@close="confirmDatevAutoSend = false"
 			@confirm="applyDatevAutoSend" />
+
+		<ConfirmDialog
+			:open="confirmResetMode"
+			:name="t('rechnungswerk', 'Nummernkreis auf „Fortlaufend“ stellen')"
+			:message="t('rechnungswerk', 'Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?')"
+			:confirm-label="t('rechnungswerk', 'Fortlaufend aktivieren')"
+			@close="confirmResetMode = false"
+			@confirm="applyResetMode" />
 	</div>
 </template>
 
@@ -274,6 +304,7 @@ const form = ref<SettingsForm | null>(null)
 const error = ref('')
 const confirmSmallBusiness = ref(false)
 const confirmDatevAutoSend = ref(false)
+const confirmResetMode = ref(false)
 const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
 const currentYearFromSettings = ref<number | null>(null)
@@ -311,8 +342,12 @@ const preview = computed(() => {
 	if (!form.value) {
 		return ''
 	}
-	const next = (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0) + 1
-	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', next, currentYear.value)
+	// Continuous: the counter never resets, so the next number is always
+	// current + 1. Yearly: it restarts at 1 once the calendar year rolls over.
+	const base = form.value.numberResetMode === 'continuous'
+		? currentCounter.value
+		: (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0)
+	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value)
 })
 
 onMounted(async () => {
@@ -379,6 +414,7 @@ function hydrate() {
 		logoFileId: s.logoFileId,
 		accentColor: s.accentColor,
 		numberFormat: s.numberFormat,
+		numberResetMode: s.numberResetMode,
 		smallBusiness: s.smallBusiness,
 		defaultTaxRateBp: s.defaultTaxRateBp,
 		datevUploadMail: s.datevUploadMail,
@@ -438,6 +474,27 @@ function applyDatevAutoSend() {
 	}
 }
 
+function onSelectResetMode(value: string) {
+	if (!form.value || value === form.value.numberResetMode) {
+		return
+	}
+	// Switching to continuous is a consequential numbering-policy change → confirm.
+	// Switching back to yearly is applied directly; the format's year component is
+	// enforced on save (client check in onSave + server validation).
+	if (value === 'continuous') {
+		confirmResetMode.value = true
+	} else {
+		form.value.numberResetMode = 'yearly'
+	}
+}
+
+function applyResetMode() {
+	confirmResetMode.value = false
+	if (form.value) {
+		form.value.numberResetMode = 'continuous'
+	}
+}
+
 /** Pick a logo from the user's files (raster image) and store it immediately. */
 function onPickLogo() {
 	OC.dialogs.filepicker(
@@ -487,6 +544,13 @@ async function onSave() {
 		return
 	}
 	error.value = ''
+	// Mirror the server rule: a yearly-resetting counter needs a year component
+	// in the format, otherwise numbers repeat every Jan 1.
+	const fmt = (form.value.numberFormat || '').trim()
+	if (form.value.numberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(fmt)) {
+		error.value = t('rechnungswerk', 'Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.')
+		return
+	}
 	savingPerms.value = true
 	try {
 		const payload = { ...form.value } as SettingsSave

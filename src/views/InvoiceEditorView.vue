@@ -95,14 +95,14 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
 					<input v-model="form.sellerContactEmail" class="rw-input" type="email" :readonly="readonly" /></label>
 			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem Nextcloud-Konto. Du kannst es für diese Rechnung ändern. Leer lassen → es greift der zentrale Firmenkontakt aus den Einstellungen.') }}</p>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.') }}</p>
 		</section>
 
-		<!-- Einleitung (vor den Positionen) -->
+		<!-- Anrede & Einleitung (vor den Positionen) -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Einleitung') }}</h3>
-			<label class="rw-field"><span>{{ t('rechnungswerk', 'Einleitungstext') }}</span>
-				<textarea v-model="form.greeting" class="rw-input" rows="2" :readonly="readonly"
+			<h3>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</h3>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</span>
+				<textarea v-model="form.greeting" class="rw-input" rows="3" :readonly="readonly"
 					:placeholder="t('rechnungswerk', 'Anrede und Einleitung – Vorgabe aus den Einstellungen')" /></label>
 		</section>
 
@@ -168,7 +168,8 @@
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
 			<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext / Anmerkungen') }}</span>
-				<textarea v-model="form.extraText" class="rw-input" rows="2" :readonly="readonly" /></label>
+				<textarea v-model="form.extraText" class="rw-input" rows="3" :readonly="readonly"
+					:placeholder="t('rechnungswerk', 'Schlusstext – Vorgabe aus den Einstellungen')" /></label>
 		</section>
 
 		<!-- Sticky actions -->
@@ -253,7 +254,7 @@ import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, sendInvoice, type InvoiceInput } from '@/api/invoices'
-import { getMyContactDefaults } from '@/api/contacts'
+import { getMyContact } from '@/api/me'
 
 const props = defineProps<{ id?: string }>()
 const router = useRouter()
@@ -339,12 +340,12 @@ const finalizeMessage = computed(() => {
 
 const defaultMailBody = computed(() => {
 	const s = settingsStore.settings
-	const greeting = (invoice.value?.greeting ?? s?.greetingDefault ?? '').trim()
-	const intro = (s?.introDefault ?? '').trim()
-	const closing = (s?.closingDefault ?? '').trim()
+	// Opening already bundles salutation + intro (see onMounted / invoice.greeting).
+	const opening = (invoice.value?.greeting
+		?? [s?.greetingDefault, s?.introDefault].filter(p => (p ?? '').trim() !== '').join('\n\n')).trim()
+	const closing = (invoice.value?.extraText ?? s?.closingDefault ?? '').trim()
 	const parts = [
-		greeting,
-		intro !== '' ? intro : t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).'),
+		opening !== '' ? opening : t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).'),
 		closing,
 	].filter(p => p !== '')
 	return parts.join('\n\n')
@@ -364,18 +365,26 @@ onMounted(async () => {
 		if (props.id) {
 			await load(Number(props.id))
 		} else {
-			form.greeting = settingsStore.settings?.greetingDefault ?? ''
-			form.extraText = settingsStore.settings?.closingDefault ?? ''
-			// Pre-fill the seller contact from the current user's NC account.
-			// Left empty → backend falls back to the central company contact.
+			const s = settingsStore.settings
+			// Opening = salutation + intro (rendered above the line items);
+			// the closing text is edited separately in its own field below.
+			form.greeting = [s?.greetingDefault, s?.introDefault]
+				.filter(p => (p ?? '').trim() !== '').join('\n\n')
+			form.extraText = s?.closingDefault ?? ''
+			// Seller-contact cascade (#47): the user's personal default ("Mein
+			// Kontakt") first, falling back per field to the central company
+			// contact when unset. Left fully empty → backend uses the company
+			// contact. The NC account is no longer pulled automatically; it is a
+			// manual import in the "Mein Kontakt" area.
+			let mine = { person: '', phone: '', email: '' }
 			try {
-				const me = await getMyContactDefaults()
-				form.sellerContactPerson = me.person
-				form.sellerContactPhone = me.phone
-				form.sellerContactEmail = me.email
+				mine = await getMyContact()
 			} catch {
 				// ignore — company contact will be used
 			}
+			form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
+			form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
+			form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
