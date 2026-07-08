@@ -15,9 +15,25 @@ jobs:
       pull-requests: write
       issues: read
       id-token: write
-      actions: read
+      # write: der Gate-Step bricht den eigenen Run per `gh run cancel` ab
+      actions: write
 
     steps:
+      # Race-Guard: wird der PR gemerged + Branch geloescht, waehrend dieser Run
+      # noch in der Queue steht, schlaegt der Checkout fehl (rote Runs am
+      # 29.06.2026 in contractmanager/vinarium). Dann ist kein Review mehr
+      # noetig — Run sauber abbrechen statt failen.
+      - name: Abbruch wenn PR nicht mehr offen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          STATE=$(gh api "/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" --jq .state)
+          if [ "$STATE" != "open" ]; then
+            echo "PR #${{ github.event.pull_request.number }} ist ${STATE} — Review nicht mehr noetig, Run wird abgebrochen."
+            gh run cancel ${{ github.run_id }} --repo ${{ github.repository }}
+            sleep 60
+          fi
+
       - name: Check review cycle count
         id: cycles
         env:
@@ -84,7 +100,15 @@ jobs:
             Der zu reviewende Pull Request ist #${{ github.event.pull_request.number }} im Repository ${{ github.repository }}.
             WICHTIG: Verwende fuer ALLE gh-Befehle ausschliesslich diese PR-Nummer (${{ github.event.pull_request.number }}).
             Ignoriere Issue-Referenzen wie "Fixes #NN" oder Nummern im Titel/Diff — das ist NICHT die PR-Nummer.
-            Hol dir den Diff mit:  gh pr diff ${{ github.event.pull_request.number }}
+
+            Hol dir den Diff SO (NICHT mit gh pr diff — grosse PRs sprengen damit
+            die Tool-Limits; Output-Umleitungen mit ">" sind hier geblockt):
+            1. Ueberblick:    git diff --stat origin/${{ github.base_ref }}...HEAD
+            2. Review-Diff:   git diff origin/${{ github.base_ref }}...HEAD -- . ':(exclude)js/**' ':(exclude)css/**' ':(exclude)dist/**' ':(exclude)vendor/**' ':(exclude)*.lock' ':(exclude)appinfo/signature.json'
+            3. Falls immer noch zu gross: die Dateien aus --stat einzeln diffen
+               (git diff origin/${{ github.base_ref }}...HEAD -- <pfad>).
+            Gebaute Artefakte (js/, css/, dist/, vendor/, Lockfiles, signature.json)
+            NICHT reviewen — sie sind generiert.
 
             ## Schritt 1: Review
             Reviewe den KOMPLETTEN PR-Diff und pruefe:
@@ -123,7 +147,7 @@ jobs:
 
           claude_args: |
             --max-turns 50
-            --allowedTools "Edit,MultiEdit,Glob,Grep,LS,Read,Write,Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git rm:*),Bash(gh pr comment:*),Bash(gh pr review:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm run:*),Bash(npx:*),Bash(cd:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(head:*),Bash(tail:*),Bash(ruff:*),Bash(pip:*),Bash(python:*),mcp__github_comment__update_claude_comment"
+            --allowedTools "Edit,MultiEdit,Glob,Grep,LS,Read,Write,Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git merge-base:*),Bash(git fetch:*),Bash(git rm:*),Bash(gh pr comment:*),Bash(gh pr review:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm run:*),Bash(npx:*),Bash(cd:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(mkdir:*),Bash(php:*),Bash(python3:*),Bash(ruff:*),Bash(pip:*),Bash(python:*),mcp__github_comment__update_claude_comment"
 
       - name: Run Claude Release Review
         # Release PRs (release/* -> main): review RELEASE-readiness, not the code
@@ -147,10 +171,13 @@ jobs:
             auf den develop-PRs reviewt — reviewe ihn NICHT Zeile fuer Zeile neu.
             Ueberfliege den Diff nur fuer Auffaelligkeiten und pruefe die RELEASE-spezifischen Punkte.
 
-            Kontext holen (nur was du brauchst, nicht alles komplett lesen):
+            Kontext holen (nur was du brauchst, nicht alles komplett lesen).
+            gh pr diff NICHT verwenden — Release-Diffs sprengen die Tool-Limits,
+            und Output-Umleitungen mit ">" sind hier geblockt:
               gh pr view ${{ github.event.pull_request.number }}
-              gh pr diff ${{ github.event.pull_request.number }}
               git log origin/${{ github.base_ref }}..HEAD --oneline
+              git diff --stat origin/${{ github.base_ref }}...HEAD
+              git diff origin/${{ github.base_ref }}...HEAD -- . ':(exclude)js/**' ':(exclude)css/**' ':(exclude)dist/**' ':(exclude)vendor/**' ':(exclude)*.lock' ':(exclude)appinfo/signature.json'
 
             Pruefe:
             1. CHANGELOG: Deckt der Eintrag der neuen Version die tatsaechlichen Commits ab? Fehlt Nennenswertes, oder steht Falsches/Veraltetes drin?
@@ -177,4 +204,4 @@ jobs:
             NEEDS_FIX nur bei echten Release-Blockern (fehlende Migration, falscher CHANGELOG/Version, Reste, Integrationskonflikt).
           claude_args: |
             --max-turns 40
-            --allowedTools "Glob,Grep,LS,Read,Bash(git diff:*),Bash(git log:*),Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(head:*),Bash(tail:*),mcp__github_comment__update_claude_comment"
+            --allowedTools "Glob,Grep,LS,Read,Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git merge-base:*),Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(cat:*),Bash(ls:*),Bash(grep:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),mcp__github_comment__update_claude_comment"
