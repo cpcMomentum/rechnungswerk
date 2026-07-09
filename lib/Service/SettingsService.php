@@ -115,6 +115,7 @@ class SettingsService {
 			$settings->setNumberCounter(0);
 			$settings->setNumberCounterYear(null);
 			$settings->setNumberResetMode(Settings::DEFAULT_RESET_MODE);
+			$settings->setFileNameFormat(Settings::DEFAULT_FILE_NAME_FORMAT);
 			$settings->setSmallBusiness(0);
 			$settings->setDatevAutoSend(0);
 			$settings->setDefaultTaxRateBp(1900);
