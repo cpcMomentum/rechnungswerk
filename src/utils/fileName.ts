@@ -16,13 +16,18 @@ const TRANSLIT: Record<string, string> = {
 /** Render a preview file name (including '.pdf') from the scheme and sample values. */
 export function previewFileName(format: string, sample: { nummer: string, date: Date, kunde: string, typ: string }): string {
 	const pad = (n: number) => String(n).padStart(2, '0')
-	let name = format
-		.replaceAll('{nummer}', sample.nummer)
-		.replaceAll('{YYYY}', String(sample.date.getFullYear()))
-		.replaceAll('{MM}', pad(sample.date.getMonth() + 1))
-		.replaceAll('{DD}', pad(sample.date.getDate()))
-		.replaceAll('{kunde}', sample.kunde.replace(/[äöüßÄÖÜ]/g, (c) => TRANSLIT[c] ?? c))
-		.replaceAll('{typ}', sample.typ)
+	const values: Record<string, string> = {
+		'{nummer}': sample.nummer,
+		'{YYYY}': String(sample.date.getFullYear()),
+		'{MM}': pad(sample.date.getMonth() + 1),
+		'{DD}': pad(sample.date.getDate()),
+		'{kunde}': sample.kunde.replace(/[äöüßÄÖÜ]/g, (c) => TRANSLIT[c] ?? c),
+		'{typ}': sample.typ,
+	}
+	// Substitute all placeholders in a single pass so a replacement value that
+	// happens to contain a literal token (e.g. '{typ}' in a customer name) is
+	// never picked up by a later replacement, unlike chained replaceAll() calls.
+	let name = format.replace(/\{nummer\}|\{YYYY\}|\{MM\}|\{DD\}|\{kunde\}|\{typ\}/g, (token) => values[token])
 	name = name
 		.replace(/[/\\:*?"<>|]/g, '-')
 		.replace(/\s+/g, ' ')
