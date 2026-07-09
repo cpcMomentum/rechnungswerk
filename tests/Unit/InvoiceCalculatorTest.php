@@ -260,4 +260,13 @@ class InvoiceCalculatorTest extends TestCase {
 		$this->assertLessThanOrEqual(124, mb_strlen($name)); // 120 + '.pdf'
 		$this->assertStringEndsWith('.pdf', $name);
 	}
+
+	public function testBuildPdfFileNameDoesNotReinterpretPlaceholderLikeTextInReplacements(): void {
+		// A customer name that happens to contain a literal placeholder token
+		// (e.g. '{typ}') must not be re-substituted just because {kunde} is
+		// rendered before {typ} in scheme order.
+		[$invoice, $settings] = $this->fileNameFixtures('{nummer}_{kunde}_{typ}');
+		$invoice->setRecipientName('Firma {typ} GmbH');
+		$this->assertSame('RE-2026-0007_Firma {typ} GmbH_Rechnung.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
 }

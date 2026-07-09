@@ -170,18 +170,20 @@ final class InvoiceCalculator {
 		}
 		$date = $invoice->getIssueDate() ?? $invoice->getCommittedAt();
 
-		$name = str_replace(
-			['{nummer}', '{YYYY}', '{MM}', '{DD}', '{kunde}', '{typ}'],
-			[
-				$number,
-				$date !== null ? $date->format('Y') : '',
-				$date !== null ? $date->format('m') : '',
-				$date !== null ? $date->format('d') : '',
-				self::transliterate((string)$invoice->getRecipientName()),
-				$invoice->getInvoiceType() === Invoice::TYPE_CANCELLATION ? 'Storno' : 'Rechnung',
-			],
-			$format,
-		);
+		// strtr() substitutes all keys in a single left-to-right pass over the
+		// original string, so a replacement value that happens to contain a
+		// literal '{typ}' etc. (e.g. in a customer name) can never be picked
+		// up by a later substitution — unlike str_replace() with parallel
+		// arrays, which re-scans already-substituted text for each subsequent
+		// search term.
+		$name = strtr($format, [
+			'{nummer}' => $number,
+			'{YYYY}' => $date !== null ? $date->format('Y') : '',
+			'{MM}' => $date !== null ? $date->format('m') : '',
+			'{DD}' => $date !== null ? $date->format('d') : '',
+			'{kunde}' => self::transliterate((string)$invoice->getRecipientName()),
+			'{typ}' => $invoice->getInvoiceType() === Invoice::TYPE_CANCELLATION ? 'Storno' : 'Rechnung',
+		]);
 
 		$name = self::sanitizeFileName($name);
 		if ($name === '') {
