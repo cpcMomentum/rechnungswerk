@@ -50,6 +50,8 @@ use OCP\DB\Types;
  * @method void setNumberCounterYear(?int $numberCounterYear)
  * @method string getNumberResetMode()
  * @method void setNumberResetMode(string $numberResetMode)
+ * @method ?string getFileNameFormat()
+ * @method void setFileNameFormat(?string $fileNameFormat)
  * @method int getSmallBusiness()
  * @method void setSmallBusiness(int $smallBusiness)
  * @method int getDefaultTaxRateBp()
@@ -105,6 +107,9 @@ class Settings extends Entity implements JsonSerializable {
 	public const RESET_MODES = [self::RESET_MODE_YEARLY, self::RESET_MODE_CONTINUOUS];
 	public const DEFAULT_RESET_MODE = self::RESET_MODE_YEARLY;
 
+	/** File-name scheme for generated PDFs; '{nummer}' = historical behaviour. */
+	public const DEFAULT_FILE_NAME_FORMAT = '{nummer}';
+
 	protected ?string $ownerUserId = null;
 	protected ?string $companyName = null;
 	protected ?string $companyAddress = null;
@@ -122,6 +127,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $numberCounter = null;
 	protected ?int $numberCounterYear = null;
 	protected ?string $numberResetMode = null;
+	protected ?string $fileNameFormat = null;
 	protected ?int $smallBusiness = null;
 	protected ?int $defaultTaxRateBp = null;
 	protected ?string $datevUploadMail = null;
@@ -163,6 +169,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('numberCounter', Types::INTEGER);
 		$this->addType('numberCounterYear', Types::INTEGER);
 		$this->addType('numberResetMode', Types::STRING);
+		$this->addType('fileNameFormat', Types::STRING);
 		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
 		$this->addType('datevUploadMail', Types::STRING);
@@ -206,6 +213,7 @@ class Settings extends Entity implements JsonSerializable {
 			'numberCounter' => $this->getNumberCounter(),
 			'numberCounterYear' => $this->getNumberCounterYear(),
 			'numberResetMode' => $this->getNumberResetMode() ?: self::DEFAULT_RESET_MODE,
+			'fileNameFormat' => $this->getFileNameFormat() ?: self::DEFAULT_FILE_NAME_FORMAT,
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
 			'datevUploadMail' => $this->getDatevUploadMail(),

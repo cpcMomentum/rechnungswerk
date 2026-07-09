@@ -235,7 +235,7 @@ class InvoiceService {
 				"Automatische DATEV-Übergabe aus RechnungsWerk.\n\nRechnung: " . $number
 					. "\n\nDie E-Rechnung (ZUGFeRD-PDF) ist als Anhang beigefügt.",
 				$pdf,
-				$number . '.pdf',
+				InvoiceCalculator::buildPdfFileName($invoice, $settings),
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
@@ -276,8 +276,7 @@ class InvoiceService {
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
 		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
-		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings, $this->settingsService->getSmtpConfig());
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, InvoiceCalculator::buildPdfFileName($invoice, $settings), $settings, $this->settingsService->getSmtpConfig());
 	}
 
 	/**
@@ -387,8 +386,7 @@ class InvoiceService {
 		$settings = $this->settingsService->getCompany();
 		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
 		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
-		return ['filename' => $base . '.pdf', 'content' => $content];
+		return ['filename' => InvoiceCalculator::buildPdfFileName($invoice, $settings), 'content' => $content];
 	}
 
 	/**

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
+use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\Settings;
 
 /**
@@ -142,5 +143,74 @@ final class InvoiceCalculator {
 	 */
 	public static function formatHasYear(string $format): bool {
 		return preg_match('/\{YYYY\}|\{YY\}/', $format) === 1;
+	}
+
+	/** Placeholders accepted in the PDF file-name scheme (#37). */
+	public const FILE_NAME_PLACEHOLDERS = ['{nummer}', '{YYYY}', '{MM}', '{DD}', '{kunde}', '{typ}'];
+
+	/**
+	 * Build the PDF file name (including '.pdf') for a committed invoice from
+	 * the configured scheme. One source of truth for download, customer mail
+	 * and DATEV mail.
+	 *
+	 * Placeholders: {nummer}, {YYYY}/{MM}/{DD} (issue date, falling back to the
+	 * commit date), {kunde} (recipient name, transliterated), {typ}
+	 * (Rechnung/Storno). The rendered name is sanitized for file systems; an
+	 * empty result falls back to the historical 'rechnung-{id}'.
+	 */
+	public static function buildPdfFileName(Invoice $invoice, Settings $settings): string {
+		$format = trim((string)$settings->getFileNameFormat());
+		if ($format === '') {
+			$format = Settings::DEFAULT_FILE_NAME_FORMAT;
+		}
+
+		$number = trim((string)$invoice->getNumber());
+		if ($number === '') {
+			$number = 'rechnung-' . $invoice->getId();
+		}
+		$date = $invoice->getIssueDate() ?? $invoice->getCommittedAt();
+
+		$name = str_replace(
+			['{nummer}', '{YYYY}', '{MM}', '{DD}', '{kunde}', '{typ}'],
+			[
+				$number,
+				$date !== null ? $date->format('Y') : '',
+				$date !== null ? $date->format('m') : '',
+				$date !== null ? $date->format('d') : '',
+				self::transliterate((string)$invoice->getRecipientName()),
+				$invoice->getInvoiceType() === Invoice::TYPE_CANCELLATION ? 'Storno' : 'Rechnung',
+			],
+			$format,
+		);
+
+		$name = self::sanitizeFileName($name);
+		if ($name === '') {
+			$name = 'rechnung-' . $invoice->getId();
+		}
+		return $name . '.pdf';
+	}
+
+	/** German-aware ASCII transliteration for the {kunde} placeholder. */
+	private static function transliterate(string $value): string {
+		return strtr($value, [
+			'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss',
+			'Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue',
+		]);
+	}
+
+	/**
+	 * Make a rendered name safe for file systems and mail attachments: strip
+	 * path separators and reserved characters, collapse whitespace, trim
+	 * leading/trailing dots and spaces, cap the length.
+	 */
+	private static function sanitizeFileName(string $name): string {
+		// Reserved on Windows/SMB, path separators, and control characters.
+		$name = (string)preg_replace('/[\/\\\\:*?"<>|]|[\x00-\x1f]/u', '-', $name);
+		$name = (string)preg_replace('/\s+/u', ' ', $name);
+		$name = trim($name, " .\t");
+		if (mb_strlen($name) > 120) {
+			$name = rtrim(mb_substr($name, 0, 120), ' .');
+		}
+		return $name;
 	}
 }

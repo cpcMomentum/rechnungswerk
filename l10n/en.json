@@ -1,5 +1,9 @@
 {
     "translations": {
+        "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.": "The file name scheme must contain the {nummer} placeholder so file names stay unique.",
+        "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.": "Applies to download, customer mail and DATEV mail. Placeholders: {nummer} invoice number, {YYYY}/{MM}/{DD} invoice date, {kunde} customer name, {typ} invoice/cancellation. {nummer} is required.",
+        "PDF-Dateiname": "PDF file name",
+        "Schema": "Scheme",
         "Stammdaten": "Master data",
         "Aus Kontakten importieren": "Import from contacts",
         "Anschrift": "Address",

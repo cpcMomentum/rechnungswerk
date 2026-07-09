@@ -140,7 +140,7 @@ class SettingsService {
 		$stringFields = [
 			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
 			'bankName', 'contactPerson', 'contactPhone', 'contactEmail',
-			'accentColor', 'numberFormat', 'datevUploadMail',
+			'accentColor', 'numberFormat', 'fileNameFormat', 'datevUploadMail',
 			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
 			'imapHost', 'imapUser',
 			'greetingDefault', 'introDefault', 'closingDefault',
@@ -193,6 +193,9 @@ class SettingsService {
 		if (($settings->getNumberFormat() ?? '') === '') {
 			$settings->setNumberFormat(Settings::DEFAULT_NUMBER_FORMAT);
 		}
+		if (trim((string)$settings->getFileNameFormat()) === '') {
+			$settings->setFileNameFormat(Settings::DEFAULT_FILE_NAME_FORMAT);
+		}
 		if (array_key_exists('numberResetMode', $data)) {
 			// validate() has already ensured the value is one of RESET_MODES.
 			$oldMode = $settings->getNumberResetMode() ?: Settings::DEFAULT_RESET_MODE;
@@ -235,6 +238,29 @@ class SettingsService {
 			}
 		}
 
+		if (array_key_exists('fileNameFormat', $data)) {
+			$format = trim((string)$data['fileNameFormat']);
+			if ($format !== '') {
+				// {nummer} keeps file names unique per invoice — without it,
+				// mails and the NC filing would silently overwrite each other.
+				if (!str_contains($format, '{nummer}')) {
+					throw new ValidationException('Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.');
+				}
+				if (preg_match('/[\/\\\\]/', $format)) {
+					throw new ValidationException('Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten.');
+				}
+				// Reject unknown {…} tokens early instead of rendering them literally.
+				$unknown = array_diff(
+					preg_match_all('/\{[^{}]*\}/', $format, $m) ? $m[0] : [],
+					InvoiceCalculator::FILE_NAME_PLACEHOLDERS,
+				);
+				if ($unknown !== []) {
+					throw new ValidationException(sprintf('Unbekannte Platzhalter im Dateinamen-Schema: %s. Erlaubt sind %s.',
+						implode(', ', $unknown), implode(', ', InvoiceCalculator::FILE_NAME_PLACEHOLDERS)));
+				}
+			}
+		}
+
 		// Cross-field: a yearly-resetting counter needs a year component in the
 		// format, otherwise the number repeats every Jan 1 and violates the
 		// unique index over `number`. Checked whenever either field changes.
@@ -258,6 +284,7 @@ class SettingsService {
 		$maxLengths = [
 			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'iban' => 34,
 			'bic' => 16, 'bankName' => 255, 'accentColor' => 9, 'numberFormat' => 64,
+			'fileNameFormat' => 128,
 			'contactPerson' => 255, 'contactPhone' => 64, 'contactEmail' => 255,
 			'datevUploadMail' => 255, 'smtpFromName' => 255, 'smtpFromEmail' => 255,
 			'smtpHost' => 255, 'smtpUser' => 255,
