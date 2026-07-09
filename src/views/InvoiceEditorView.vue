@@ -176,6 +176,10 @@
 		<div class="rw-action-bar">
 			<template v-if="!readonly">
 				<NcButton :disabled="saving" @click="save()">{{ t('rechnungswerk', 'Speichern') }}</NcButton>
+				<NcButton :disabled="saving" @click="openPreview">
+					<template #icon><EyeOutlineIcon :size="20" /></template>
+					{{ t('rechnungswerk', 'Vorschau') }}
+				</NcButton>
 				<NcButton variant="primary" :disabled="saving" @click="askFinalize">
 					<template #icon><LockIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'Festschreiben') }}
@@ -222,6 +226,16 @@
 			:saving="sending"
 			@close="sendDialogOpen = false"
 			@send="doSend" />
+
+		<NcDialog :open="previewOpen"
+			:name="t('rechnungswerk', 'Vorschau (Entwurf)')"
+			size="large"
+			@update:open="onPreviewUpdateOpen">
+			<iframe v-if="previewUrl"
+				:src="previewUrl"
+				class="preview-frame"
+				:title="t('rechnungswerk', 'Vorschau (Entwurf)')" />
+		</NcDialog>
 	</div>
 </template>
 
@@ -230,6 +244,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcBreadcrumbs from '@nextcloud/vue/components/NcBreadcrumbs'
 import NcBreadcrumb from '@nextcloud/vue/components/NcBreadcrumb'
@@ -237,6 +252,7 @@ import LockIcon from 'vue-material-design-icons/Lock.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import SendIcon from 'vue-material-design-icons/Send.vue'
 import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
+import EyeOutlineIcon from 'vue-material-design-icons/EyeOutline.vue'
 import CloseCircleIcon from 'vue-material-design-icons/CloseCircle.vue'
 import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
@@ -253,7 +269,7 @@ import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type ContactMatch, type Cus
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
-import { downloadInvoicePdf, sendInvoice, type InvoiceInput } from '@/api/invoices'
+import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 import { getMyContact } from '@/api/me'
 
 const props = defineProps<{ id?: string }>()
@@ -269,6 +285,8 @@ const notice = ref('')
 const saving = ref(false)
 const sending = ref(false)
 const sendDialogOpen = ref(false)
+const previewOpen = ref(false)
+const previewUrl = ref('')
 const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 
 const form = reactive({
@@ -503,6 +521,25 @@ async function save(): Promise<InvoiceDetail | null> {
 	}
 }
 
+/**
+ * Save the draft first so the preview reflects the current form state, then
+ * show the watermarked preview PDF in a dialog.
+ */
+async function openPreview() {
+	const saved = await save()
+	if (!saved) {
+		return
+	}
+	previewUrl.value = invoicePreviewUrl(saved.id)
+	previewOpen.value = true
+}
+function onPreviewUpdateOpen(value: boolean) {
+	if (!value) {
+		previewOpen.value = false
+		previewUrl.value = ''
+	}
+}
+
 function askFinalize() {
 	dialog.value = 'finalize'
 }
@@ -645,5 +682,12 @@ function fail(e: unknown, fallback: string) {
 /* Keep the read-only invoice number compact so the date pickers get the room. */
 .invoice-no {
 	flex: 0 1 180px;
+}
+/* A4-portrait preview needs real height; the browser's PDF viewer fills the frame. */
+.preview-frame {
+	width: 100%;
+	height: min(75vh, 1000px);
+	border: none;
+	display: block;
 }
 </style>

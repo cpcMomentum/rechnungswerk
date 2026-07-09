@@ -223,6 +223,8 @@ OC.L10N.register(
     "Versand" : "Sending",
     "Versand fehlgeschlagen" : "Sending failed",
     "Verschlüsselung" : "Encryption",
+    "Vorschau" : "Preview",
+    "Vorschau (Entwurf)" : "Preview (draft)",
     "Vorschau: {preview}" : "Preview: {preview}",
     "Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)" : "More fields (reference, order number, Leitweg-ID)",
     "z. B. 2 % bei Zahlung bis …" : "e.g. 2 % if paid by …",

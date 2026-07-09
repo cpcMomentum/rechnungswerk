@@ -257,4 +257,39 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertMatchesRegularExpression('/InvoiceReferencedDocument>.*RE-2026-0001/s', $xml);
 		$this->assertStringContainsString('20260516', $xml);
 	}
+
+	private function renderHtml(Invoice $invoice, array $items, Settings $settings, bool $preview): string {
+		$m = new \ReflectionMethod(ZugferdService::class, 'renderHtml');
+		return (string)$m->invoke($this->service, $invoice, $items, $settings, null, null, $preview);
+	}
+
+	public function testPreviewHtmlCarriesDraftMarkingAndNumberPlaceholder(): void {
+		$invoice = $this->invoice();
+		$invoice->setStatus(Invoice::STATUS_DRAFT);
+		$invoice->setNumber(null); // drafts have no final number yet
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), true);
+
+		$this->assertStringContainsString('ENTWURF', $html);
+		$this->assertStringContainsString('keine g&uuml;ltige Rechnung', $html);
+		$this->assertStringContainsString('wird beim Festschreiben vergeben', $html);
+	}
+
+	public function testRegularRenderHasNoDraftMarking(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
+
+		$this->assertStringNotContainsString('ENTWURF', $html);
+		$this->assertStringNotContainsString('wird beim Festschreiben vergeben', $html);
+		$this->assertStringContainsString('RE-2026-0001', $html);
+	}
 }
