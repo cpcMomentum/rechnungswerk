@@ -100,6 +100,18 @@
 				</p>
 			</section>
 
+			<!-- PDF-Dateiname -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'PDF-Dateiname') }}</h3>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Schema') }}</span>
+					<input v-model="form.fileNameFormat" class="rw-input" type="text" /></label>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.') }}
+					<br>
+					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: fileNamePreview }) }}
+				</p>
+			</section>
+
 			<!-- Steuer -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Steuer') }}</h3>
@@ -296,6 +308,7 @@ import { testSmtp, setLogo, deleteLogo, logoUrl, type SettingsSave } from '@/api
 import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
+import { previewFileName } from '@/utils/fileName'
 
 type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear'>
 
@@ -348,6 +361,21 @@ const preview = computed(() => {
 		? currentCounter.value
 		: (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0)
 	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value)
+})
+
+/** Live preview of the file-name scheme, fed with the number preview above. */
+const fileNamePreview = computed(() => {
+	if (!form.value) {
+		return ''
+	}
+	// Sample values mirror the server: {typ} renders literally as
+	// 'Rechnung'/'Storno' (the PDF itself is German-only).
+	return previewFileName(form.value.fileNameFormat || '{nummer}', {
+		nummer: preview.value,
+		date: new Date(),
+		kunde: 'Muster GmbH',
+		typ: 'Rechnung',
+	})
 })
 
 onMounted(async () => {
@@ -415,6 +443,7 @@ function hydrate() {
 		accentColor: s.accentColor,
 		numberFormat: s.numberFormat,
 		numberResetMode: s.numberResetMode,
+		fileNameFormat: s.fileNameFormat,
 		smallBusiness: s.smallBusiness,
 		defaultTaxRateBp: s.defaultTaxRateBp,
 		datevUploadMail: s.datevUploadMail,
@@ -549,6 +578,12 @@ async function onSave() {
 	const fmt = (form.value.numberFormat || '').trim()
 	if (form.value.numberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(fmt)) {
 		error.value = t('rechnungswerk', 'Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.')
+		return
+	}
+	// Mirror the server rule: the file-name scheme needs {nummer} for uniqueness.
+	const fileFmt = (form.value.fileNameFormat || '').trim()
+	if (fileFmt !== '' && !fileFmt.includes('{nummer}')) {
+		error.value = t('rechnungswerk', 'Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.')
 		return
 	}
 	savingPerms.value = true

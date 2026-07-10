@@ -1,6 +1,10 @@
 OC.L10N.register(
     "rechnungswerk",
     {
+    "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben." : "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.",
+    "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht." : "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.",
+    "PDF-Dateiname" : "PDF-Dateiname",
+    "Schema" : "Schema",
     "Stammdaten" : "Stammdaten",
     "Aus Kontakten importieren" : "Aus Kontakten importieren",
     "Anschrift" : "Anschrift",
