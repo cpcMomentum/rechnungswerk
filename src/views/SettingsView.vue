@@ -43,7 +43,7 @@
 				<NcCheckboxRadioSwitch
 					type="switch"
 					:model-value="form.girocodeEnabled"
-					:disabled="!form.iban"
+					:disabled="!form.iban && !form.girocodeEnabled"
 					@update:model-value="(v: boolean) => { if (form) form.girocodeEnabled = v }">
 					{{ t('rechnungswerk', 'Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen') }}
 				</NcCheckboxRadioSwitch>
