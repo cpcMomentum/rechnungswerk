@@ -89,7 +89,6 @@
 </template>
 
 <script setup lang="ts">
-import { escCloses } from '@/utils/modalEsc'
 import { computed, onMounted, ref } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -109,6 +108,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useCustomerStore } from '@/stores/customerStore'
 import type { Customer, ContactMatch } from '@/types/api'
 import type { CustomerCreate } from '@/api/customers'
+import { escCloses } from '@/utils/modalEsc'
 
 const store = useCustomerStore()
 const editorOpen = ref(false)

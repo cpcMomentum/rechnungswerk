@@ -47,13 +47,13 @@
 </template>
 
 <script setup lang="ts">
-import { escCloses } from '@/utils/modalEsc'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcModal from '@nextcloud/vue/components/NcModal'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
+import { escCloses } from '@/utils/modalEsc'
 import { centsToEuroInput, euroInputToCents, formatTaxRate } from '@/utils/money'
 
 const props = defineProps<{

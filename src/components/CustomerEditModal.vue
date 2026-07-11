@@ -121,7 +121,6 @@
 </template>
 
 <script setup lang="ts">
-import { escCloses } from '@/utils/modalEsc'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcModal from '@nextcloud/vue/components/NcModal'
@@ -129,6 +128,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import { TAX_RATES_BP, type Customer } from '@/types/api'
 import type { CustomerCreate } from '@/api/customers'
+import { escCloses } from '@/utils/modalEsc'
 import { formatTaxRate } from '@/utils/money'
 
 const props = defineProps<{
