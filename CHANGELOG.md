@@ -7,6 +7,29 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-07-11
+
+### Added
+- Neue Referenzfelder auf der Rechnung: Vertragsnummer (BT-12) und
+  Objekt-/Projektkennung (BT-18). Beide stehen strukturiert im
+  E-Rechnungs-XML und als Meta-Zeilen im PDF (#41)
+- Notizen/Hinweise auf der Rechnung: frei formulierbare Textzeilen,
+  sichtbar im PDF und als Notiz (BT-22) im E-Rechnungs-XML (#41)
+
+### Changed
+- Anrede/Einleitung und Schlusstext stehen jetzt auch im E-Rechnungs-XML
+  (BT-22) und nicht mehr nur im PDF (#41)
+- Stornobelege übernehmen die Referenzen der Originalrechnung
+  (Bestell-, Referenz-, Vertragsnummer, Leitweg-ID, Objektkennung)
+- Generische freie Felder (Key-Value) werden nicht weiterverfolgt;
+  bestehende Einträge bleiben als Notizen lesbar (#41)
+
+### Fixed
+- Rechnungseditor übernimmt beim Wechsel von einer Rechnung zu
+  „Neue Rechnung" keinen alten Formularzustand mehr (#109)
+- Esc schließt Modals auch dann, wenn der Fokus in einem Eingabefeld
+  liegt (#107)
+
 ## [0.1.4] - 2026-07-11
 
 ### Added
@@ -120,7 +143,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.1...v0.1.2
