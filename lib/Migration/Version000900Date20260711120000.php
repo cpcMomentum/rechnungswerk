@@ -49,6 +49,7 @@ class Version000900Date20260711120000 extends SimpleMigrationStep {
 		if (!$table->hasColumn('archive_folder_id')) {
 			$table->addColumn('archive_folder_id', Types::BIGINT, [
 				'notnull' => false,
+				'length' => 20,
 				'default' => null,
 			]);
 		}
