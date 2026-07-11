@@ -68,7 +68,7 @@
 			@close="editorOpen = false"
 			@save="onSave" />
 
-		<NcModal v-if="importOpen" :name="t('rechnungswerk', 'Aus Nextcloud-Kontakten übernehmen')" @close="importOpen = false">
+		<NcModal v-if="importOpen" :name="t('rechnungswerk', 'Aus Nextcloud-Kontakten übernehmen')" @keydown.esc="e => escCloses(e, () => (importOpen = false))" @close="importOpen = false">
 			<div class="rw-import">
 				<p class="rw-muted">
 					{{ t('rechnungswerk', 'Einmaliger Import als Kopie – danach ist der Kunde unabhängig in RechnungsWerk. Kein automatischer Abgleich.') }}
@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import { escCloses } from '@/utils/modalEsc'
 import { computed, onMounted, ref } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'

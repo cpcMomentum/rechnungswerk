@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="open" :name="t('rechnungswerk', 'Rechnung an Kunde senden')" @close="$emit('close')">
+	<NcModal v-if="open" :name="t('rechnungswerk', 'Rechnung an Kunde senden')" @keydown.esc="e => escCloses(e, () => $emit('close'))" @close="$emit('close')">
 		<div class="send-modal">
 			<h2>{{ t('rechnungswerk', 'Rechnung an Kunde senden') }}</h2>
 			<p class="send-modal__hint">{{ t('rechnungswerk', 'Die E-Rechnung wird als ZUGFeRD-PDF angehängt.') }}</p>
@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { escCloses } from '@/utils/modalEsc'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcModal from '@nextcloud/vue/components/NcModal'

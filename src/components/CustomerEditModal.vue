@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="open" :name="title" @close="$emit('close')">
+	<NcModal v-if="open" :name="title" @keydown.esc="e => escCloses(e, () => $emit('close'))" @close="$emit('close')">
 		<div class="customer-modal">
 			<h2>{{ title }}</h2>
 
@@ -121,6 +121,7 @@
 </template>
 
 <script setup lang="ts">
+import { escCloses } from '@/utils/modalEsc'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcModal from '@nextcloud/vue/components/NcModal'
