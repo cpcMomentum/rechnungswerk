@@ -13,6 +13,7 @@ use DateTime;
 use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\Settings;
+use OCA\Rechnungswerk\Service\GirocodeService;
 use OCA\Rechnungswerk\Service\ZugferdService;
 use OCP\Files\IRootFolder;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,7 @@ class ZugferdServiceTest extends TestCase {
 		parent::setUp();
 		$this->service = new ZugferdService(
 			$this->createMock(IRootFolder::class),
+			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
 		);
 	}
@@ -256,5 +258,61 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('InvoiceReferencedDocument', $xml);
 		$this->assertMatchesRegularExpression('/InvoiceReferencedDocument>.*RE-2026-0001/s', $xml);
 		$this->assertStringContainsString('20260516', $xml);
+	}
+
+	private function renderHtml(Invoice $invoice, array $items, Settings $settings, bool $preview): string {
+		$m = new \ReflectionMethod(ZugferdService::class, 'renderHtml');
+		return (string)$m->invoke($this->service, $invoice, $items, $settings, null, null, $preview);
+	}
+
+	public function testPreviewHtmlCarriesDraftMarkingAndNumberPlaceholder(): void {
+		$invoice = $this->invoice();
+		$invoice->setStatus(Invoice::STATUS_DRAFT);
+		$invoice->setNumber(null); // drafts have no final number yet
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), true);
+
+		$this->assertStringContainsString('ENTWURF', $html);
+		$this->assertStringContainsString('keine g&uuml;ltige Rechnung', $html);
+		$this->assertStringContainsString('wird beim Festschreiben vergeben', $html);
+	}
+
+	public function testGirocodeAppearsOnCommittedRenderButNotOnPreview(): void {
+		if (!extension_loaded('gd')) {
+			$this->markTestSkipped('ext-gd nicht verfügbar (auf Nextcloud immer vorhanden, GD ist Pflichtmodul).');
+		}
+		$settings = $this->settings();
+		$settings->setGirocodeEnabled(1);
+		$invoice = $this->invoice();
+		$invoice->setTotalCents(23800);
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$committedHtml = $this->renderHtml($invoice, $items, $settings, false);
+		$this->assertStringContainsString('Zahlen mit Girocode', $committedHtml);
+		$this->assertStringContainsString('data:image/png;base64,', $committedHtml);
+
+		// The draft preview must never carry a scannable payment code.
+		$previewHtml = $this->renderHtml($invoice, $items, $settings, true);
+		$this->assertStringNotContainsString('Zahlen mit Girocode', $previewHtml);
+	}
+
+	public function testRegularRenderHasNoDraftMarking(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
+
+		$this->assertStringNotContainsString('ENTWURF', $html);
+		$this->assertStringNotContainsString('wird beim Festschreiben vergeben', $html);
+		$this->assertStringContainsString('RE-2026-0001', $html);
 	}
 }

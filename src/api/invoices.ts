@@ -72,6 +72,14 @@ export const invoicePdfUrl = (id: number): string =>
 	apiUrl(`/invoices/${id}/pdf`)
 
 /**
+ * Same-origin URL of the watermarked draft-preview PDF. The cache-buster
+ * forces the iframe to re-fetch after every edit — the URL would otherwise
+ * be identical across previews of the same draft.
+ */
+export const invoicePreviewUrl = (id: number): string =>
+	apiUrl(`/invoices/${id}/preview`) + '?t=' + Date.now()
+
+/**
  * Trigger a browser download of the invoice PDF. Uses a transient anchor with
  * the `download` attribute rather than window.open() — the latter flickers a
  * blank tab and is throttled by popup blockers; the anchor lets the server's

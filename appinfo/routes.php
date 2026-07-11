@@ -20,6 +20,7 @@ return [
 		['name' => 'invoice#commit',  'url' => '/api/v1/invoices/{id}/commit', 'verb' => 'POST'],
 		['name' => 'invoice#cancel',  'url' => '/api/v1/invoices/{id}/cancel', 'verb' => 'POST'],
 		['name' => 'invoice#download', 'url' => '/api/v1/invoices/{id}/pdf',   'verb' => 'GET'],
+		['name' => 'invoice#preview', 'url' => '/api/v1/invoices/{id}/preview', 'verb' => 'GET'],
 		['name' => 'invoice#send',    'url' => '/api/v1/invoices/{id}/send',  'verb' => 'POST'],
 
 		// Products
@@ -43,6 +44,8 @@ return [
 		['name' => 'settings#getLogo',    'url' => '/api/v1/settings/logo', 'verb' => 'GET'],
 		['name' => 'settings#setLogo',    'url' => '/api/v1/settings/logo', 'verb' => 'PUT'],
 		['name' => 'settings#deleteLogo', 'url' => '/api/v1/settings/logo', 'verb' => 'DELETE'],
+		['name' => 'settings#setArchiveFolder',    'url' => '/api/v1/settings/archive-folder', 'verb' => 'PUT'],
+		['name' => 'settings#deleteArchiveFolder', 'url' => '/api/v1/settings/archive-folder', 'verb' => 'DELETE'],
 
 		// Contacts (recipient picker)
 		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],

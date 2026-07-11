@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Tests\Unit;
 
+use OCA\Rechnungswerk\Db\Invoice;
+use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Service\InvoiceCalculator;
 use PHPUnit\Framework\TestCase;
 
@@ -193,5 +195,78 @@ class InvoiceCalculatorTest extends TestCase {
 	public function testFormatHasYearFalseForYearlessFormat(): void {
 		$this->assertFalse(InvoiceCalculator::formatHasYear('RE-{####}'));
 		$this->assertFalse(InvoiceCalculator::formatHasYear('{######}'));
+	}
+	// --- buildPdfFileName (#37) -------------------------------------------
+
+	private function fileNameFixtures(string $format): array {
+		$invoice = new Invoice();
+		$invoice->setId(42);
+		$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
+		$invoice->setNumber('RE-2026-0007');
+		$invoice->setIssueDate(new \DateTime('2026-07-09'));
+		$invoice->setRecipientName('Müller & Söhne GmbH');
+		$settings = new Settings();
+		$settings->setFileNameFormat($format);
+		return [$invoice, $settings];
+	}
+
+	public function testBuildPdfFileNameDefaultIsNumber(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{nummer}');
+		$this->assertSame('RE-2026-0007.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
+
+	public function testBuildPdfFileNameEmptyFormatFallsBackToDefault(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('');
+		$this->assertSame('RE-2026-0007.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
+
+	public function testBuildPdfFileNameRendersAllPlaceholders(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{YYYY}-{MM}-{DD}_{typ}_{nummer}_{kunde}');
+		$this->assertSame(
+			'2026-07-09_Rechnung_RE-2026-0007_Mueller & Soehne GmbH.pdf',
+			InvoiceCalculator::buildPdfFileName($invoice, $settings),
+		);
+	}
+
+	public function testBuildPdfFileNameStornoType(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{typ}-{nummer}');
+		$invoice->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$this->assertSame('Storno-RE-2026-0007.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
+
+	public function testBuildPdfFileNameSanitizesReservedCharacters(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{nummer}_{kunde}');
+		$invoice->setRecipientName('A/B\\C:D*E?F"G<H>I|J');
+		$this->assertSame('RE-2026-0007_A-B-C-D-E-F-G-H-I-J.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
+
+	public function testBuildPdfFileNameMissingNumberFallsBackToId(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{nummer}');
+		$invoice->setNumber(null);
+		$this->assertSame('rechnung-42.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
+
+	public function testBuildPdfFileNameDateFallsBackToCommittedAt(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{YYYY}{MM}{DD}_{nummer}');
+		$invoice->setIssueDate(null);
+		$invoice->setCommittedAt(new \DateTime('2026-01-31'));
+		$this->assertSame('20260131_RE-2026-0007.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
+	}
+
+	public function testBuildPdfFileNameCapsLength(): void {
+		[$invoice, $settings] = $this->fileNameFixtures('{nummer}_{kunde}');
+		$invoice->setRecipientName(str_repeat('x', 300));
+		$name = InvoiceCalculator::buildPdfFileName($invoice, $settings);
+		$this->assertLessThanOrEqual(124, mb_strlen($name)); // 120 + '.pdf'
+		$this->assertStringEndsWith('.pdf', $name);
+	}
+
+	public function testBuildPdfFileNameDoesNotReinterpretPlaceholderLikeTextInReplacements(): void {
+		// A customer name that happens to contain a literal placeholder token
+		// (e.g. '{typ}') must not be re-substituted just because {kunde} is
+		// rendered before {typ} in scheme order.
+		[$invoice, $settings] = $this->fileNameFixtures('{nummer}_{kunde}_{typ}');
+		$invoice->setRecipientName('Firma {typ} GmbH');
+		$this->assertSame('RE-2026-0007_Firma {typ} GmbH_Rechnung.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
 	}
 }

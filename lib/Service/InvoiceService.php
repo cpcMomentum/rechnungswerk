@@ -28,6 +28,7 @@ class InvoiceService {
 		private readonly InvoiceItemMapper $itemMapper,
 		private readonly SettingsService $settingsService,
 		private readonly ZugferdService $zugferdService,
+		private readonly ArchiveService $archiveService,
 		private readonly MailService $mailService,
 		private readonly IDBConnection $db,
 		private readonly LoggerInterface $logger,
@@ -210,6 +211,7 @@ class InvoiceService {
 		// roll it back — it is only logged. The result is surfaced to the UI.
 		$result = $this->present($invoice);
 		$result['datevMailSent'] = $this->maybeSendToDatev($invoice);
+		$result['archived'] = $this->maybeArchive($invoice);
 		return $result;
 	}
 
@@ -235,7 +237,7 @@ class InvoiceService {
 				"Automatische DATEV-Übergabe aus RechnungsWerk.\n\nRechnung: " . $number
 					. "\n\nDie E-Rechnung (ZUGFeRD-PDF) ist als Anhang beigefügt.",
 				$pdf,
-				$number . '.pdf',
+				InvoiceCalculator::buildPdfFileName($invoice, $settings),
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
@@ -276,8 +278,7 @@ class InvoiceService {
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
 		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
-		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $base . '.pdf', $settings, $this->settingsService->getSmtpConfig());
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, InvoiceCalculator::buildPdfFileName($invoice, $settings), $settings, $this->settingsService->getSmtpConfig());
 	}
 
 	/**
@@ -367,7 +368,27 @@ class InvoiceService {
 		// only logged, never rolls back the (legally final) storno.
 		$result = $this->present($storno);
 		$result['datevMailSent'] = $this->maybeSendToDatev($storno);
+		$result['archived'] = $this->maybeArchive($storno);
 		return $result;
+	}
+
+	/**
+	 * Fire-and-forget Nextcloud filing of a freshly committed document (#38);
+	 * mirrors the DATEV hand-off contract (true/false/null, never throws).
+	 */
+	private function maybeArchive(Invoice $invoice): ?bool {
+		try {
+			$settings = $this->settingsService->getCompany();
+			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+			return $this->archiveService->maybeArchive($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: Ablage-Aufruf fehlgeschlagen', [
+				'exception' => $e,
+				'invoice' => $invoice->getId(),
+			]);
+			return null;
+		}
 	}
 
 	/**
@@ -387,8 +408,27 @@ class InvoiceService {
 		$settings = $this->settingsService->getCompany();
 		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
 		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		$base = ($invoice->getNumber() ?? '') !== '' ? (string)$invoice->getNumber() : 'rechnung-' . $invoice->getId();
-		return ['filename' => $base . '.pdf', 'content' => $content];
+		return ['filename' => InvoiceCalculator::buildPdfFileName($invoice, $settings), 'content' => $content];
+	}
+
+	/**
+	 * Render a DRAFT invoice as a watermarked preview PDF (visible layout
+	 * only, no embedded e-invoice XML). Committed invoices already have the
+	 * real ZUGFeRD download and are rejected here — the two must not mix.
+	 *
+	 * @return array{filename: string, content: string}
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function generatePreviewPdf(int $id): array {
+		$invoice = $this->findById($id);
+		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
+			throw new IllegalStateException('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
+		}
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$settings = $this->settingsService->getCompany();
+		$content = $this->zugferdService->generateDraftPreviewPdf($invoice, $items, $settings);
+		return ['filename' => 'entwurf-' . $invoice->getId() . '.pdf', 'content' => $content];
 	}
 
 	// --- internals -------------------------------------------------------

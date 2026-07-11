@@ -183,6 +183,12 @@ export interface Settings {
 	numberCounter: number
 	numberCounterYear: number | null
 	numberResetMode: 'yearly' | 'continuous'
+	fileNameFormat: string
+	archiveEnabled: boolean
+	archiveFolderId: number | null
+	archiveSubfolder: string | null
+	archiveFolderPath?: string | null
+	girocodeEnabled: boolean
 	smallBusiness: boolean
 	defaultTaxRateBp: number
 	datevUploadMail: string | null
