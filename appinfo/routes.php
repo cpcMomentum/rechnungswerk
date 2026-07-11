@@ -44,6 +44,8 @@ return [
 		['name' => 'settings#getLogo',    'url' => '/api/v1/settings/logo', 'verb' => 'GET'],
 		['name' => 'settings#setLogo',    'url' => '/api/v1/settings/logo', 'verb' => 'PUT'],
 		['name' => 'settings#deleteLogo', 'url' => '/api/v1/settings/logo', 'verb' => 'DELETE'],
+		['name' => 'settings#setArchiveFolder',    'url' => '/api/v1/settings/archive-folder', 'verb' => 'PUT'],
+		['name' => 'settings#deleteArchiveFolder', 'url' => '/api/v1/settings/archive-folder', 'verb' => 'DELETE'],
 
 		// Contacts (recipient picker)
 		['name' => 'contact#search', 'url' => '/api/v1/contacts/search', 'verb' => 'GET'],

@@ -203,9 +203,10 @@ final class InvoiceCalculator {
 	/**
 	 * Make a rendered name safe for file systems and mail attachments: strip
 	 * path separators and reserved characters, collapse whitespace, trim
-	 * leading/trailing dots and spaces, cap the length.
+	 * leading/trailing dots and spaces, cap the length. Public so the archive
+	 * path segments (#38) go through the same rules as file names.
 	 */
-	private static function sanitizeFileName(string $name): string {
+	public static function sanitizeFileName(string $name): string {
 		// Reserved on Windows/SMB, path separators, and control characters.
 		$name = (string)preg_replace('/[\/\\\\:*?"<>|]|[\x00-\x1f]/u', '-', $name);
 		$name = (string)preg_replace('/\s+/u', ' ', $name);
