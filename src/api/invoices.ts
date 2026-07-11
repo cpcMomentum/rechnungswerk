@@ -37,10 +37,12 @@ export interface InvoiceInput {
 	referenceNumber?: string | null
 	orderNumber?: string | null
 	buyerReference?: string | null
+	contractNumber?: string | null
+	projectReference?: string | null
 	specialTaxCase?: string | null
 	greeting?: string | null
 	extraText?: string | null
-	customFields?: Array<{ label: string, value: string }>
+	notes?: string[]
 	paymentTermDays?: number | null
 	discountTerms?: string | null
 	items?: InvoiceItemInput[]
