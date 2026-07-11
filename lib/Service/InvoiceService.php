@@ -325,6 +325,13 @@ class InvoiceService {
 			$storno->setSpecialTaxCase($original->getSpecialTaxCase());
 			$storno->setGreeting($original->getGreeting());
 			$storno->setCustomFields($original->getCustomFields());
+			// The storno corrects the original, so it carries the same business
+			// references (order, our reference, Leitweg, contract, project).
+			$storno->setReferenceNumber($original->getReferenceNumber());
+			$storno->setOrderNumber($original->getOrderNumber());
+			$storno->setBuyerReference($original->getBuyerReference());
+			$storno->setContractNumber($original->getContractNumber());
+			$storno->setProjectReference($original->getProjectReference());
 			$storno->setIssueDate($now);
 			$storno->setCommittedAt($now);
 			$storno->setCreatedAt($now);
@@ -501,7 +508,8 @@ class InvoiceService {
 			'recipientCity', 'recipientEmail', 'recipientVatId', 'recipientContactPerson',
 			'recipientPhone', 'sellerContactPerson', 'sellerContactPhone', 'sellerContactEmail',
 			'referenceNumber',
-			'orderNumber', 'buyerReference', 'specialTaxCase', 'greeting', 'extraText',
+			'orderNumber', 'buyerReference', 'contractNumber', 'projectReference',
+			'specialTaxCase', 'greeting', 'extraText',
 			'discountTerms',
 		];
 		foreach ($strings as $field) {
@@ -529,8 +537,8 @@ class InvoiceService {
 				$invoice->{'set' . ucfirst($dateField)}($this->parseDate($data[$dateField]));
 			}
 		}
-		if (array_key_exists('customFields', $data)) {
-			$invoice->setCustomFields($this->encodeCustomFields($data['customFields']));
+		if (array_key_exists('notes', $data)) {
+			$invoice->setCustomFields($this->encodeNotes($data['notes']));
 		}
 	}
 
@@ -646,19 +654,20 @@ class InvoiceService {
 		return $date;
 	}
 
-	private function encodeCustomFields(mixed $value): ?string {
+	/**
+	 * Encode the plain-text invoice notes (BT-22) as a JSON list of strings
+	 * for the custom_fields column. Empty entries are dropped.
+	 */
+	private function encodeNotes(mixed $value): ?string {
 		if (!is_array($value)) {
 			return null;
 		}
 		$clean = [];
 		foreach ($value as $entry) {
-			if (is_array($entry) && isset($entry['label'])) {
-				$clean[] = [
-					'label' => (string)$entry['label'],
-					'value' => (string)($entry['value'] ?? ''),
-				];
+			if (is_string($entry) && trim($entry) !== '') {
+				$clean[] = trim($entry);
 			}
 		}
-		return $clean === [] ? null : json_encode($clean);
+		return $clean === [] ? null : json_encode($clean, JSON_UNESCAPED_UNICODE);
 	}
 }

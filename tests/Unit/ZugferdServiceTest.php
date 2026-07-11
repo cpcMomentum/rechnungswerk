@@ -315,4 +315,51 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringNotContainsString('wird beim Festschreiben vergeben', $html);
 		$this->assertStringContainsString('RE-2026-0001', $html);
 	}
+
+	public function testReferencesAndNotesAreExportedToXml(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$invoice->setContractNumber('V-2026-004');
+		$invoice->setProjectReference('OBJ-88');
+		$invoice->setGreeting("Sehr geehrte Damen und Herren,\nvielen Dank für Ihren Auftrag.");
+		$invoice->setExtraText('Bitte geben Sie bei Zahlung die Rechnungsnummer an.');
+		$invoice->setCustomFields(json_encode(['Lieferung frei Haus', 'Es gelten unsere AGB.'], JSON_UNESCAPED_UNICODE));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		// BT-12 contract reference and BT-18 invoiced object (type code 130).
+		$this->assertStringContainsString('ContractReferencedDocument', $xml);
+		$this->assertStringContainsString('V-2026-004', $xml);
+		$this->assertStringContainsString('AdditionalReferencedDocument', $xml);
+		$this->assertStringContainsString('OBJ-88', $xml);
+		$this->assertStringContainsString('<ram:TypeCode>130</ram:TypeCode>', $xml);
+		// BT-22 notes: explicit invoice notes plus greeting and closing text.
+		$this->assertStringContainsString('IncludedNote', $xml);
+		$this->assertStringContainsString('Lieferung frei Haus', $xml);
+		$this->assertStringContainsString('Es gelten unsere AGB.', $xml);
+		$this->assertStringContainsString('vielen Dank für Ihren Auftrag.', $xml);
+		$this->assertStringContainsString('Bitte geben Sie bei Zahlung die Rechnungsnummer an.', $xml);
+	}
+
+	public function testLegacyLabelValueCustomFieldsReadAsNotes(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		// Pre-#41 shape: abandoned key-value custom fields survive as "label: value" notes.
+		$invoice->setCustomFields(json_encode([['label' => 'Kostenstelle', 'value' => 'KST-4711']]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$this->assertSame(['Kostenstelle: KST-4711'], $invoice->getNotesArray());
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+		$this->assertStringContainsString('Kostenstelle: KST-4711', $xml);
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
+		$this->assertStringContainsString('Hinweise', $html);
+		$this->assertStringContainsString('Kostenstelle: KST-4711', $html);
+	}
 }

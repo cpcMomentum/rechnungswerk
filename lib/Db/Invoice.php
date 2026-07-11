@@ -64,6 +64,10 @@ use OCP\DB\Types;
  * @method void setOrderNumber(?string $orderNumber)
  * @method ?string getBuyerReference()
  * @method void setBuyerReference(?string $buyerReference)
+ * @method ?string getContractNumber()
+ * @method void setContractNumber(?string $contractNumber)
+ * @method ?string getProjectReference()
+ * @method void setProjectReference(?string $projectReference)
  * @method ?int getRelatedInvoiceId()
  * @method void setRelatedInvoiceId(?int $relatedInvoiceId)
  * @method int getSubtotalCents()
@@ -163,6 +167,8 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $referenceNumber = null;
 	protected ?string $orderNumber = null;
 	protected ?string $buyerReference = null;
+	protected ?string $contractNumber = null;
+	protected ?string $projectReference = null;
 	protected ?int $relatedInvoiceId = null;
 	protected ?int $subtotalCents = null;
 	protected ?int $totalCents = null;
@@ -208,6 +214,8 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('referenceNumber', Types::STRING);
 		$this->addType('orderNumber', Types::STRING);
 		$this->addType('buyerReference', Types::STRING);
+		$this->addType('contractNumber', Types::STRING);
+		$this->addType('projectReference', Types::STRING);
 		$this->addType('relatedInvoiceId', Types::INTEGER);
 		$this->addType('subtotalCents', Types::INTEGER);
 		$this->addType('totalCents', Types::INTEGER);
@@ -245,13 +253,37 @@ class Invoice extends Entity implements JsonSerializable {
 		return in_array($this->getSpecialTaxCase(), self::SPECIAL_TAX_EXEMPT_CASES, true);
 	}
 
-	/** @return list<array{label: string, value: string}> */
-	public function getCustomFieldsArray(): array {
+	/**
+	 * Plain-text invoice notes (BT-22), stored as a JSON list of strings in the
+	 * custom_fields column. Legacy rows may still hold the abandoned
+	 * label/value custom-field shape (#41) — those read as "label: value".
+	 *
+	 * @return list<string>
+	 */
+	public function getNotesArray(): array {
 		if ($this->customFields === null || $this->customFields === '') {
 			return [];
 		}
 		$decoded = json_decode($this->customFields, true);
-		return is_array($decoded) ? $decoded : [];
+		if (!is_array($decoded)) {
+			return [];
+		}
+		$notes = [];
+		foreach ($decoded as $entry) {
+			if (is_string($entry)) {
+				$note = trim($entry);
+			} elseif (is_array($entry)) {
+				$label = trim((string)($entry['label'] ?? ''));
+				$value = trim((string)($entry['value'] ?? ''));
+				$note = $label !== '' && $value !== '' ? $label . ': ' . $value : ($label . $value);
+			} else {
+				continue;
+			}
+			if ($note !== '') {
+				$notes[] = $note;
+			}
+		}
+		return $notes;
 	}
 
 	private function formatDate(?\DateTime $date): ?string {
@@ -289,6 +321,8 @@ class Invoice extends Entity implements JsonSerializable {
 			'referenceNumber' => $this->getReferenceNumber(),
 			'orderNumber' => $this->getOrderNumber(),
 			'buyerReference' => $this->getBuyerReference(),
+			'contractNumber' => $this->getContractNumber(),
+			'projectReference' => $this->getProjectReference(),
 			'relatedInvoiceId' => $this->getRelatedInvoiceId(),
 			'subtotalCents' => $this->getSubtotalCents(),
 			'totalCents' => $this->getTotalCents(),
@@ -296,7 +330,7 @@ class Invoice extends Entity implements JsonSerializable {
 			'specialTaxCase' => $this->getSpecialTaxCase(),
 			'greeting' => $this->getGreeting(),
 			'extraText' => $this->getExtraText(),
-			'customFields' => $this->getCustomFieldsArray(),
+			'notes' => $this->getNotesArray(),
 			'paymentTermDays' => $this->getPaymentTermDays(),
 			'dueDate' => $this->formatDate($this->getDueDate()),
 			'discountTerms' => $this->getDiscountTerms(),
