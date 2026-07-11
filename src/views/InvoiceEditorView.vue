@@ -265,7 +265,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -317,7 +317,7 @@ const previewOpen = ref(false)
 const previewUrl = ref('')
 const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 
-const form = reactive({
+const emptyForm = () => ({
 	customerId: null as number | null,
 	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
@@ -329,6 +329,7 @@ const form = reactive({
 	greeting: '', extraText: '',
 	paymentTermDays: '' as string | number, discountTerms: '',
 })
+const form = reactive(emptyForm())
 
 const TAX_EXEMPT_CASES = ['reverse_charge', 'intra_community', 'export']
 const taxExempt = computed(() =>
@@ -412,31 +413,72 @@ onMounted(async () => {
 		if (props.id) {
 			await load(Number(props.id))
 		} else {
-			const s = settingsStore.settings
-			// Opening = salutation + intro (rendered above the line items);
-			// the closing text is edited separately in its own field below.
-			form.greeting = [s?.greetingDefault, s?.introDefault]
-				.filter(p => (p ?? '').trim() !== '').join('\n\n')
-			form.extraText = s?.closingDefault ?? ''
-			// Seller-contact cascade (#47): the user's personal default ("Mein
-			// Kontakt") first, falling back per field to the central company
-			// contact when unset. Left fully empty → backend uses the company
-			// contact. The NC account is no longer pulled automatically; it is a
-			// manual import in the "Mein Kontakt" area.
-			let mine = { person: '', phone: '', email: '' }
-			try {
-				mine = await getMyContact()
-			} catch {
-				// ignore — company contact will be used
-			}
-			form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
-			form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
-			form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
+			await initNew()
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
 	}
 })
+
+// invoice-new and invoice-detail share this component, so Vue Router reuses
+// the instance on SPA navigation between them — onMounted does not run again
+// (#109). Reset and re-initialise here instead of forcing a remount via a
+// keyed router-view: save() swaps /invoices/new to /invoices/{id} while the
+// finalize/preview flow is still running on this instance, and a remount
+// would strand that flow on a dead instance.
+watch(() => props.id, async (newId) => {
+	try {
+		if (!newId) {
+			resetEditor()
+			await initNew()
+		} else if (invoice.value?.id !== Number(newId)) {
+			resetEditor()
+			await load(Number(newId))
+		}
+		// invoice.value.id === newId: our own router.replace after creating the
+		// draft — state is already current, nothing to do.
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
+	}
+})
+
+/** Blank editor state for a fresh invoice (SPA navigation, no remount). */
+function resetEditor() {
+	invoice.value = null
+	items.value = [emptyItem()]
+	notes.value = []
+	error.value = ''
+	notice.value = ''
+	sendDialogOpen.value = false
+	previewOpen.value = false
+	previewUrl.value = ''
+	dialog.value = null
+	Object.assign(form, emptyForm())
+}
+
+/** Defaults for a new invoice: text templates + seller-contact cascade. */
+async function initNew() {
+	const s = settingsStore.settings
+	// Opening = salutation + intro (rendered above the line items);
+	// the closing text is edited separately in its own field below.
+	form.greeting = [s?.greetingDefault, s?.introDefault]
+		.filter(p => (p ?? '').trim() !== '').join('\n\n')
+	form.extraText = s?.closingDefault ?? ''
+	// Seller-contact cascade (#47): the user's personal default ("Mein
+	// Kontakt") first, falling back per field to the central company
+	// contact when unset. Left fully empty → backend uses the company
+	// contact. The NC account is no longer pulled automatically; it is a
+	// manual import in the "Mein Kontakt" area.
+	let mine = { person: '', phone: '', email: '' }
+	try {
+		mine = await getMyContact()
+	} catch {
+		// ignore — company contact will be used
+	}
+	form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
+	form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
+	form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
+}
 
 async function load(id: number) {
 	const detail = await invoiceStore.get(id)
