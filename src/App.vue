@@ -36,7 +36,10 @@
 				</template>
 			</NcAppNavigation>
 			<NcAppContent>
-				<router-view />
+				<!-- Keyed by path: invoice-new and invoice-detail share the editor
+				     component, and without a remount the previous invoice's form
+				     state (even the readonly mode) survives the navigation (#109). -->
+				<router-view :key="$route.path" />
 			</NcAppContent>
 		</template>
 	</NcContent>
