@@ -188,6 +188,7 @@ export interface Settings {
 	archiveFolderId: number | null
 	archiveSubfolder: string | null
 	archiveFolderPath?: string | null
+	girocodeEnabled: boolean
 	smallBusiness: boolean
 	defaultTaxRateBp: number
 	datevUploadMail: string | null

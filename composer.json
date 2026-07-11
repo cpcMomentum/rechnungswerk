@@ -6,6 +6,7 @@
   "require": {
     "php": ">=8.2",
     "ext-mbstring": "*",
+    "bacon/bacon-qr-code": "^3.0",
     "dompdf/dompdf": "^3.0",
     "horstoeko/zugferd": "^1.0",
     "phpmailer/phpmailer": "^6.9"

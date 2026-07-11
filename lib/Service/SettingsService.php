@@ -116,6 +116,8 @@ class SettingsService {
 			$settings->setNumberCounterYear(null);
 			$settings->setNumberResetMode(Settings::DEFAULT_RESET_MODE);
 			$settings->setFileNameFormat(Settings::DEFAULT_FILE_NAME_FORMAT);
+			$settings->setArchiveEnabled(0);
+			$settings->setGirocodeEnabled(0);
 			$settings->setSmallBusiness(0);
 			$settings->setDatevAutoSend(0);
 			$settings->setDefaultTaxRateBp(1900);
@@ -168,6 +170,10 @@ class SettingsService {
 		if (array_key_exists('archiveEnabled', $data)) {
 			// Only meaningful with a picked target folder (validated above).
 			$settings->setArchiveEnabled(!empty($data['archiveEnabled']) ? 1 : 0);
+		}
+		if (array_key_exists('girocodeEnabled', $data)) {
+			// Needs an IBAN to build an EPC payload (validated above).
+			$settings->setGirocodeEnabled(!empty($data['girocodeEnabled']) ? 1 : 0);
 		}
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$settings->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);
@@ -270,6 +276,17 @@ class SettingsService {
 			$effectiveFolderId = $current->getArchiveFolderId();
 			if ($effectiveFolderId === null) {
 				throw new ValidationException('Für die Ablage muss zuerst ein Zielordner gewählt werden.');
+			}
+		}
+
+		// Cross-field: the Girocode payload needs an IBAN; check the effective
+		// (merged) state because both fields live in the same form.
+		if (array_key_exists('girocodeEnabled', $data) && !empty($data['girocodeEnabled'])) {
+			$effectiveIban = array_key_exists('iban', $data)
+				? trim((string)$data['iban'])
+				: trim((string)$current->getIban());
+			if ($effectiveIban === '') {
+				throw new ValidationException('Für den Girocode muss eine IBAN hinterlegt sein.');
 			}
 		}
 

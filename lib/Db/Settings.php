@@ -58,6 +58,8 @@ use OCP\DB\Types;
  * @method void setArchiveFolderId(?int $archiveFolderId)
  * @method ?string getArchiveSubfolder()
  * @method void setArchiveSubfolder(?string $archiveSubfolder)
+ * @method int getGirocodeEnabled()
+ * @method void setGirocodeEnabled(int $girocodeEnabled)
  * @method int getSmallBusiness()
  * @method void setSmallBusiness(int $smallBusiness)
  * @method int getDefaultTaxRateBp()
@@ -137,6 +139,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $archiveEnabled = null;
 	protected ?int $archiveFolderId = null;
 	protected ?string $archiveSubfolder = null;
+	protected ?int $girocodeEnabled = null;
 	protected ?int $smallBusiness = null;
 	protected ?int $defaultTaxRateBp = null;
 	protected ?string $datevUploadMail = null;
@@ -182,6 +185,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('archiveEnabled', Types::SMALLINT);
 		$this->addType('archiveFolderId', Types::INTEGER);
 		$this->addType('archiveSubfolder', Types::STRING);
+		$this->addType('girocodeEnabled', Types::SMALLINT);
 		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
 		$this->addType('datevUploadMail', Types::STRING);
@@ -229,6 +233,7 @@ class Settings extends Entity implements JsonSerializable {
 			'archiveEnabled' => (bool)$this->getArchiveEnabled(),
 			'archiveFolderId' => $this->getArchiveFolderId(),
 			'archiveSubfolder' => $this->getArchiveSubfolder(),
+			'girocodeEnabled' => (bool)$this->getGirocodeEnabled(),
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
 			'datevUploadMail' => $this->getDatevUploadMail(),

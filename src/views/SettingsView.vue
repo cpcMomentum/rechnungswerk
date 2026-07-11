@@ -40,6 +40,16 @@
 				</div>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Bankname') }}</span>
 					<input v-model="form.bankName" class="rw-input" type="text" /></label>
+				<NcCheckboxRadioSwitch
+					type="switch"
+					:model-value="form.girocodeEnabled"
+					:disabled="!form.iban"
+					@update:model-value="(v: boolean) => { if (form) form.girocodeEnabled = v }">
+					{{ t('rechnungswerk', 'Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen') }}
+				</NcCheckboxRadioSwitch>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.') }}
+				</p>
 			</section>
 
 			<!-- Branding -->
@@ -492,6 +502,7 @@ function hydrate() {
 		archiveEnabled: s.archiveEnabled,
 		archiveFolderId: s.archiveFolderId,
 		archiveSubfolder: s.archiveSubfolder,
+		girocodeEnabled: s.girocodeEnabled,
 		smallBusiness: s.smallBusiness,
 		defaultTaxRateBp: s.defaultTaxRateBp,
 		datevUploadMail: s.datevUploadMail,
