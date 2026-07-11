@@ -45,6 +45,7 @@ class ZugferdService {
 
 	public function __construct(
 		private readonly IRootFolder $rootFolder,
+		private readonly GirocodeService $girocodeService,
 		private readonly LoggerInterface $logger,
 	) {
 	}
@@ -587,6 +588,23 @@ class ZugferdService {
 			]);
 			$paymentInfo = '<p class="bank">' . implode(' &middot; ', $bank) . '</p>';
 		}
+
+		// Girocode (#79): payment QR next to the bank details — only on final
+		// documents. The draft preview deliberately gets NO scannable payment
+		// code (someone could pay an uncommitted draft), and the builder itself
+		// excludes storno documents via the amount guard.
+		$girocodeHtml = '';
+		if (!$preview) {
+			$payload = $this->girocodeService->buildPayload($invoice, $settings);
+			$qrUri = $payload !== null ? $this->girocodeService->renderDataUri($payload) : null;
+			if ($qrUri !== null) {
+				$girocodeHtml = '<table class="girocode"><tr>'
+					. '<td class="girocode-img"><img src="' . $qrUri . '" alt=""></td>'
+					. '<td class="girocode-label"><strong>Zahlen mit Girocode</strong><br>'
+					. 'QR-Code mit der Banking-App scannen &ndash; Empf&auml;nger, Betrag und Verwendungszweck werden automatisch &uuml;bernommen.</td>'
+					. '</tr></table>';
+			}
+		}
 		$termDesc = $this->paymentTermDescription($invoice);
 		$termHtml = $termDesc !== null ? '<p>' . $e($termDesc) . '</p>' : '';
 
@@ -649,6 +667,10 @@ table.items td.num, table.items th.num { text-align: right; }
 .footer { margin-top: 28px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 8pt; color: #777; text-align: center; }
 .draft-watermark { position: fixed; top: 38%; left: -10%; width: 120%; text-align: center; font-size: 84pt; font-weight: bold; letter-spacing: 14pt; color: #f0d5d5; transform: rotate(-30deg); }
 .draft-banner { background: #fdecec; color: #b93a3a; border: 1px solid #e8b4b4; padding: 6px 10px; margin-bottom: 14px; font-weight: bold; font-size: 10pt; text-align: center; }
+table.girocode { margin-top: 10px; border-collapse: collapse; }
+table.girocode td { vertical-align: middle; }
+td.girocode-img img { width: 96px; height: 96px; }
+td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width: 260px; }
 </style></head><body>
 {$watermarkHtml}
 <div class="header">
@@ -673,6 +695,7 @@ table.items td.num, table.items th.num { text-align: right; }
   {$exemptNoteHtml}
   {$termHtml}
   {$paymentInfo}
+  {$girocodeHtml}
   {$closing}
 </div>
 {$footer}
