@@ -5,6 +5,7 @@
   "type": "project",
   "require": {
     "php": ">=8.2",
+    "ext-gd": "*",
     "ext-mbstring": "*",
     "bacon/bacon-qr-code": "^3.0",
     "dompdf/dompdf": "^3.0",
