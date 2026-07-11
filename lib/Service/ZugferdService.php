@@ -14,6 +14,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use horstoeko\zugferd\codelists\ZugferdCountryCodes;
 use horstoeko\zugferd\codelists\ZugferdCurrencyCodes;
+use horstoeko\zugferd\codelists\ZugferdDocumentType;
 use horstoeko\zugferd\codelists\ZugferdInvoiceType;
 use horstoeko\zugferd\codelists\ZugferdVatCategoryCodes;
 use horstoeko\zugferd\codelists\ZugferdVatTypeCodes;
@@ -161,6 +162,7 @@ class ZugferdService {
 		$this->applySeller($builder, $settings, $invoice);
 		$this->applyBuyer($builder, $invoice);
 		$this->applyReferences($builder, $invoice);
+		$this->applyNotes($builder, $invoice, $settings);
 		$this->applyPayment($builder, $invoice, $settings);
 		$this->applyPositions($builder, $items, $exemptCategory);
 		$this->applyTaxBreakdown($builder, $invoice, $exemptCategory, $exemptReason);
@@ -190,6 +192,48 @@ class ZugferdService {
 			// BT-14: sales order reference (our own reference).
 			$builder->setDocumentSellerOrderReferencedDocument($invoice->getReferenceNumber());
 		}
+		if (($invoice->getContractNumber() ?? '') !== '') {
+			// BT-12: contract reference.
+			$builder->setDocumentContractReferencedDocument($invoice->getContractNumber());
+		}
+		if (($invoice->getProjectReference() ?? '') !== '') {
+			// BT-18: invoiced object identifier, expressed as an additional
+			// referenced document with type code 130. The optional scheme
+			// identifier (BT-18-1) is deliberately not set.
+			$builder->addDocumentAdditionalReferencedDocument(
+				$invoice->getProjectReference(),
+				ZugferdDocumentType::INVOICING_DATA_SHEET,
+			);
+		}
+	}
+
+	/**
+	 * BT-22 document notes: the explicit per-invoice notes plus the free text
+	 * that previously only lived in the PDF (greeting/intro and closing text),
+	 * so no human-readable text is lost in the machine-readable XML (#41).
+	 */
+	private function applyNotes(ZugferdDocumentBuilder $builder, Invoice $invoice, Settings $settings): void {
+		foreach ($invoice->getNotesArray() as $note) {
+			$builder->addDocumentNote($note);
+		}
+		if (($invoice->getGreeting() ?? '') !== '') {
+			$builder->addDocumentNote($invoice->getGreeting());
+		}
+		$closing = $this->effectiveClosingText($invoice, $settings);
+		if ($closing !== '') {
+			$builder->addDocumentNote($closing);
+		}
+	}
+
+	/**
+	 * Closing text shown at the bottom of the invoice: per-invoice extraText,
+	 * falling back to the configured default. Shared by the XML notes (BT-22)
+	 * and the PDF rendering so both sides can never diverge.
+	 */
+	private function effectiveClosingText(Invoice $invoice, Settings $settings): string {
+		return ($invoice->getExtraText() ?? '') !== ''
+			? (string)$invoice->getExtraText()
+			: ($settings->getClosingDefault() ?? '');
 	}
 
 	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings, Invoice $invoice): void {
@@ -536,6 +580,12 @@ class ZugferdService {
 		if (($invoice->getBuyerReference() ?? '') !== '') {
 			$meta[] = ['Leitweg-ID', $e($invoice->getBuyerReference())];
 		}
+		if (($invoice->getContractNumber() ?? '') !== '') {
+			$meta[] = ['Vertragsnummer', $e($invoice->getContractNumber())];
+		}
+		if (($invoice->getProjectReference() ?? '') !== '') {
+			$meta[] = ['Objekt-/Projektkennung', $e($invoice->getProjectReference())];
+		}
 		if (($invoice->getRecipientVatId() ?? '') !== '') {
 			$meta[] = ['USt-IdNr. (Kunde)', $e($invoice->getRecipientVatId())];
 		}
@@ -615,9 +665,18 @@ class ZugferdService {
 		// Salutation + intro text belong ABOVE the line items.
 		$greeting = ($invoice->getGreeting() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getGreeting())) . '</p>' : '';
 		$introHtml = $greeting !== '' ? '<div class="intro">' . $greeting . '</div>' : '';
-		// Closing text belongs at the BOTTOM: per-invoice extraText, falling back to the configured default.
-		$closingText = ($invoice->getExtraText() ?? '') !== '' ? $invoice->getExtraText() : ($settings->getClosingDefault() ?? '');
+		// Closing text belongs at the BOTTOM.
+		$closingText = $this->effectiveClosingText($invoice, $settings);
 		$closing = $closingText !== '' ? '<p>' . nl2br($e($closingText)) . '</p>' : '';
+
+		// Plain-text invoice notes (BT-22): rendered as a visible block so the
+		// PDF matches what goes into the XML as IncludedNote (#41).
+		$notes = $invoice->getNotesArray();
+		$notesHtml = '';
+		if ($notes !== []) {
+			$noteParas = implode('', array_map(static fn (string $n): string => '<p>' . nl2br($e($n)) . '</p>', $notes));
+			$notesHtml = '<div class="notes"><strong>Hinweise</strong>' . $noteParas . '</div>';
+		}
 
 		$taxIds = array_filter([
 			($settings->getVatId() ?? '') !== '' ? 'USt-IdNr.: ' . $e($settings->getVatId()) : null,
@@ -664,6 +723,8 @@ table.items td.num, table.items th.num { text-align: right; }
 .totals .grand td { border-top: 2px solid {$accent}; font-weight: bold; font-size: 11pt; color: {$accent}; }
 .payment { clear: both; padding-top: 24px; font-size: 9.5pt; }
 .bank { background: #f5f5f5; padding: 6px 8px; }
+.notes { margin-top: 12px; }
+.notes p { margin: 2px 0; }
 .footer { margin-top: 28px; padding-top: 6px; border-top: 1px solid #ccc; font-size: 8pt; color: #777; text-align: center; }
 .draft-watermark { position: fixed; top: 38%; left: -10%; width: 120%; text-align: center; font-size: 84pt; font-weight: bold; letter-spacing: 14pt; color: #f0d5d5; transform: rotate(-30deg); }
 .draft-banner { background: #fdecec; color: #b93a3a; border: 1px solid #e8b4b4; padding: 6px 10px; margin-bottom: 14px; font-weight: bold; font-size: 10pt; text-align: center; }
@@ -696,6 +757,7 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
   {$termHtml}
   {$paymentInfo}
   {$girocodeHtml}
+  {$notesHtml}
   {$closing}
 </div>
 {$footer}

@@ -68,7 +68,7 @@
 			@close="editorOpen = false"
 			@save="onSave" />
 
-		<NcModal v-if="importOpen" :name="t('rechnungswerk', 'Aus Nextcloud-Kontakten übernehmen')" @close="importOpen = false">
+		<NcModal v-if="importOpen" :name="t('rechnungswerk', 'Aus Nextcloud-Kontakten übernehmen')" @keydown.esc="e => escCloses(e, () => (importOpen = false))" @close="importOpen = false">
 			<div class="rw-import">
 				<p class="rw-muted">
 					{{ t('rechnungswerk', 'Einmaliger Import als Kopie – danach ist der Kunde unabhängig in RechnungsWerk. Kein automatischer Abgleich.') }}
@@ -108,6 +108,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useCustomerStore } from '@/stores/customerStore'
 import type { Customer, ContactMatch } from '@/types/api'
 import type { CustomerCreate } from '@/api/customers'
+import { escCloses } from '@/utils/modalEsc'
 
 const store = useCustomerStore()
 const editorOpen = ref(false)

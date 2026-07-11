@@ -36,7 +36,7 @@
 			</div>
 			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
 			<details class="more">
-				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Leitweg-ID)') }}</summary>
+				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)') }}</summary>
 				<div class="rw-form-row">
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Referenznummer') }}</span>
 						<input v-model="form.referenceNumber" class="rw-input" type="text" :readonly="readonly" /></label>
@@ -45,6 +45,13 @@
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Käuferreferenz / Leitweg-ID (BT-10)') }}</span>
 						<input v-model="form.buyerReference" class="rw-input" type="text" :readonly="readonly"
 							:placeholder="t('rechnungswerk', 'nur für öffentliche Auftraggeber')" /></label>
+				</div>
+				<div class="rw-form-row">
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Vertragsnummer (BT-12)') }}</span>
+						<input v-model="form.contractNumber" class="rw-input" type="text" :readonly="readonly" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Objekt-/Projektkennung (BT-18)') }}</span>
+						<input v-model="form.projectReference" class="rw-input" type="text" :readonly="readonly" /></label>
+					<span class="rw-field" aria-hidden="true" />
 				</div>
 			</details>
 		</section>
@@ -172,6 +179,24 @@
 					:placeholder="t('rechnungswerk', 'Schlusstext – Vorgabe aus den Einstellungen')" /></label>
 		</section>
 
+		<!-- Notizen / Hinweise (BT-22) -->
+		<section v-if="!readonly || notes.length > 0" class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Notizen / Hinweise auf der Rechnung') }}</h3>
+			<div v-for="(note, i) in notes" :key="i" class="rw-note-row">
+				<input v-model="notes[i]" class="rw-input" type="text" :readonly="readonly"
+					:aria-label="t('rechnungswerk', 'Notiz {index}', { index: i + 1 })" />
+				<NcButton v-if="!readonly" variant="tertiary"
+					:aria-label="t('rechnungswerk', 'Notiz entfernen')" @click="removeNote(i)">
+					<template #icon><DeleteIcon :size="20" /></template>
+				</NcButton>
+			</div>
+			<NcButton v-if="!readonly" variant="tertiary" @click="addNote">
+				<template #icon><PlusIcon :size="20" /></template>
+				{{ t('rechnungswerk', 'Notiz hinzufügen') }}
+			</NcButton>
+			<p class="rw-hint">{{ t('rechnungswerk', 'Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.') }}</p>
+		</section>
+
 		<!-- Sticky actions -->
 		<div class="rw-action-bar">
 			<template v-if="!readonly">
@@ -240,7 +265,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -249,6 +274,8 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcBreadcrumbs from '@nextcloud/vue/components/NcBreadcrumbs'
 import NcBreadcrumb from '@nextcloud/vue/components/NcBreadcrumb'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
+import PlusIcon from 'vue-material-design-icons/Plus.vue'
+import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import SendIcon from 'vue-material-design-icons/Send.vue'
 import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
@@ -280,6 +307,7 @@ const settingsStore = useSettingsStore()
 
 const invoice = ref<InvoiceDetail | null>(null)
 const items = ref<EditorItem[]>([emptyItem()])
+const notes = ref<string[]>([])
 const error = ref('')
 const notice = ref('')
 const saving = ref(false)
@@ -289,17 +317,19 @@ const previewOpen = ref(false)
 const previewUrl = ref('')
 const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
 
-const form = reactive({
+const emptyForm = () => ({
 	customerId: null as number | null,
 	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
 	recipientContactPerson: '', recipientPhone: '',
 	sellerContactPerson: '', sellerContactPhone: '', sellerContactEmail: '',
 	performanceDate: '', performancePeriodStart: '', performancePeriodEnd: '',
-	referenceNumber: '', orderNumber: '', buyerReference: '', specialTaxCase: '',
+	referenceNumber: '', orderNumber: '', buyerReference: '',
+	contractNumber: '', projectReference: '', specialTaxCase: '',
 	greeting: '', extraText: '',
 	paymentTermDays: '' as string | number, discountTerms: '',
 })
+const form = reactive(emptyForm())
 
 const TAX_EXEMPT_CASES = ['reverse_charge', 'intra_community', 'export']
 const taxExempt = computed(() =>
@@ -377,40 +407,98 @@ const totals = computed(() => computeTotals(items.value.map(i => ({
 	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
 })), taxExempt.value))
 
+// Bumped on every navigation-driven (re-)load below; load()/initNew() compare
+// the token they were called with against the current value after their
+// await so a slow, superseded request can't clobber a newer one's state when
+// the user navigates between invoices faster than the response arrives.
+let navToken = 0
+
 onMounted(async () => {
+	const token = ++navToken
 	try {
 		await Promise.all([productStore.fetchAll(), settingsStore.fetch()])
+		if (token !== navToken) {
+			return
+		}
 		if (props.id) {
-			await load(Number(props.id))
+			await load(Number(props.id), token)
 		} else {
-			const s = settingsStore.settings
-			// Opening = salutation + intro (rendered above the line items);
-			// the closing text is edited separately in its own field below.
-			form.greeting = [s?.greetingDefault, s?.introDefault]
-				.filter(p => (p ?? '').trim() !== '').join('\n\n')
-			form.extraText = s?.closingDefault ?? ''
-			// Seller-contact cascade (#47): the user's personal default ("Mein
-			// Kontakt") first, falling back per field to the central company
-			// contact when unset. Left fully empty → backend uses the company
-			// contact. The NC account is no longer pulled automatically; it is a
-			// manual import in the "Mein Kontakt" area.
-			let mine = { person: '', phone: '', email: '' }
-			try {
-				mine = await getMyContact()
-			} catch {
-				// ignore — company contact will be used
-			}
-			form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
-			form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
-			form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
+			await initNew(token)
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
 	}
 })
 
-async function load(id: number) {
+// invoice-new and invoice-detail share this component, so Vue Router reuses
+// the instance on SPA navigation between them — onMounted does not run again
+// (#109). Reset and re-initialise here instead of forcing a remount via a
+// keyed router-view: save() swaps /invoices/new to /invoices/{id} while the
+// finalize/preview flow is still running on this instance, and a remount
+// would strand that flow on a dead instance.
+watch(() => props.id, async (newId) => {
+	const token = ++navToken
+	try {
+		if (!newId) {
+			resetEditor()
+			await initNew(token)
+		} else if (invoice.value?.id !== Number(newId)) {
+			resetEditor()
+			await load(Number(newId), token)
+		}
+		// invoice.value.id === newId: our own router.replace after creating the
+		// draft — state is already current, nothing to do.
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
+	}
+})
+
+/** Blank editor state for a fresh invoice (SPA navigation, no remount). */
+function resetEditor() {
+	invoice.value = null
+	items.value = [emptyItem()]
+	notes.value = []
+	error.value = ''
+	notice.value = ''
+	sendDialogOpen.value = false
+	previewOpen.value = false
+	previewUrl.value = ''
+	dialog.value = null
+	Object.assign(form, emptyForm())
+}
+
+/** Defaults for a new invoice: text templates + seller-contact cascade. */
+async function initNew(token: number = navToken) {
+	const s = settingsStore.settings
+	// Opening = salutation + intro (rendered above the line items);
+	// the closing text is edited separately in its own field below.
+	form.greeting = [s?.greetingDefault, s?.introDefault]
+		.filter(p => (p ?? '').trim() !== '').join('\n\n')
+	form.extraText = s?.closingDefault ?? ''
+	// Seller-contact cascade (#47): the user's personal default ("Mein
+	// Kontakt") first, falling back per field to the central company
+	// contact when unset. Left fully empty → backend uses the company
+	// contact. The NC account is no longer pulled automatically; it is a
+	// manual import in the "Mein Kontakt" area.
+	let mine = { person: '', phone: '', email: '' }
+	try {
+		mine = await getMyContact()
+	} catch {
+		// ignore — company contact will be used
+	}
+	if (token !== navToken) {
+		return
+	}
+	form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
+	form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
+	form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
+}
+
+async function load(id: number, token: number = navToken) {
 	const detail = await invoiceStore.get(id)
+	if (token !== navToken) {
+		return
+	}
 	invoice.value = detail
 	form.customerId = detail.customerId ?? null
 	form.recipientName = detail.recipientName ?? ''
@@ -432,12 +520,22 @@ async function load(id: number) {
 	form.referenceNumber = detail.referenceNumber ?? ''
 	form.orderNumber = detail.orderNumber ?? ''
 	form.buyerReference = detail.buyerReference ?? ''
+	form.contractNumber = detail.contractNumber ?? ''
+	form.projectReference = detail.projectReference ?? ''
+	notes.value = [...(detail.notes ?? [])]
 	form.specialTaxCase = detail.specialTaxCase ?? ''
 	form.greeting = detail.greeting ?? ''
 	form.extraText = detail.extraText ?? ''
 	form.paymentTermDays = detail.paymentTermDays ?? ''
 	form.discountTerms = detail.discountTerms ?? ''
 	items.value = detail.items.length > 0 ? detail.items.map(itemFromInvoiceItem) : [emptyItem()]
+}
+
+function addNote() {
+	notes.value.push('')
+}
+function removeNote(i: number) {
+	notes.value.splice(i, 1)
 }
 
 function onCustomerSelect(c: Customer) {
@@ -486,6 +584,7 @@ function buildInput(): InvoiceInput {
 		...form,
 		...dates,
 		paymentTermDays: form.paymentTermDays === '' ? null : Number(form.paymentTermDays),
+		notes: notes.value.map(n => n.trim()).filter(n => n !== ''),
 		items: items.value
 			.filter(i => i.name.trim() !== '')
 			.map(i => ({
@@ -666,6 +765,15 @@ function fail(e: unknown, fallback: string) {
 }
 .more {
 	margin-top: 8px;
+}
+.rw-note-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+.rw-note-row .rw-input {
+	flex: 1 1 auto;
 }
 .more summary {
 	cursor: pointer;

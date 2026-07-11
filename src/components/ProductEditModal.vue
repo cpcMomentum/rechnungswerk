@@ -1,5 +1,5 @@
 <template>
-	<NcModal v-if="open" :name="title" @close="$emit('close')">
+	<NcModal v-if="open" :name="title" @keydown.esc="e => escCloses(e, () => $emit('close'))" @close="$emit('close')">
 		<div class="product-modal">
 			<h2>{{ title }}</h2>
 
@@ -53,6 +53,7 @@ import NcModal from '@nextcloud/vue/components/NcModal'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
+import { escCloses } from '@/utils/modalEsc'
 import { centsToEuroInput, euroInputToCents, formatTaxRate } from '@/utils/money'
 
 const props = defineProps<{

@@ -78,11 +78,6 @@ export interface TaxBreakdownRow {
 	taxCents: number
 }
 
-export interface CustomField {
-	label: string
-	value: string
-}
-
 export interface InvoiceItem {
 	id: number
 	invoiceId: number
@@ -123,6 +118,8 @@ export interface Invoice {
 	referenceNumber: string | null
 	orderNumber: string | null
 	buyerReference: string | null
+	contractNumber: string | null
+	projectReference: string | null
 	relatedInvoiceId: number | null
 	/** Number of the original invoice a storno/credit note refers to. */
 	relatedNumber: string | null
@@ -132,7 +129,8 @@ export interface Invoice {
 	specialTaxCase: string | null
 	greeting: string | null
 	extraText: string | null
-	customFields: CustomField[]
+	/** Plain-text notes shown on the invoice and exported as BT-22. */
+	notes: string[]
 	paymentTermDays: number | null
 	dueDate: string | null
 	discountTerms: string | null
