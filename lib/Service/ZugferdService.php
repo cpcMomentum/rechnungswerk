@@ -219,12 +219,21 @@ class ZugferdService {
 		if (($invoice->getGreeting() ?? '') !== '') {
 			$builder->addDocumentNote($invoice->getGreeting());
 		}
-		// Same fallback as the PDF rendering: per-invoice closing text, else the
-		// configured default.
-		$closing = ($invoice->getExtraText() ?? '') !== '' ? $invoice->getExtraText() : ($settings->getClosingDefault() ?? '');
+		$closing = $this->effectiveClosingText($invoice, $settings);
 		if ($closing !== '') {
 			$builder->addDocumentNote($closing);
 		}
+	}
+
+	/**
+	 * Closing text shown at the bottom of the invoice: per-invoice extraText,
+	 * falling back to the configured default. Shared by the XML notes (BT-22)
+	 * and the PDF rendering so both sides can never diverge.
+	 */
+	private function effectiveClosingText(Invoice $invoice, Settings $settings): string {
+		return ($invoice->getExtraText() ?? '') !== ''
+			? (string)$invoice->getExtraText()
+			: ($settings->getClosingDefault() ?? '');
 	}
 
 	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings, Invoice $invoice): void {
@@ -656,8 +665,8 @@ class ZugferdService {
 		// Salutation + intro text belong ABOVE the line items.
 		$greeting = ($invoice->getGreeting() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getGreeting())) . '</p>' : '';
 		$introHtml = $greeting !== '' ? '<div class="intro">' . $greeting . '</div>' : '';
-		// Closing text belongs at the BOTTOM: per-invoice extraText, falling back to the configured default.
-		$closingText = ($invoice->getExtraText() ?? '') !== '' ? $invoice->getExtraText() : ($settings->getClosingDefault() ?? '');
+		// Closing text belongs at the BOTTOM.
+		$closingText = $this->effectiveClosingText($invoice, $settings);
 		$closing = $closingText !== '' ? '<p>' . nl2br($e($closingText)) . '</p>' : '';
 
 		// Plain-text invoice notes (BT-22): rendered as a visible block so the
