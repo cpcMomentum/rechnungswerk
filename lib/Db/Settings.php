@@ -52,6 +52,12 @@ use OCP\DB\Types;
  * @method void setNumberResetMode(string $numberResetMode)
  * @method ?string getFileNameFormat()
  * @method void setFileNameFormat(?string $fileNameFormat)
+ * @method int getArchiveEnabled()
+ * @method void setArchiveEnabled(int $archiveEnabled)
+ * @method ?int getArchiveFolderId()
+ * @method void setArchiveFolderId(?int $archiveFolderId)
+ * @method ?string getArchiveSubfolder()
+ * @method void setArchiveSubfolder(?string $archiveSubfolder)
  * @method int getSmallBusiness()
  * @method void setSmallBusiness(int $smallBusiness)
  * @method int getDefaultTaxRateBp()
@@ -128,6 +134,9 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $numberCounterYear = null;
 	protected ?string $numberResetMode = null;
 	protected ?string $fileNameFormat = null;
+	protected ?int $archiveEnabled = null;
+	protected ?int $archiveFolderId = null;
+	protected ?string $archiveSubfolder = null;
 	protected ?int $smallBusiness = null;
 	protected ?int $defaultTaxRateBp = null;
 	protected ?string $datevUploadMail = null;
@@ -170,6 +179,9 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('numberCounterYear', Types::INTEGER);
 		$this->addType('numberResetMode', Types::STRING);
 		$this->addType('fileNameFormat', Types::STRING);
+		$this->addType('archiveEnabled', Types::SMALLINT);
+		$this->addType('archiveFolderId', Types::INTEGER);
+		$this->addType('archiveSubfolder', Types::STRING);
 		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
 		$this->addType('datevUploadMail', Types::STRING);
@@ -214,6 +226,9 @@ class Settings extends Entity implements JsonSerializable {
 			'numberCounterYear' => $this->getNumberCounterYear(),
 			'numberResetMode' => $this->getNumberResetMode() ?: self::DEFAULT_RESET_MODE,
 			'fileNameFormat' => $this->getFileNameFormat() ?: self::DEFAULT_FILE_NAME_FORMAT,
+			'archiveEnabled' => (bool)$this->getArchiveEnabled(),
+			'archiveFolderId' => $this->getArchiveFolderId(),
+			'archiveSubfolder' => $this->getArchiveSubfolder(),
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
 			'datevUploadMail' => $this->getDatevUploadMail(),

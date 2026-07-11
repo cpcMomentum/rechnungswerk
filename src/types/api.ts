@@ -184,6 +184,10 @@ export interface Settings {
 	numberCounterYear: number | null
 	numberResetMode: 'yearly' | 'continuous'
 	fileNameFormat: string
+	archiveEnabled: boolean
+	archiveFolderId: number | null
+	archiveSubfolder: string | null
+	archiveFolderPath?: string | null
 	smallBusiness: boolean
 	defaultTaxRateBp: number
 	datevUploadMail: string | null

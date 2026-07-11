@@ -150,6 +150,39 @@
 				</div>
 			</section>
 
+			<!-- Ablage in Nextcloud -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'Ablage in Nextcloud') }}</h3>
+				<div class="rw-field">
+					<span>{{ t('rechnungswerk', 'Zielordner') }}</span>
+					<div class="rw-archive-folder">
+						<span v-if="archiveFolderPath" class="rw-archive-folder__path">{{ archiveFolderPath }}</span>
+						<span v-else class="rw-archive-folder__empty">{{ t('rechnungswerk', 'Kein Ordner gewählt') }}</span>
+						<NcButton :disabled="archiveBusy" @click="onPickArchiveFolder">
+							{{ archiveFolderPath ? t('rechnungswerk', 'Ordner ändern') : t('rechnungswerk', 'Ordner wählen') }}
+						</NcButton>
+						<NcButton v-if="archiveFolderPath" variant="tertiary" :disabled="archiveBusy" @click="onRemoveArchiveFolder">
+							{{ t('rechnungswerk', 'Entfernen') }}
+						</NcButton>
+					</div>
+				</div>
+				<NcCheckboxRadioSwitch
+					type="switch"
+					:model-value="form.archiveEnabled"
+					:disabled="!form.archiveFolderId"
+					@update:model-value="onToggleArchive">
+					{{ t('rechnungswerk', 'ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen') }}
+				</NcCheckboxRadioSwitch>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Unterordner (optional)') }}</span>
+					<input v-model="form.archiveSubfolder" class="rw-input" type="text"
+						:placeholder="t('rechnungswerk', 'z. B. {YYYY}')" /></label>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {MM} Monat, {DD} Tag (Rechnungsdatum). Unterordner werden bei Bedarf angelegt. Vorhandene Dateien werden nie überschrieben.') }}
+					<br>
+					{{ t('rechnungswerk', 'Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.') }}
+				</p>
+			</section>
+
 			<!-- Eigenes SMTP-Konto -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Eigenes SMTP-Konto (optional)') }}</h3>
@@ -284,6 +317,14 @@
 			@confirm="applyDatevAutoSend" />
 
 		<ConfirmDialog
+			:open="confirmArchive"
+			:name="t('rechnungswerk', 'Automatische Ablage aktivieren')"
+			:message="t('rechnungswerk', 'Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?')"
+			:confirm-label="t('rechnungswerk', 'Aktivieren')"
+			@close="confirmArchive = false"
+			@confirm="applyArchive" />
+
+		<ConfirmDialog
 			:open="confirmResetMode"
 			:name="t('rechnungswerk', 'Nummernkreis auf „Fortlaufend“ stellen')"
 			:message="t('rechnungswerk', 'Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?')"
@@ -304,7 +345,7 @@ import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { TAX_RATES_BP, type Settings } from '@/types/api'
-import { testSmtp, setLogo, deleteLogo, logoUrl, type SettingsSave } from '@/api/settings'
+import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'
 import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
@@ -314,9 +355,12 @@ type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear'>
 
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+const archiveFolderPath = ref<string | null>(null)
+const archiveBusy = ref(false)
 const error = ref('')
 const confirmSmallBusiness = ref(false)
 const confirmDatevAutoSend = ref(false)
+const confirmArchive = ref(false)
 const confirmResetMode = ref(false)
 const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
@@ -428,6 +472,7 @@ function hydrate() {
 	}
 	currentCounter.value = s.numberCounter
 	currentYearFromSettings.value = s.numberCounterYear
+	archiveFolderPath.value = s.archiveFolderPath ?? null
 	form.value = {
 		companyName: s.companyName,
 		companyAddress: s.companyAddress,
@@ -444,6 +489,9 @@ function hydrate() {
 		numberFormat: s.numberFormat,
 		numberResetMode: s.numberResetMode,
 		fileNameFormat: s.fileNameFormat,
+		archiveEnabled: s.archiveEnabled,
+		archiveFolderId: s.archiveFolderId,
+		archiveSubfolder: s.archiveSubfolder,
 		smallBusiness: s.smallBusiness,
 		defaultTaxRateBp: s.defaultTaxRateBp,
 		datevUploadMail: s.datevUploadMail,
@@ -503,6 +551,24 @@ function applyDatevAutoSend() {
 	}
 }
 
+function onToggleArchive(value: boolean) {
+	if (!form.value) {
+		return
+	}
+	if (value) {
+		confirmArchive.value = true
+	} else {
+		form.value.archiveEnabled = false
+	}
+}
+
+function applyArchive() {
+	confirmArchive.value = false
+	if (form.value) {
+		form.value.archiveEnabled = true
+	}
+}
+
 function onSelectResetMode(value: string) {
 	if (!form.value || value === form.value.numberResetMode) {
 		return
@@ -525,6 +591,52 @@ function applyResetMode() {
 }
 
 /** Pick a logo from the user's files (raster image) and store it immediately. */
+function onPickArchiveFolder() {
+	OC.dialogs.filepicker(
+		t('rechnungswerk', 'Zielordner für die Ablage wählen'),
+		async (path: string) => {
+			if (!path) {
+				return
+			}
+			archiveBusy.value = true
+			error.value = ''
+			try {
+				const res = await setArchiveFolder(path)
+				if (form.value) {
+					form.value.archiveFolderId = res.archiveFolderId
+				}
+				archiveFolderPath.value = res.archiveFolderPath
+			} catch (e) {
+				fail(e, t('rechnungswerk', 'Zielordner konnte nicht gesetzt werden.'))
+			} finally {
+				archiveBusy.value = false
+			}
+		},
+		false,
+		'httpd/unix-directory',
+		true,
+		OC.dialogs.FILEPICKER_TYPE_CHOOSE,
+	)
+}
+
+/** Clear the archive target; the server also switches the toggle off. */
+async function onRemoveArchiveFolder() {
+	archiveBusy.value = true
+	error.value = ''
+	try {
+		await deleteArchiveFolder()
+		if (form.value) {
+			form.value.archiveFolderId = null
+			form.value.archiveEnabled = false
+		}
+		archiveFolderPath.value = null
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Zielordner konnte nicht entfernt werden.'))
+	} finally {
+		archiveBusy.value = false
+	}
+}
+
 function onPickLogo() {
 	OC.dialogs.filepicker(
 		t('rechnungswerk', 'Firmenlogo wählen'),
@@ -592,6 +704,8 @@ async function onSave() {
 		// The logo is managed via its own endpoints (setLogo/deleteLogo), not the
 		// generic save — the server ignores logoFileId here, so don't send it.
 		delete payload.logoFileId
+		// Same for the archive folder (setArchiveFolder/deleteArchiveFolder).
+		delete payload.archiveFolderId
 		// Only send the SMTP password when the admin typed a new one (it is
 		// masked; an empty field means "keep the stored one").
 		if (smtpPassword.value !== '') {
@@ -715,6 +829,22 @@ function fail(e: unknown, fallback: string) {
 	align-items: center;
 	gap: 16px;
 	margin-top: 4px;
+}
+.rw-archive-folder {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-top: 4px;
+}
+.rw-archive-folder__path {
+	font-family: var(--font-face, monospace);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.rw-archive-folder__empty {
+	color: var(--color-text-maxcontrast);
+	font-style: italic;
 }
 .rw-logo__preview {
 	max-width: 180px;

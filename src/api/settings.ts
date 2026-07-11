@@ -41,3 +41,16 @@ export const deleteLogo = (): Promise<{ logoFileId: number | null }> =>
  */
 export const logoUrl = (cacheBuster: number | string): string =>
 	`${apiUrl('/settings/logo')}?v=${cacheBuster}`
+
+export interface ArchiveFolderResult {
+	archiveFolderId: number | null
+	archiveFolderPath: string | null
+}
+
+/** Set the archive target folder from a folder path in the admin's Nextcloud files. */
+export const setArchiveFolder = (path: string): Promise<ArchiveFolderResult> =>
+	apiPut<ArchiveFolderResult, { path: string }>('/settings/archive-folder', { path })
+
+/** Clear the archive target folder (also switches the toggle off server-side). */
+export const deleteArchiveFolder = (): Promise<ArchiveFolderResult> =>
+	apiDelete<ArchiveFolderResult>('/settings/archive-folder')

@@ -19,7 +19,9 @@ use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\Constants;
 use OCP\Files\File;
+use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IRequest;
@@ -51,7 +53,32 @@ class SettingsController extends Controller {
 		if (!$this->permissionService->hasAccess($this->userId)) {
 			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
-		return new DataResponse($this->settingsService->getCompany());
+		$settings = $this->settingsService->getCompany();
+		$data = $settings->jsonSerialize();
+		// Display path of the archive target, resolved from the viewer's own
+		// files so the label matches what the admin sees in the picker.
+		$data['archiveFolderPath'] = $this->archiveFolderPath($settings->getArchiveFolderId());
+		return new DataResponse($data);
+	}
+
+	/** User-relative display path of the archive folder, or null if unset/unreachable. */
+	private function archiveFolderPath(?int $folderId): ?string {
+		if ($folderId === null || $this->userId === null) {
+			return null;
+		}
+		try {
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$node = $userFolder->getById($folderId)[0] ?? null;
+			if ($node instanceof Folder) {
+				return $userFolder->getRelativePath($node->getPath()) ?? $node->getName();
+			}
+			// Not mounted in this user's view (e.g. team folder the viewer is not
+			// a member of) — fall back to the global node name.
+			$global = $this->rootFolder->getById($folderId)[0] ?? null;
+			return $global instanceof Folder ? $global->getName() : null;
+		} catch (\Throwable) {
+			return null;
+		}
 	}
 
 	#[NoAdminRequired]
@@ -109,6 +136,53 @@ class SettingsController extends Controller {
 		}
 		$this->settingsService->saveLogoFileId(null);
 		return new DataResponse(['logoFileId' => null]);
+	}
+
+	/**
+	 * Pick the archive target folder from the admin's file view (#38). Stored
+	 * by file id (like the logo) so it survives renames and resolves globally
+	 * — team/group folders included.
+	 */
+	#[NoAdminRequired]
+	public function setArchiveFolder(string $path = ''): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->isAdmin($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		if (trim($path) === '') {
+			return new DataResponse(['error' => 'Kein Pfad angegeben.'], Http::STATUS_BAD_REQUEST);
+		}
+		try {
+			$node = $this->rootFolder->getUserFolder($this->userId)->get($path);
+		} catch (NotFoundException) {
+			return new DataResponse(['error' => 'Ordner nicht gefunden.'], Http::STATUS_NOT_FOUND);
+		}
+		if (!$node instanceof Folder) {
+			return new DataResponse(['error' => 'Bitte einen Ordner wählen.'], Http::STATUS_BAD_REQUEST);
+		}
+		if (($node->getPermissions() & Constants::PERMISSION_CREATE) === 0) {
+			return new DataResponse(['error' => 'In diesem Ordner dürfen keine Dateien angelegt werden.'], Http::STATUS_BAD_REQUEST);
+		}
+		$settings = $this->settingsService->saveArchiveFolderId($node->getId());
+		return new DataResponse([
+			'archiveFolderId' => $settings->getArchiveFolderId(),
+			'archiveFolderPath' => $this->archiveFolderPath($settings->getArchiveFolderId()),
+		]);
+	}
+
+	/** Clear the archive target folder (app admin only); disables the toggle. */
+	#[NoAdminRequired]
+	public function deleteArchiveFolder(): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->isAdmin($this->userId)) {
+			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+		}
+		$this->settingsService->saveArchiveFolderId(null);
+		return new DataResponse(['archiveFolderId' => null, 'archiveFolderPath' => null, 'archiveEnabled' => false]);
 	}
 
 	/**
