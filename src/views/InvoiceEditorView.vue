@@ -407,13 +407,23 @@ const totals = computed(() => computeTotals(items.value.map(i => ({
 	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
 })), taxExempt.value))
 
+// Bumped on every navigation-driven (re-)load below; load()/initNew() compare
+// the token they were called with against the current value after their
+// await so a slow, superseded request can't clobber a newer one's state when
+// the user navigates between invoices faster than the response arrives.
+let navToken = 0
+
 onMounted(async () => {
+	const token = ++navToken
 	try {
 		await Promise.all([productStore.fetchAll(), settingsStore.fetch()])
+		if (token !== navToken) {
+			return
+		}
 		if (props.id) {
-			await load(Number(props.id))
+			await load(Number(props.id), token)
 		} else {
-			await initNew()
+			await initNew(token)
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
@@ -427,13 +437,14 @@ onMounted(async () => {
 // finalize/preview flow is still running on this instance, and a remount
 // would strand that flow on a dead instance.
 watch(() => props.id, async (newId) => {
+	const token = ++navToken
 	try {
 		if (!newId) {
 			resetEditor()
-			await initNew()
+			await initNew(token)
 		} else if (invoice.value?.id !== Number(newId)) {
 			resetEditor()
-			await load(Number(newId))
+			await load(Number(newId), token)
 		}
 		// invoice.value.id === newId: our own router.replace after creating the
 		// draft — state is already current, nothing to do.
@@ -457,7 +468,7 @@ function resetEditor() {
 }
 
 /** Defaults for a new invoice: text templates + seller-contact cascade. */
-async function initNew() {
+async function initNew(token: number = navToken) {
 	const s = settingsStore.settings
 	// Opening = salutation + intro (rendered above the line items);
 	// the closing text is edited separately in its own field below.
@@ -475,13 +486,19 @@ async function initNew() {
 	} catch {
 		// ignore — company contact will be used
 	}
+	if (token !== navToken) {
+		return
+	}
 	form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
 	form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
 	form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
 }
 
-async function load(id: number) {
+async function load(id: number, token: number = navToken) {
 	const detail = await invoiceStore.get(id)
+	if (token !== navToken) {
+		return
+	}
 	invoice.value = detail
 	form.customerId = detail.customerId ?? null
 	form.recipientName = detail.recipientName ?? ''
