@@ -23,7 +23,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - **Stammdaten** — Firmendaten, Logo, Standardtexte, Nummernformat, Kleinunternehmer §19
     ]]></description>
 
-    <version>0.1.5</version>
+    <version>0.1.6</version>
     <licence>AGPL-3.0-or-later</licence>
 
     <author mail="axel.deffner@cpcmomentum.com" homepage="https://github.com/cpcMomentum">Axel Deffner</author>
@@ -35,16 +35,19 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 
     <bugs>https://github.com/cpcMomentum/rechnungswerk/issues</bugs>
     <repository type="git">https://github.com/cpcMomentum/rechnungswerk.git</repository>
-    <donation>https://ko-fi.com/AxDe888</donation>
-
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/01-rechnungsliste.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/02-rechnung-editor.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/03-stammdaten.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/04-produktkatalog.png</screenshot>
 
+    <donation>https://ko-fi.com/AxDe888</donation>
+
     <dependencies>
-        <nextcloud min-version="31" max-version="34"/>
         <php min-version="8.2"/>
+        <database>sqlite</database>
+        <database>mysql</database>
+        <database>pgsql</database>
+        <nextcloud min-version="31" max-version="34"/>
     </dependencies>
 
     <navigations>
