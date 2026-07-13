@@ -7,6 +7,15 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-07-13
+
+### Fixed
+- App-Installation auf Nextcloud 31 und 32 schlug fehl mit
+  „Primary index name on 'oc_rechnungswerk_invoice_item' is too long".
+  Die unterstützten Datenbanken (SQLite/MySQL/PostgreSQL) sind jetzt in
+  der info.xml deklariert, wodurch Nextclouds Oracle-Namenslimit-Prüfung
+  nicht mehr greift (#118)
+
 ## [0.1.5] - 2026-07-11
 
 ### Added
@@ -143,7 +152,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.2...v0.1.3
