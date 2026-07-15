@@ -66,7 +66,8 @@
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
 						<td class="rw-col-actions">
 							<div class="rw-actions">
-								<NcButton type="tertiary"
+								<NcButton v-if="inv.invoiceType !== 'cancellation'"
+									type="tertiary"
 									:aria-label="t('rechnungswerk', 'Duplizieren')"
 									:title="t('rechnungswerk', 'Als Vorlage für neue Rechnung duplizieren')"
 									@click.stop="duplicate(inv.id)">

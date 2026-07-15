@@ -388,9 +388,16 @@ class InvoiceService {
 	 *
 	 * @return array<string, mixed> the new draft
 	 * @throws NotFoundException
+	 * @throws IllegalStateException
 	 */
 	public function duplicate(int $id, string $userId): array {
 		$original = $this->findById($id);
+		// Storno documents carry negative line amounts; cloning one into a normal
+		// invoice would yield a nonsensical negative draft. Cancelled *invoices*
+		// keep their positive amounts and stay duplicable.
+		if ($original->getInvoiceType() === Invoice::TYPE_CANCELLATION) {
+			throw new IllegalStateException('Stornobelege können nicht dupliziert werden.');
+		}
 		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
 		$now = new DateTime();

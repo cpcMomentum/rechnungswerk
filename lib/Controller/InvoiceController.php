@@ -211,6 +211,8 @@ class InvoiceController extends Controller {
 			return new DataResponse($this->invoiceService->duplicate($id, $this->userId), Http::STATUS_CREATED);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		}
 	}
 
