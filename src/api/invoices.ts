@@ -69,6 +69,10 @@ export const commitInvoice = (id: number): Promise<InvoiceDetail> =>
 export const cancelInvoice = (id: number): Promise<InvoiceDetail> =>
 	apiPost<InvoiceDetail, Record<string, never>>(`/invoices/${id}/cancel`, {})
 
+/** Clone any invoice into a fresh, editable draft (#124) and return it. */
+export const duplicateInvoice = (id: number): Promise<InvoiceDetail> =>
+	apiPost<InvoiceDetail, Record<string, never>>(`/invoices/${id}/duplicate`, {})
+
 /** Same-origin URL of the ZUGFeRD PDF for a committed invoice (session-authenticated). */
 export const invoicePdfUrl = (id: number): string =>
 	apiUrl(`/invoices/${id}/pdf`)

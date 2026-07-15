@@ -11,6 +11,7 @@ import {
 	commitInvoice as apiCommit,
 	createInvoice as apiCreate,
 	deleteInvoice as apiDelete,
+	duplicateInvoice as apiDuplicate,
 	getInvoice as apiGet,
 	listInvoices as apiList,
 	updateInvoice as apiUpdate,
@@ -61,5 +62,11 @@ export const useInvoiceStore = defineStore('invoice', () => {
 		return storno
 	}
 
-	return { invoices, loading, fetchAll, get, create, update, remove, commit, cancel }
+	async function duplicate(id: number): Promise<InvoiceDetail> {
+		const draft = await apiDuplicate(id)
+		await fetchAll()
+		return draft
+	}
+
+	return { invoices, loading, fetchAll, get, create, update, remove, commit, cancel, duplicate }
 })
