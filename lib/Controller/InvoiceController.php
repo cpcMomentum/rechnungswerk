@@ -202,6 +202,20 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[NoAdminRequired]
+	public function duplicate(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->duplicate($id, $this->userId), Http::STATUS_CREATED);
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
 	private function guardAccess(): ?DataResponse {
 		if ($this->userId === null) {
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);

@@ -173,7 +173,10 @@ const blank = (): Form => ({
 })
 
 const form = reactive<Form>(blank())
-const paymentTermInput = ref('')
+// type="number" inputs: Vue casts the bound value to a real Number on input,
+// even without the .number modifier (see @vue/shared looseToNumber) — the
+// ref genuinely holds string | number depending on user interaction.
+const paymentTermInput = ref<string | number>('')
 const taxRateInput = ref('')
 
 const title = computed(() => props.customer
@@ -252,7 +255,7 @@ function onSave() {
 		iban: trimmedOrNull(form.iban),
 		bic: trimmedOrNull(form.bic),
 		bankName: trimmedOrNull(form.bankName),
-		defaultPaymentTermDays: paymentTermInput.value.trim() === '' ? null : Math.max(0, Number(paymentTermInput.value)),
+		defaultPaymentTermDays: String(paymentTermInput.value).trim() === '' ? null : Math.max(0, Number(paymentTermInput.value)),
 		defaultTaxRateBp: taxRateInput.value === '' ? null : Number(taxRateInput.value),
 		note: trimmedOrNull(form.note),
 	})

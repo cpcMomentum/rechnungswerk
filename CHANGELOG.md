@@ -7,6 +7,23 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-07-15
+
+### Added
+- Rechnung duplizieren: eine bestehende Rechnung lässt sich per Knopfdruck
+  in der Rechnungsliste als Vorlage für eine neue, bearbeitbare Rechnung
+  übernehmen. Empfänger, Positionen, Referenzen, Notizen und Textbausteine
+  werden kopiert; die neue Rechnung startet als Entwurf ohne Nummer.
+  Stornobelege sind davon ausgenommen (#124)
+
+### Fixed
+- Kunde anlegen: Das Speichern schlug fehl, sobald ein Zahlungsziel
+  gesetzt war (#122)
+- Das DATEV-„gesendet"-Symbol in der Rechnungsliste wird nur noch
+  angezeigt, wenn die DATEV-/IMAP-Anbindung eingerichtet ist. Ohne
+  IMAP-Konfiguration lief der automatische Abgleich ohnehin nie, sodass
+  der Status sonst dauerhaft ohne Wirkung sichtbar blieb (#127)
+
 ## [0.1.6] - 2026-07-13
 
 ### Fixed
@@ -152,7 +169,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.7...HEAD
+[0.1.7]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.3...v0.1.4

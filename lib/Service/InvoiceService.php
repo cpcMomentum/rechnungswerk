@@ -380,6 +380,87 @@ class InvoiceService {
 	}
 
 	/**
+	 * Duplicate any invoice into a fresh, editable DRAFT (#124): recurring
+	 * invoices differ only in a few fields, so we clone the source (recipient,
+	 * seller contact, references, notes, content texts and all positions) but
+	 * reset everything lifecycle-bound. Reuses the same copy mechanics as
+	 * cancel() — but as a normal invoice, with positive amounts and no number.
+	 *
+	 * @return array<string, mixed> the new draft
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function duplicate(int $id, string $userId): array {
+		$original = $this->findById($id);
+		// Storno documents carry negative line amounts; cloning one into a normal
+		// invoice would yield a nonsensical negative draft. Cancelled *invoices*
+		// keep their positive amounts and stay duplicable.
+		if ($original->getInvoiceType() === Invoice::TYPE_CANCELLATION) {
+			throw new IllegalStateException('Stornobelege können nicht dupliziert werden.');
+		}
+		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
+
+		$now = new DateTime();
+
+		$this->db->beginTransaction();
+		try {
+			$copy = new Invoice();
+			$copy->setOwnerUserId($userId);
+			// A duplicate starts life as a fresh draft: no final number, no
+			// commit/issue/due dates, no DATEV state, not linked to the source.
+			$copy->setStatus(Invoice::STATUS_DRAFT);
+			$copy->setInvoiceType(Invoice::TYPE_INVOICE);
+			$copy->setCreatedAt($now);
+			$copy->setUpdatedAt($now);
+			$this->copyRecipient($original, $copy);
+			$copy->setSellerContactPerson($original->getSellerContactPerson());
+			$copy->setSellerContactPhone($original->getSellerContactPhone());
+			$copy->setSellerContactEmail($original->getSellerContactEmail());
+			$copy->setSpecialTaxCase($original->getSpecialTaxCase());
+			$copy->setGreeting($original->getGreeting());
+			$copy->setCustomFields($original->getCustomFields());
+			$copy->setReferenceNumber($original->getReferenceNumber());
+			$copy->setOrderNumber($original->getOrderNumber());
+			$copy->setBuyerReference($original->getBuyerReference());
+			$copy->setContractNumber($original->getContractNumber());
+			$copy->setProjectReference($original->getProjectReference());
+			// Content the user wants to keep as a starting point (editable). These
+			// are exactly the fields cancel() drops but a template must carry over.
+			$copy->setExtraText($original->getExtraText());
+			$copy->setPaymentTermDays($original->getPaymentTermDays());
+			$copy->setDiscountTerms($original->getDiscountTerms());
+			$copy->setPerformanceDate($original->getPerformanceDate());
+			$copy->setPerformancePeriodStart($original->getPerformancePeriodStart());
+			$copy->setPerformancePeriodEnd($original->getPerformancePeriodEnd());
+			$copy = $this->invoiceMapper->insert($copy);
+
+			foreach ($originalItems as $item) {
+				$line = new InvoiceItem();
+				$line->setInvoiceId((int)$copy->getId());
+				$line->setProductId($item->getProductId());
+				$line->setName($item->getName());
+				$line->setDescription($item->getDescription());
+				$line->setQuantity($item->getQuantity());
+				$line->setUnitCode($item->getUnitCode());
+				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setTaxRateBp($item->getTaxRateBp());
+				$line->setLineTotalCents($item->getLineTotalCents());
+				$line->setSortOrder($item->getSortOrder());
+				$this->itemMapper->insert($line);
+			}
+			$this->recomputeTotals($copy);
+			$this->invoiceMapper->update($copy);
+
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+
+		return $this->present($copy);
+	}
+
+	/**
 	 * Fire-and-forget Nextcloud filing of a freshly committed document (#38);
 	 * mirrors the DATEV hand-off contract (true/false/null, never throws).
 	 */

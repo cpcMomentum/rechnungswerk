@@ -32,7 +32,7 @@
 											<span class="rw-legend__item"><PencilOutlineIcon :size="16" class="rw-sicon rw-sicon--draft" /> {{ t('rechnungswerk', 'Entwurf') }}</span>
 											<span class="rw-legend__item"><CloseCircleIcon :size="16" class="rw-sicon rw-sicon--cancelled" /> {{ t('rechnungswerk', 'Storniert') }}</span>
 										</div>
-										<div class="rw-info-popup__group">
+										<div v-if="datevFeatureActive" class="rw-info-popup__group">
 											<span class="rw-legend__label">{{ t('rechnungswerk', 'DATEV-Übergabe') }}</span>
 											<span class="rw-legend__item"><CheckCircleIcon :size="16" class="rw-sicon rw-sicon--datev-confirmed" /> {{ t('rechnungswerk', 'bestätigt') }}</span>
 											<span class="rw-legend__item"><ClockOutlineIcon :size="16" class="rw-sicon rw-sicon--datev-pending" /> {{ t('rechnungswerk', 'gesendet') }}</span>
@@ -54,7 +54,7 @@
 						<td>
 							<span class="rw-status-cell">
 								<component :is="statusIcon(inv.status)" :size="20" :class="['rw-sicon', `rw-sicon--${inv.status}`]" :title="statusLabel(inv.status)" />
-								<component :is="datevIcon(inv.datevStatus)" v-if="inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
+								<component :is="datevIcon(inv.datevStatus)" v-if="datevFeatureActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
 							</span>
 						</td>
 						<td>
@@ -65,13 +65,22 @@
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
 						<td class="rw-col-actions">
-							<NcButton v-if="inv.status !== 'draft'"
-								type="tertiary"
-								:aria-label="t('rechnungswerk', 'PDF herunterladen')"
-								:title="t('rechnungswerk', 'PDF herunterladen')"
-								@click.stop="downloadPdf(inv.id)">
-								<template #icon><DownloadIcon :size="20" /></template>
-							</NcButton>
+							<div class="rw-actions">
+								<NcButton v-if="inv.invoiceType !== 'cancellation'"
+									type="tertiary"
+									:aria-label="t('rechnungswerk', 'Duplizieren')"
+									:title="t('rechnungswerk', 'Als Vorlage für neue Rechnung duplizieren')"
+									@click.stop="duplicate(inv.id)">
+									<template #icon><ContentCopyIcon :size="20" /></template>
+								</NcButton>
+								<NcButton v-if="inv.status !== 'draft'"
+									type="tertiary"
+									:aria-label="t('rechnungswerk', 'PDF herunterladen')"
+									:title="t('rechnungswerk', 'PDF herunterladen')"
+									@click.stop="downloadPdf(inv.id)">
+									<template #icon><DownloadIcon :size="20" /></template>
+								</NcButton>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -81,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -91,6 +100,7 @@ import InfoIcon from '@/components/InfoIcon.vue'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import ContentCopyIcon from 'vue-material-design-icons/ContentCopy.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
 import CloseCircleIcon from 'vue-material-design-icons/CloseCircle.vue'
@@ -98,13 +108,20 @@ import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import { downloadInvoicePdf } from '@/api/invoices'
 import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type Invoice, type InvoiceStatus, type InvoiceType } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
 const router = useRouter()
 const store = useInvoiceStore()
+const settingsStore = useSettingsStore()
 const error = ref('')
+
+// The DATEV confirmation poller (DatevConfirmationService::poll) only runs when
+// an IMAP host is configured; without it a "pending" status would hang forever.
+// So the DATEV column/legend only make sense when the feature is actually set up.
+const datevFeatureActive = computed(() => !!settingsStore.settings?.imapHost)
 
 const STATUS_ICON: Record<string, unknown> = { draft: PencilOutlineIcon, committed: LockIcon, cancelled: CloseCircleIcon }
 const DATEV_ICON: Record<string, unknown> = { pending: ClockOutlineIcon, confirmed: CheckCircleIcon, unknown: HelpCircleOutlineIcon, failed: CloseCircleIcon }
@@ -135,6 +152,9 @@ onMounted(() => {
 	store.fetchAll().catch((e: { message?: string }) => {
 		error.value = e.message ?? t('rechnungswerk', 'Laden fehlgeschlagen')
 	})
+	// Best-effort: decides whether the DATEV status column is shown. A failure
+	// here must not block the invoice list, so it is silently ignored.
+	settingsStore.fetch().catch(() => { /* DATEV column stays hidden */ })
 })
 
 function newInvoice() {
@@ -147,5 +167,15 @@ function openInvoice(id: number) {
 
 function downloadPdf(id: number) {
 	downloadInvoicePdf(id)
+}
+
+async function duplicate(id: number) {
+	error.value = ''
+	try {
+		const draft = await store.duplicate(id)
+		router.push({ name: 'invoice-detail', params: { id: String(draft.id) } })
+	} catch (e) {
+		error.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Duplizieren fehlgeschlagen')
+	}
 }
 </script>
