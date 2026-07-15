@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?" : "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?",
     "Ablage in Nextcloud" : "Ablage in Nextcloud",
+    "Als Vorlage für neue Rechnung duplizieren" : "Als Vorlage für neue Rechnung duplizieren",
     "Automatische Ablage aktivieren" : "Automatische Ablage aktivieren",
     "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben." : "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.",
     "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen." : "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.",
@@ -112,6 +113,8 @@ OC.L10N.register(
     "Du bist für RechnungsWerk nicht freigeschaltet. Wende dich an einen Administrator." : "Du bist für RechnungsWerk nicht freigeschaltet. Wende dich an einen Administrator.",
     "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen." : "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.",
     "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden." : "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.",
+    "Duplizieren" : "Duplizieren",
+    "Duplizieren fehlgeschlagen" : "Duplizieren fehlgeschlagen",
     "E-Mail" : "E-Mail",
     "E-Rechnung beim Festschreiben automatisch an DATEV senden" : "E-Rechnung beim Festschreiben automatisch an DATEV senden",
     "Eigenes SMTP-Konto (optional)" : "Eigenes SMTP-Konto (optional)",

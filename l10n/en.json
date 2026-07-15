@@ -2,6 +2,7 @@
     "translations": {
         "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?": "From now on, the ZUGFeRD PDF will automatically be filed in the selected folder on every commit. Everyone with access to the folder can see the invoices. Continue?",
         "Ablage in Nextcloud": "Filing in Nextcloud",
+        "Als Vorlage für neue Rechnung duplizieren": "Duplicate as a template for a new invoice",
         "Automatische Ablage aktivieren": "Enable automatic filing",
         "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.": "The file name scheme must contain the {nummer} placeholder so file names stay unique.",
         "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.": "Prints an EPC QR code next to the bank details: customers scan it with their banking app, with beneficiary, amount and payment reference prefilled. Only appears on invoices with a positive total, not on cancellation documents.",
@@ -111,6 +112,8 @@
         "Du bist für RechnungsWerk nicht freigeschaltet. Wende dich an einen Administrator.": "You are not enabled for RechnungsWerk. Please contact an administrator.",
         "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.": "May configure company data, number range, DATEV and access.",
         "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.": "May create, view, download and send invoices.",
+        "Duplizieren": "Duplicate",
+        "Duplizieren fehlgeschlagen": "Duplication failed",
         "E-Mail": "E-mail",
         "E-Rechnung beim Festschreiben automatisch an DATEV senden": "Automatically send the e-invoice to DATEV when finalising",
         "Eigenes SMTP-Konto (optional)": "Own SMTP account (optional)",

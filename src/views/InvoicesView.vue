@@ -65,13 +65,22 @@
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
 						<td class="rw-col-actions">
-							<NcButton v-if="inv.status !== 'draft'"
-								type="tertiary"
-								:aria-label="t('rechnungswerk', 'PDF herunterladen')"
-								:title="t('rechnungswerk', 'PDF herunterladen')"
-								@click.stop="downloadPdf(inv.id)">
-								<template #icon><DownloadIcon :size="20" /></template>
-							</NcButton>
+							<div class="rw-actions">
+								<NcButton v-if="inv.invoiceType !== 'cancellation'"
+									type="tertiary"
+									:aria-label="t('rechnungswerk', 'Duplizieren')"
+									:title="t('rechnungswerk', 'Als Vorlage für neue Rechnung duplizieren')"
+									@click.stop="duplicate(inv.id)">
+									<template #icon><ContentCopyIcon :size="20" /></template>
+								</NcButton>
+								<NcButton v-if="inv.status !== 'draft'"
+									type="tertiary"
+									:aria-label="t('rechnungswerk', 'PDF herunterladen')"
+									:title="t('rechnungswerk', 'PDF herunterladen')"
+									@click.stop="downloadPdf(inv.id)">
+									<template #icon><DownloadIcon :size="20" /></template>
+								</NcButton>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -91,6 +100,7 @@ import InfoIcon from '@/components/InfoIcon.vue'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import ContentCopyIcon from 'vue-material-design-icons/ContentCopy.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
 import CloseCircleIcon from 'vue-material-design-icons/CloseCircle.vue'
@@ -147,5 +157,15 @@ function openInvoice(id: number) {
 
 function downloadPdf(id: number) {
 	downloadInvoicePdf(id)
+}
+
+async function duplicate(id: number) {
+	error.value = ''
+	try {
+		const draft = await store.duplicate(id)
+		router.push({ name: 'invoice-detail', params: { id: String(draft.id) } })
+	} catch (e) {
+		error.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Duplizieren fehlgeschlagen')
+	}
 }
 </script>
