@@ -153,7 +153,7 @@ onMounted(() => {
 		error.value = e.message ?? t('rechnungswerk', 'Laden fehlgeschlagen')
 	})
 	// Best-effort: decides whether the DATEV status column is shown. A failure
-	// here must not block the invoice list, so it is only logged.
+	// here must not block the invoice list, so it is silently ignored.
 	settingsStore.fetch().catch(() => { /* DATEV column stays hidden */ })
 })
 
