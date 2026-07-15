@@ -65,19 +65,21 @@
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">{{ formatCents(inv.totalCents) }}</td>
 						<td class="rw-col-actions">
-							<NcButton type="tertiary"
-								:aria-label="t('rechnungswerk', 'Duplizieren')"
-								:title="t('rechnungswerk', 'Als Vorlage für neue Rechnung duplizieren')"
-								@click.stop="duplicate(inv.id)">
-								<template #icon><ContentCopyIcon :size="20" /></template>
-							</NcButton>
-							<NcButton v-if="inv.status !== 'draft'"
-								type="tertiary"
-								:aria-label="t('rechnungswerk', 'PDF herunterladen')"
-								:title="t('rechnungswerk', 'PDF herunterladen')"
-								@click.stop="downloadPdf(inv.id)">
-								<template #icon><DownloadIcon :size="20" /></template>
-							</NcButton>
+							<div class="rw-actions">
+								<NcButton type="tertiary"
+									:aria-label="t('rechnungswerk', 'Duplizieren')"
+									:title="t('rechnungswerk', 'Als Vorlage für neue Rechnung duplizieren')"
+									@click.stop="duplicate(inv.id)">
+									<template #icon><ContentCopyIcon :size="20" /></template>
+								</NcButton>
+								<NcButton v-if="inv.status !== 'draft'"
+									type="tertiary"
+									:aria-label="t('rechnungswerk', 'PDF herunterladen')"
+									:title="t('rechnungswerk', 'PDF herunterladen')"
+									@click.stop="downloadPdf(inv.id)">
+									<template #icon><DownloadIcon :size="20" /></template>
+								</NcButton>
+							</div>
 						</td>
 					</tr>
 				</tbody>

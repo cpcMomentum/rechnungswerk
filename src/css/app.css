@@ -152,6 +152,17 @@
 	padding-top: 2px;
 	padding-bottom: 2px;
 }
+/* List tables (invoices etc.) can hold multiple row actions side by side; the
+   fixed 44px above is meant for the single-button positions table. */
+.app-rechnungswerk .rw-table:not(.rw-table--positions) .rw-col-actions {
+	width: auto;
+	white-space: nowrap;
+}
+.app-rechnungswerk .rw-actions {
+	display: inline-flex;
+	gap: 4px;
+	justify-content: flex-end;
+}
 .app-rechnungswerk .rw-row-clickable {
 	cursor: pointer;
 }
