@@ -32,7 +32,7 @@
 											<span class="rw-legend__item"><PencilOutlineIcon :size="16" class="rw-sicon rw-sicon--draft" /> {{ t('rechnungswerk', 'Entwurf') }}</span>
 											<span class="rw-legend__item"><CloseCircleIcon :size="16" class="rw-sicon rw-sicon--cancelled" /> {{ t('rechnungswerk', 'Storniert') }}</span>
 										</div>
-										<div class="rw-info-popup__group">
+										<div v-if="datevFeatureActive" class="rw-info-popup__group">
 											<span class="rw-legend__label">{{ t('rechnungswerk', 'DATEV-Übergabe') }}</span>
 											<span class="rw-legend__item"><CheckCircleIcon :size="16" class="rw-sicon rw-sicon--datev-confirmed" /> {{ t('rechnungswerk', 'bestätigt') }}</span>
 											<span class="rw-legend__item"><ClockOutlineIcon :size="16" class="rw-sicon rw-sicon--datev-pending" /> {{ t('rechnungswerk', 'gesendet') }}</span>
@@ -54,7 +54,7 @@
 						<td>
 							<span class="rw-status-cell">
 								<component :is="statusIcon(inv.status)" :size="20" :class="['rw-sicon', `rw-sicon--${inv.status}`]" :title="statusLabel(inv.status)" />
-								<component :is="datevIcon(inv.datevStatus)" v-if="inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
+								<component :is="datevIcon(inv.datevStatus)" v-if="datevFeatureActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
 							</span>
 						</td>
 						<td>
@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -108,13 +108,20 @@ import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import { downloadInvoicePdf } from '@/api/invoices'
 import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type Invoice, type InvoiceStatus, type InvoiceType } from '@/types/api'
 import { formatCents } from '@/utils/money'
 
 const router = useRouter()
 const store = useInvoiceStore()
+const settingsStore = useSettingsStore()
 const error = ref('')
+
+// The DATEV confirmation poller (DatevConfirmationService::poll) only runs when
+// an IMAP host is configured; without it a "pending" status would hang forever.
+// So the DATEV column/legend only make sense when the feature is actually set up.
+const datevFeatureActive = computed(() => !!settingsStore.settings?.imapHost)
 
 const STATUS_ICON: Record<string, unknown> = { draft: PencilOutlineIcon, committed: LockIcon, cancelled: CloseCircleIcon }
 const DATEV_ICON: Record<string, unknown> = { pending: ClockOutlineIcon, confirmed: CheckCircleIcon, unknown: HelpCircleOutlineIcon, failed: CloseCircleIcon }
@@ -145,6 +152,9 @@ onMounted(() => {
 	store.fetchAll().catch((e: { message?: string }) => {
 		error.value = e.message ?? t('rechnungswerk', 'Laden fehlgeschlagen')
 	})
+	// Best-effort: decides whether the DATEV status column is shown. A failure
+	// here must not block the invoice list, so it is only logged.
+	settingsStore.fetch().catch(() => { /* DATEV column stays hidden */ })
 })
 
 function newInvoice() {
