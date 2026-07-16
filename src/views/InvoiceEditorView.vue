@@ -475,6 +475,9 @@ async function initNew(token: number = navToken) {
 	form.greeting = [s?.greetingDefault, s?.introDefault]
 		.filter(p => (p ?? '').trim() !== '').join('\n\n')
 	form.extraText = s?.closingDefault ?? ''
+	// Global default payment term (#117) pre-fills the due date on new invoices;
+	// a customer-specific term still overrides this on customer selection.
+	form.paymentTermDays = s?.defaultPaymentTermDays ?? ''
 	// Seller-contact cascade (#47): the user's personal default ("Mein
 	// Kontakt") first, falling back per field to the central company
 	// contact when unset. Left fully empty → backend uses the company

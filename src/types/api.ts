@@ -60,6 +60,8 @@ export interface Customer {
 
 export type InvoiceStatus = 'draft' | 'committed' | 'cancelled'
 export type InvoiceType = 'invoice' | 'cancellation'
+/** Derived payment status (#117); null for drafts and cancellation documents. */
+export type PaymentStatus = 'unpaid' | 'overdue' | 'paid'
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 	draft: 'Entwurf',
@@ -137,6 +139,10 @@ export interface Invoice {
 	datevStatus: string | null
 	datevStatusAt: string | null
 	committedAt: string | null
+	/** Payment date (#117); set = paid, null = open. */
+	paidAt: string | null
+	/** Derived payment status; null for drafts and cancellation documents. */
+	paymentStatus: PaymentStatus | null
 	createdAt: string | null
 	updatedAt: string | null
 }
@@ -189,6 +195,8 @@ export interface Settings {
 	girocodeEnabled: boolean
 	smallBusiness: boolean
 	defaultTaxRateBp: number
+	/** Global default payment term in days, pre-fills new invoices (#117). */
+	defaultPaymentTermDays: number | null
 	datevUploadMail: string | null
 	datevAutoSend: boolean
 	smtpFromName: string | null

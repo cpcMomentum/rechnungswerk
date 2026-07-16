@@ -64,6 +64,8 @@ use OCP\DB\Types;
  * @method void setSmallBusiness(int $smallBusiness)
  * @method int getDefaultTaxRateBp()
  * @method void setDefaultTaxRateBp(int $defaultTaxRateBp)
+ * @method ?int getDefaultPaymentTermDays()
+ * @method void setDefaultPaymentTermDays(?int $defaultPaymentTermDays)
  * @method ?string getDatevUploadMail()
  * @method void setDatevUploadMail(?string $datevUploadMail)
  * @method int getDatevAutoSend()
@@ -142,6 +144,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $girocodeEnabled = null;
 	protected ?int $smallBusiness = null;
 	protected ?int $defaultTaxRateBp = null;
+	protected ?int $defaultPaymentTermDays = null;
 	protected ?string $datevUploadMail = null;
 	protected ?int $datevAutoSend = null;
 	protected ?string $smtpFromName = null;
@@ -188,6 +191,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('girocodeEnabled', Types::SMALLINT);
 		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
+		$this->addType('defaultPaymentTermDays', Types::INTEGER);
 		$this->addType('datevUploadMail', Types::STRING);
 		$this->addType('datevAutoSend', Types::SMALLINT);
 		$this->addType('smtpFromName', Types::STRING);
@@ -236,6 +240,7 @@ class Settings extends Entity implements JsonSerializable {
 			'girocodeEnabled' => (bool)$this->getGirocodeEnabled(),
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
+			'defaultPaymentTermDays' => $this->getDefaultPaymentTermDays(),
 			'datevUploadMail' => $this->getDatevUploadMail(),
 			'datevAutoSend' => (bool)$this->getDatevAutoSend(),
 			'smtpFromName' => $this->getSmtpFromName(),

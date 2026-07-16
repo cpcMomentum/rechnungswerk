@@ -261,7 +261,27 @@
         "Zahlungsbedingungen": "Payment terms",
         "Zahlungsziel (Tage)": "Payment term (days)",
         "Zugriff & Administration": "Access & administration",
-        "Zwischensumme (netto)": "Subtotal (net)"
+        "Zwischensumme (netto)": "Subtotal (net)",
+        "Offen gesamt:": "Total open:",
+        "Bezahlt": "Paid",
+        "Alle": "All",
+        "Offen": "Open",
+        "Überfällig": "Overdue",
+        "bezahlt am {date}": "paid on {date}",
+        "bezahlt": "paid",
+        "1 Tag überfällig": "1 day overdue",
+        "{days} Tage überfällig": "{days} days overdue",
+        "fällig heute": "due today",
+        "fällig morgen ({date})": "due tomorrow ({date})",
+        "fällig in {days} Tagen ({date})": "due in {days} days ({date})",
+        "Als bezahlt markieren": "Mark as paid",
+        "Als unbezahlt markieren": "Mark as unpaid",
+        "Bezahlt am {date} – klicken, um die Zahlung zurückzunehmen": "Paid on {date} – click to undo the payment",
+        "Bezahlt – klicken, um die Zahlung zurückzunehmen": "Paid – click to undo the payment",
+        "Zahlungsstatus konnte nicht geändert werden": "Payment status could not be changed",
+        "Zahlung": "Payment",
+        "Standard-Zahlungsziel (Tage)": "Default payment term (days)",
+        "Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.": "Pre-fills the payment term on new invoices. Leave empty for no default."
     },
     "pluralForm": "nplurals=2; plural=(n != 1);"
 }
