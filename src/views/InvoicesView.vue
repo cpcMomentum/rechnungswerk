@@ -189,9 +189,18 @@ const filteredInvoices = computed(() => {
 
 const MS_PER_DAY = 86_400_000
 
+/**
+ * Parse a "Y-m-d" date-only string at local noon so it never shifts a day in
+ * timezones west of UTC (see the same fix in InvoiceEditorView.vue); full ISO
+ * timestamps (e.g. paidAt) already carry an offset and parse as-is.
+ */
+function parseLocalDate(iso: string): Date {
+	return iso.length === 10 ? new Date(`${iso}T12:00:00`) : new Date(iso)
+}
+
 /** Whole-day difference (date-only) between an ISO date and today; positive = future. */
 function daysFromToday(iso: string): number {
-	const d = new Date(iso)
+	const d = parseLocalDate(iso)
 	d.setHours(0, 0, 0, 0)
 	const today = new Date()
 	today.setHours(0, 0, 0, 0)
@@ -202,7 +211,7 @@ function shortDate(iso: string | null): string {
 	if (!iso) {
 		return ''
 	}
-	return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'numeric' })
+	return parseLocalDate(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'numeric' })
 }
 
 const amountClass = (inv: Invoice): string =>
