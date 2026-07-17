@@ -167,6 +167,21 @@ class QuoteController extends Controller {
 		}
 	}
 
+	/** Revise the quote into a new quote-revision draft (#111 Modell B; returns that draft). */
+	#[NoAdminRequired]
+	public function revise(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->reviseQuote($id, $this->userId), Http::STATUS_CREATED);
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
 	// GET download triggered via an <a download> click; browsers do not attach
 	// custom request headers (CSRF tokens) on anchor navigations. Safe:
 	// read-only, access-gated below, authenticated session required.

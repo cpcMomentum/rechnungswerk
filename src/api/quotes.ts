@@ -39,6 +39,10 @@ export const rejectQuote = (id: number): Promise<InvoiceDetail> =>
 export const convertQuote = (id: number): Promise<InvoiceDetail> =>
 	apiPost<InvoiceDetail, Record<string, never>>(`/quotes/${id}/convert`, {})
 
+/** Revise a committed quote into a new quote-revision draft (#111 Modell B); returns that draft. */
+export const reviseQuote = (id: number): Promise<InvoiceDetail> =>
+	apiPost<InvoiceDetail, Record<string, never>>(`/quotes/${id}/revise`, {})
+
 /** Same-origin URL of the quote PDF for a committed quote (session-authenticated). */
 export const quotePdfUrl = (id: number): string =>
 	apiUrl(`/quotes/${id}/pdf`)

@@ -11,6 +11,7 @@
 					{{ statusLabel }}
 				</span>
 				<span v-if="!isQuote && invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
+				<span v-if="isQuote && invoice.relatedQuoteNumber" class="rw-pill">{{ t('rechnungswerk', 'Revision von {number}', { number: invoice.relatedQuoteNumber }) }}</span>
 				<span v-if="invoice.datevStatus && datevStatusLabel" class="rw-status-tag" :title="t('rechnungswerk', 'DATEV-Übergabe')">
 					<component :is="datevIcon(invoice.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${invoice.datevStatus}`]" />
 					{{ datevStatusLabel }}
@@ -252,7 +253,7 @@
 				<NcButton v-if="!isQuote && invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
 					{{ t('rechnungswerk', 'Stornieren') }}
 				</NcButton>
-				<!-- Quote lifecycle (#111): decide (open/expired) and/or convert -->
+				<!-- Quote lifecycle (#111): decide (open/expired), revise and/or convert -->
 				<template v-if="isQuote">
 					<NcButton v-if="canDecideQuote" :disabled="saving" @click="doAccept">
 						<template #icon><CheckIcon :size="20" /></template>
@@ -261,6 +262,10 @@
 					<NcButton v-if="canDecideQuote" :disabled="saving" @click="doReject">
 						<template #icon><CloseIcon :size="20" /></template>
 						{{ t('rechnungswerk', 'Ablehnen') }}
+					</NcButton>
+					<NcButton v-if="canReviseQuote" :disabled="saving" @click="askRevise">
+						<template #icon><FileEditOutlineIcon :size="20" /></template>
+						{{ t('rechnungswerk', 'Revidieren') }}
 					</NcButton>
 					<NcButton v-if="canConvertQuote" variant="primary" :disabled="saving" @click="askConvert">
 						<template #icon><FileMoveOutlineIcon :size="20" /></template>
@@ -290,6 +295,11 @@
 			:message="t('rechnungswerk', 'Aus diesem Angebot wird ein neuer Rechnungs-Entwurf mit denselben Positionen erstellt. Das Angebot wird als „übernommen“ markiert. Fortfahren?')"
 			:confirm-label="t('rechnungswerk', 'Rechnung erstellen')"
 			@close="dialog = null" @confirm="doConvert" />
+		<ConfirmDialog :open="dialog === 'revise'"
+			:name="t('rechnungswerk', 'Angebot revidieren')"
+			:message="t('rechnungswerk', 'Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?')"
+			:confirm-label="t('rechnungswerk', 'Revision erstellen')"
+			@close="dialog = null" @confirm="doRevise" />
 
 		<SendInvoiceDialog
 			:open="sendDialogOpen"
@@ -331,6 +341,7 @@ import EyeOutlineIcon from 'vue-material-design-icons/EyeOutline.vue'
 import CheckIcon from 'vue-material-design-icons/Check.vue'
 import CloseIcon from 'vue-material-design-icons/Close.vue'
 import FileMoveOutlineIcon from 'vue-material-design-icons/FileMoveOutline.vue'
+import FileEditOutlineIcon from 'vue-material-design-icons/FileEditOutline.vue'
 import CloseCircleIcon from 'vue-material-design-icons/CloseCircle.vue'
 import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
@@ -381,7 +392,7 @@ const sending = ref(false)
 const sendDialogOpen = ref(false)
 const previewOpen = ref(false)
 const previewUrl = ref('')
-const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | null>(null)
+const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | null>(null)
 
 const emptyForm = () => ({
 	customerId: null as number | null,
@@ -594,7 +605,9 @@ async function initNew(token: number = navToken) {
 }
 
 async function load(id: number, token: number = navToken) {
-	const detail = await invoiceStore.get(id)
+	// Route through the facade: a quote id must be fetched from /quotes, not
+	// /invoices (the invoice endpoint type-rejects a quote id with a 404).
+	const detail = await docStore.value.get(id)
 	if (token !== navToken) {
 		return
 	}
@@ -765,6 +778,12 @@ function askCancel() {
 function askConvert() {
 	dialog.value = 'convert'
 }
+function askRevise() {
+	dialog.value = 'revise'
+}
+
+/** A committed quote can be revised from any state (#111 Modell B). */
+const canReviseQuote = computed(() => isQuote.value && invoice.value?.status === 'committed')
 
 /** Whether a committed quote can still be turned into an invoice (mirrors backend). */
 const canConvertQuote = computed(() =>
@@ -861,6 +880,24 @@ async function doConvert() {
 		router.push({ name: 'invoice-detail', params: { id: String(created.id) } })
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Übernahme fehlgeschlagen'))
+	} finally {
+		saving.value = false
+	}
+}
+
+async function doRevise() {
+	dialog.value = null
+	if (!invoice.value) {
+		return
+	}
+	saving.value = true
+	error.value = ''
+	try {
+		const draft = await quoteStore.revise(invoice.value.id)
+		// Land on the new revision draft so the user can adjust and finalise it.
+		router.push({ name: 'quote-detail', params: { id: String(draft.id) } })
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Revidieren fehlgeschlagen'))
 	} finally {
 		saving.value = false
 	}

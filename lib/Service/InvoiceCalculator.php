@@ -145,6 +145,28 @@ final class InvoiceCalculator {
 		return preg_match('/\{YYYY\}|\{YY\}/', $format) === 1;
 	}
 
+	/**
+	 * Next quote revision number for a family (#111 Modell B): given the root/base
+	 * number and the numbers already in use, return "{base}-{n}" with the next free
+	 * n. The base itself counts as revision 0, so the first revision is "{base}-1".
+	 *
+	 * The base is taken from the family's root quote (via related_quote_id), never
+	 * derived by string-stripping — a quote number like "AN-2026-0007" contains its
+	 * own hyphens, so only an exact "{base}-<digits>" suffix is treated as a revision.
+	 *
+	 * @param string[] $existing all numbers currently in the family (base + revisions)
+	 */
+	public static function nextRevisionNumber(string $base, array $existing): string {
+		$max = 0;
+		$pattern = '/^' . preg_quote($base, '/') . '-(\d+)$/';
+		foreach ($existing as $num) {
+			if (preg_match($pattern, (string)$num, $m) === 1) {
+				$max = max($max, (int)$m[1]);
+			}
+		}
+		return $base . '-' . ($max + 1);
+	}
+
 	/** Placeholders accepted in the PDF file-name scheme (#37). */
 	public const FILE_NAME_PLACEHOLDERS = ['{nummer}', '{YYYY}', '{MM}', '{DD}', '{kunde}', '{typ}'];
 

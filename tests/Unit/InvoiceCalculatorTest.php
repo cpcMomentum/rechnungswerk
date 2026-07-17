@@ -269,4 +269,36 @@ class InvoiceCalculatorTest extends TestCase {
 		$invoice->setRecipientName('Firma {typ} GmbH');
 		$this->assertSame('RE-2026-0007_Firma {typ} GmbH_Rechnung.pdf', InvoiceCalculator::buildPdfFileName($invoice, $settings));
 	}
+
+	// --- Quote revision numbering (#111 Modell B) ------------------------
+
+	public function testFirstRevisionAppendsDashOne(): void {
+		// Only the base exists yet → first revision is "-1".
+		$this->assertSame('AN-2026-0007-1',
+			InvoiceCalculator::nextRevisionNumber('AN-2026-0007', ['AN-2026-0007']));
+	}
+
+	public function testNextRevisionIncrementsHighestSuffix(): void {
+		$this->assertSame('AN-2026-0007-3',
+			InvoiceCalculator::nextRevisionNumber('AN-2026-0007', ['AN-2026-0007', 'AN-2026-0007-1', 'AN-2026-0007-2']));
+	}
+
+	public function testRevisionIgnoresBaseOwnHyphenatedDigits(): void {
+		// The base itself ("…-0007") must NOT be read as revision 7; only an exact
+		// "{base}-<n>" suffix counts. With just the base present, next is "-1".
+		$this->assertSame('AN-2026-0007-1',
+			InvoiceCalculator::nextRevisionNumber('AN-2026-0007', ['AN-2026-0007']));
+	}
+
+	public function testRevisionUsesMaxNotCount(): void {
+		// Gaps are fine: highest suffix + 1, not a count.
+		$this->assertSame('AN-2026-0007-6',
+			InvoiceCalculator::nextRevisionNumber('AN-2026-0007', ['AN-2026-0007', 'AN-2026-0007-5']));
+	}
+
+	public function testRevisionOfDifferentBaseIsIsolated(): void {
+		// Numbers from another family must not influence this one.
+		$this->assertSame('AN-2026-0008-1',
+			InvoiceCalculator::nextRevisionNumber('AN-2026-0008', ['AN-2026-0007', 'AN-2026-0007-1', 'AN-2026-0008']));
+	}
 }

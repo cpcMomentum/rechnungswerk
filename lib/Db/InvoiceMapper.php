@@ -82,6 +82,35 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * Quote numbers belonging to one revision family (#111 Modell B): the base
+	 * number itself ("AN-2026-0007") and its revisions ("AN-2026-0007-1", …).
+	 * Used to pick the next free revision suffix. The base is escaped so a literal
+	 * '_' or '%' in a number cannot widen the LIKE match.
+	 *
+	 * @return string[]
+	 */
+	public function findQuoteNumbersInFamily(string $base): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('number')->from($this->tableName)
+			->where($qb->expr()->eq('invoice_type', $qb->createNamedParameter(Invoice::TYPE_QUOTE)))
+			->andWhere($qb->expr()->orX(
+				$qb->expr()->eq('number', $qb->createNamedParameter($base)),
+				$qb->expr()->like('number', $qb->createNamedParameter(
+					$this->db->escapeLikeParameter($base) . '-%',
+				)),
+			));
+		$result = $qb->executeQuery();
+		$numbers = [];
+		while (($row = $result->fetch()) !== false) {
+			if ($row['number'] !== null) {
+				$numbers[] = (string)$row['number'];
+			}
+		}
+		$result->closeCursor();
+		return $numbers;
+	}
+
+	/**
 	 * @throws DoesNotExistException
 	 */
 	public function findOne(int $id): Invoice {

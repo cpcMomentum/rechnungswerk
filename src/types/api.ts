@@ -63,7 +63,7 @@ export type InvoiceType = 'invoice' | 'cancellation' | 'quote'
 /** Derived payment status (#117); null for drafts and cancellation documents. */
 export type PaymentStatus = 'unpaid' | 'overdue' | 'paid'
 /** Derived quote status (#111); null for non-quote documents. */
-export type QuoteStatus = 'draft' | 'open' | 'expired' | 'accepted' | 'rejected' | 'converted'
+export type QuoteStatus = 'draft' | 'open' | 'expired' | 'accepted' | 'rejected' | 'converted' | 'superseded'
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 	draft: 'Entwurf',
@@ -84,6 +84,7 @@ export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
 	accepted: 'Angenommen',
 	rejected: 'Abgelehnt',
 	converted: 'Übernommen',
+	superseded: 'Revidiert',
 }
 
 export interface TaxBreakdownRow {
@@ -159,8 +160,10 @@ export interface Invoice {
 	validUntil: string | null
 	/** Freibleibend/unverbindlich flag (§145 BGB, #111); quotes only. */
 	offerFreeform: boolean
-	/** Link from a converted invoice back to its source quote (#111). */
+	/** Link from a converted invoice or a revision back to its source quote (#111). */
 	relatedQuoteId: number | null
+	/** Number of the source quote (revision source / convert source); detail responses only. */
+	relatedQuoteNumber?: string | null
 	/** Derived quote status (#111); null for non-quote documents. */
 	quoteStatus: QuoteStatus | null
 	createdAt: string | null

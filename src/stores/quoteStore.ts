@@ -16,6 +16,7 @@ import {
 	getQuote as apiGet,
 	listQuotes as apiList,
 	rejectQuote as apiReject,
+	reviseQuote as apiRevise,
 	updateQuote as apiUpdate,
 } from '@/api/quotes'
 
@@ -80,5 +81,11 @@ export const useQuoteStore = defineStore('quote', () => {
 		return invoice
 	}
 
-	return { quotes, loading, fetchAll, get, create, update, remove, commit, accept, reject, convert }
+	async function revise(id: number): Promise<InvoiceDetail> {
+		const draft = await apiRevise(id)
+		await fetchAll()
+		return draft
+	}
+
+	return { quotes, loading, fetchAll, get, create, update, remove, commit, accept, reject, convert, revise }
 })
