@@ -2,7 +2,7 @@
 	<div class="rw-view">
 		<div class="rw-editor-head">
 			<NcBreadcrumbs>
-				<NcBreadcrumb :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }" />
+				<NcBreadcrumb :name="isQuote ? t('rechnungswerk', 'Angebote') : t('rechnungswerk', 'Rechnungen')" :to="{ name: listRoute }" />
 				<NcBreadcrumb :name="headerTitle" />
 			</NcBreadcrumbs>
 			<span v-if="invoice" class="rw-status-group">
@@ -10,7 +10,7 @@
 					<component :is="statusIcon(invoice.status)" :size="18" :class="['rw-sicon', `rw-sicon--${invoice.status}`]" />
 					{{ statusLabel }}
 				</span>
-				<span v-if="invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
+				<span v-if="!isQuote && invoice.invoiceType !== 'invoice'" v-tooltip="typeTooltip" class="rw-pill">{{ typeLabel }}</span>
 				<span v-if="invoice.datevStatus && datevStatusLabel" class="rw-status-tag" :title="t('rechnungswerk', 'DATEV-Übergabe')">
 					<component :is="datevIcon(invoice.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${invoice.datevStatus}`]" />
 					{{ datevStatusLabel }}
@@ -21,13 +21,15 @@
 		<NcNoteCard v-if="error" type="error" :text="error" />
 		<NcNoteCard v-if="notice" type="success" :text="notice" />
 		<NcNoteCard v-if="readonly" type="info"
-			:text="t('rechnungswerk', 'Diese Rechnung ist festgeschrieben und kann nicht mehr geändert werden.')" />
+			:text="isQuote
+				? t('rechnungswerk', 'Dieses Angebot ist festgeschrieben und kann nicht mehr geändert werden.')
+				: t('rechnungswerk', 'Diese Rechnung ist festgeschrieben und kann nicht mehr geändert werden.')" />
 
-		<!-- Rechnungsdaten -->
+		<!-- Kopfdaten -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Rechnungsdaten') }}</h3>
+			<h3>{{ isQuote ? t('rechnungswerk', 'Angebotsdaten') : t('rechnungswerk', 'Rechnungsdaten') }}</h3>
 			<div class="rw-form-row">
-				<label class="rw-field invoice-no"><span>{{ t('rechnungswerk', 'Rechnungsnummer') }}</span>
+				<label class="rw-field invoice-no"><span>{{ isQuote ? t('rechnungswerk', 'Angebotsnummer') : t('rechnungswerk', 'Rechnungsnummer') }}</span>
 					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird vergeben)')" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
 					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
@@ -36,15 +38,19 @@
 			</div>
 			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
 			<details class="more">
-				<summary>{{ t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)') }}</summary>
+				<summary>{{ isQuote
+					? t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)')
+					: t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)') }}</summary>
 				<div class="rw-form-row">
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Referenznummer') }}</span>
 						<input v-model="form.referenceNumber" class="rw-input" type="text" :readonly="readonly" /></label>
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Bestellnummer') }}</span>
 						<input v-model="form.orderNumber" class="rw-input" type="text" :readonly="readonly" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Käuferreferenz / Leitweg-ID (BT-10)') }}</span>
+					<!-- Leitweg-ID (BT-10) is an e-invoice field for public buyers; a quote has none. -->
+					<label v-if="!isQuote" class="rw-field"><span>{{ t('rechnungswerk', 'Käuferreferenz / Leitweg-ID (BT-10)') }}</span>
 						<input v-model="form.buyerReference" class="rw-input" type="text" :readonly="readonly"
 							:placeholder="t('rechnungswerk', 'nur für öffentliche Auftraggeber')" /></label>
+					<span v-else class="rw-field" aria-hidden="true" />
 				</div>
 				<div class="rw-form-row">
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'Vertragsnummer (BT-12)') }}</span>
@@ -93,7 +99,7 @@
 
 		<!-- Rechnungssteller / Ansprechpartner (Verkäuferseite) -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Ansprechpartner (für diese Rechnung)') }}</h3>
+			<h3>{{ isQuote ? t('rechnungswerk', 'Ansprechpartner (für dieses Angebot)') : t('rechnungswerk', 'Ansprechpartner (für diese Rechnung)') }}</h3>
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Name') }}</span>
 					<input v-model="form.sellerContactPerson" class="rw-input" type="text" :readonly="readonly" /></label>
@@ -102,7 +108,9 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'E-Mail') }}</span>
 					<input v-model="form.sellerContactEmail" class="rw-input" type="email" :readonly="readonly" /></label>
 			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.') }}</p>
+			<p class="rw-hint">{{ isQuote
+				? t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.')
+				: t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.') }}</p>
 		</section>
 
 		<!-- Anrede & Einleitung (vor den Positionen) -->
@@ -157,8 +165,8 @@
 			</div>
 		</section>
 
-		<!-- Zahlungsbedingungen -->
-		<section class="rw-section">
+		<!-- Zahlungsbedingungen (Rechnung) -->
+		<section v-if="!isQuote" class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Zahlungsbedingungen') }}</h3>
 			<div class="rw-form-row">
 				<label class="rw-field payterm-days"><span>{{ t('rechnungswerk', 'Zahlungsziel (Tage)') }}</span>
@@ -171,6 +179,22 @@
 			</div>
 		</section>
 
+		<!-- Gültigkeit (Angebot, #111) -->
+		<section v-else class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Gültigkeit') }}</h3>
+			<div class="rw-form-row">
+				<label class="rw-field payterm-days"><span>{{ t('rechnungswerk', 'Gültig bis') }}</span>
+					<input v-model="form.validUntil" class="rw-input" type="date" :readonly="readonly" /></label>
+				<label class="rw-field rw-checkbox-field">
+					<span class="rw-checkbox-row">
+						<input v-model="form.offerFreeform" type="checkbox" :disabled="readonly" />
+						{{ t('rechnungswerk', 'Freibleibendes Angebot (unverbindlich)') }}
+					</span>
+				</label>
+			</div>
+			<p class="rw-hint">{{ t('rechnungswerk', '„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.') }}</p>
+		</section>
+
 		<!-- Schlusstext -->
 		<section class="rw-section">
 			<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
@@ -181,7 +205,7 @@
 
 		<!-- Notizen / Hinweise (BT-22) -->
 		<section v-if="!readonly || notes.length > 0" class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Notizen / Hinweise auf der Rechnung') }}</h3>
+			<h3>{{ isQuote ? t('rechnungswerk', 'Notizen / Hinweise auf dem Angebot') : t('rechnungswerk', 'Notizen / Hinweise auf der Rechnung') }}</h3>
 			<div v-for="(note, i) in notes" :key="i" class="rw-note-row">
 				<input v-model="notes[i]" class="rw-input" type="text" :readonly="readonly"
 					:aria-label="t('rechnungswerk', 'Notiz {index}', { index: i + 1 })" />
@@ -194,7 +218,9 @@
 				<template #icon><PlusIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Notiz hinzufügen') }}
 			</NcButton>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.') }}</p>
+			<p class="rw-hint">{{ isQuote
+				? t('rechnungswerk', 'Erscheint als Freitext auf dem Angebot – kein strukturiertes Datenfeld.')
+				: t('rechnungswerk', 'Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.') }}</p>
 		</section>
 
 		<!-- Sticky actions -->
@@ -218,24 +244,40 @@
 					<template #icon><DownloadIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'PDF herunterladen') }}
 				</NcButton>
-				<NcButton variant="primary" :disabled="sending" @click="sendDialogOpen = true">
+				<NcButton :variant="isQuote ? 'secondary' : 'primary'" :disabled="sending" @click="sendDialogOpen = true">
 					<template #icon><SendIcon :size="20" /></template>
 					{{ t('rechnungswerk', 'An Kunde senden') }}
 				</NcButton>
-				<NcButton v-if="invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
+				<!-- Invoice: correction via storno -->
+				<NcButton v-if="!isQuote && invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
 					{{ t('rechnungswerk', 'Stornieren') }}
 				</NcButton>
+				<!-- Quote lifecycle (#111): decide (open/expired) and/or convert -->
+				<template v-if="isQuote">
+					<NcButton v-if="canDecideQuote" :disabled="saving" @click="doAccept">
+						<template #icon><CheckIcon :size="20" /></template>
+						{{ t('rechnungswerk', 'Annehmen') }}
+					</NcButton>
+					<NcButton v-if="canDecideQuote" :disabled="saving" @click="doReject">
+						<template #icon><CloseIcon :size="20" /></template>
+						{{ t('rechnungswerk', 'Ablehnen') }}
+					</NcButton>
+					<NcButton v-if="canConvertQuote" variant="primary" :disabled="saving" @click="askConvert">
+						<template #icon><FileMoveOutlineIcon :size="20" /></template>
+						{{ t('rechnungswerk', 'In Rechnung übernehmen') }}
+					</NcButton>
+				</template>
 			</template>
 		</div>
 
 		<ConfirmDialog :open="dialog === 'finalize'"
-			:name="t('rechnungswerk', 'Rechnung festschreiben')"
+			:name="isQuote ? t('rechnungswerk', 'Angebot festschreiben') : t('rechnungswerk', 'Rechnung festschreiben')"
 			:message="finalizeMessage"
 			:confirm-label="t('rechnungswerk', 'Festschreiben')"
 			@close="dialog = null" @confirm="doFinalize" />
 		<ConfirmDialog :open="dialog === 'delete'"
-			:name="t('rechnungswerk', 'Entwurf löschen')"
-			:message="t('rechnungswerk', 'Diesen Entwurf wirklich löschen?')"
+			:name="isQuote ? t('rechnungswerk', 'Angebot löschen') : t('rechnungswerk', 'Entwurf löschen')"
+			:message="isQuote ? t('rechnungswerk', 'Diesen Angebots-Entwurf wirklich löschen?') : t('rechnungswerk', 'Diesen Entwurf wirklich löschen?')"
 			:confirm-label="t('rechnungswerk', 'Löschen')" destructive
 			@close="dialog = null" @confirm="doDelete" />
 		<ConfirmDialog :open="dialog === 'cancel'"
@@ -243,12 +285,18 @@
 			:message="t('rechnungswerk', 'Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?')"
 			:confirm-label="t('rechnungswerk', 'Stornorechnung erstellen')" destructive
 			@close="dialog = null" @confirm="doCancel" />
+		<ConfirmDialog :open="dialog === 'convert'"
+			:name="t('rechnungswerk', 'In Rechnung übernehmen')"
+			:message="t('rechnungswerk', 'Aus diesem Angebot wird ein neuer Rechnungs-Entwurf mit denselben Positionen erstellt. Das Angebot wird als „übernommen“ markiert. Fortfahren?')"
+			:confirm-label="t('rechnungswerk', 'Rechnung erstellen')"
+			@close="dialog = null" @confirm="doConvert" />
 
 		<SendInvoiceDialog
 			:open="sendDialogOpen"
 			:invoice="invoice"
 			:default-body="defaultMailBody"
 			:saving="sending"
+			:kind="isQuote ? 'quote' : 'invoice'"
 			@close="sendDialogOpen = false"
 			@send="doSend" />
 
@@ -266,7 +314,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -280,6 +328,9 @@ import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import SendIcon from 'vue-material-design-icons/Send.vue'
 import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
 import EyeOutlineIcon from 'vue-material-design-icons/EyeOutline.vue'
+import CheckIcon from 'vue-material-design-icons/Check.vue'
+import CloseIcon from 'vue-material-design-icons/Close.vue'
+import FileMoveOutlineIcon from 'vue-material-design-icons/FileMoveOutline.vue'
 import CloseCircleIcon from 'vue-material-design-icons/CloseCircle.vue'
 import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
@@ -290,20 +341,35 @@ import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
+import { useQuoteStore } from '@/stores/quoteStore'
 import { useProductStore } from '@/stores/productStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, type ContactMatch, type Customer, type InvoiceDetail } from '@/types/api'
+import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
+import { downloadQuotePdf, quotePreviewUrl, sendQuote } from '@/api/quotes'
 import { getMyContact } from '@/api/me'
 
 const props = defineProps<{ id?: string }>()
+const route = useRoute()
 const router = useRouter()
 const invoiceStore = useInvoiceStore()
+const quoteStore = useQuoteStore()
 const productStore = useProductStore()
 const settingsStore = useSettingsStore()
+
+// The invoice editor doubles as the quote editor (#111): the mode is derived
+// from the route name ('quote-new'/'quote-detail' → quote). Everything below
+// keeps the invoice path unchanged and only diverges when isQuote is true.
+const isQuote = computed(() => typeof route.name === 'string' && route.name.startsWith('quote'))
+// Facade over whichever store owns this document type. Both expose the same
+// get/create/update/remove/commit surface; quote-only actions (accept/reject/
+// convert) and invoice-only ones (cancel) are called on their store directly.
+const docStore = computed(() => (isQuote.value ? quoteStore : invoiceStore))
+const listRoute = computed(() => (isQuote.value ? 'quotes' : 'invoices'))
+const detailRoute = computed(() => (isQuote.value ? 'quote-detail' : 'invoice-detail'))
 
 const invoice = ref<InvoiceDetail | null>(null)
 const items = ref<EditorItem[]>([emptyItem()])
@@ -315,7 +381,7 @@ const sending = ref(false)
 const sendDialogOpen = ref(false)
 const previewOpen = ref(false)
 const previewUrl = ref('')
-const dialog = ref<'finalize' | 'delete' | 'cancel' | null>(null)
+const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | null>(null)
 
 const emptyForm = () => ({
 	customerId: null as number | null,
@@ -328,6 +394,7 @@ const emptyForm = () => ({
 	contractNumber: '', projectReference: '', specialTaxCase: '',
 	greeting: '', extraText: '',
 	paymentTermDays: '' as string | number, discountTerms: '',
+	validUntil: '', offerFreeform: false,
 })
 const form = reactive(emptyForm())
 
@@ -356,7 +423,17 @@ const STATUS_ICON: Record<string, unknown> = { draft: PencilOutlineIcon, committ
 const DATEV_ICON: Record<string, unknown> = { pending: ClockOutlineIcon, confirmed: CheckCircleIcon, unknown: HelpCircleOutlineIcon, failed: CloseCircleIcon }
 const statusIcon = (s: string): unknown => STATUS_ICON[s] ?? PencilOutlineIcon
 const datevIcon = (s: string): unknown => DATEV_ICON[s] ?? HelpCircleOutlineIcon
-const statusLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status]) : '')
+// For a committed quote the derived quote status (Offen/Angenommen/…) is more
+// informative than the generic document status, so show it in quote mode.
+const statusLabel = computed(() => {
+	if (!invoice.value) {
+		return ''
+	}
+	if (isQuote.value && invoice.value.quoteStatus) {
+		return t('rechnungswerk', QUOTE_STATUS_LABELS[invoice.value.quoteStatus] ?? invoice.value.status)
+	}
+	return t('rechnungswerk', INVOICE_STATUS_LABELS[invoice.value.status])
+})
 const typeLabel = computed(() => invoice.value ? t('rechnungswerk', INVOICE_TYPE_LABELS[invoice.value.invoiceType]) : '')
 const datevStatusLabel = computed(() => {
 	const map: Record<string, string> = {
@@ -378,6 +455,9 @@ const typeTooltip = computed(() => {
 })
 
 const finalizeMessage = computed(() => {
+	if (isQuote.value) {
+		return t('rechnungswerk', 'Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?')
+	}
 	let msg = t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')
 	const s = settingsStore.settings
 	if (s?.datevAutoSend && s.datevUploadMail) {
@@ -392,15 +472,21 @@ const defaultMailBody = computed(() => {
 	const opening = (invoice.value?.greeting
 		?? [s?.greetingDefault, s?.introDefault].filter(p => (p ?? '').trim() !== '').join('\n\n')).trim()
 	const closing = (invoice.value?.extraText ?? s?.closingDefault ?? '').trim()
+	const fallback = isQuote.value
+		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.')
+		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).')
 	const parts = [
-		opening !== '' ? opening : t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).'),
+		opening !== '' ? opening : fallback,
 		closing,
 	].filter(p => p !== '')
 	return parts.join('\n\n')
 })
-const headerTitle = computed(() => invoice.value
-	? (invoice.value.number ?? t('rechnungswerk', 'Entwurf'))
-	: t('rechnungswerk', 'Neue Rechnung'))
+const headerTitle = computed(() => {
+	if (invoice.value) {
+		return invoice.value.number ?? t('rechnungswerk', 'Entwurf')
+	}
+	return isQuote.value ? t('rechnungswerk', 'Neues Angebot') : t('rechnungswerk', 'Neue Rechnung')
+})
 
 const totals = computed(() => computeTotals(items.value.map(i => ({
 	taxRateBp: i.taxRateBp,
@@ -436,18 +522,27 @@ onMounted(async () => {
 // keyed router-view: save() swaps /invoices/new to /invoices/{id} while the
 // finalize/preview flow is still running on this instance, and a remount
 // would strand that flow on a dead instance.
-watch(() => props.id, async (newId) => {
+// Also react to the document mode (route name): the same component instance
+// backs both invoice and quote editors, so navigating invoice→quote keeps the
+// instance and only the route name changes.
+watch(() => [route.name, props.id] as const, async ([, newId]) => {
 	const token = ++navToken
 	try {
 		if (!newId) {
 			resetEditor()
 			await initNew(token)
-		} else if (invoice.value?.id !== Number(newId)) {
-			resetEditor()
-			await load(Number(newId), token)
+		} else {
+			// Reload when the id differs OR the loaded document's type no longer
+			// matches the current mode (invoice↔quote on the same id).
+			const modeMismatch = invoice.value !== null
+				&& (invoice.value.invoiceType === 'quote') !== isQuote.value
+			if (invoice.value?.id !== Number(newId) || modeMismatch) {
+				resetEditor()
+				await load(Number(newId), token)
+			}
 		}
-		// invoice.value.id === newId: our own router.replace after creating the
-		// draft — state is already current, nothing to do.
+		// invoice.value.id === newId and same mode: our own router.replace after
+		// creating the draft — state is already current, nothing to do.
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Laden fehlgeschlagen'))
 	}
@@ -476,8 +571,9 @@ async function initNew(token: number = navToken) {
 		.filter(p => (p ?? '').trim() !== '').join('\n\n')
 	form.extraText = s?.closingDefault ?? ''
 	// Global default payment term (#117) pre-fills the due date on new invoices;
-	// a customer-specific term still overrides this on customer selection.
-	form.paymentTermDays = s?.defaultPaymentTermDays ?? ''
+	// a customer-specific term still overrides this on customer selection. A
+	// quote has no payment term, so it is left blank there.
+	form.paymentTermDays = isQuote.value ? '' : (s?.defaultPaymentTermDays ?? '')
 	// Seller-contact cascade (#47): the user's personal default ("Mein
 	// Kontakt") first, falling back per field to the central company
 	// contact when unset. Left fully empty → backend uses the company
@@ -531,6 +627,8 @@ async function load(id: number, token: number = navToken) {
 	form.extraText = detail.extraText ?? ''
 	form.paymentTermDays = detail.paymentTermDays ?? ''
 	form.discountTerms = detail.discountTerms ?? ''
+	form.validUntil = detail.validUntil ?? ''
+	form.offerFreeform = detail.offerFreeform ?? false
 	items.value = detail.items.length > 0 ? detail.items.map(itemFromInvoiceItem) : [emptyItem()]
 }
 
@@ -583,7 +681,7 @@ function buildInput(): InvoiceInput {
 	const dates = (von && bis)
 		? { performanceDate: '', performancePeriodStart: von, performancePeriodEnd: bis }
 		: { performanceDate: von || bis || '', performancePeriodStart: '', performancePeriodEnd: '' }
-	return {
+	const input: InvoiceInput = {
 		...form,
 		...dates,
 		paymentTermDays: form.paymentTermDays === '' ? null : Number(form.paymentTermDays),
@@ -600,6 +698,19 @@ function buildInput(): InvoiceInput {
 				taxRateBp: i.taxRateBp,
 			})),
 	}
+	// Keep the payloads type-clean: a quote carries validity + freibleibend but no
+	// payment term / discount; an invoice carries the reverse. Never write a
+	// field of one document type onto the other.
+	if (isQuote.value) {
+		input.validUntil = form.validUntil === '' ? null : form.validUntil
+		input.offerFreeform = form.offerFreeform
+		input.paymentTermDays = null
+		input.discountTerms = null
+	} else {
+		delete input.validUntil
+		delete input.offerFreeform
+	}
+	return input
 }
 
 async function save(): Promise<InvoiceDetail | null> {
@@ -608,10 +719,10 @@ async function save(): Promise<InvoiceDetail | null> {
 	try {
 		let detail: InvoiceDetail
 		if (invoice.value) {
-			detail = await invoiceStore.update(invoice.value.id, buildInput())
+			detail = await docStore.value.update(invoice.value.id, buildInput())
 		} else {
-			detail = await invoiceStore.create(buildInput())
-			router.replace({ name: 'invoice-detail', params: { id: String(detail.id) } })
+			detail = await docStore.value.create(buildInput())
+			router.replace({ name: detailRoute.value, params: { id: String(detail.id) } })
 		}
 		invoice.value = detail
 		return detail
@@ -632,7 +743,7 @@ async function openPreview() {
 	if (!saved) {
 		return
 	}
-	previewUrl.value = invoicePreviewUrl(saved.id)
+	previewUrl.value = isQuote.value ? quotePreviewUrl(saved.id) : invoicePreviewUrl(saved.id)
 	previewOpen.value = true
 }
 function onPreviewUpdateOpen(value: boolean) {
@@ -651,12 +762,28 @@ function askDelete() {
 function askCancel() {
 	dialog.value = 'cancel'
 }
+function askConvert() {
+	dialog.value = 'convert'
+}
+
+/** Whether a committed quote can still be turned into an invoice (mirrors backend). */
+const canConvertQuote = computed(() =>
+	isQuote.value && invoice.value?.status === 'committed'
+	&& ['open', 'expired', 'accepted'].includes(invoice.value?.quoteStatus ?? ''))
+/** Whether a committed quote is still awaiting a decision (open/expired). */
+const canDecideQuote = computed(() =>
+	isQuote.value && invoice.value?.status === 'committed'
+	&& ['open', 'expired'].includes(invoice.value?.quoteStatus ?? ''))
 
 function downloadPdf() {
 	if (!invoice.value) {
 		return
 	}
-	downloadInvoicePdf(invoice.value.id)
+	if (isQuote.value) {
+		downloadQuotePdf(invoice.value.id)
+	} else {
+		downloadInvoicePdf(invoice.value.id)
+	}
 }
 
 async function doFinalize() {
@@ -667,19 +794,73 @@ async function doFinalize() {
 	}
 	saving.value = true
 	try {
-		const committed = await invoiceStore.commit(saved.id)
+		const committed = await docStore.value.commit(saved.id)
 		invoice.value = committed
 		notice.value = ''
-		// The commit response carries a transient DATEV hand-off result that is
-		// not part of the persisted invoice — surface it as feedback.
-		const datevMailSent = (committed as InvoiceDetail & { datevMailSent?: boolean | null }).datevMailSent
-		if (datevMailSent === true) {
-			notice.value = t('rechnungswerk', 'Festgeschrieben. E-Rechnung wurde automatisch an DATEV gesendet.')
-		} else if (datevMailSent === null) {
-			error.value = t('rechnungswerk', 'Rechnung festgeschrieben, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden.')
+		if (isQuote.value) {
+			notice.value = t('rechnungswerk', 'Angebot festgeschrieben.')
+		} else {
+			// The commit response carries a transient DATEV hand-off result that is
+			// not part of the persisted invoice — surface it as feedback.
+			const datevMailSent = (committed as InvoiceDetail & { datevMailSent?: boolean | null }).datevMailSent
+			if (datevMailSent === true) {
+				notice.value = t('rechnungswerk', 'Festgeschrieben. E-Rechnung wurde automatisch an DATEV gesendet.')
+			} else if (datevMailSent === null) {
+				error.value = t('rechnungswerk', 'Rechnung festgeschrieben, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden.')
+			}
 		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Festschreiben fehlgeschlagen'))
+	} finally {
+		saving.value = false
+	}
+}
+
+async function doAccept() {
+	if (!invoice.value) {
+		return
+	}
+	saving.value = true
+	error.value = ''
+	try {
+		invoice.value = await quoteStore.accept(invoice.value.id)
+		notice.value = t('rechnungswerk', 'Angebot als angenommen markiert.')
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Aktion fehlgeschlagen'))
+	} finally {
+		saving.value = false
+	}
+}
+
+async function doReject() {
+	if (!invoice.value) {
+		return
+	}
+	saving.value = true
+	error.value = ''
+	try {
+		invoice.value = await quoteStore.reject(invoice.value.id)
+		notice.value = t('rechnungswerk', 'Angebot als abgelehnt markiert.')
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Aktion fehlgeschlagen'))
+	} finally {
+		saving.value = false
+	}
+}
+
+async function doConvert() {
+	dialog.value = null
+	if (!invoice.value) {
+		return
+	}
+	saving.value = true
+	error.value = ''
+	try {
+		const created = await quoteStore.convert(invoice.value.id)
+		// Land on the new invoice draft so the user can finalise it.
+		router.push({ name: 'invoice-detail', params: { id: String(created.id) } })
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Übernahme fehlgeschlagen'))
 	} finally {
 		saving.value = false
 	}
@@ -692,9 +873,15 @@ async function doSend(data: { to: string, subject: string, body: string }) {
 	sending.value = true
 	error.value = ''
 	try {
-		await sendInvoice(invoice.value.id, data)
-		sendDialogOpen.value = false
-		notice.value = t('rechnungswerk', 'Rechnung an {to} gesendet.', { to: data.to })
+		if (isQuote.value) {
+			await sendQuote(invoice.value.id, data)
+			sendDialogOpen.value = false
+			notice.value = t('rechnungswerk', 'Angebot an {to} gesendet.', { to: data.to })
+		} else {
+			await sendInvoice(invoice.value.id, data)
+			sendDialogOpen.value = false
+			notice.value = t('rechnungswerk', 'Rechnung an {to} gesendet.', { to: data.to })
+		}
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Versand fehlgeschlagen'))
 	} finally {
@@ -710,7 +897,7 @@ async function doDelete() {
 	}
 	saving.value = true
 	try {
-		await invoiceStore.remove(invoice.value.id)
+		await docStore.value.remove(invoice.value.id)
 		backToList()
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Löschen fehlgeschlagen'))
@@ -743,7 +930,7 @@ async function doCancel() {
 }
 
 function backToList() {
-	router.push({ name: 'invoices' })
+	router.push({ name: listRoute.value })
 }
 
 function fail(e: unknown, fallback: string) {
@@ -793,6 +980,22 @@ function fail(e: unknown, fallback: string) {
 /* Keep the read-only invoice number compact so the date pickers get the room. */
 .invoice-no {
 	flex: 0 1 180px;
+}
+/* Freibleibend checkbox (quote mode): align the box with the neighbouring inputs. */
+.rw-checkbox-field {
+	justify-content: flex-end;
+}
+.rw-checkbox-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 34px;
+}
+.rw-checkbox-row input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	flex: 0 0 auto;
+	margin: 0;
 }
 /* A4-portrait preview needs real height; the browser's PDF viewer fills the frame. */
 .preview-frame {
