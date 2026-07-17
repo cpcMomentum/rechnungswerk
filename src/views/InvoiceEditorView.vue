@@ -370,7 +370,6 @@ const isQuote = computed(() => typeof route.name === 'string' && route.name.star
 const docStore = computed(() => (isQuote.value ? quoteStore : invoiceStore))
 const listRoute = computed(() => (isQuote.value ? 'quotes' : 'invoices'))
 const detailRoute = computed(() => (isQuote.value ? 'quote-detail' : 'invoice-detail'))
-const newRoute = computed(() => (isQuote.value ? 'quote-new' : 'invoice-new'))
 
 const invoice = ref<InvoiceDetail | null>(null)
 const items = ref<EditorItem[]>([emptyItem()])
