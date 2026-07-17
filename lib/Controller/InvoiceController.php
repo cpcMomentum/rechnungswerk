@@ -216,6 +216,34 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[NoAdminRequired]
+	public function markPaid(int $id, ?string $date = null): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->markPaid($id, $date));
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
+	#[NoAdminRequired]
+	public function markUnpaid(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->markUnpaid($id));
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
 	private function guardAccess(): ?DataResponse {
 		if ($this->userId === null) {
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);

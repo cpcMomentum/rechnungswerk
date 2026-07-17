@@ -176,6 +176,106 @@
 	font-size: 0.9em;
 }
 
+/* --- Payment tracking (#117) --- */
+.app-rechnungswerk .rw-filterbar {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+	margin: 4px 0 14px;
+}
+.app-rechnungswerk .rw-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	padding: 5px 12px;
+	border-radius: 16px;
+	border: 1px solid var(--color-border-dark);
+	background: var(--color-main-background);
+	color: var(--color-main-text);
+	cursor: pointer;
+}
+.app-rechnungswerk .rw-chip:hover {
+	background: var(--color-background-hover);
+}
+.app-rechnungswerk .rw-chip__n {
+	font-variant-numeric: tabular-nums;
+	color: var(--color-text-maxcontrast);
+}
+.app-rechnungswerk .rw-chip--active {
+	background: var(--color-primary-element-light);
+	border-color: var(--color-primary-element);
+	color: var(--color-primary-element-text-dark, var(--color-main-text));
+}
+.app-rechnungswerk .rw-chip--active .rw-chip__n {
+	color: inherit;
+}
+.app-rechnungswerk .rw-chip--overdue {
+	color: #c0392b;
+}
+.app-rechnungswerk .rw-chip--sum {
+	border: none;
+	background: transparent;
+	cursor: default;
+	font-weight: 500;
+	color: var(--color-text-maxcontrast);
+}
+.app-rechnungswerk .rw-chip--sum strong {
+	color: var(--color-main-text);
+}
+
+.app-rechnungswerk .rw-table .rw-col-paid {
+	width: 72px;
+	text-align: center;
+	vertical-align: middle;
+}
+.app-rechnungswerk .rw-paybox {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 8px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+}
+.app-rechnungswerk .rw-paybox--open {
+	color: var(--color-text-maxcontrast);
+}
+.app-rechnungswerk .rw-paybox--open:hover {
+	background: #e7f4e9;
+	color: #2e7d32;
+}
+.app-rechnungswerk .rw-paybox--paid {
+	color: #2e7d32;
+}
+.app-rechnungswerk .rw-paybox--paid:hover {
+	background: #f7e4e4;
+	color: #c0392b;
+}
+
+.app-rechnungswerk .rw-amt-overdue {
+	color: #c0392b;
+	font-weight: 600;
+}
+.app-rechnungswerk .rw-amt-paid {
+	color: var(--color-text-maxcontrast);
+}
+.app-rechnungswerk .rw-subline {
+	font-size: 0.82em;
+	color: var(--color-text-maxcontrast);
+	margin-top: 2px;
+}
+.app-rechnungswerk .rw-subline--overdue {
+	color: #c0392b;
+}
+.app-rechnungswerk .rw-row--overdue td:first-child {
+	box-shadow: inset 3px 0 0 #c0392b;
+}
+
 /* Positions table: fixed layout so inputs never overlap. */
 .app-rechnungswerk .rw-table--positions {
 	min-width: 680px;

@@ -178,6 +178,10 @@ class SettingsService {
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$settings->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);
 		}
+		if (array_key_exists('defaultPaymentTermDays', $data)) {
+			$days = $data['defaultPaymentTermDays'];
+			$settings->setDefaultPaymentTermDays($days !== null && $days !== '' ? max(0, (int)$days) : null);
+		}
 		if (array_key_exists('smtpPort', $data)) {
 			$settings->setSmtpPort($data['smtpPort'] !== null && $data['smtpPort'] !== '' ? (int)$data['smtpPort'] : null);
 		}

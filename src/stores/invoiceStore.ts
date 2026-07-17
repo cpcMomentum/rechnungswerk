@@ -14,6 +14,8 @@ import {
 	duplicateInvoice as apiDuplicate,
 	getInvoice as apiGet,
 	listInvoices as apiList,
+	markInvoicePaid as apiMarkPaid,
+	markInvoiceUnpaid as apiMarkUnpaid,
 	updateInvoice as apiUpdate,
 	type InvoiceInput,
 } from '@/api/invoices'
@@ -68,5 +70,17 @@ export const useInvoiceStore = defineStore('invoice', () => {
 		return draft
 	}
 
-	return { invoices, loading, fetchAll, get, create, update, remove, commit, cancel, duplicate }
+	async function markPaid(id: number, date?: string): Promise<InvoiceDetail> {
+		const updated = await apiMarkPaid(id, date)
+		await fetchAll()
+		return updated
+	}
+
+	async function markUnpaid(id: number): Promise<InvoiceDetail> {
+		const updated = await apiMarkUnpaid(id)
+		await fetchAll()
+		return updated
+	}
+
+	return { invoices, loading, fetchAll, get, create, update, remove, commit, cancel, duplicate, markPaid, markUnpaid }
 })
