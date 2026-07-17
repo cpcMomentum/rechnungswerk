@@ -348,6 +348,10 @@ OC.L10N.register(
     "Das Angebot wird als PDF angehängt." : "Das Angebot wird als PDF angehängt.",
     "Angebot {number}" : "Angebot {number}",
     "Ihr Angebot" : "Ihr Angebot",
-    "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt." : "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt."
+    "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt." : "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.",
+    "Abgelaufen" : "Abgelaufen",
+    "Angenommen" : "Angenommen",
+    "Abgelehnt" : "Abgelehnt",
+    "Übernommen" : "Übernommen"
 },
 "nplurals=2; plural=(n != 1);");
