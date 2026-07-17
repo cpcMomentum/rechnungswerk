@@ -77,7 +77,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->update($id, $data));
+			return new DataResponse($this->invoiceService->updateInvoice($id, $data));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -93,7 +93,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			$this->invoiceService->delete($id);
+			$this->invoiceService->deleteInvoice($id);
 			return new DataResponse(null, Http::STATUS_NO_CONTENT);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);

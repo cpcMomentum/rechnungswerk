@@ -64,7 +64,7 @@ class InvoiceService {
 	 * @throws NotFoundException
 	 */
 	public function get(int $id): array {
-		$invoice = $this->findById($id);
+		$invoice = $this->assertInvoiceType($this->findById($id));
 		return $this->present($invoice);
 	}
 
@@ -96,6 +96,20 @@ class InvoiceService {
 		}
 
 		return $this->present($invoice);
+	}
+
+	/**
+	 * Type-guarded entry point for InvoiceController: rejects a quote id before
+	 * reusing the shared update() transaction (see assertInvoiceType()).
+	 *
+	 * @param array<string, mixed> $data
+	 * @return array<string, mixed>
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function updateInvoice(int $id, array $data): array {
+		$this->assertInvoiceType($this->findById($id));
+		return $this->update($id, $data);
 	}
 
 	/**
@@ -132,6 +146,18 @@ class InvoiceService {
 	}
 
 	/**
+	 * Type-guarded entry point for InvoiceController: rejects a quote id before
+	 * reusing the shared delete() transaction (see assertInvoiceType()).
+	 *
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function deleteInvoice(int $id): void {
+		$this->assertInvoiceType($this->findById($id));
+		$this->delete($id);
+	}
+
+	/**
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
@@ -163,7 +189,7 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function commit(int $id): array {
-		$invoice = $this->findById($id);
+		$invoice = $this->assertInvoiceType($this->findById($id));
 		$this->assertDraft($invoice);
 
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
@@ -271,7 +297,7 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function sendToCustomer(int $id, string $to, string $subject, string $body): void {
-		$invoice = $this->findById($id);
+		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können versendet werden.');
 		}
@@ -297,7 +323,7 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function cancel(int $id, string $userId): array {
-		$original = $this->findById($id);
+		$original = $this->assertInvoiceType($this->findById($id));
 		if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
 		}
@@ -395,7 +421,7 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function duplicate(int $id, string $userId): array {
-		$original = $this->findById($id);
+		$original = $this->assertInvoiceType($this->findById($id));
 		// Storno documents carry negative line amounts; cloning one into a normal
 		// invoice would yield a nonsensical negative draft. Cancelled *invoices*
 		// keep their positive amounts and stay duplicable.
@@ -492,7 +518,7 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function generatePdf(int $id): array {
-		$invoice = $this->findById($id);
+		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
 		}
@@ -513,7 +539,7 @@ class InvoiceService {
 	 * @throws IllegalStateException
 	 */
 	public function generatePreviewPdf(int $id): array {
-		$invoice = $this->findById($id);
+		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
 			throw new IllegalStateException('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
 		}
@@ -562,6 +588,22 @@ class InvoiceService {
 		} catch (DoesNotExistException) {
 			throw new NotFoundException('Rechnung nicht gefunden.');
 		}
+	}
+
+	/**
+	 * Quotes (#111) share this table's id space with invoices/cancellations, so
+	 * every invoice-only entry point (the generic findById()/findByIdForUpdate()
+	 * do not filter by type) must reject a quote id here — otherwise a quote
+	 * could be committed/sent/downloaded through the invoice endpoints and, most
+	 * critically, consume a real sequential invoice number.
+	 *
+	 * @throws NotFoundException
+	 */
+	private function assertInvoiceType(Invoice $invoice): Invoice {
+		if (!in_array($invoice->getInvoiceType(), Invoice::INVOICE_TYPES, true)) {
+			throw new NotFoundException('Rechnung nicht gefunden.');
+		}
+		return $invoice;
 	}
 
 	/**
