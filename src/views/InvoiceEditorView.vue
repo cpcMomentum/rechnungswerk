@@ -782,8 +782,9 @@ function askRevise() {
 	dialog.value = 'revise'
 }
 
-/** A committed quote can be revised from any state (#111 Modell B). */
-const canReviseQuote = computed(() => isQuote.value && invoice.value?.status === 'committed')
+/** A committed quote can be revised unless it was already converted or superseded (mirrors backend). */
+const canReviseQuote = computed(() => isQuote.value && invoice.value?.status === 'committed'
+	&& !['converted', 'superseded'].includes(invoice.value?.quoteStatus ?? ''))
 
 /** Whether a committed quote can still be turned into an invoice (mirrors backend). */
 const canConvertQuote = computed(() =>

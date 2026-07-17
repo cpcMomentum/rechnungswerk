@@ -1106,7 +1106,8 @@ class InvoiceService {
 	/**
 	 * Revise a committed quote (#111 Modell B): clone its content into a fresh,
 	 * editable quote draft linked to the source (related_quote_id). Allowed from
-	 * any committed state. The source is only marked "superseded" once the
+	 * any live state except converted/superseded (assertQuoteRevisable) — both
+	 * are already terminal. The source is only marked "superseded" once the
 	 * revision is itself festgeschrieben (commitQuote) — a discarded revision
 	 * draft must leave the original untouched. On commit the revision receives a
 	 * "{Ursprung}-{n}" number (AN-2026-0007-1, -2, …).
@@ -1115,12 +1116,15 @@ class InvoiceService {
 	 * @throws NotFoundException|IllegalStateException
 	 */
 	public function reviseQuote(int $id, string $userId): array {
-		$this->assertCommittedQuote($this->findById($id));
+		$this->assertQuoteRevisable($this->assertCommittedQuote($this->findById($id)));
 		$now = new DateTime();
 
 		$this->db->beginTransaction();
 		try {
+			// Re-read under a row lock and re-check inside the transaction so a
+			// concurrent convert/revise cannot slip through the pre-check.
 			$source = $this->assertCommittedQuote($this->findByIdForUpdate($id));
+			$this->assertQuoteRevisable($source);
 			$sourceItems = $this->itemMapper->findByInvoice((int)$source->getId());
 
 			$revision = new Invoice();
@@ -1408,6 +1412,25 @@ class InvoiceService {
 		}
 		if ($status === Invoice::QUOTE_REJECTED) {
 			throw new IllegalStateException('Ein abgelehntes Angebot kann nicht in eine Rechnung übernommen werden.');
+		}
+	}
+
+	/**
+	 * A quote can be revised from any live state, but not once it is already
+	 * terminal for this purpose: a converted quote already produced an invoice
+	 * (revising it would let the source's 'converted' status be silently
+	 * overwritten with 'superseded' once the revision commits), and a superseded
+	 * quote already has a newer revision.
+	 *
+	 * @throws IllegalStateException
+	 */
+	private function assertQuoteRevisable(Invoice $quote): void {
+		$status = $quote->getQuoteStatus();
+		if ($status === Invoice::QUOTE_CONVERTED) {
+			throw new IllegalStateException('Ein übernommenes Angebot kann nicht mehr revidiert werden.');
+		}
+		if ($status === Invoice::QUOTE_SUPERSEDED) {
+			throw new IllegalStateException('Dieses Angebot wurde bereits revidiert.');
 		}
 	}
 
