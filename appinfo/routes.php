@@ -26,6 +26,20 @@ return [
 		['name' => 'invoice#preview', 'url' => '/api/v1/invoices/{id}/preview', 'verb' => 'GET'],
 		['name' => 'invoice#send',    'url' => '/api/v1/invoices/{id}/send',  'verb' => 'POST'],
 
+		// Quotes (#111) — third document type on the invoice table, own list
+		['name' => 'quote#index',     'url' => '/api/v1/quotes',                'verb' => 'GET'],
+		['name' => 'quote#show',      'url' => '/api/v1/quotes/{id}',           'verb' => 'GET'],
+		['name' => 'quote#create',    'url' => '/api/v1/quotes',                'verb' => 'POST'],
+		['name' => 'quote#update',    'url' => '/api/v1/quotes/{id}',           'verb' => 'PATCH'],
+		['name' => 'quote#destroy',   'url' => '/api/v1/quotes/{id}',           'verb' => 'DELETE'],
+		['name' => 'quote#commit',    'url' => '/api/v1/quotes/{id}/commit',    'verb' => 'POST'],
+		['name' => 'quote#accept',    'url' => '/api/v1/quotes/{id}/accept',    'verb' => 'POST'],
+		['name' => 'quote#reject',    'url' => '/api/v1/quotes/{id}/reject',    'verb' => 'POST'],
+		['name' => 'quote#convert',   'url' => '/api/v1/quotes/{id}/convert',   'verb' => 'POST'],
+		['name' => 'quote#download',  'url' => '/api/v1/quotes/{id}/pdf',       'verb' => 'GET'],
+		['name' => 'quote#preview',   'url' => '/api/v1/quotes/{id}/preview',   'verb' => 'GET'],
+		['name' => 'quote#send',      'url' => '/api/v1/quotes/{id}/send',      'verb' => 'POST'],
+
 		// Products
 		['name' => 'product#index',   'url' => '/api/v1/products',      'verb' => 'GET'],
 		['name' => 'product#show',    'url' => '/api/v1/products/{id}', 'verb' => 'GET'],
