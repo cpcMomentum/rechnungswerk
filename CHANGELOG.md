@@ -7,6 +7,16 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-07-17
+
+### Added
+- Zahlungsstatus verfolgen: Rechnungen lassen sich in der Liste als bezahlt
+  markieren; der Status (offen, überfällig, bezahlt) ist auf einen Blick
+  sichtbar – überfällige Rechnungen sind hervorgehoben, bezahlte gedämpft
+  dargestellt. Eine Filterleiste (Alle/Offen/Überfällig/Bezahlt) zeigt zusätzlich
+  die Summe der offenen Beträge. Ein Standard-Zahlungsziel in den Einstellungen
+  belegt neue Rechnungen vor (#117)
+
 ## [0.1.7] - 2026-07-15
 
 ### Added
@@ -169,7 +179,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.8...HEAD
+[0.1.8]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.4...v0.1.5
