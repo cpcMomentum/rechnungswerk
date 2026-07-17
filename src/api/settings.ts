@@ -18,7 +18,7 @@ export interface SmtpTestInput {
 export const testSmtp = (data: SmtpTestInput): Promise<{ ok: boolean }> =>
 	apiPost<{ ok: boolean }, SmtpTestInput>('/smtp/test', data)
 
-export type SettingsSave = Partial<Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' | 'smtpPasswordSet' | 'imapPasswordSet'>>
+export type SettingsSave = Partial<Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' | 'quoteNumberCounter' | 'quoteNumberCounterYear' | 'smtpPasswordSet' | 'imapPasswordSet'>>
 	& { smtpPassword?: string, imapPassword?: string }
 
 export const getSettings = (): Promise<Settings> =>

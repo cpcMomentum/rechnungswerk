@@ -6,6 +6,7 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
 import InvoicesView from '@/views/InvoicesView.vue'
 import InvoiceEditorView from '@/views/InvoiceEditorView.vue'
+import QuotesView from '@/views/QuotesView.vue'
 import ProductsView from '@/views/ProductsView.vue'
 import CustomersView from '@/views/CustomersView.vue'
 import MyContactView from '@/views/MyContactView.vue'
@@ -16,6 +17,11 @@ const routes: RouteRecordRaw[] = [
 	{ path: '/invoices', name: 'invoices', component: InvoicesView },
 	{ path: '/invoices/new', name: 'invoice-new', component: InvoiceEditorView },
 	{ path: '/invoices/:id', name: 'invoice-detail', component: InvoiceEditorView, props: true },
+	// Quotes (#111) reuse the invoice editor in "quote" mode (derived from the
+	// route name); the list is its own view.
+	{ path: '/quotes', name: 'quotes', component: QuotesView },
+	{ path: '/quotes/new', name: 'quote-new', component: InvoiceEditorView },
+	{ path: '/quotes/:id', name: 'quote-detail', component: InvoiceEditorView, props: true },
 	{ path: '/customers', name: 'customers', component: CustomersView },
 	{ path: '/products', name: 'products', component: ProductsView },
 	{ path: '/me', name: 'my-contact', component: MyContactView },
