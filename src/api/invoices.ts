@@ -73,6 +73,14 @@ export const cancelInvoice = (id: number): Promise<InvoiceDetail> =>
 export const duplicateInvoice = (id: number): Promise<InvoiceDetail> =>
 	apiPost<InvoiceDetail, Record<string, never>>(`/invoices/${id}/duplicate`, {})
 
+/** Mark a committed invoice as paid (#117); date defaults to today (YYYY-MM-DD). */
+export const markInvoicePaid = (id: number, date?: string): Promise<InvoiceDetail> =>
+	apiPost<InvoiceDetail, { date?: string }>(`/invoices/${id}/pay`, date ? { date } : {})
+
+/** Undo a recorded payment (#117); the invoice is open again. */
+export const markInvoiceUnpaid = (id: number): Promise<InvoiceDetail> =>
+	apiPost<InvoiceDetail, Record<string, never>>(`/invoices/${id}/unpay`, {})
+
 /** Same-origin URL of the ZUGFeRD PDF for a committed invoice (session-authenticated). */
 export const invoicePdfUrl = (id: number): string =>
 	apiUrl(`/invoices/${id}/pdf`)

@@ -139,6 +139,16 @@
 				</label>
 			</section>
 
+			<!-- Zahlung -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'Zahlung') }}</h3>
+				<label class="rw-field rw-field--narrow">
+					<span>{{ t('rechnungswerk', 'Standard-Zahlungsziel (Tage)') }}</span>
+					<input v-model.number="form.defaultPaymentTermDays" class="rw-input" type="number" min="0" step="1" placeholder="14" />
+				</label>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.') }}</p>
+			</section>
+
 			<!-- Versand -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Versand') }}</h3>
@@ -505,6 +515,7 @@ function hydrate() {
 		girocodeEnabled: s.girocodeEnabled,
 		smallBusiness: s.smallBusiness,
 		defaultTaxRateBp: s.defaultTaxRateBp,
+		defaultPaymentTermDays: s.defaultPaymentTermDays,
 		datevUploadMail: s.datevUploadMail,
 		datevAutoSend: s.datevAutoSend,
 		smtpFromName: s.smtpFromName,

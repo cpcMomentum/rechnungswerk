@@ -47,10 +47,13 @@ class InvoiceService {
 		foreach ($invoices as $invoice) {
 			$numbersById[(int)$invoice->getId()] = $invoice->getNumber();
 		}
-		return array_map(static function (Invoice $invoice) use ($numbersById): array {
+		return array_map(function (Invoice $invoice) use ($numbersById): array {
 			$data = $invoice->jsonSerialize();
 			$relatedId = $invoice->getRelatedInvoiceId();
 			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? null) : null;
+			// The list feeds the payment-status column/filter (#117); the derived
+			// status is not stored, so compute it here just like present() does.
+			$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
 			return $data;
 		}, $invoices);
 	}
@@ -720,7 +723,99 @@ class InvoiceService {
 		$data = $invoice->jsonSerialize();
 		$data['items'] = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$data['relatedNumber'] = $this->relatedNumber($invoice);
+		$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
 		return $data;
+	}
+
+	/**
+	 * Derive the payment status (#117). Only regular, committed invoices can be
+	 * paid; drafts and cancellation documents return null. paid = a payment date
+	 * is set; overdue = still open and past the due date; otherwise unpaid.
+	 */
+	private function derivePaymentStatus(Invoice $invoice): ?string {
+		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
+			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
+			return null;
+		}
+		if ($invoice->getPaidAt() !== null) {
+			return Invoice::PAYMENT_PAID;
+		}
+		$due = $invoice->getDueDate();
+		if ($due !== null) {
+			$today = new DateTime();
+			$today->setTime(0, 0, 0);
+			if ($due < $today) {
+				return Invoice::PAYMENT_OVERDUE;
+			}
+		}
+		return Invoice::PAYMENT_UNPAID;
+	}
+
+	/**
+	 * Record a payment (#117): mark a committed invoice as paid on the given date
+	 * (default today). Only regular committed invoices are payable — drafts and
+	 * cancellation documents are rejected.
+	 *
+	 * @return array<string, mixed>
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function markPaid(int $id, ?string $date = null): array {
+		$invoice = $this->assertPayable($this->findById($id));
+		$paidAt = $this->parseDate($date) ?? (function () {
+			$now = new DateTime();
+			$now->setTime(0, 0, 0);
+			return $now;
+		})();
+
+		$this->db->beginTransaction();
+		try {
+			$invoice = $this->assertPayable($this->findByIdForUpdate($id));
+			$invoice->setPaidAt($paidAt);
+			$invoice->setUpdatedAt(new DateTime());
+			$this->invoiceMapper->update($invoice);
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($invoice);
+	}
+
+	/**
+	 * Undo a recorded payment (#117): clear the payment date so the invoice is
+	 * open again (and derives overdue as usual).
+	 *
+	 * @return array<string, mixed>
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 */
+	public function markUnpaid(int $id): array {
+		$this->assertPayable($this->findById($id));
+
+		$this->db->beginTransaction();
+		try {
+			$invoice = $this->assertPayable($this->findByIdForUpdate($id));
+			$invoice->setPaidAt(null);
+			$invoice->setUpdatedAt(new DateTime());
+			$this->invoiceMapper->update($invoice);
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($invoice);
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 */
+	private function assertPayable(Invoice $invoice): Invoice {
+		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
+			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
+			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als bezahlt markiert werden.');
+		}
+		return $invoice;
 	}
 
 	private function parseDate(mixed $value): ?DateTime {

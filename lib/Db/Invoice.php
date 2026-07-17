@@ -100,6 +100,8 @@ use OCP\DB\Types;
  * @method void setDatevResponseRaw(?string $datevResponseRaw)
  * @method ?\DateTime getCommittedAt()
  * @method void setCommittedAt(?\DateTime $committedAt)
+ * @method ?\DateTime getPaidAt()
+ * @method void setPaidAt(?\DateTime $paidAt)
  * @method ?\DateTime getCreatedAt()
  * @method void setCreatedAt(?\DateTime $createdAt)
  * @method ?\DateTime getUpdatedAt()
@@ -135,6 +137,15 @@ class Invoice extends Entity implements JsonSerializable {
 		self::SPECIAL_TAX_INTRA_COMMUNITY,
 		self::SPECIAL_TAX_EXPORT,
 	];
+
+	/**
+	 * Derived payment status (#117), not stored — computed from paidAt and the
+	 * due date at read time. Only meaningful for committed, non-cancellation
+	 * invoices; null otherwise.
+	 */
+	public const PAYMENT_UNPAID = 'unpaid';
+	public const PAYMENT_OVERDUE = 'overdue';
+	public const PAYMENT_PAID = 'paid';
 
 	/** DATEV hand-off status (fed by the upload-mail confirmation channel, #36). */
 	public const DATEV_PENDING = 'pending';
@@ -185,6 +196,7 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?\DateTime $datevStatusAt = null;
 	protected ?string $datevResponseRaw = null;
 	protected ?\DateTime $committedAt = null;
+	protected ?\DateTime $paidAt = null;
 	protected ?\DateTime $createdAt = null;
 	protected ?\DateTime $updatedAt = null;
 
@@ -232,6 +244,7 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('datevStatusAt', Types::DATETIME);
 		$this->addType('datevResponseRaw', Types::TEXT);
 		$this->addType('committedAt', Types::DATETIME);
+		$this->addType('paidAt', Types::DATETIME);
 		$this->addType('createdAt', Types::DATETIME);
 		$this->addType('updatedAt', Types::DATETIME);
 	}
@@ -337,6 +350,7 @@ class Invoice extends Entity implements JsonSerializable {
 			'datevStatus' => $this->getDatevStatus(),
 			'datevStatusAt' => $this->formatDateTime($this->getDatevStatusAt()),
 			'committedAt' => $this->formatDateTime($this->getCommittedAt()),
+			'paidAt' => $this->formatDateTime($this->getPaidAt()),
 			'createdAt' => $this->formatDateTime($this->getCreatedAt()),
 			'updatedAt' => $this->formatDateTime($this->getUpdatedAt()),
 		];
