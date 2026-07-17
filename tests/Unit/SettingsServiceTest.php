@@ -157,6 +157,61 @@ class SettingsServiceTest extends TestCase {
 		$this->assertSame($currentYear, $saved->getNumberCounterYear(), 'counter year is anchored to the current year');
 	}
 
+	// --- Quote number circle (#111) --------------------------------------
+
+	public function testSaveRejectsQuoteNumberFormatWithoutCounter(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		$this->service->save(['quoteNumberFormat' => 'AN-{YYYY}']);
+	}
+
+	public function testSaveRejectsYearlyQuoteModeWithoutYearComponent(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		// Yearly (the effective default) + a year-less quote format must be caught.
+		$this->service->save(['quoteNumberFormat' => 'AN-{####}']);
+	}
+
+	public function testSaveRejectsUnknownQuoteResetMode(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		$this->service->save(['quoteNumberResetMode' => 'monthly']);
+	}
+
+	public function testSaveAcceptsCustomQuoteFormatIndependentlyOfInvoiceCircle(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save([
+			'quoteNumberFormat' => 'OFFER-{YY}-{#####}',
+			'quoteNumberResetMode' => 'continuous',
+		]);
+
+		$this->assertSame('OFFER-{YY}-{#####}', $saved->getQuoteNumberFormat());
+		$this->assertSame('continuous', $saved->getQuoteNumberResetMode());
+		// The invoice circle must stay untouched by a quote-only change.
+		$this->assertSame(Settings::DEFAULT_NUMBER_FORMAT, $saved->getNumberFormat());
+	}
+
+	public function testSwitchingQuoteCircleContinuousToYearlyAnchorsYear(): void {
+		$s = $this->existing();
+		$s->setQuoteNumberResetMode('continuous');
+		$s->setQuoteNumberCounter(77);
+		$s->setQuoteNumberCounterYear(2019);
+		$this->mapper->method('findByOwner')->willReturn($s);
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save([
+			'quoteNumberResetMode' => 'yearly',
+			'quoteNumberFormat' => 'AN-{YYYY}-{####}',
+		]);
+
+		$currentYear = (int)(new \DateTime())->format('Y');
+		$this->assertSame('yearly', $saved->getQuoteNumberResetMode());
+		$this->assertSame(77, $saved->getQuoteNumberCounter(), 'quote counter must not be reset on switch');
+		$this->assertSame($currentYear, $saved->getQuoteNumberCounterYear(), 'quote counter year anchored to current year');
+	}
+
 	private function existing(): Settings {
 		$settings = new Settings();
 		$settings->setOwnerUserId('alice');

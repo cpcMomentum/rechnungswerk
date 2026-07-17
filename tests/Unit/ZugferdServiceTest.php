@@ -362,4 +362,73 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('Hinweise', $html);
 		$this->assertStringContainsString('Kostenstelle: KST-4711', $html);
 	}
+
+	// --- Quotes (#111) ---------------------------------------------------
+
+	private function quote(): Invoice {
+		$q = $this->invoice(Invoice::TYPE_QUOTE);
+		$q->setNumber('AN-2026-0001');
+		$q->setValidUntil(new DateTime('2026-08-15'));
+		$q->setSubtotalCents(20000);
+		$q->setTotalCents(23800);
+		$q->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		return $q;
+	}
+
+	public function testQuoteRenderShowsAngebotTitleValidityAndFreeformNote(): void {
+		$quote = $this->quote();
+		$quote->setOfferFreeform(1);
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($quote, $items, $this->settings(), false);
+
+		$this->assertStringContainsString('<h1>Angebot</h1>', $html);
+		$this->assertStringContainsString('Angebotsnummer', $html);
+		$this->assertStringContainsString('AN-2026-0001', $html);
+		$this->assertStringContainsString('Gültig bis', $html);
+		$this->assertStringContainsString('15.08.2026', $html);
+		// Freibleibend note (§145 BGB) only when the flag is set.
+		$this->assertStringContainsString('§ 145 BGB', $html);
+		// A quote is not an invoice: no invoice title, no due date.
+		$this->assertStringNotContainsString('<h1>Rechnung</h1>', $html);
+		$this->assertStringNotContainsString('Rechnungsnummer', $html);
+		$this->assertStringNotContainsString('Fällig am', $html);
+	}
+
+	public function testQuoteWithoutFreeformFlagOmitsTheFreeformNote(): void {
+		$quote = $this->quote();
+		$quote->setOfferFreeform(0);
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($quote, $items, $this->settings(), false);
+
+		$this->assertStringContainsString('gültig bis 15.08.2026', $html);
+		$this->assertStringNotContainsString('§ 145 BGB', $html);
+	}
+
+	public function testQuoteRenderHasNoBankDetailsOrGirocode(): void {
+		$settings = $this->settings();
+		$settings->setGirocodeEnabled(1); // even enabled, a quote must not show it
+		$quote = $this->quote();
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($quote, $items, $settings, false);
+
+		// No payment circle on a quote: no IBAN block, no scannable payment code.
+		$this->assertStringNotContainsString('Zahlen mit Girocode', $html);
+		$this->assertStringNotContainsString('IBAN:', $html);
+	}
+
+	public function testQuotePreviewCarriesQuoteWording(): void {
+		$quote = $this->quote();
+		$quote->setStatus(Invoice::STATUS_DRAFT);
+		$quote->setNumber(null);
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($quote, $items, $this->settings(), true);
+
+		$this->assertStringContainsString('ENTWURF', $html);
+		$this->assertStringContainsString('kein g&uuml;ltiges Angebot', $html);
+		$this->assertStringContainsString('wird beim Festschreiben vergeben', $html);
+	}
 }

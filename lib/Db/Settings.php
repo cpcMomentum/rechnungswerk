@@ -50,6 +50,14 @@ use OCP\DB\Types;
  * @method void setNumberCounterYear(?int $numberCounterYear)
  * @method string getNumberResetMode()
  * @method void setNumberResetMode(string $numberResetMode)
+ * @method ?string getQuoteNumberFormat()
+ * @method void setQuoteNumberFormat(?string $quoteNumberFormat)
+ * @method ?int getQuoteNumberCounter()
+ * @method void setQuoteNumberCounter(?int $quoteNumberCounter)
+ * @method ?int getQuoteNumberCounterYear()
+ * @method void setQuoteNumberCounterYear(?int $quoteNumberCounterYear)
+ * @method ?string getQuoteNumberResetMode()
+ * @method void setQuoteNumberResetMode(?string $quoteNumberResetMode)
  * @method ?string getFileNameFormat()
  * @method void setFileNameFormat(?string $fileNameFormat)
  * @method int getArchiveEnabled()
@@ -109,6 +117,8 @@ use OCP\DB\Types;
  */
 class Settings extends Entity implements JsonSerializable {
 	public const DEFAULT_NUMBER_FORMAT = 'RE-{YYYY}-{####}';
+	/** Default format for the independent quote number circle (#111). */
+	public const DEFAULT_QUOTE_NUMBER_FORMAT = 'AN-{YYYY}-{####}';
 
 	/** Counter resets to 1 each calendar year (needs a year component in the format). */
 	public const RESET_MODE_YEARLY = 'yearly';
@@ -137,6 +147,10 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?int $numberCounter = null;
 	protected ?int $numberCounterYear = null;
 	protected ?string $numberResetMode = null;
+	protected ?string $quoteNumberFormat = null;
+	protected ?int $quoteNumberCounter = null;
+	protected ?int $quoteNumberCounterYear = null;
+	protected ?string $quoteNumberResetMode = null;
 	protected ?string $fileNameFormat = null;
 	protected ?int $archiveEnabled = null;
 	protected ?int $archiveFolderId = null;
@@ -184,6 +198,10 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('numberCounter', Types::INTEGER);
 		$this->addType('numberCounterYear', Types::INTEGER);
 		$this->addType('numberResetMode', Types::STRING);
+		$this->addType('quoteNumberFormat', Types::STRING);
+		$this->addType('quoteNumberCounter', Types::INTEGER);
+		$this->addType('quoteNumberCounterYear', Types::INTEGER);
+		$this->addType('quoteNumberResetMode', Types::STRING);
 		$this->addType('fileNameFormat', Types::STRING);
 		$this->addType('archiveEnabled', Types::SMALLINT);
 		$this->addType('archiveFolderId', Types::INTEGER);
@@ -233,6 +251,10 @@ class Settings extends Entity implements JsonSerializable {
 			'numberCounter' => $this->getNumberCounter(),
 			'numberCounterYear' => $this->getNumberCounterYear(),
 			'numberResetMode' => $this->getNumberResetMode() ?: self::DEFAULT_RESET_MODE,
+			'quoteNumberFormat' => $this->getQuoteNumberFormat() ?: self::DEFAULT_QUOTE_NUMBER_FORMAT,
+			'quoteNumberCounter' => (int)$this->getQuoteNumberCounter(),
+			'quoteNumberCounterYear' => $this->getQuoteNumberCounterYear(),
+			'quoteNumberResetMode' => $this->getQuoteNumberResetMode() ?: self::DEFAULT_RESET_MODE,
 			'fileNameFormat' => $this->getFileNameFormat() ?: self::DEFAULT_FILE_NAME_FORMAT,
 			'archiveEnabled' => (bool)$this->getArchiveEnabled(),
 			'archiveFolderId' => $this->getArchiveFolderId(),

@@ -54,6 +54,7 @@ class InvoiceService {
 			// The list feeds the payment-status column/filter (#117); the derived
 			// status is not stored, so compute it here just like present() does.
 			$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
+			$data['quoteStatus'] = $this->deriveQuoteStatus($invoice);
 			return $data;
 		}, $invoices);
 	}
@@ -616,10 +617,14 @@ class InvoiceService {
 		} elseif ($invoice->getRecipientCountry() === null) {
 			$invoice->setRecipientCountry('DE');
 		}
-		foreach (['performanceDate', 'performancePeriodStart', 'performancePeriodEnd'] as $dateField) {
+		foreach (['performanceDate', 'performancePeriodStart', 'performancePeriodEnd', 'validUntil'] as $dateField) {
 			if (array_key_exists($dateField, $data)) {
 				$invoice->{'set' . ucfirst($dateField)}($this->parseDate($data[$dateField]));
 			}
+		}
+		// Quote-only fields (#111); harmless no-ops for invoices, which never send them.
+		if (array_key_exists('offerFreeform', $data)) {
+			$invoice->setOfferFreeform(!empty($data['offerFreeform']) ? 1 : 0);
 		}
 		if (array_key_exists('notes', $data)) {
 			$invoice->setCustomFields($this->encodeNotes($data['notes']));
@@ -724,7 +729,36 @@ class InvoiceService {
 		$data['items'] = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$data['relatedNumber'] = $this->relatedNumber($invoice);
 		$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
+		$data['quoteStatus'] = $this->deriveQuoteStatus($invoice);
 		return $data;
+	}
+
+	/**
+	 * Derive the effective quote status (#111). Only quotes have one; every other
+	 * document type returns null. draft/open/expired are computed (a draft from
+	 * the document status, expired from valid_until once committed and still
+	 * open); accepted/rejected/converted are read from the stored outcome.
+	 */
+	private function deriveQuoteStatus(Invoice $quote): ?string {
+		if ($quote->getInvoiceType() !== Invoice::TYPE_QUOTE) {
+			return null;
+		}
+		if ($quote->getStatus() === Invoice::STATUS_DRAFT) {
+			return Invoice::QUOTE_DRAFT;
+		}
+		$stored = $quote->getQuoteStatus();
+		if ($stored !== null && $stored !== '') {
+			return $stored;
+		}
+		$validUntil = $quote->getValidUntil();
+		if ($validUntil !== null) {
+			$today = new DateTime();
+			$today->setTime(0, 0, 0);
+			if ($validUntil < $today) {
+				return Invoice::QUOTE_EXPIRED;
+			}
+		}
+		return Invoice::QUOTE_OPEN;
 	}
 
 	/**
@@ -816,6 +850,343 @@ class InvoiceService {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als bezahlt markiert werden.');
 		}
 		return $invoice;
+	}
+
+	// --- Quotes (#111) ---------------------------------------------------
+
+	/**
+	 * @return array<int, array<string, mixed>> serialized quotes, each with the
+	 *   derived quoteStatus (open/expired/…)
+	 */
+	public function listQuotes(): array {
+		$quotes = $this->invoiceMapper->findByTypes([Invoice::TYPE_QUOTE]);
+		return array_map(function (Invoice $quote): array {
+			$data = $quote->jsonSerialize();
+			$data['quoteStatus'] = $this->deriveQuoteStatus($quote);
+			return $data;
+		}, $quotes);
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 * @throws NotFoundException
+	 */
+	public function getQuote(int $id): array {
+		return $this->present($this->assertQuoteType($this->findById($id)));
+	}
+
+	/**
+	 * Create a quote draft (#111): same header/positions/totals mechanics as an
+	 * invoice, only stamped TYPE_QUOTE so it lives in the quote list and number
+	 * circle. Freibleibend defaults to off.
+	 *
+	 * @param array<string, mixed> $data
+	 * @return array<string, mixed>
+	 * @throws ValidationException
+	 */
+	public function createQuote(string $userId, array $data): array {
+		$now = new DateTime();
+		$quote = new Invoice();
+		$quote->setOwnerUserId($userId);
+		$quote->setStatus(Invoice::STATUS_DRAFT);
+		$quote->setInvoiceType(Invoice::TYPE_QUOTE);
+		$quote->setOfferFreeform(0);
+		$quote->setCreatedAt($now);
+		$quote->setUpdatedAt($now);
+		$this->applyHeader($quote, $data);
+
+		$this->db->beginTransaction();
+		try {
+			$quote = $this->invoiceMapper->insert($quote);
+			$this->replaceItems($quote, $this->extractItems($data));
+			$this->recomputeTotals($quote);
+			$this->invoiceMapper->update($quote);
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($quote);
+	}
+
+	/**
+	 * Update a quote draft. Type-guards first (a non-quote id yields a 404) so
+	 * the quote endpoints can only ever touch quotes, then reuses the shared
+	 * invoice update transaction (row lock, header + positions, totals).
+	 *
+	 * @param array<string, mixed> $data
+	 * @return array<string, mixed>
+	 * @throws NotFoundException|IllegalStateException|ValidationException
+	 */
+	public function updateQuote(int $id, array $data): array {
+		$this->assertQuoteType($this->findById($id));
+		return $this->update($id, $data);
+	}
+
+	/**
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function deleteQuote(int $id): void {
+		$this->assertQuoteType($this->findById($id));
+		$this->delete($id);
+	}
+
+	/**
+	 * Festschreibung of a quote (#111): reserve the final quote number from the
+	 * independent circle and lock the document. Unlike an invoice commit there is
+	 * no due date, no DATEV hand-off and no archiving — a quote is not a
+	 * booking-relevant beleg.
+	 *
+	 * @return array<string, mixed>
+	 * @throws NotFoundException|IllegalStateException|ValidationException
+	 */
+	public function commitQuote(int $id): array {
+		$quote = $this->assertQuoteDraft($this->findById($id));
+
+		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
+		if (count($items) === 0) {
+			throw new ValidationException('Ein Angebot ohne Positionen kann nicht festgeschrieben werden.');
+		}
+		if (($quote->getRecipientName() ?? '') === '') {
+			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
+		}
+
+		// Create the settings row outside the transaction (see commit()).
+		$this->settingsService->getCompany();
+
+		$now = new DateTime();
+		$year = (int)$now->format('Y');
+
+		$this->db->beginTransaction();
+		try {
+			// Re-read under a row lock and re-check inside the transaction so two
+			// concurrent commits cannot both reserve a quote number.
+			$quote = $this->assertQuoteDraft($this->findByIdForUpdate($id));
+			$quote->setNumber($this->settingsService->reserveNextQuoteNumber($year));
+			$quote->setStatus(Invoice::STATUS_COMMITTED);
+			$quote->setIssueDate($now);
+			$quote->setCommittedAt($now);
+			$quote->setUpdatedAt($now);
+			$this->recomputeTotals($quote);
+			$this->invoiceMapper->update($quote);
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($quote);
+	}
+
+	/**
+	 * Record the outcome of a committed quote (#111): accepted or rejected. A
+	 * converted quote is terminal and cannot be changed.
+	 *
+	 * @return array<string, mixed>
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function markQuoteAccepted(int $id): array {
+		return $this->setQuoteOutcome($id, Invoice::QUOTE_ACCEPTED);
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function markQuoteRejected(int $id): array {
+		return $this->setQuoteOutcome($id, Invoice::QUOTE_REJECTED);
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	private function setQuoteOutcome(int $id, string $outcome): array {
+		$this->assertCommittedQuote($this->findById($id));
+
+		$this->db->beginTransaction();
+		try {
+			$quote = $this->assertCommittedQuote($this->findByIdForUpdate($id));
+			if ($quote->getQuoteStatus() === Invoice::QUOTE_CONVERTED) {
+				throw new IllegalStateException('Ein übernommenes Angebot kann nicht mehr geändert werden.');
+			}
+			$quote->setQuoteStatus($outcome);
+			$quote->setUpdatedAt(new DateTime());
+			$this->invoiceMapper->update($quote);
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($quote);
+	}
+
+	/**
+	 * Convert a committed quote into a fresh invoice draft (#111): clone all
+	 * content (recipient, seller contact, references, notes, texts, positions)
+	 * into a new TYPE_INVOICE draft that only gets its own sequential number when
+	 * committed. The invoice links back to the quote (related_quote_id) and
+	 * carries the quote number as its reference; the quote flips to 'converted'.
+	 *
+	 * @return array<string, mixed> the new invoice draft
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function convertToInvoice(int $id, string $userId): array {
+		$this->assertCommittedQuote($this->findById($id));
+		$now = new DateTime();
+
+		$this->db->beginTransaction();
+		try {
+			// Lock and re-check so a double convert cannot create two invoices.
+			$quote = $this->assertCommittedQuote($this->findByIdForUpdate($id));
+			if ($quote->getQuoteStatus() === Invoice::QUOTE_CONVERTED) {
+				throw new IllegalStateException('Dieses Angebot wurde bereits in eine Rechnung übernommen.');
+			}
+			$quoteItems = $this->itemMapper->findByInvoice((int)$quote->getId());
+
+			$invoice = new Invoice();
+			$invoice->setOwnerUserId($userId);
+			$invoice->setStatus(Invoice::STATUS_DRAFT);
+			$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
+			$invoice->setCreatedAt($now);
+			$invoice->setUpdatedAt($now);
+			$this->copyRecipient($quote, $invoice);
+			$invoice->setSellerContactPerson($quote->getSellerContactPerson());
+			$invoice->setSellerContactPhone($quote->getSellerContactPhone());
+			$invoice->setSellerContactEmail($quote->getSellerContactEmail());
+			$invoice->setSpecialTaxCase($quote->getSpecialTaxCase());
+			$invoice->setGreeting($quote->getGreeting());
+			$invoice->setCustomFields($quote->getCustomFields());
+			$invoice->setExtraText($quote->getExtraText());
+			// Carry the business references over; our own reference points at the
+			// source quote so the link is visible on the invoice (BT-25-ish).
+			$invoice->setReferenceNumber($quote->getNumber());
+			$invoice->setOrderNumber($quote->getOrderNumber());
+			$invoice->setBuyerReference($quote->getBuyerReference());
+			$invoice->setContractNumber($quote->getContractNumber());
+			$invoice->setProjectReference($quote->getProjectReference());
+			$invoice->setPerformanceDate($quote->getPerformanceDate());
+			$invoice->setPerformancePeriodStart($quote->getPerformancePeriodStart());
+			$invoice->setPerformancePeriodEnd($quote->getPerformancePeriodEnd());
+			$invoice->setRelatedQuoteId((int)$quote->getId());
+			$invoice = $this->invoiceMapper->insert($invoice);
+
+			foreach ($quoteItems as $item) {
+				$line = new InvoiceItem();
+				$line->setInvoiceId((int)$invoice->getId());
+				$line->setProductId($item->getProductId());
+				$line->setName($item->getName());
+				$line->setDescription($item->getDescription());
+				$line->setQuantity($item->getQuantity());
+				$line->setUnitCode($item->getUnitCode());
+				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setTaxRateBp($item->getTaxRateBp());
+				$line->setLineTotalCents($item->getLineTotalCents());
+				$line->setSortOrder($item->getSortOrder());
+				$this->itemMapper->insert($line);
+			}
+			$this->recomputeTotals($invoice);
+			$this->invoiceMapper->update($invoice);
+
+			$quote->setQuoteStatus(Invoice::QUOTE_CONVERTED);
+			$quote->setUpdatedAt($now);
+			$this->invoiceMapper->update($quote);
+
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($invoice);
+	}
+
+	/**
+	 * Render a committed quote as a plain PDF — visible layout only, no ZUGFeRD
+	 * XML (a quote is not an e-invoice).
+	 *
+	 * @return array{filename: string, content: string}
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function generateQuotePdf(int $id): array {
+		$quote = $this->assertCommittedQuote($this->findById($id));
+		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
+		$settings = $this->settingsService->getCompany();
+		$content = $this->zugferdService->generateQuotePdf($quote, $items, $settings);
+		return ['filename' => $this->quoteFileName($quote), 'content' => $content];
+	}
+
+	/**
+	 * Render a DRAFT quote as a watermarked preview PDF.
+	 *
+	 * @return array{filename: string, content: string}
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function generateQuotePreviewPdf(int $id): array {
+		$quote = $this->assertQuoteType($this->findById($id));
+		if ($quote->getStatus() !== Invoice::STATUS_DRAFT) {
+			throw new IllegalStateException('Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden.');
+		}
+		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
+		$settings = $this->settingsService->getCompany();
+		$content = $this->zugferdService->generateQuotePreviewPdf($quote, $items, $settings);
+		return ['filename' => 'angebot-entwurf-' . $quote->getId() . '.pdf', 'content' => $content];
+	}
+
+	/**
+	 * Send a committed quote to a recipient as a PDF mail attachment.
+	 *
+	 * @throws NotFoundException|IllegalStateException|ValidationException
+	 */
+	public function sendQuoteToCustomer(int $id, string $to, string $subject, string $body): void {
+		$quote = $this->assertCommittedQuote($this->findById($id));
+		if (trim($subject) === '') {
+			throw new ValidationException('Ein Betreff ist erforderlich.');
+		}
+		$settings = $this->settingsService->getCompany();
+		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
+		$pdf = $this->zugferdService->generateQuotePdf($quote, $items, $settings);
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $this->quoteFileName($quote), $settings, $this->settingsService->getSmtpConfig());
+	}
+
+	private function quoteFileName(Invoice $quote): string {
+		$number = trim((string)$quote->getNumber());
+		$base = $number !== '' ? 'Angebot-' . $number : 'angebot-' . $quote->getId();
+		$base = InvoiceCalculator::sanitizeFileName($base);
+		if ($base === '') {
+			$base = 'angebot-' . $quote->getId();
+		}
+		return $base . '.pdf';
+	}
+
+	/**
+	 * @throws NotFoundException
+	 */
+	private function assertQuoteType(Invoice $quote): Invoice {
+		if ($quote->getInvoiceType() !== Invoice::TYPE_QUOTE) {
+			throw new NotFoundException('Angebot nicht gefunden.');
+		}
+		return $quote;
+	}
+
+	/**
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	private function assertQuoteDraft(Invoice $quote): Invoice {
+		$this->assertQuoteType($quote);
+		if ($quote->getStatus() !== Invoice::STATUS_DRAFT) {
+			throw new IllegalStateException('Festgeschriebene Angebote können nicht mehr geändert werden.');
+		}
+		return $quote;
+	}
+
+	/**
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	private function assertCommittedQuote(Invoice $quote): Invoice {
+		$this->assertQuoteType($quote);
+		if ($quote->getStatus() !== Invoice::STATUS_COMMITTED) {
+			throw new IllegalStateException('Diese Aktion ist nur für festgeschriebene Angebote möglich.');
+		}
+		return $quote;
 	}
 
 	private function parseDate(mixed $value): ?DateTime {
