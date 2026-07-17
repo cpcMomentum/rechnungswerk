@@ -1073,16 +1073,15 @@ class InvoiceService {
 	 * @throws NotFoundException|IllegalStateException
 	 */
 	public function convertToInvoice(int $id, string $userId): array {
-		$this->assertCommittedQuote($this->findById($id));
+		$this->assertQuoteConvertible($this->assertCommittedQuote($this->findById($id)));
 		$now = new DateTime();
 
 		$this->db->beginTransaction();
 		try {
-			// Lock and re-check so a double convert cannot create two invoices.
+			// Lock and re-check so a double convert cannot create two invoices and
+			// so a concurrent reject/convert cannot slip through the pre-check.
 			$quote = $this->assertCommittedQuote($this->findByIdForUpdate($id));
-			if ($quote->getQuoteStatus() === Invoice::QUOTE_CONVERTED) {
-				throw new IllegalStateException('Dieses Angebot wurde bereits in eine Rechnung übernommen.');
-			}
+			$this->assertQuoteConvertible($quote);
 			$quoteItems = $this->itemMapper->findByInvoice((int)$quote->getId());
 
 			$invoice = new Invoice();
@@ -1099,6 +1098,10 @@ class InvoiceService {
 			$invoice->setGreeting($quote->getGreeting());
 			$invoice->setCustomFields($quote->getCustomFields());
 			$invoice->setExtraText($quote->getExtraText());
+			// Carry the agreed payment/discount conditions into the invoice draft
+			// (mirrors duplicate()); the user can still adjust them before commit.
+			$invoice->setPaymentTermDays($quote->getPaymentTermDays());
+			$invoice->setDiscountTerms($quote->getDiscountTerms());
 			// Carry the business references over; our own reference points at the
 			// source quote so the link is visible on the invoice (BT-25-ish).
 			$invoice->setReferenceNumber($quote->getNumber());
@@ -1229,6 +1232,25 @@ class InvoiceService {
 			throw new IllegalStateException('Diese Aktion ist nur für festgeschriebene Angebote möglich.');
 		}
 		return $quote;
+	}
+
+	/**
+	 * A quote can only be turned into an invoice while it is still live — open,
+	 * expired or accepted. A rejected quote was declined and a converted one has
+	 * already produced an invoice; both are terminal for conversion. Accepting or
+	 * rejecting an offer stays freely reversible (a customer may reconsider), but
+	 * a rejected offer must be re-accepted before it can become an invoice.
+	 *
+	 * @throws IllegalStateException
+	 */
+	private function assertQuoteConvertible(Invoice $quote): void {
+		$status = $quote->getQuoteStatus();
+		if ($status === Invoice::QUOTE_CONVERTED) {
+			throw new IllegalStateException('Dieses Angebot wurde bereits in eine Rechnung übernommen.');
+		}
+		if ($status === Invoice::QUOTE_REJECTED) {
+			throw new IllegalStateException('Ein abgelehntes Angebot kann nicht in eine Rechnung übernommen werden.');
+		}
 	}
 
 	private function parseDate(mixed $value): ?DateTime {
