@@ -93,6 +93,7 @@ import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import FileDocumentOutlineIcon from 'vue-material-design-icons/FileDocumentOutline.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import FileMoveOutlineIcon from 'vue-material-design-icons/FileMoveOutline.vue'
+import FileEditOutlineIcon from 'vue-material-design-icons/FileEditOutline.vue'
 import PencilOutlineIcon from 'vue-material-design-icons/PencilOutline.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import AlertCircleOutlineIcon from 'vue-material-design-icons/AlertCircleOutline.vue'
@@ -155,6 +156,7 @@ const QUOTE_STATUS_ICON: Record<string, unknown> = {
 	accepted: CheckCircleIcon,
 	rejected: CloseCircleIcon,
 	converted: FileMoveOutlineIcon,
+	superseded: FileEditOutlineIcon,
 }
 const quoteStatusIcon = (s: QuoteStatus | null): unknown => (s ? QUOTE_STATUS_ICON[s] ?? PencilOutlineIcon : PencilOutlineIcon)
 const quoteStatusLabel = (s: QuoteStatus | null): string => (s ? t('rechnungswerk', QUOTE_STATUS_LABELS[s] ?? s) : '')
@@ -204,6 +206,7 @@ async function convert(id: number) {
 .rw-qsicon--accepted { color: var(--color-success, #2d7d46); }
 .rw-qsicon--rejected { color: var(--color-error, #c9326c); }
 .rw-qsicon--converted { color: var(--color-text-maxcontrast); }
+.rw-qsicon--superseded { color: var(--color-text-maxcontrast); }
 .rw-status-cell { display: inline-flex; align-items: center; gap: 6px; }
 .rw-qstatus-text { font-size: 0.9em; }
 </style>

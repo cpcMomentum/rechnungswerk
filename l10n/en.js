@@ -352,6 +352,13 @@ OC.L10N.register(
     "Abgelaufen" : "Expired",
     "Angenommen" : "Accepted",
     "Abgelehnt" : "Rejected",
-    "Übernommen" : "Converted"
+    "Übernommen" : "Converted",
+    "Revision von {number}" : "Revision of {number}",
+    "Revidieren" : "Revise",
+    "Angebot revidieren" : "Revise quote",
+    "Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?" : "An editable copy is created as a new quote revision. On finalisation it receives a revision number (e.g. AN-…-1) and this quote is marked as “revised”. Continue?",
+    "Revision erstellen" : "Create revision",
+    "Revidieren fehlgeschlagen" : "Revision failed",
+    "Revidiert" : "Revised"
 },
 "nplurals=2; plural=(n != 1);");

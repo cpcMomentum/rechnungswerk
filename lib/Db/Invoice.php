@@ -155,12 +155,16 @@ class Invoice extends Entity implements JsonSerializable {
 	public const QUOTE_ACCEPTED = 'accepted';
 	public const QUOTE_REJECTED = 'rejected';
 	public const QUOTE_CONVERTED = 'converted';
+	/** Superseded by a newer revision (#111 Modell B). Set on the source quote
+	 *  when a revision of it is finalised; related_quote_id links the revision back. */
+	public const QUOTE_SUPERSEDED = 'superseded';
 
 	/** The outcomes that are actually persisted in the quote_status column. */
 	public const QUOTE_STORED_STATUSES = [
 		self::QUOTE_ACCEPTED,
 		self::QUOTE_REJECTED,
 		self::QUOTE_CONVERTED,
+		self::QUOTE_SUPERSEDED,
 	];
 
 	/** Special VAT treatment (document level). Empty/null = regular taxation. */

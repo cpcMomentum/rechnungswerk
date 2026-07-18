@@ -36,6 +36,7 @@ return [
 		['name' => 'quote#accept',    'url' => '/api/v1/quotes/{id}/accept',    'verb' => 'POST'],
 		['name' => 'quote#reject',    'url' => '/api/v1/quotes/{id}/reject',    'verb' => 'POST'],
 		['name' => 'quote#convert',   'url' => '/api/v1/quotes/{id}/convert',   'verb' => 'POST'],
+		['name' => 'quote#revise',    'url' => '/api/v1/quotes/{id}/revise',    'verb' => 'POST'],
 		['name' => 'quote#download',  'url' => '/api/v1/quotes/{id}/pdf',       'verb' => 'GET'],
 		['name' => 'quote#preview',   'url' => '/api/v1/quotes/{id}/preview',   'verb' => 'GET'],
 		['name' => 'quote#send',      'url' => '/api/v1/quotes/{id}/send',      'verb' => 'POST'],

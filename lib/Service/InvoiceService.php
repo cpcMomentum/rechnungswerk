@@ -572,6 +572,23 @@ class InvoiceService {
 	}
 
 	/**
+	 * Number of the quote this document derives from via related_quote_id — for a
+	 * revision, its source quote (#111 Modell B); for a converted invoice, the
+	 * source quote. Null if unlinked or the source is gone.
+	 */
+	private function relatedQuoteNumber(Invoice $invoice): ?string {
+		$rid = $invoice->getRelatedQuoteId();
+		if ($rid === null) {
+			return null;
+		}
+		try {
+			return $this->invoiceMapper->findOne($rid)->getNumber();
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
+
+	/**
 	 * @return array{0: ?string, 1: ?\DateTime} [number, issueDate] of the related invoice, or [null, null].
 	 */
 	private function relatedReference(Invoice $invoice): array {
@@ -770,6 +787,7 @@ class InvoiceService {
 		$data = $invoice->jsonSerialize();
 		$data['items'] = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$data['relatedNumber'] = $this->relatedNumber($invoice);
+		$data['relatedQuoteNumber'] = $this->relatedQuoteNumber($invoice);
 		$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
 		$data['quoteStatus'] = $this->deriveQuoteStatus($invoice);
 		return $data;
@@ -1004,7 +1022,15 @@ class InvoiceService {
 			// Re-read under a row lock and re-check inside the transaction so two
 			// concurrent commits cannot both reserve a quote number.
 			$quote = $this->assertQuoteDraft($this->findByIdForUpdate($id));
-			$quote->setNumber($this->settingsService->reserveNextQuoteNumber($year));
+			// A revision (#111 Modell B) carries a link to its source quote; it gets
+			// a "{base}-{n}" number from its family instead of a fresh AN number, and
+			// supersedes its source. A normal quote pulls from the AN counter.
+			if ($quote->getRelatedQuoteId() !== null) {
+				$quote->setNumber($this->reserveNextRevisionNumber($quote));
+				$this->markSourceSuperseded((int)$quote->getRelatedQuoteId(), $now);
+			} else {
+				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($year));
+			}
 			$quote->setStatus(Invoice::STATUS_COMMITTED);
 			$quote->setIssueDate($now);
 			$quote->setCommittedAt($now);
@@ -1017,6 +1043,142 @@ class InvoiceService {
 			throw $e;
 		}
 		return $this->present($quote);
+	}
+
+	/**
+	 * Compute the next revision number for a revision quote (#111 Modell B). The
+	 * base is the family's root number (walked via related_quote_id), never
+	 * derived from the string — quote numbers contain their own hyphens.
+	 *
+	 * @throws ValidationException
+	 */
+	private function reserveNextRevisionNumber(Invoice $revision): string {
+		$root = $this->rootQuote($revision);
+		$base = (string)$root->getNumber();
+		if ($base === '') {
+			throw new ValidationException('Das Ursprungsangebot hat keine Nummer und kann nicht revidiert werden.');
+		}
+		$existing = $this->invoiceMapper->findQuoteNumbersInFamily($base);
+		return InvoiceCalculator::nextRevisionNumber($base, $existing);
+	}
+
+	/**
+	 * Walk related_quote_id up to the family root — the original quote committed
+	 * with a plain AN number (related_quote_id null). A missing/cyclic link stops
+	 * the walk and returns the last resolved quote.
+	 */
+	private function rootQuote(Invoice $quote): Invoice {
+		$current = $quote;
+		$seen = [(int)$quote->getId() => true];
+		while (($parentId = $current->getRelatedQuoteId()) !== null) {
+			if (isset($seen[$parentId])) {
+				break;
+			}
+			$seen[$parentId] = true;
+			try {
+				$parent = $this->invoiceMapper->findOne($parentId);
+			} catch (DoesNotExistException) {
+				break;
+			}
+			if ($parent->getInvoiceType() !== Invoice::TYPE_QUOTE) {
+				break;
+			}
+			$current = $parent;
+		}
+		return $current;
+	}
+
+	/** Mark a revision's source quote as superseded (best-effort; source may be gone). */
+	private function markSourceSuperseded(int $sourceId, DateTime $now): void {
+		try {
+			$source = $this->invoiceMapper->findOneForUpdate($sourceId);
+		} catch (DoesNotExistException) {
+			return;
+		}
+		if ($source->getInvoiceType() !== Invoice::TYPE_QUOTE) {
+			return;
+		}
+		$source->setQuoteStatus(Invoice::QUOTE_SUPERSEDED);
+		$source->setUpdatedAt($now);
+		$this->invoiceMapper->update($source);
+	}
+
+	/**
+	 * Revise a committed quote (#111 Modell B): clone its content into a fresh,
+	 * editable quote draft linked to the source (related_quote_id). Allowed from
+	 * any live state except converted/superseded (assertQuoteRevisable) — both
+	 * are already terminal. The source is only marked "superseded" once the
+	 * revision is itself festgeschrieben (commitQuote) — a discarded revision
+	 * draft must leave the original untouched. On commit the revision receives a
+	 * "{Ursprung}-{n}" number (AN-2026-0007-1, -2, …).
+	 *
+	 * @return array<string, mixed> the new revision draft
+	 * @throws NotFoundException|IllegalStateException
+	 */
+	public function reviseQuote(int $id, string $userId): array {
+		$this->assertQuoteRevisable($this->assertCommittedQuote($this->findById($id)));
+		$now = new DateTime();
+
+		$this->db->beginTransaction();
+		try {
+			// Re-read under a row lock and re-check inside the transaction so a
+			// concurrent convert/revise cannot slip through the pre-check.
+			$source = $this->assertCommittedQuote($this->findByIdForUpdate($id));
+			$this->assertQuoteRevisable($source);
+			$sourceItems = $this->itemMapper->findByInvoice((int)$source->getId());
+
+			$revision = new Invoice();
+			$revision->setOwnerUserId($userId);
+			$revision->setStatus(Invoice::STATUS_DRAFT);
+			$revision->setInvoiceType(Invoice::TYPE_QUOTE);
+			$revision->setOfferFreeform($source->getOfferFreeform() ?? 0);
+			$revision->setCreatedAt($now);
+			$revision->setUpdatedAt($now);
+			$this->copyRecipient($source, $revision);
+			$revision->setSellerContactPerson($source->getSellerContactPerson());
+			$revision->setSellerContactPhone($source->getSellerContactPhone());
+			$revision->setSellerContactEmail($source->getSellerContactEmail());
+			$revision->setSpecialTaxCase($source->getSpecialTaxCase());
+			$revision->setGreeting($source->getGreeting());
+			$revision->setCustomFields($source->getCustomFields());
+			$revision->setExtraText($source->getExtraText());
+			$revision->setReferenceNumber($source->getReferenceNumber());
+			$revision->setOrderNumber($source->getOrderNumber());
+			$revision->setBuyerReference($source->getBuyerReference());
+			$revision->setContractNumber($source->getContractNumber());
+			$revision->setProjectReference($source->getProjectReference());
+			$revision->setPerformanceDate($source->getPerformanceDate());
+			$revision->setPerformancePeriodStart($source->getPerformancePeriodStart());
+			$revision->setPerformancePeriodEnd($source->getPerformancePeriodEnd());
+			$revision->setValidUntil($source->getValidUntil());
+			// The link that both marks this as a revision (drives the "-n" numbering
+			// and source supersession on commit) and preserves the family chain.
+			$revision->setRelatedQuoteId((int)$source->getId());
+			$revision = $this->invoiceMapper->insert($revision);
+
+			foreach ($sourceItems as $item) {
+				$line = new InvoiceItem();
+				$line->setInvoiceId((int)$revision->getId());
+				$line->setProductId($item->getProductId());
+				$line->setName($item->getName());
+				$line->setDescription($item->getDescription());
+				$line->setQuantity($item->getQuantity());
+				$line->setUnitCode($item->getUnitCode());
+				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setTaxRateBp($item->getTaxRateBp());
+				$line->setLineTotalCents($item->getLineTotalCents());
+				$line->setSortOrder($item->getSortOrder());
+				$this->itemMapper->insert($line);
+			}
+			$this->recomputeTotals($revision);
+			$this->invoiceMapper->update($revision);
+
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
+		return $this->present($revision);
 	}
 
 	/**
@@ -1250,6 +1412,25 @@ class InvoiceService {
 		}
 		if ($status === Invoice::QUOTE_REJECTED) {
 			throw new IllegalStateException('Ein abgelehntes Angebot kann nicht in eine Rechnung übernommen werden.');
+		}
+	}
+
+	/**
+	 * A quote can be revised from any live state, but not once it is already
+	 * terminal for this purpose: a converted quote already produced an invoice
+	 * (revising it would let the source's 'converted' status be silently
+	 * overwritten with 'superseded' once the revision commits), and a superseded
+	 * quote already has a newer revision.
+	 *
+	 * @throws IllegalStateException
+	 */
+	private function assertQuoteRevisable(Invoice $quote): void {
+		$status = $quote->getQuoteStatus();
+		if ($status === Invoice::QUOTE_CONVERTED) {
+			throw new IllegalStateException('Ein übernommenes Angebot kann nicht mehr revidiert werden.');
+		}
+		if ($status === Invoice::QUOTE_SUPERSEDED) {
+			throw new IllegalStateException('Dieses Angebot wurde bereits revidiert.');
 		}
 	}
 
