@@ -70,6 +70,14 @@ use OCP\DB\Types;
  * @method void setProjectReference(?string $projectReference)
  * @method ?int getRelatedInvoiceId()
  * @method void setRelatedInvoiceId(?int $relatedInvoiceId)
+ * @method ?\DateTime getValidUntil()
+ * @method void setValidUntil(?\DateTime $validUntil)
+ * @method ?string getQuoteStatus()
+ * @method void setQuoteStatus(?string $quoteStatus)
+ * @method ?int getOfferFreeform()
+ * @method void setOfferFreeform(?int $offerFreeform)
+ * @method ?int getRelatedQuoteId()
+ * @method void setRelatedQuoteId(?int $relatedQuoteId)
  * @method int getSubtotalCents()
  * @method void setSubtotalCents(int $subtotalCents)
  * @method int getTotalCents()
@@ -120,10 +128,43 @@ class Invoice extends Entity implements JsonSerializable {
 
 	public const TYPE_INVOICE = 'invoice';
 	public const TYPE_CANCELLATION = 'cancellation';
+	/** Quotes (#111) live on the same table as a third document type. */
+	public const TYPE_QUOTE = 'quote';
 
 	public const TYPES = [
 		self::TYPE_INVOICE,
 		self::TYPE_CANCELLATION,
+		self::TYPE_QUOTE,
+	];
+
+	/** Document types that behave like real invoices (own sequential number circle). */
+	public const INVOICE_TYPES = [
+		self::TYPE_INVOICE,
+		self::TYPE_CANCELLATION,
+	];
+
+	/**
+	 * Quote lifecycle status (#111). Stored outcomes (accepted/rejected/converted)
+	 * live in quote_status; draft/open/expired are derived — draft from the
+	 * document status, expired from valid_until — and never stored. Only
+	 * meaningful for TYPE_QUOTE documents; null otherwise.
+	 */
+	public const QUOTE_DRAFT = 'draft';
+	public const QUOTE_OPEN = 'open';
+	public const QUOTE_EXPIRED = 'expired';
+	public const QUOTE_ACCEPTED = 'accepted';
+	public const QUOTE_REJECTED = 'rejected';
+	public const QUOTE_CONVERTED = 'converted';
+	/** Superseded by a newer revision (#111 Modell B). Set on the source quote
+	 *  when a revision of it is finalised; related_quote_id links the revision back. */
+	public const QUOTE_SUPERSEDED = 'superseded';
+
+	/** The outcomes that are actually persisted in the quote_status column. */
+	public const QUOTE_STORED_STATUSES = [
+		self::QUOTE_ACCEPTED,
+		self::QUOTE_REJECTED,
+		self::QUOTE_CONVERTED,
+		self::QUOTE_SUPERSEDED,
 	];
 
 	/** Special VAT treatment (document level). Empty/null = regular taxation. */
@@ -181,6 +222,10 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $contractNumber = null;
 	protected ?string $projectReference = null;
 	protected ?int $relatedInvoiceId = null;
+	protected ?\DateTime $validUntil = null;
+	protected ?string $quoteStatus = null;
+	protected ?int $offerFreeform = null;
+	protected ?int $relatedQuoteId = null;
 	protected ?int $subtotalCents = null;
 	protected ?int $totalCents = null;
 	protected ?string $taxBreakdown = null;
@@ -229,6 +274,10 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('contractNumber', Types::STRING);
 		$this->addType('projectReference', Types::STRING);
 		$this->addType('relatedInvoiceId', Types::INTEGER);
+		$this->addType('validUntil', Types::DATE);
+		$this->addType('quoteStatus', Types::STRING);
+		$this->addType('offerFreeform', Types::SMALLINT);
+		$this->addType('relatedQuoteId', Types::INTEGER);
 		$this->addType('subtotalCents', Types::INTEGER);
 		$this->addType('totalCents', Types::INTEGER);
 		$this->addType('taxBreakdown', Types::TEXT);
@@ -337,6 +386,11 @@ class Invoice extends Entity implements JsonSerializable {
 			'contractNumber' => $this->getContractNumber(),
 			'projectReference' => $this->getProjectReference(),
 			'relatedInvoiceId' => $this->getRelatedInvoiceId(),
+			// Quote fields (#111). The effective quote status (open/expired/…) is
+			// derived and added by the service layer, just like paymentStatus.
+			'validUntil' => $this->formatDate($this->getValidUntil()),
+			'offerFreeform' => (bool)$this->getOfferFreeform(),
+			'relatedQuoteId' => $this->getRelatedQuoteId(),
 			'subtotalCents' => $this->getSubtotalCents(),
 			'totalCents' => $this->getTotalCents(),
 			'taxBreakdown' => $this->getTaxBreakdownArray(),

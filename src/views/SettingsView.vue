@@ -110,6 +110,40 @@
 				</p>
 			</section>
 
+			<!-- Angebotsnummer (#111) -->
+			<section class="rw-section">
+				<h3>{{ t('rechnungswerk', 'Angebotsnummer') }}</h3>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
+					<input v-model="form.quoteNumberFormat" class="rw-input" type="text" placeholder="AN-{YYYY}-{####}" /></label>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.') }}
+					<br>
+					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: quotePreview }) }}
+				</p>
+				<div class="rw-field rw-reset-mode">
+					<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
+					<NcCheckboxRadioSwitch
+						type="radio"
+						name="rw-quote-reset-mode"
+						value="yearly"
+						:model-value="form.quoteNumberResetMode"
+						@update:model-value="onSelectQuoteResetMode">
+						{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
+					</NcCheckboxRadioSwitch>
+					<NcCheckboxRadioSwitch
+						type="radio"
+						name="rw-quote-reset-mode"
+						value="continuous"
+						:model-value="form.quoteNumberResetMode"
+						@update:model-value="onSelectQuoteResetMode">
+						{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
+					</NcCheckboxRadioSwitch>
+				</div>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.') }}
+				</p>
+			</section>
+
 			<!-- PDF-Dateiname -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'PDF-Dateiname') }}</h3>
@@ -351,6 +385,14 @@
 			:confirm-label="t('rechnungswerk', 'Fortlaufend aktivieren')"
 			@close="confirmResetMode = false"
 			@confirm="applyResetMode" />
+
+		<ConfirmDialog
+			:open="confirmQuoteResetMode"
+			:name="t('rechnungswerk', 'Angebots-Nummernkreis auf „Fortlaufend“ stellen')"
+			:message="t('rechnungswerk', 'Der Angebots-Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Fortfahren?')"
+			:confirm-label="t('rechnungswerk', 'Fortlaufend aktivieren')"
+			@close="confirmQuoteResetMode = false"
+			@confirm="applyQuoteResetMode" />
 	</div>
 </template>
 
@@ -371,7 +413,7 @@ import { formatTaxRate } from '@/utils/money'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
 import { previewFileName } from '@/utils/fileName'
 
-type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear'>
+type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' | 'quoteNumberCounter' | 'quoteNumberCounterYear'>
 
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
@@ -382,9 +424,12 @@ const confirmSmallBusiness = ref(false)
 const confirmDatevAutoSend = ref(false)
 const confirmArchive = ref(false)
 const confirmResetMode = ref(false)
+const confirmQuoteResetMode = ref(false)
 const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
 const currentYearFromSettings = ref<number | null>(null)
+const currentQuoteCounter = ref(0)
+const currentQuoteYearFromSettings = ref<number | null>(null)
 
 const appAdmins = ref<Principal[]>([])
 const appUsers = ref<Principal[]>([])
@@ -425,6 +470,17 @@ const preview = computed(() => {
 		? currentCounter.value
 		: (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0)
 	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value)
+})
+
+/** Live preview of the next quote number (#111), mirroring the invoice preview. */
+const quotePreview = computed(() => {
+	if (!form.value) {
+		return ''
+	}
+	const base = form.value.quoteNumberResetMode === 'continuous'
+		? currentQuoteCounter.value
+		: (currentYear.value === currentQuoteYearFromSettings.value ? currentQuoteCounter.value : 0)
+	return previewInvoiceNumber(form.value.quoteNumberFormat || 'AN-{YYYY}-{####}', base + 1, currentYear.value)
 })
 
 /** Live preview of the file-name scheme, fed with the number preview above. */
@@ -492,6 +548,8 @@ function hydrate() {
 	}
 	currentCounter.value = s.numberCounter
 	currentYearFromSettings.value = s.numberCounterYear
+	currentQuoteCounter.value = s.quoteNumberCounter
+	currentQuoteYearFromSettings.value = s.quoteNumberCounterYear
 	archiveFolderPath.value = s.archiveFolderPath ?? null
 	form.value = {
 		companyName: s.companyName,
@@ -508,6 +566,8 @@ function hydrate() {
 		accentColor: s.accentColor,
 		numberFormat: s.numberFormat,
 		numberResetMode: s.numberResetMode,
+		quoteNumberFormat: s.quoteNumberFormat,
+		quoteNumberResetMode: s.quoteNumberResetMode,
 		fileNameFormat: s.fileNameFormat,
 		archiveEnabled: s.archiveEnabled,
 		archiveFolderId: s.archiveFolderId,
@@ -612,6 +672,24 @@ function applyResetMode() {
 	}
 }
 
+function onSelectQuoteResetMode(value: string) {
+	if (!form.value || value === form.value.quoteNumberResetMode) {
+		return
+	}
+	if (value === 'continuous') {
+		confirmQuoteResetMode.value = true
+	} else {
+		form.value.quoteNumberResetMode = 'yearly'
+	}
+}
+
+function applyQuoteResetMode() {
+	confirmQuoteResetMode.value = false
+	if (form.value) {
+		form.value.quoteNumberResetMode = 'continuous'
+	}
+}
+
 /** Pick a logo from the user's files (raster image) and store it immediately. */
 function onPickArchiveFolder() {
 	OC.dialogs.filepicker(
@@ -712,6 +790,12 @@ async function onSave() {
 	const fmt = (form.value.numberFormat || '').trim()
 	if (form.value.numberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(fmt)) {
 		error.value = t('rechnungswerk', 'Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.')
+		return
+	}
+	// Same rule for the independent quote number circle (#111).
+	const quoteFmt = (form.value.quoteNumberFormat || '').trim()
+	if (form.value.quoteNumberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(quoteFmt)) {
+		error.value = t('rechnungswerk', 'Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.')
 		return
 	}
 	// Mirror the server rule: the file-name scheme needs {nummer} for uniqueness.

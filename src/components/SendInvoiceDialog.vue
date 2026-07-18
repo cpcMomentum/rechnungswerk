@@ -1,8 +1,8 @@
 <template>
-	<NcModal v-if="open" :name="t('rechnungswerk', 'Rechnung an Kunde senden')" @keydown.esc="e => escCloses(e, () => $emit('close'))" @close="$emit('close')">
+	<NcModal v-if="open" :name="title" @keydown.esc="e => escCloses(e, () => $emit('close'))" @close="$emit('close')">
 		<div class="send-modal">
-			<h2>{{ t('rechnungswerk', 'Rechnung an Kunde senden') }}</h2>
-			<p class="send-modal__hint">{{ t('rechnungswerk', 'Die E-Rechnung wird als ZUGFeRD-PDF angehängt.') }}</p>
+			<h2>{{ title }}</h2>
+			<p class="send-modal__hint">{{ hint }}</p>
 
 			<label class="field">
 				<span>{{ t('rechnungswerk', 'Empfänger-E-Mail') }} *</span>
@@ -44,7 +44,17 @@ const props = defineProps<{
 	invoice: InvoiceDetail | null
 	defaultBody: string
 	saving?: boolean
+	/** Wording of the dialog: an invoice (default) or a quote (#111). */
+	kind?: 'invoice' | 'quote'
 }>()
+
+const isQuote = computed(() => props.kind === 'quote')
+const title = computed(() => isQuote.value
+	? t('rechnungswerk', 'Angebot an Kunde senden')
+	: t('rechnungswerk', 'Rechnung an Kunde senden'))
+const hint = computed(() => isQuote.value
+	? t('rechnungswerk', 'Das Angebot wird als PDF angehängt.')
+	: t('rechnungswerk', 'Die E-Rechnung wird als ZUGFeRD-PDF angehängt.'))
 
 const emit = defineEmits<{
 	close: []
@@ -67,9 +77,15 @@ watch(() => props.open, (open) => {
 	}
 	const inv = props.invoice
 	form.to = inv?.recipientEmail ?? ''
-	form.subject = inv?.number
-		? t('rechnungswerk', 'Rechnung {number}', { number: inv.number })
-		: t('rechnungswerk', 'Ihre Rechnung')
+	if (isQuote.value) {
+		form.subject = inv?.number
+			? t('rechnungswerk', 'Angebot {number}', { number: inv.number })
+			: t('rechnungswerk', 'Ihr Angebot')
+	} else {
+		form.subject = inv?.number
+			? t('rechnungswerk', 'Rechnung {number}', { number: inv.number })
+			: t('rechnungswerk', 'Ihre Rechnung')
+	}
 	form.body = props.defaultBody
 	nextTick(() => toInput.value?.focus())
 }, { immediate: true })

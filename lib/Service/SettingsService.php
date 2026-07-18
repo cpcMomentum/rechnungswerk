@@ -143,7 +143,7 @@ class SettingsService {
 		$stringFields = [
 			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
 			'bankName', 'contactPerson', 'contactPhone', 'contactEmail',
-			'accentColor', 'numberFormat', 'fileNameFormat', 'archiveSubfolder', 'datevUploadMail',
+			'accentColor', 'numberFormat', 'quoteNumberFormat', 'fileNameFormat', 'archiveSubfolder', 'datevUploadMail',
 			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
 			'imapHost', 'imapUser',
 			'greetingDefault', 'introDefault', 'closingDefault',
@@ -224,6 +224,18 @@ class SettingsService {
 				$settings->setNumberCounterYear((int)(new DateTime())->format('Y'));
 			}
 		}
+		if (($settings->getQuoteNumberFormat() ?? '') === '') {
+			$settings->setQuoteNumberFormat(Settings::DEFAULT_QUOTE_NUMBER_FORMAT);
+		}
+		if (array_key_exists('quoteNumberResetMode', $data)) {
+			// validate() has already ensured the value is one of RESET_MODES.
+			$oldMode = $settings->getQuoteNumberResetMode() ?: Settings::DEFAULT_RESET_MODE;
+			$newMode = (string)$data['quoteNumberResetMode'];
+			$settings->setQuoteNumberResetMode($newMode);
+			if ($oldMode === Settings::RESET_MODE_CONTINUOUS && $newMode === Settings::RESET_MODE_YEARLY) {
+				$settings->setQuoteNumberCounterYear((int)(new DateTime())->format('Y'));
+			}
+		}
 
 		$settings->setUpdatedAt(new DateTime());
 		return $this->mapper->update($settings);
@@ -250,6 +262,18 @@ class SettingsService {
 			$format = trim((string)$data['numberFormat']);
 			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
 				throw new ValidationException('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
+			}
+		}
+
+		if (array_key_exists('quoteNumberResetMode', $data)
+			&& !in_array((string)$data['quoteNumberResetMode'], Settings::RESET_MODES, true)) {
+			throw new ValidationException('Ungültiger Angebots-Nummernkreis-Modus.');
+		}
+
+		if (array_key_exists('quoteNumberFormat', $data)) {
+			$format = trim((string)$data['quoteNumberFormat']);
+			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
+				throw new ValidationException('Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
 			}
 		}
 
@@ -330,10 +354,28 @@ class SettingsService {
 			}
 		}
 
+		// Same cross-field rule for the independent quote number circle (#111).
+		if (array_key_exists('quoteNumberFormat', $data) || array_key_exists('quoteNumberResetMode', $data)) {
+			$effectiveFormat = array_key_exists('quoteNumberFormat', $data)
+				? trim((string)$data['quoteNumberFormat'])
+				: (string)$current->getQuoteNumberFormat();
+			if ($effectiveFormat === '') {
+				$effectiveFormat = Settings::DEFAULT_QUOTE_NUMBER_FORMAT;
+			}
+			$effectiveMode = array_key_exists('quoteNumberResetMode', $data)
+				? (string)$data['quoteNumberResetMode']
+				: ($current->getQuoteNumberResetMode() ?: Settings::DEFAULT_RESET_MODE);
+			if ($effectiveMode === Settings::RESET_MODE_YEARLY
+				&& !InvoiceCalculator::formatHasYear($effectiveFormat)) {
+				throw new ValidationException('Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Angebotsnummern.');
+			}
+		}
+
 		// Column-length limits mirror the migration schema.
 		$maxLengths = [
 			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'iban' => 34,
 			'bic' => 16, 'bankName' => 255, 'accentColor' => 9, 'numberFormat' => 64,
+			'quoteNumberFormat' => 64,
 			'fileNameFormat' => 128, 'archiveSubfolder' => 64,
 			'contactPerson' => 255, 'contactPhone' => 64, 'contactEmail' => 255,
 			'datevUploadMail' => 255, 'smtpFromName' => 255, 'smtpFromEmail' => 255,
@@ -442,6 +484,58 @@ class SettingsService {
 		$update->update(self::SETTINGS_TABLE)
 			->set('number_counter', $update->createNamedParameter($next, IQueryBuilder::PARAM_INT))
 			->set('number_counter_year', $update->createNamedParameter($year, IQueryBuilder::PARAM_INT))
+			->set('updated_at', $update->createNamedParameter(new DateTime(), IQueryBuilder::PARAM_DATETIME_MUTABLE))
+			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter(self::COMPANY_KEY)));
+		$update->executeStatement();
+
+		return InvoiceCalculator::formatNumber($format, $next, $year);
+	}
+
+	/**
+	 * Reserve and return the next quote number for the given year (#111),
+	 * persisting the incremented counter. Independent of the invoice number
+	 * circle — quotes have no §14-UStG numbering duty, so a gap here is harmless,
+	 * but the same row lock keeps concurrent commits from handing out the same
+	 * quote number.
+	 *
+	 * MUST be called inside a DB transaction owned by the caller (the company
+	 * settings row is locked with SELECT ... FOR UPDATE for the rest of it).
+	 */
+	public function reserveNextQuoteNumber(int $year): string {
+		$this->getCompany();
+
+		$select = $this->db->getQueryBuilder();
+		$select->select('quote_number_counter', 'quote_number_counter_year', 'quote_number_format', 'quote_number_reset_mode')
+			->from(self::SETTINGS_TABLE)
+			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)))
+			->forUpdate();
+		$result = $select->executeQuery();
+		$row = $result->fetch();
+		$result->closeCursor();
+
+		$counter = (int)($row['quote_number_counter'] ?? 0);
+		$counterYear = isset($row['quote_number_counter_year']) && $row['quote_number_counter_year'] !== null
+			? (int)$row['quote_number_counter_year'] : null;
+		$format = (string)($row['quote_number_format'] ?? '');
+		if ($format === '') {
+			$format = Settings::DEFAULT_QUOTE_NUMBER_FORMAT;
+		}
+		$mode = (string)($row['quote_number_reset_mode'] ?? Settings::DEFAULT_RESET_MODE);
+		if (!in_array($mode, Settings::RESET_MODES, true)) {
+			$mode = Settings::DEFAULT_RESET_MODE;
+		}
+		// Same defence in depth as the invoice circle: a yearly reset with a
+		// year-less format would repeat every Jan 1 — fall back to continuous.
+		if ($mode === Settings::RESET_MODE_YEARLY && !InvoiceCalculator::formatHasYear($format)) {
+			$mode = Settings::RESET_MODE_CONTINUOUS;
+		}
+
+		$next = InvoiceCalculator::nextCounter($mode, $counter, $counterYear, $year);
+
+		$update = $this->db->getQueryBuilder();
+		$update->update(self::SETTINGS_TABLE)
+			->set('quote_number_counter', $update->createNamedParameter($next, IQueryBuilder::PARAM_INT))
+			->set('quote_number_counter_year', $update->createNamedParameter($year, IQueryBuilder::PARAM_INT))
 			->set('updated_at', $update->createNamedParameter(new DateTime(), IQueryBuilder::PARAM_DATETIME_MUTABLE))
 			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter(self::COMPANY_KEY)));
 		$update->executeStatement();

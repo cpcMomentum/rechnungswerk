@@ -101,6 +101,28 @@ class ZugferdService {
 	}
 
 	/**
+	 * Render a committed quote (#111) as a plain PDF: the visible layout only, no
+	 * embedded EN16931 XML — a quote is not an e-invoice. The quote-specific
+	 * wording (title "Angebot", "Gültig bis", Freibleibend note) comes from the
+	 * document type inside renderHtml.
+	 *
+	 * @param InvoiceItem[] $items
+	 */
+	public function generateQuotePdf(Invoice $quote, array $items, Settings $settings): string {
+		return $this->renderVisiblePdf($quote, $items, $settings);
+	}
+
+	/**
+	 * Render a DRAFT quote (#111) as a watermarked preview PDF (visible layout
+	 * only), the quote analogue of generateDraftPreviewPdf.
+	 *
+	 * @param InvoiceItem[] $items
+	 */
+	public function generateQuotePreviewPdf(Invoice $quote, array $items, Settings $settings): string {
+		return $this->renderVisiblePdf($quote, $items, $settings, preview: true);
+	}
+
+	/**
 	 * Run $fn with libxml's default external-entity loader, restoring
 	 * Nextcloud's blocking loader afterwards (see base.php).
 	 *
@@ -550,15 +572,20 @@ class ZugferdService {
 		], static fn ($l) => trim((string)$l) !== '');
 		$recipient = implode('<br>', array_map($e, $recipientLines));
 
-		$title = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE ? 'Rechnung' : 'Stornorechnung';
+		$isQuote = $invoice->getInvoiceType() === Invoice::TYPE_QUOTE;
+		$title = match ($invoice->getInvoiceType()) {
+			Invoice::TYPE_INVOICE => 'Rechnung',
+			Invoice::TYPE_QUOTE => 'Angebot',
+			default => 'Stornorechnung',
+		};
 		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt();
 		$meta = [];
 		$number = $preview && ($invoice->getNumber() ?? '') === ''
 			? 'wird beim Festschreiben vergeben'
 			: $e($invoice->getNumber());
-		$meta[] = ['Rechnungsnummer', $number];
+		$meta[] = [$isQuote ? 'Angebotsnummer' : 'Rechnungsnummer', $number];
 		if ($issueDate !== null) {
-			$meta[] = ['Rechnungsdatum', $issueDate->format('d.m.Y')];
+			$meta[] = [$isQuote ? 'Angebotsdatum' : 'Rechnungsdatum', $issueDate->format('d.m.Y')];
 		}
 		// BT-72 / BG-14: performance date or period.
 		$ps = $invoice->getPerformancePeriodStart();
@@ -568,7 +595,11 @@ class ZugferdService {
 		} elseif ($invoice->getPerformanceDate() !== null) {
 			$meta[] = ['Leistungsdatum', $invoice->getPerformanceDate()->format('d.m.Y')];
 		}
-		if ($invoice->getDueDate() !== null) {
+		if ($isQuote) {
+			if ($invoice->getValidUntil() !== null) {
+				$meta[] = ['Gültig bis', $invoice->getValidUntil()->format('d.m.Y')];
+			}
+		} elseif ($invoice->getDueDate() !== null) {
 			$meta[] = ['Fällig am', $invoice->getDueDate()->format('d.m.Y')];
 		}
 		if (($invoice->getOrderNumber() ?? '') !== '') {
@@ -630,7 +661,7 @@ class ZugferdService {
 		}
 
 		$paymentInfo = '';
-		if (($settings->getIban() ?? '') !== '') {
+		if (($settings->getIban() ?? '') !== '' && !$isQuote) {
 			$bank = array_filter([
 				$settings->getBankName() ? 'Bank: ' . $e($settings->getBankName()) : null,
 				'IBAN: ' . $e($settings->getIban()),
@@ -644,7 +675,7 @@ class ZugferdService {
 		// code (someone could pay an uncommitted draft), and the builder itself
 		// excludes storno documents via the amount guard.
 		$girocodeHtml = '';
-		if (!$preview) {
+		if (!$preview && !$isQuote) {
 			$payload = $this->girocodeService->buildPayload($invoice, $settings);
 			$qrUri = $payload !== null ? $this->girocodeService->renderDataUri($payload) : null;
 			if ($qrUri !== null) {
@@ -656,7 +687,24 @@ class ZugferdService {
 			}
 		}
 		$termDesc = $this->paymentTermDescription($invoice);
-		$termHtml = $termDesc !== null ? '<p>' . $e($termDesc) . '</p>' : '';
+		$termHtml = ($termDesc !== null && !$isQuote) ? '<p>' . $e($termDesc) . '</p>' : '';
+
+		// Quote-only notes (#111): validity date ("gültig bis") and, if flagged, the
+		// freibleibend/unverbindlich hint (§145 BGB). A quote carries no payment
+		// terms or bank details, so this replaces the invoice payment block.
+		$quoteNoteHtml = '';
+		if ($isQuote) {
+			$quoteParts = [];
+			if ($invoice->getValidUntil() !== null) {
+				$quoteParts[] = 'Dieses Angebot ist gültig bis ' . $invoice->getValidUntil()->format('d.m.Y') . '.';
+			}
+			if ($invoice->getOfferFreeform() === 1) {
+				$quoteParts[] = 'Freibleibendes Angebot – alle Angaben sind freibleibend und unverbindlich (§ 145 BGB).';
+			}
+			if ($quoteParts !== []) {
+				$quoteNoteHtml = '<p class="quote-note">' . $e(implode(' ', $quoteParts)) . '</p>';
+			}
+		}
 
 		// VAT-exemption note (only for the special tax cases; §19 is already on the tax row).
 		$exemptNote = (!$smallBusiness && $invoice->isTaxExemptCase()) ? $this->specialTaxCaseLabel($invoice) : null;
@@ -687,9 +735,12 @@ class ZugferdService {
 		// Preview marking: diagonal ENTWURF watermark on every page (position:
 		// fixed repeats per page in dompdf) plus an explicit banner — the
 		// preview must never be mistakable for a real, committed invoice.
+		$draftBannerText = $isQuote
+			? 'Entwurf &ndash; Vorschau, kein g&uuml;ltiges Angebot'
+			: 'Entwurf &ndash; Vorschau, keine g&uuml;ltige Rechnung';
 		$watermarkHtml = $preview
 			? '<div class="draft-watermark">ENTWURF</div>'
-			. '<div class="draft-banner">Entwurf &ndash; Vorschau, keine g&uuml;ltige Rechnung</div>'
+			. '<div class="draft-banner">' . $draftBannerText . '</div>'
 			: '';
 
 		return <<<HTML
@@ -716,6 +767,7 @@ table.items td.num, table.items th.num { text-align: right; }
 .intro { margin: 0 0 14px; font-size: 9.5pt; }
 .intro p { margin: 4px 0; }
 .exempt-note { background: #f5f5f5; padding: 6px 8px; font-weight: bold; }
+.quote-note { background: #f5f5f5; padding: 6px 8px; font-size: 9.5pt; }
 .totals { width: 45%; float: right; margin-top: 8px; }
 .totals table { width: 100%; border-collapse: collapse; }
 .totals td { padding: 3px 8px; }
@@ -754,6 +806,7 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 </table></div>
 <div class="payment">
   {$exemptNoteHtml}
+  {$quoteNoteHtml}
   {$termHtml}
   {$paymentInfo}
   {$girocodeHtml}

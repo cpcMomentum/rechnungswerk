@@ -59,9 +59,11 @@ export interface Customer {
 }
 
 export type InvoiceStatus = 'draft' | 'committed' | 'cancelled'
-export type InvoiceType = 'invoice' | 'cancellation'
+export type InvoiceType = 'invoice' | 'cancellation' | 'quote'
 /** Derived payment status (#117); null for drafts and cancellation documents. */
 export type PaymentStatus = 'unpaid' | 'overdue' | 'paid'
+/** Derived quote status (#111); null for non-quote documents. */
+export type QuoteStatus = 'draft' | 'open' | 'expired' | 'accepted' | 'rejected' | 'converted' | 'superseded'
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 	draft: 'Entwurf',
@@ -72,6 +74,17 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 export const INVOICE_TYPE_LABELS: Record<InvoiceType, string> = {
 	invoice: 'Rechnung',
 	cancellation: 'Storno',
+	quote: 'Angebot',
+}
+
+export const QUOTE_STATUS_LABELS: Record<QuoteStatus, string> = {
+	draft: 'Entwurf',
+	open: 'Offen',
+	expired: 'Abgelaufen',
+	accepted: 'Angenommen',
+	rejected: 'Abgelehnt',
+	converted: 'Übernommen',
+	superseded: 'Revidiert',
 }
 
 export interface TaxBreakdownRow {
@@ -143,6 +156,16 @@ export interface Invoice {
 	paidAt: string | null
 	/** Derived payment status; null for drafts and cancellation documents. */
 	paymentStatus: PaymentStatus | null
+	/** Quote validity date ("gültig bis", #111); quotes only. */
+	validUntil: string | null
+	/** Freibleibend/unverbindlich flag (§145 BGB, #111); quotes only. */
+	offerFreeform: boolean
+	/** Link from a converted invoice or a revision back to its source quote (#111). */
+	relatedQuoteId: number | null
+	/** Number of the source quote (revision source / convert source); detail responses only. */
+	relatedQuoteNumber?: string | null
+	/** Derived quote status (#111); null for non-quote documents. */
+	quoteStatus: QuoteStatus | null
 	createdAt: string | null
 	updatedAt: string | null
 }
@@ -187,6 +210,11 @@ export interface Settings {
 	numberCounter: number
 	numberCounterYear: number | null
 	numberResetMode: 'yearly' | 'continuous'
+	/** Independent quote number circle (#111). */
+	quoteNumberFormat: string
+	quoteNumberCounter: number
+	quoteNumberCounterYear: number | null
+	quoteNumberResetMode: 'yearly' | 'continuous'
 	fileNameFormat: string
 	archiveEnabled: boolean
 	archiveFolderId: number | null

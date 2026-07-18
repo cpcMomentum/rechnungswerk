@@ -27,7 +27,13 @@ use OCP\AppFramework\Http\Response;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
-class InvoiceController extends Controller {
+/**
+ * Quotes (#111). Thin HTTP layer over InvoiceService: quotes are the third
+ * document type on the invoice table, so the controller mirrors
+ * InvoiceController but routes every call through the quote-typed service
+ * methods (which 404 on a non-quote id).
+ */
+class QuoteController extends Controller {
 
 	public function __construct(
 		IRequest $request,
@@ -44,7 +50,7 @@ class InvoiceController extends Controller {
 		if (($r = $this->guardAccess()) !== null) {
 			return $r;
 		}
-		return new DataResponse($this->invoiceService->list());
+		return new DataResponse($this->invoiceService->listQuotes());
 	}
 
 	#[NoAdminRequired]
@@ -53,7 +59,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->get($id));
+			return new DataResponse($this->invoiceService->getQuote($id));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		}
@@ -65,7 +71,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->create($this->userId, $data), Http::STATUS_CREATED);
+			return new DataResponse($this->invoiceService->createQuote($this->userId, $data), Http::STATUS_CREATED);
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -77,7 +83,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->updateInvoice($id, $data));
+			return new DataResponse($this->invoiceService->updateQuote($id, $data));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -93,7 +99,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			$this->invoiceService->deleteInvoice($id);
+			$this->invoiceService->deleteQuote($id);
 			return new DataResponse(null, Http::STATUS_NO_CONTENT);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
@@ -108,7 +114,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->commit($id));
+			return new DataResponse($this->invoiceService->commitQuote($id));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -118,9 +124,67 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[NoAdminRequired]
+	public function accept(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->markQuoteAccepted($id));
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
+	#[NoAdminRequired]
+	public function reject(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->markQuoteRejected($id));
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
+	/** Convert the quote into a new invoice draft (returns that draft). */
+	#[NoAdminRequired]
+	public function convert(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->convertToInvoice($id, $this->userId), Http::STATUS_CREATED);
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
+	/** Revise the quote into a new quote-revision draft (#111 Modell B; returns that draft). */
+	#[NoAdminRequired]
+	public function revise(int $id): DataResponse {
+		if (($r = $this->guardEdit()) !== null) {
+			return $r;
+		}
+		try {
+			return new DataResponse($this->invoiceService->reviseQuote($id, $this->userId), Http::STATUS_CREATED);
+		} catch (NotFoundException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+		} catch (IllegalStateException $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		}
+	}
+
 	// GET download triggered via an <a download> click; browsers do not attach
-	// custom request headers (including CSRF tokens) on anchor navigations.
-	// Safe: read-only, access-gated below, authenticated session required.
+	// custom request headers (CSRF tokens) on anchor navigations. Safe:
+	// read-only, access-gated below, authenticated session required.
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function download(int $id): Response {
@@ -128,14 +192,14 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			$pdf = $this->invoiceService->generatePdf($id);
+			$pdf = $this->invoiceService->generateQuotePdf($id);
 			return new DataDownloadResponse($pdf['content'], $pdf['filename'], 'application/pdf');
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		} catch (\Throwable $e) {
-			$this->logger->error('Rechnungswerk: PDF generation failed', ['exception' => $e, 'invoice' => $id]);
+			$this->logger->error('Rechnungswerk: quote PDF generation failed', ['exception' => $e, 'quote' => $id]);
 			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -150,10 +214,8 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			$pdf = $this->invoiceService->generatePreviewPdf($id);
+			$pdf = $this->invoiceService->generateQuotePreviewPdf($id);
 			$response = new DataDisplayResponse($pdf['content'], Http::STATUS_OK, ['Content-Type' => 'application/pdf']);
-			// The default CSP ships frame-ancestors 'none', which blocks the
-			// preview dialog's same-origin <iframe>. Relax exactly that.
 			$csp = new ContentSecurityPolicy();
 			$csp->addAllowedFrameAncestorDomain("'self'");
 			$response->setContentSecurityPolicy($csp);
@@ -163,7 +225,7 @@ class InvoiceController extends Controller {
 		} catch (IllegalStateException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		} catch (\Throwable $e) {
-			$this->logger->error('Rechnungswerk: preview PDF generation failed', ['exception' => $e, 'invoice' => $id]);
+			$this->logger->error('Rechnungswerk: quote preview PDF generation failed', ['exception' => $e, 'quote' => $id]);
 			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -174,7 +236,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			$this->invoiceService->sendToCustomer($id, $to, $subject, $body);
+			$this->invoiceService->sendQuoteToCustomer($id, $to, $subject, $body);
 			return new DataResponse(['sent' => true]);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
@@ -183,64 +245,8 @@ class InvoiceController extends Controller {
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		} catch (\Throwable $e) {
-			$this->logger->error('Rechnungswerk: invoice mail failed', ['exception' => $e, 'invoice' => $id]);
+			$this->logger->error('Rechnungswerk: quote mail failed', ['exception' => $e, 'quote' => $id]);
 			return new DataResponse(['error' => 'Der Versand ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	#[NoAdminRequired]
-	public function cancel(int $id): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
-			return $r;
-		}
-		try {
-			return new DataResponse($this->invoiceService->cancel($id, $this->userId));
-		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
-		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
-		}
-	}
-
-	#[NoAdminRequired]
-	public function duplicate(int $id): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
-			return $r;
-		}
-		try {
-			return new DataResponse($this->invoiceService->duplicate($id, $this->userId), Http::STATUS_CREATED);
-		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
-		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
-		}
-	}
-
-	#[NoAdminRequired]
-	public function markPaid(int $id, ?string $date = null): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
-			return $r;
-		}
-		try {
-			return new DataResponse($this->invoiceService->markPaid($id, $date));
-		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
-		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
-		}
-	}
-
-	#[NoAdminRequired]
-	public function markUnpaid(int $id): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
-			return $r;
-		}
-		try {
-			return new DataResponse($this->invoiceService->markUnpaid($id));
-		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
-		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
 		}
 	}
 

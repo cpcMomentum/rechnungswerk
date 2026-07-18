@@ -23,21 +23,39 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
-	 * All invoices of the company (shared pool). owner_user_id stays on each row
-	 * only as "created by"; access is governed by PermissionService, not here.
+	 * Documents of the company (shared pool) restricted to the given document
+	 * types, newest first. owner_user_id stays on each row only as "created by";
+	 * access is governed by PermissionService, not here.
 	 *
+	 * Quotes and invoices share this table but are listed separately (#111), so
+	 * every listing query goes through here with an explicit type filter — a
+	 * quote must never surface in the invoice list, nor an invoice in the quote list.
+	 *
+	 * @param non-empty-list<string> $types
 	 * @return Invoice[]
 	 */
-	public function findAll(): array {
+	public function findByTypes(array $types): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->in('invoice_type', $qb->createNamedParameter($types, IQueryBuilder::PARAM_STR_ARRAY)))
 			->orderBy('created_at', 'DESC')
 			->addOrderBy('id', 'DESC');
 		return $this->findEntities($qb);
 	}
 
 	/**
-	 * All invoices referencing a given customer (newest first), for the customer view (#60).
+	 * All real invoices (invoice + cancellation) of the company, newest first.
+	 * Excludes quotes (#111), which have their own list.
+	 *
+	 * @return Invoice[]
+	 */
+	public function findAll(): array {
+		return $this->findByTypes(Invoice::INVOICE_TYPES);
+	}
+
+	/**
+	 * All invoices (not quotes) referencing a given customer (newest first), for
+	 * the customer view (#60).
 	 *
 	 * @return Invoice[]
 	 */
@@ -45,6 +63,7 @@ class InvoiceMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->tableName)
 			->where($qb->expr()->eq('customer_id', $qb->createNamedParameter($customerId, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->in('invoice_type', $qb->createNamedParameter(Invoice::INVOICE_TYPES, IQueryBuilder::PARAM_STR_ARRAY)))
 			->orderBy('created_at', 'DESC')
 			->addOrderBy('id', 'DESC');
 		return $this->findEntities($qb);
@@ -60,6 +79,35 @@ class InvoiceMapper extends QBMapper {
 		$qb->select('*')->from($this->tableName)
 			->where($qb->expr()->eq('datev_status', $qb->createNamedParameter(Invoice::DATEV_PENDING)));
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Quote numbers belonging to one revision family (#111 Modell B): the base
+	 * number itself ("AN-2026-0007") and its revisions ("AN-2026-0007-1", …).
+	 * Used to pick the next free revision suffix. The base is escaped so a literal
+	 * '_' or '%' in a number cannot widen the LIKE match.
+	 *
+	 * @return string[]
+	 */
+	public function findQuoteNumbersInFamily(string $base): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('number')->from($this->tableName)
+			->where($qb->expr()->eq('invoice_type', $qb->createNamedParameter(Invoice::TYPE_QUOTE)))
+			->andWhere($qb->expr()->orX(
+				$qb->expr()->eq('number', $qb->createNamedParameter($base)),
+				$qb->expr()->like('number', $qb->createNamedParameter(
+					$this->db->escapeLikeParameter($base) . '-%',
+				)),
+			));
+		$result = $qb->executeQuery();
+		$numbers = [];
+		while (($row = $result->fetch()) !== false) {
+			if ($row['number'] !== null) {
+				$numbers[] = (string)$row['number'];
+			}
+		}
+		$result->closeCursor();
+		return $numbers;
 	}
 
 	/**

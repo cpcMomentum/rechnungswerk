@@ -45,6 +45,10 @@ export interface InvoiceInput {
 	notes?: string[]
 	paymentTermDays?: number | null
 	discountTerms?: string | null
+	/** Quote validity date "gültig bis" (#111); quotes only. */
+	validUntil?: string | null
+	/** Freibleibend/unverbindlich flag (§145 BGB, #111); quotes only. */
+	offerFreeform?: boolean
 	items?: InvoiceItemInput[]
 }
 
