@@ -7,6 +7,25 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-18
+
+### Added
+- Angebote: Angebote mit eigenem Nummernkreis erstellen, festschreiben und
+  als PDF versenden. Ein eigener Menüpunkt „Angebote" führt zu einer eigenen
+  Liste mit Status (Offen, Abgelaufen, Angenommen, Abgelehnt, Übernommen,
+  Revidiert). Angebote haben ein „Gültig bis"-Datum (§ 148 BGB) und eine
+  optionale Freibleibend-Kennzeichnung (§ 145 BGB), die als Hinweis auf dem
+  PDF erscheint. Der Angebots-Nummernkreis (Standard `AN-{YYYY}-{####}`) ist
+  in den Einstellungen unabhängig von den Rechnungen konfigurierbar (#111)
+- In Rechnung übernehmen: ein festgeschriebenes Angebot lässt sich per
+  Knopfdruck in einen neuen Rechnungs-Entwurf überführen – Positionen und
+  Empfänger werden übernommen, die Rechnung referenziert die Angebotsnummer,
+  das Angebot wird als „übernommen" markiert (#111)
+- Angebot revidieren: aus einem festgeschriebenen Angebot lässt sich eine
+  überarbeitbare Revision erstellen. Sie erhält beim Festschreiben eine
+  Revisionsnummer (`AN-…-1`, `-2`, …), das Ursprungsangebot wird als
+  „revidiert" markiert (#111)
+
 ## [0.1.8] - 2026-07-17
 
 ### Added
@@ -179,7 +198,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.8...v0.2.0
 [0.1.8]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.5...v0.1.6
