@@ -1054,6 +1054,21 @@ class InvoiceService {
 	 */
 	private function reserveNextRevisionNumber(Invoice $revision): string {
 		$root = $this->rootQuote($revision);
+		// Serialise concurrent revision commits of the same family: lock the root
+		// quote row FOR UPDATE for the rest of the caller's transaction, then read
+		// the family numbers. Without this, two revisions of one family could read
+		// the same set and both compute the same "-n" suffix — the unique index on
+		// `number` would reject one with a raw DB error instead of the clean
+		// serialisation the regular AN counter already gets from the settings lock.
+		// The root is always the family anchor and is acquired before the source
+		// row (markSourceSuperseded), so the lock order stays consistent (no
+		// deadlock). A vanished root (never for a committed source) falls back to
+		// the already-walked instance.
+		try {
+			$root = $this->invoiceMapper->findOneForUpdate((int)$root->getId());
+		} catch (DoesNotExistException) {
+			// keep the unlocked root resolved above
+		}
 		$base = (string)$root->getNumber();
 		if ($base === '') {
 			throw new ValidationException('Das Ursprungsangebot hat keine Nummer und kann nicht revidiert werden.');
