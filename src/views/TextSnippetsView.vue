@@ -30,22 +30,21 @@
 				<div class="rw-table-wrap">
 					<table class="rw-table">
 						<tbody>
-							<tr v-for="s in g.items" :key="s.id" class="rw-row-clickable" @click="openEdit(s)">
+							<tr v-for="s in g.items" :key="s.id" class="rw-row-clickable rw-snippet-row" @click="openEdit(s)">
 								<td>
 									<strong>{{ s.label }}</strong>
-									<div v-if="s.content" class="rw-muted rw-preview">{{ preview(s.content) }}</div>
+									<div v-if="s.content" class="rw-muted rw-snippet-content">{{ s.content }}</div>
 								</td>
-								<td class="rw-badge-cell">
-									<span v-if="s.isDefault" class="rw-badge">{{ t('rechnungswerk', 'Standard') }}</span>
-								</td>
-								<td class="rw-col-actions">
+								<td class="rw-col-actions rw-snippet-actions">
 									<div class="rw-actions">
-										<NcButton v-if="!s.isDefault"
-											type="tertiary"
-											:aria-label="t('rechnungswerk', 'Als Standard festlegen')"
-											:title="t('rechnungswerk', 'Als Standard festlegen')"
+										<NcButton type="tertiary"
+											:aria-label="s.isDefault ? t('rechnungswerk', 'Standard-Vorlage') : t('rechnungswerk', 'Als Standard festlegen')"
+											:title="s.isDefault ? t('rechnungswerk', 'Standard-Vorlage') : t('rechnungswerk', 'Als Standard festlegen')"
 											@click.stop="setDefault(s)">
-											<template #icon><StarOutlineIcon :size="20" /></template>
+											<template #icon>
+												<StarIcon v-if="s.isDefault" :size="20" class="rw-star rw-star--active" />
+												<StarOutlineIcon v-else :size="20" class="rw-star" />
+											</template>
 										</NcButton>
 										<NcButton type="tertiary"
 											:aria-label="t('rechnungswerk', 'Löschen')"
@@ -87,6 +86,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
+import StarIcon from 'vue-material-design-icons/Star.vue'
 import StarOutlineIcon from 'vue-material-design-icons/StarOutline.vue'
 import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
@@ -122,11 +122,6 @@ const editing = ref<TextSnippet | null>(null)
 const deleteTarget = ref<TextSnippet | null>(null)
 const error = ref('')
 
-const preview = (content: string): string => {
-	const flat = content.replace(/\s+/g, ' ').trim()
-	return flat.length > 90 ? flat.slice(0, 90) + '…' : flat
-}
-
 function fail(e: unknown, fallback: string) {
 	const message = (e as { message?: string }).message ?? fallback
 	error.value = message
@@ -148,6 +143,9 @@ function openEdit(snippet: TextSnippet) {
 }
 
 async function setDefault(snippet: TextSnippet) {
+	if (snippet.isDefault) {
+		return
+	}
 	error.value = ''
 	try {
 		await store.update(snippet.id, { isDefault: true })
@@ -194,10 +192,6 @@ async function confirmDelete() {
 	max-width: 60em;
 	margin: 0 0 16px;
 }
-.rw-preview {
-	font-size: 0.85em;
-	margin-top: 2px;
-}
 .rw-snippet-group {
 	margin-bottom: 24px;
 }
@@ -211,17 +205,23 @@ async function confirmDelete() {
 	margin: 0 4px;
 	opacity: 0.6;
 }
-.rw-badge-cell {
-	white-space: nowrap;
-	width: 1%;
+/* Full snippet text, keeping the author's line breaks. */
+.rw-snippet-content {
+	font-size: 0.9em;
+	margin-top: 4px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
 }
-.rw-badge {
-	display: inline-block;
-	padding: 1px 8px;
-	border-radius: var(--border-radius-pill, 16px);
-	background: var(--color-primary-element);
-	color: var(--color-primary-element-text);
-	font-size: 0.8em;
-	font-weight: 600;
+/* Row content can span several lines → the actions belong at the top, not
+   floating in the vertical centre. */
+.rw-snippet-row > td {
+	vertical-align: top;
+}
+.rw-snippet-actions {
+	padding-top: 8px;
+}
+/* Filled star = this is the default template for its document type + slot. */
+.rw-star--active {
+	color: #eab308;
 }
 </style>

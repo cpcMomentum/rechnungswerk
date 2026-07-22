@@ -385,6 +385,7 @@ OC.L10N.register(
     "Geplanter Leistungszeitraum (optional)" : "Geplanter Leistungszeitraum (optional)",
     "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend." : "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.",
     "Vorgabe" : "Vorgabe",
-    "Als Standard festlegen" : "Als Standard festlegen"
+    "Als Standard festlegen" : "Als Standard festlegen",
+    "Standard-Vorlage" : "Standard-Vorlage"
 },
 "nplurals=2; plural=(n != 1);");
