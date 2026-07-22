@@ -35,7 +35,7 @@
 									<strong>{{ s.label }}</strong>
 									<div v-if="s.content" class="rw-muted rw-snippet-content">{{ s.content }}</div>
 								</td>
-								<td class="rw-col-actions rw-snippet-actions">
+								<td class="rw-snippet-actions">
 									<div class="rw-actions">
 										<NcButton type="tertiary"
 											:aria-label="s.isDefault ? t('rechnungswerk', 'Standard-Vorlage') : t('rechnungswerk', 'Als Standard festlegen')"
@@ -213,14 +213,18 @@ async function confirmDelete() {
 	overflow-wrap: anywhere;
 }
 /* Row content can span several lines → the actions belong at the top, not
-   floating in the vertical centre. The `td.rw-col-actions` selector is needed to
-   out-specify the global `.rw-table … .rw-col-actions { vertical-align: middle }`
-   rule in app.css. */
-.rw-snippet-row > td,
-.rw-snippet-row > td.rw-col-actions {
+   floating in the vertical centre. The actions cell deliberately does NOT use the
+   global `rw-col-actions` class, because that class forces `vertical-align: middle`
+   (app.css) with a specificity a scoped rule can't beat. We style the cell fully
+   here instead. */
+.rw-snippet-row > td {
 	vertical-align: top;
 }
 .rw-snippet-actions {
+	width: 1%;
+	white-space: nowrap;
+	text-align: right;
+	vertical-align: top;
 	padding-top: 4px;
 }
 /* Filled star = this is the default template for its document type + slot. */
