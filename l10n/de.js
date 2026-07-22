@@ -384,6 +384,7 @@ OC.L10N.register(
     "z. B. Neukunde, Mahnfreundlich" : "z. B. Neukunde, Mahnfreundlich",
     "Geplanter Leistungszeitraum (optional)" : "Geplanter Leistungszeitraum (optional)",
     "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend." : "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.",
-    "Vorgabe" : "Vorgabe"
+    "Vorgabe" : "Vorgabe",
+    "Als Standard festlegen" : "Als Standard festlegen"
 },
 "nplurals=2; plural=(n != 1);");

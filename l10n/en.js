@@ -384,6 +384,7 @@ OC.L10N.register(
     "z. B. Neukunde, Mahnfreundlich" : "e.g. New customer, Friendly reminder",
     "Geplanter Leistungszeitraum (optional)" : "Planned service period (optional)",
     "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend." : "Optional: planned date or period of the service. First field only → date, both fields → period. Not mandatory for a quote.",
-    "Vorgabe" : "Default"
+    "Vorgabe" : "Default",
+    "Als Standard festlegen" : "Set as default"
 },
 "nplurals=2; plural=(n != 1);");

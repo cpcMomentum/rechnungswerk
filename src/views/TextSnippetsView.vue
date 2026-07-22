@@ -30,25 +30,30 @@
 				<div class="rw-table-wrap">
 					<table class="rw-table">
 						<tbody>
-							<tr v-for="s in g.items" :key="s.id">
+							<tr v-for="s in g.items" :key="s.id" class="rw-row-clickable" @click="openEdit(s)">
 								<td>
 									<strong>{{ s.label }}</strong>
 									<div v-if="s.content" class="rw-muted rw-preview">{{ preview(s.content) }}</div>
 								</td>
 								<td class="rw-badge-cell">
-									<span v-if="s.isDefault" class="rw-badge">{{ t('rechnungswerk', 'Vorgabe') }}</span>
+									<span v-if="s.isDefault" class="rw-badge">{{ t('rechnungswerk', 'Standard') }}</span>
 								</td>
-								<td class="num">
-									<NcActions :aria-label="t('rechnungswerk', 'Aktionen')">
-										<NcActionButton @click="openEdit(s)">
-											<template #icon><PencilIcon :size="20" /></template>
-											{{ t('rechnungswerk', 'Bearbeiten') }}
-										</NcActionButton>
-										<NcActionButton @click="askDelete(s)">
+								<td class="rw-col-actions">
+									<div class="rw-actions">
+										<NcButton v-if="!s.isDefault"
+											type="tertiary"
+											:aria-label="t('rechnungswerk', 'Als Standard festlegen')"
+											:title="t('rechnungswerk', 'Als Standard festlegen')"
+											@click.stop="setDefault(s)">
+											<template #icon><StarOutlineIcon :size="20" /></template>
+										</NcButton>
+										<NcButton type="tertiary"
+											:aria-label="t('rechnungswerk', 'Löschen')"
+											:title="t('rechnungswerk', 'Löschen')"
+											@click.stop="askDelete(s)">
 											<template #icon><DeleteIcon :size="20" /></template>
-											{{ t('rechnungswerk', 'Löschen') }}
-										</NcActionButton>
-									</NcActions>
+										</NcButton>
+									</div>
 								</td>
 							</tr>
 						</tbody>
@@ -81,10 +86,8 @@ import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
-import PencilIcon from 'vue-material-design-icons/Pencil.vue'
+import StarOutlineIcon from 'vue-material-design-icons/StarOutline.vue'
 import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import TextSnippetEditModal from '@/components/TextSnippetEditModal.vue'
@@ -142,6 +145,15 @@ function openCreate() {
 function openEdit(snippet: TextSnippet) {
 	editing.value = snippet
 	editorOpen.value = true
+}
+
+async function setDefault(snippet: TextSnippet) {
+	error.value = ''
+	try {
+		await store.update(snippet.id, { isDefault: true })
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Speichern fehlgeschlagen'))
+	}
 }
 
 async function onSave(data: TextSnippetCreate) {

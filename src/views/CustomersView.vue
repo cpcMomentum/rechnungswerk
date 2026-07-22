@@ -33,26 +33,24 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="c in store.customers" :key="c.id">
+					<tr v-for="c in store.customers" :key="c.id" class="rw-row-clickable" @click="openEdit(c)">
 						<td class="rw-muted">{{ c.customerNumber }}</td>
 						<td>
-							<strong>{{ c.name }}</strong>
+							{{ c.name }}
 							<div v-if="c.contactPerson || c.vatId" class="rw-muted">
 								{{ [c.contactPerson, c.vatId].filter(Boolean).join(' · ') }}
 							</div>
 						</td>
 						<td>{{ [c.postalCode, c.city].filter(Boolean).join(' ') }}</td>
-						<td class="num">
-							<NcActions :aria-label="t('rechnungswerk', 'Aktionen')">
-								<NcActionButton @click="openEdit(c)">
-									<template #icon><PencilIcon :size="20" /></template>
-									{{ t('rechnungswerk', 'Bearbeiten') }}
-								</NcActionButton>
-								<NcActionButton @click="askDelete(c)">
+						<td class="rw-col-actions">
+							<div class="rw-actions">
+								<NcButton type="tertiary"
+									:aria-label="t('rechnungswerk', 'Löschen')"
+									:title="t('rechnungswerk', 'Löschen')"
+									@click.stop="askDelete(c)">
 									<template #icon><DeleteIcon :size="20" /></template>
-									{{ t('rechnungswerk', 'Löschen') }}
-								</NcActionButton>
-							</NcActions>
+								</NcButton>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -95,10 +93,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcModal from '@nextcloud/vue/components/NcModal'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
-import PencilIcon from 'vue-material-design-icons/Pencil.vue'
 import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
 import AccountArrowRightIcon from 'vue-material-design-icons/AccountArrowRight.vue'

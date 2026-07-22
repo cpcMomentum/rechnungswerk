@@ -107,13 +107,25 @@ class Version001400Date20260722120000 extends SimpleMigrationStep {
 			], static fn (string $p): bool => $p !== ''));
 			$closing = trim((string)($row['closing_default'] ?? ''));
 
+			// Descriptive default names per document type + slot, so the migrated
+			// snippet does not just read "Standard" next to the "Standard" badge.
+			$labels = [
+				TextSnippet::DOC_TYPE_INVOICE => [
+					TextSnippet::SLOT_OPENING => 'Standard Rechnungseinleitung',
+					TextSnippet::SLOT_CLOSING => 'Standard Rechnungsschluss',
+				],
+				TextSnippet::DOC_TYPE_QUOTE => [
+					TextSnippet::SLOT_OPENING => 'Standard Angebotseinleitung',
+					TextSnippet::SLOT_CLOSING => 'Standard Angebotsschluss',
+				],
+			];
 			foreach (TextSnippet::DOC_TYPES as $docType) {
 				if ($opening !== '') {
-					$this->insertSnippet($owner, $docType, TextSnippet::SLOT_OPENING, $opening, $now);
+					$this->insertSnippet($owner, $docType, TextSnippet::SLOT_OPENING, $labels[$docType][TextSnippet::SLOT_OPENING], $opening, $now);
 					$seeded++;
 				}
 				if ($closing !== '') {
-					$this->insertSnippet($owner, $docType, TextSnippet::SLOT_CLOSING, $closing, $now);
+					$this->insertSnippet($owner, $docType, TextSnippet::SLOT_CLOSING, $labels[$docType][TextSnippet::SLOT_CLOSING], $closing, $now);
 					$seeded++;
 				}
 			}
@@ -124,14 +136,14 @@ class Version001400Date20260722120000 extends SimpleMigrationStep {
 		}
 	}
 
-	private function insertSnippet(string $owner, string $docType, string $slot, string $content, string $now): void {
+	private function insertSnippet(string $owner, string $docType, string $slot, string $label, string $content, string $now): void {
 		$insert = $this->db->getQueryBuilder();
 		$insert->insert('rechnungswerk_text_snippet')
 			->values([
 				'owner_user_id' => $insert->createNamedParameter($owner),
 				'doc_type' => $insert->createNamedParameter($docType),
 				'slot' => $insert->createNamedParameter($slot),
-				'label' => $insert->createNamedParameter('Standard'),
+				'label' => $insert->createNamedParameter($label),
 				'content' => $insert->createNamedParameter($content),
 				'is_default' => $insert->createNamedParameter(1, IQueryBuilder::PARAM_INT),
 				'sort_order' => $insert->createNamedParameter(0, IQueryBuilder::PARAM_INT),
