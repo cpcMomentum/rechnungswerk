@@ -35,6 +35,34 @@ export interface Product {
 	updatedAt: string | null
 }
 
+/** Default §19 UStG hint; mirrors ZugferdService::SMALL_BUSINESS_NOTE_DEFAULT (#141). */
+export const SMALL_BUSINESS_NOTE_DEFAULT = 'Gem. § 19 UStG enthält der Rechnungsbetrag keine Umsatzsteuer.'
+
+/** Text snippet catalog (#126/#141): reusable opening / closing texts per doc type. */
+export type SnippetDocType = 'invoice' | 'quote'
+export type SnippetSlot = 'opening' | 'closing'
+
+export const SNIPPET_DOC_TYPE_LABELS: Record<SnippetDocType, string> = {
+	invoice: 'Rechnung',
+	quote: 'Angebot',
+}
+export const SNIPPET_SLOT_LABELS: Record<SnippetSlot, string> = {
+	opening: 'Anrede & Einleitung',
+	closing: 'Schlusstext',
+}
+
+export interface TextSnippet {
+	id: number
+	docType: SnippetDocType
+	slot: SnippetSlot
+	label: string
+	content: string | null
+	isDefault: boolean
+	sortOrder: number
+	createdAt: string | null
+	updatedAt: string | null
+}
+
 export interface Customer {
 	id: number
 	customerNumber: string
@@ -222,6 +250,8 @@ export interface Settings {
 	archiveFolderPath?: string | null
 	girocodeEnabled: boolean
 	smallBusiness: boolean
+	/** Configurable §19 UStG hint printed on invoices; null = use default wording (#141). */
+	smallBusinessNote: string | null
 	defaultTaxRateBp: number
 	/** Global default payment term in days, pre-fills new invoices (#117). */
 	defaultPaymentTermDays: number | null

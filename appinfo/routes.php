@@ -48,6 +48,13 @@ return [
 		['name' => 'product#update',  'url' => '/api/v1/products/{id}', 'verb' => 'PATCH'],
 		['name' => 'product#destroy', 'url' => '/api/v1/products/{id}', 'verb' => 'DELETE'],
 
+		// Text snippets (#126/#141)
+		['name' => 'text_snippet#index',   'url' => '/api/v1/text-snippets',      'verb' => 'GET'],
+		['name' => 'text_snippet#show',    'url' => '/api/v1/text-snippets/{id}', 'verb' => 'GET'],
+		['name' => 'text_snippet#create',  'url' => '/api/v1/text-snippets',      'verb' => 'POST'],
+		['name' => 'text_snippet#update',  'url' => '/api/v1/text-snippets/{id}', 'verb' => 'PATCH'],
+		['name' => 'text_snippet#destroy', 'url' => '/api/v1/text-snippets/{id}', 'verb' => 'DELETE'],
+
 		// Customers
 		['name' => 'customer#index',    'url' => '/api/v1/customers',               'verb' => 'GET'],
 		['name' => 'customer#show',     'url' => '/api/v1/customers/{id}',          'verb' => 'GET'],

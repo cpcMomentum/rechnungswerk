@@ -147,6 +147,7 @@ class SettingsService {
 			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
 			'imapHost', 'imapUser',
 			'greetingDefault', 'introDefault', 'closingDefault',
+			'smallBusinessNote',
 		];
 		foreach ($stringFields as $field) {
 			if (array_key_exists($field, $data)) {
