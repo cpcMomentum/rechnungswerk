@@ -213,12 +213,15 @@ async function confirmDelete() {
 	overflow-wrap: anywhere;
 }
 /* Row content can span several lines → the actions belong at the top, not
-   floating in the vertical centre. */
-.rw-snippet-row > td {
+   floating in the vertical centre. The `td.rw-col-actions` selector is needed to
+   out-specify the global `.rw-table … .rw-col-actions { vertical-align: middle }`
+   rule in app.css. */
+.rw-snippet-row > td,
+.rw-snippet-row > td.rw-col-actions {
 	vertical-align: top;
 }
 .rw-snippet-actions {
-	padding-top: 8px;
+	padding-top: 4px;
 }
 /* Filled star = this is the default template for its document type + slot. */
 .rw-star--active {
