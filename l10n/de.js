@@ -381,6 +381,9 @@ OC.L10N.register(
     "Textbausteine verwalten" : "Textbausteine verwalten",
     "Textbereich" : "Textbereich",
     "Vorlage einfügen" : "Vorlage einfügen",
-    "z. B. Neukunde, Mahnfreundlich" : "z. B. Neukunde, Mahnfreundlich"
+    "z. B. Neukunde, Mahnfreundlich" : "z. B. Neukunde, Mahnfreundlich",
+    "Geplanter Leistungszeitraum (optional)" : "Geplanter Leistungszeitraum (optional)",
+    "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend." : "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.",
+    "Vorgabe" : "Vorgabe"
 },
 "nplurals=2; plural=(n != 1);");

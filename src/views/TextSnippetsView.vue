@@ -20,44 +20,41 @@
 			<template #icon><TextBoxIcon :size="20" /></template>
 		</NcEmptyContent>
 
-		<div v-else-if="store.snippets.length > 0" class="rw-table-wrap">
-			<table class="rw-table">
-				<thead>
-					<tr>
-						<th>{{ t('rechnungswerk', 'Name') }}</th>
-						<th>{{ t('rechnungswerk', 'Dokument') }}</th>
-						<th>{{ t('rechnungswerk', 'Textbereich') }}</th>
-						<th>{{ t('rechnungswerk', 'Standard') }}</th>
-						<th class="num" />
-					</tr>
-				</thead>
-				<tbody>
-					<tr v-for="s in store.snippets" :key="s.id">
-						<td>
-							<strong>{{ s.label }}</strong>
-							<div v-if="s.content" class="rw-muted rw-preview">{{ preview(s.content) }}</div>
-						</td>
-						<td>{{ t('rechnungswerk', SNIPPET_DOC_TYPE_LABELS[s.docType]) }}</td>
-						<td>{{ t('rechnungswerk', SNIPPET_SLOT_LABELS[s.slot]) }}</td>
-						<td>
-							<span v-if="s.isDefault" class="rw-badge">{{ t('rechnungswerk', 'Standard') }}</span>
-							<span v-else class="rw-muted">–</span>
-						</td>
-						<td class="num">
-							<NcActions :aria-label="t('rechnungswerk', 'Aktionen')">
-								<NcActionButton @click="openEdit(s)">
-									<template #icon><PencilIcon :size="20" /></template>
-									{{ t('rechnungswerk', 'Bearbeiten') }}
-								</NcActionButton>
-								<NcActionButton @click="askDelete(s)">
-									<template #icon><DeleteIcon :size="20" /></template>
-									{{ t('rechnungswerk', 'Löschen') }}
-								</NcActionButton>
-							</NcActions>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+		<div v-else-if="store.snippets.length > 0" class="rw-snippet-groups">
+			<section v-for="g in groups" :key="g.key" class="rw-snippet-group">
+				<h3 class="rw-snippet-group__head">
+					{{ t('rechnungswerk', SNIPPET_DOC_TYPE_LABELS[g.docType]) }}
+					<span class="rw-snippet-group__sep">–</span>
+					{{ t('rechnungswerk', SNIPPET_SLOT_LABELS[g.slot]) }}
+				</h3>
+				<div class="rw-table-wrap">
+					<table class="rw-table">
+						<tbody>
+							<tr v-for="s in g.items" :key="s.id">
+								<td>
+									<strong>{{ s.label }}</strong>
+									<div v-if="s.content" class="rw-muted rw-preview">{{ preview(s.content) }}</div>
+								</td>
+								<td class="rw-badge-cell">
+									<span v-if="s.isDefault" class="rw-badge">{{ t('rechnungswerk', 'Vorgabe') }}</span>
+								</td>
+								<td class="num">
+									<NcActions :aria-label="t('rechnungswerk', 'Aktionen')">
+										<NcActionButton @click="openEdit(s)">
+											<template #icon><PencilIcon :size="20" /></template>
+											{{ t('rechnungswerk', 'Bearbeiten') }}
+										</NcActionButton>
+										<NcActionButton @click="askDelete(s)">
+											<template #icon><DeleteIcon :size="20" /></template>
+											{{ t('rechnungswerk', 'Löschen') }}
+										</NcActionButton>
+									</NcActions>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
 		</div>
 
 		<TextSnippetEditModal
@@ -79,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -93,10 +90,30 @@ import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import TextSnippetEditModal from '@/components/TextSnippetEditModal.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useTextSnippetStore } from '@/stores/textSnippetStore'
-import { SNIPPET_DOC_TYPE_LABELS, SNIPPET_SLOT_LABELS, type TextSnippet } from '@/types/api'
+import { SNIPPET_DOC_TYPE_LABELS, SNIPPET_SLOT_LABELS, type SnippetDocType, type SnippetSlot, type TextSnippet } from '@/types/api'
 import type { TextSnippetCreate } from '@/api/textSnippets'
 
 const store = useTextSnippetStore()
+
+// Primary structure of the list: one group per document type + text area, in a
+// natural reading order (invoice before quote, opening before closing). The
+// snippet name is secondary — the group heading tells you what it is for.
+const DOC_TYPE_ORDER: SnippetDocType[] = ['invoice', 'quote']
+const SLOT_ORDER: SnippetSlot[] = ['opening', 'closing']
+const groups = computed(() => {
+	const out: Array<{ key: string, docType: SnippetDocType, slot: SnippetSlot, items: TextSnippet[] }> = []
+	for (const docType of DOC_TYPE_ORDER) {
+		for (const slot of SLOT_ORDER) {
+			const items = store.snippets
+				.filter(s => s.docType === docType && s.slot === slot)
+				.sort((a, b) => Number(b.isDefault) - Number(a.isDefault) || a.sortOrder - b.sortOrder || a.label.localeCompare(b.label))
+			if (items.length > 0) {
+				out.push({ key: `${docType}-${slot}`, docType, slot, items })
+			}
+		}
+	}
+	return out
+})
 const editorOpen = ref(false)
 const editing = ref<TextSnippet | null>(null)
 const deleteTarget = ref<TextSnippet | null>(null)
@@ -168,6 +185,23 @@ async function confirmDelete() {
 .rw-preview {
 	font-size: 0.85em;
 	margin-top: 2px;
+}
+.rw-snippet-group {
+	margin-bottom: 24px;
+}
+.rw-snippet-group__head {
+	font-size: 1em;
+	font-weight: 600;
+	margin: 0 0 8px;
+	color: var(--color-text-maxcontrast);
+}
+.rw-snippet-group__sep {
+	margin: 0 4px;
+	opacity: 0.6;
+}
+.rw-badge-cell {
+	white-space: nowrap;
+	width: 1%;
 }
 .rw-badge {
 	display: inline-block;

@@ -32,12 +32,14 @@
 			<div class="rw-form-row">
 				<label class="rw-field invoice-no"><span>{{ isQuote ? t('rechnungswerk', 'Angebotsnummer') : t('rechnungswerk', 'Rechnungsnummer') }}</span>
 					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird vergeben)')" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
+				<label class="rw-field"><span>{{ isQuote ? t('rechnungswerk', 'Geplanter Leistungszeitraum (optional)') : t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
 					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'bis (optional)') }}</span>
 					<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
 			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
+			<p class="rw-hint">{{ isQuote
+				? t('rechnungswerk', 'Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.')
+				: t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
 			<details class="more">
 				<summary>{{ isQuote
 					? t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)')
