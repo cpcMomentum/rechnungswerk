@@ -386,6 +386,13 @@ OC.L10N.register(
     "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend." : "Optional: planned date or period of the service. First field only → date, both fields → period. Not mandatory for a quote.",
     "Vorgabe" : "Default",
     "Als Standard festlegen" : "Set as default",
-    "Standard-Vorlage" : "Default template"
+    "Standard-Vorlage" : "Default template",
+    "kWh" : "kWh",
+    "Liter" : "Litre",
+    "Meter" : "Metre",
+    "Kilometer" : "Kilometre",
+    "m²" : "m²",
+    "Gramm" : "Gram",
+    "Tonne" : "Tonne"
 },
 "nplurals=2; plural=(n != 1);");
