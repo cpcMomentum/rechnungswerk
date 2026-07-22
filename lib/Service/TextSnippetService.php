@@ -15,11 +15,13 @@ use OCA\Rechnungswerk\Db\TextSnippetMapper;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IDBConnection;
 
 class TextSnippetService {
 
 	public function __construct(
 		private readonly TextSnippetMapper $mapper,
+		private readonly IDBConnection $db,
 	) {
 	}
 
@@ -48,9 +50,18 @@ class TextSnippetService {
 		$snippet->setCreatedAt($now);
 		$snippet->setUpdatedAt($now);
 		$this->apply($snippet, $data, true);
-		$snippet = $this->mapper->insert($snippet);
-		if ($snippet->getIsDefault() === 1) {
-			$this->mapper->clearDefault($snippet->getDocType(), $snippet->getSlot(), $snippet->getId());
+		// Insert + clear-sibling-defaults must be atomic: a failure mid-way could
+		// otherwise leave two defaults for the same (docType, slot).
+		$this->db->beginTransaction();
+		try {
+			$snippet = $this->mapper->insert($snippet);
+			if ($snippet->getIsDefault() === 1) {
+				$this->mapper->clearDefault($snippet->getDocType(), $snippet->getSlot(), $snippet->getId());
+			}
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
 		}
 		return $snippet;
 	}
@@ -65,9 +76,17 @@ class TextSnippetService {
 		$this->validate($data, partial: true);
 		$this->apply($snippet, $data, false);
 		$snippet->setUpdatedAt(new DateTime());
-		$snippet = $this->mapper->update($snippet);
-		if ($snippet->getIsDefault() === 1) {
-			$this->mapper->clearDefault($snippet->getDocType(), $snippet->getSlot(), $snippet->getId());
+		// Atomic update + clear-sibling-defaults (see create()).
+		$this->db->beginTransaction();
+		try {
+			$snippet = $this->mapper->update($snippet);
+			if ($snippet->getIsDefault() === 1) {
+				$this->mapper->clearDefault($snippet->getDocType(), $snippet->getSlot(), $snippet->getId());
+			}
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
 		}
 		return $snippet;
 	}

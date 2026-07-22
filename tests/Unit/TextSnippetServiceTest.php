@@ -15,6 +15,7 @@ use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\TextSnippetService;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IDBConnection;
 use PHPUnit\Framework\TestCase;
 
 class TextSnippetServiceTest extends TestCase {
@@ -25,7 +26,7 @@ class TextSnippetServiceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(TextSnippetMapper::class);
-		$this->service = new TextSnippetService($this->mapper);
+		$this->service = new TextSnippetService($this->mapper, $this->createMock(IDBConnection::class));
 	}
 
 	public function testCreateAppliesDefaults(): void {
