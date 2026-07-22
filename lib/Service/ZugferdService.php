@@ -772,10 +772,10 @@ h1 { font-size: 18pt; color: {$accent}; margin: 0 0 4px; }
 table.meta { font-size: 9pt; margin-bottom: 16px; }
 table.meta td { padding: 1px 8px 1px 0; }
 table.meta .meta-label { color: #666; }
-table.items { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+table.items { width: 100%; border-collapse: collapse; margin-bottom: 4px; table-layout: fixed; }
 table.items th { background: {$accent}; color: #fff; text-align: left; padding: 6px 8px; font-size: 9pt; }
-table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
-table.items td.num, table.items th.num { text-align: right; }
+table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; }
+table.items td.num, table.items th.num { text-align: right; white-space: nowrap; }
 .item-desc { color: #666; font-size: 8.5pt; margin-top: 2px; }
 .company-contact { font-size: 8.5pt; color: #555; margin-top: 2px; }
 .intro { margin: 0 0 14px; font-size: 9.5pt; }
@@ -810,6 +810,7 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 <table class="meta">{$metaHtml}</table>
 {$introHtml}
 <table class="items">
+  <colgroup><col style="width: 46%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 10%;"><col style="width: 16%;"></colgroup>
   <thead><tr><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th></tr></thead>
   <tbody>{$rows}</tbody>
 </table>
