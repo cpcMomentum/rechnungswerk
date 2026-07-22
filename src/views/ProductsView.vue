@@ -28,25 +28,23 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="p in store.products" :key="p.id">
+					<tr v-for="p in store.products" :key="p.id" class="rw-row-clickable" @click="openEdit(p)">
 						<td>
-							<strong>{{ p.name }}</strong>
+							{{ p.name }}
 							<div v-if="p.description" class="rw-muted">{{ p.description }}</div>
 						</td>
 						<td>{{ t('rechnungswerk', unitLabel(p.defaultUnitCode)) }}</td>
 						<td class="num">{{ formatCents(p.defaultPriceCents) }}</td>
 						<td class="num">{{ formatTaxRate(p.defaultTaxRateBp) }}</td>
-						<td class="num">
-							<NcActions :aria-label="t('rechnungswerk', 'Aktionen')">
-								<NcActionButton @click="openEdit(p)">
-									<template #icon><PencilIcon :size="20" /></template>
-									{{ t('rechnungswerk', 'Bearbeiten') }}
-								</NcActionButton>
-								<NcActionButton @click="askDelete(p)">
+						<td class="rw-col-actions">
+							<div class="rw-actions">
+								<NcButton type="tertiary"
+									:aria-label="t('rechnungswerk', 'Löschen')"
+									:title="t('rechnungswerk', 'Löschen')"
+									@click.stop="askDelete(p)">
 									<template #icon><DeleteIcon :size="20" /></template>
-									{{ t('rechnungswerk', 'Löschen') }}
-								</NcActionButton>
-							</NcActions>
+								</NcButton>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -77,10 +75,7 @@ import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
-import PencilIcon from 'vue-material-design-icons/Pencil.vue'
 import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import ProductEditModal from '@/components/ProductEditModal.vue'
