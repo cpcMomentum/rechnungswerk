@@ -385,7 +385,9 @@
         "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.": "Optional: planned date or period of the service. First field only → date, both fields → period. Not mandatory for a quote.",
         "Vorgabe": "Default",
         "Als Standard festlegen": "Set as default",
-        "Standard-Vorlage": "Default template"
+        "Standard-Vorlage": "Default template",
+        "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.": "Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter.",
+        "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.": "Separate number circle, independent from invoices. Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter."
     },
     "pluralForm": "nplurals=2; plural=(n != 1);"
 }

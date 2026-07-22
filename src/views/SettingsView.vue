@@ -82,7 +82,7 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
 					<input v-model="form.numberFormat" class="rw-input" type="text" /></label>
 				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.') }}
+					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
 				</p>
@@ -116,7 +116,7 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
 					<input v-model="form.quoteNumberFormat" class="rw-input" type="text" placeholder="AN-{YYYY}-{####}" /></label>
 				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.') }}
+					{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: quotePreview }) }}
 				</p>
@@ -439,6 +439,10 @@ const confirmResetMode = ref(false)
 const confirmQuoteResetMode = ref(false)
 const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
+// Month/day for the {MM}/{DD} number preview (#143); illustrative — the real
+// number takes these from the invoice's issue date at commit time.
+const currentMonth = ref(new Date().getMonth() + 1)
+const currentDay = ref(new Date().getDate())
 const currentYearFromSettings = ref<number | null>(null)
 const currentQuoteCounter = ref(0)
 const currentQuoteYearFromSettings = ref<number | null>(null)
@@ -481,7 +485,7 @@ const preview = computed(() => {
 	const base = form.value.numberResetMode === 'continuous'
 		? currentCounter.value
 		: (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0)
-	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value)
+	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value, currentMonth.value, currentDay.value)
 })
 
 /** Live preview of the next quote number (#111), mirroring the invoice preview. */
@@ -492,7 +496,7 @@ const quotePreview = computed(() => {
 	const base = form.value.quoteNumberResetMode === 'continuous'
 		? currentQuoteCounter.value
 		: (currentYear.value === currentQuoteYearFromSettings.value ? currentQuoteCounter.value : 0)
-	return previewInvoiceNumber(form.value.quoteNumberFormat || 'AN-{YYYY}-{####}', base + 1, currentYear.value)
+	return previewInvoiceNumber(form.value.quoteNumberFormat || 'AN-{YYYY}-{####}', base + 1, currentYear.value, currentMonth.value, currentDay.value)
 })
 
 /** Live preview of the file-name scheme, fed with the number preview above. */
