@@ -44,6 +44,9 @@ class ZugferdService {
 	/** §19 UStG exemption reason placed on the VAT breakdown (category E). */
 	private const SMALL_BUSINESS_REASON = 'Steuerbefreit gemäß § 19 UStG (Kleinunternehmer)';
 
+	/** Default §19 UStG hint printed on the invoice; configurable per company (#141). */
+	public const SMALL_BUSINESS_NOTE_DEFAULT = 'Gem. § 19 UStG enthält der Rechnungsbetrag keine Umsatzsteuer.';
+
 	public function __construct(
 		private readonly IRootFolder $rootFolder,
 		private readonly GirocodeService $girocodeService,
@@ -710,6 +713,17 @@ class ZugferdService {
 		$exemptNote = (!$smallBusiness && $invoice->isTaxExemptCase()) ? $this->specialTaxCaseLabel($invoice) : null;
 		$exemptNoteHtml = $exemptNote !== null ? '<p class="exempt-note">' . $e($exemptNote) . '</p>' : '';
 
+		// §19 UStG small-business hint (#141): a configurable sentence printed on the
+		// invoice below the totals; falls back to the default wording when unset.
+		$smallBusinessNoteHtml = '';
+		if ($smallBusiness && !$isQuote) {
+			$note = trim((string)($settings->getSmallBusinessNote() ?? ''));
+			if ($note === '') {
+				$note = self::SMALL_BUSINESS_NOTE_DEFAULT;
+			}
+			$smallBusinessNoteHtml = '<p class="exempt-note">' . $e($note) . '</p>';
+		}
+
 		// Salutation + intro text belong ABOVE the line items.
 		$greeting = ($invoice->getGreeting() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getGreeting())) . '</p>' : '';
 		$introHtml = $greeting !== '' ? '<div class="intro">' . $greeting . '</div>' : '';
@@ -806,6 +820,7 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 </table></div>
 <div class="payment">
   {$exemptNoteHtml}
+  {$smallBusinessNoteHtml}
   {$quoteNoteHtml}
   {$termHtml}
   {$paymentInfo}
