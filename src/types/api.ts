@@ -36,6 +36,8 @@ export interface Product {
 	name: string
 	description: string | null
 	defaultUnitCode: UnitCode
+	/** Optional free-text unit name; XML uses C62 when set (#153). */
+	defaultUnitLabel: string | null
 	/** Default unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
 	defaultPriceE4: number
 	defaultTaxRateBp: number
@@ -137,6 +139,8 @@ export interface InvoiceItem {
 	description: string | null
 	quantity: string
 	unitCode: UnitCode
+	/** Optional free-text unit name; XML uses C62 when set (#153). */
+	unitLabel: string | null
 	/** Unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
 	unitPriceE4: number
 	taxRateBp: number

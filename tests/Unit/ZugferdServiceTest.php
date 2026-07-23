@@ -66,16 +66,34 @@ class ZugferdServiceTest extends TestCase {
 		return $inv;
 	}
 
-	private function item(int $unitPriceE4, int $taxRateBp, int $lineTotalCents, string $qty = '2'): InvoiceItem {
+	private function item(int $unitPriceE4, int $taxRateBp, int $lineTotalCents, string $qty = '2', string $unitCode = InvoiceItem::UNIT_PIECE, ?string $unitLabel = null): InvoiceItem {
 		$i = new InvoiceItem();
 		$i->setName('Beratung');
 		$i->setQuantity($qty);
-		$i->setUnitCode(InvoiceItem::UNIT_PIECE);
+		$i->setUnitCode($unitCode);
+		$i->setUnitLabel($unitLabel);
 		$i->setUnitPriceE4($unitPriceE4);
 		$i->setTaxRateBp($taxRateBp);
 		$i->setLineTotalCents($lineTotalCents);
 		$i->setSortOrder(0);
 		return $i;
+	}
+
+	public function testFreeTextUnitLabelMapsToGenericCodeInXml(): void {
+		// A free-text unit ("Personen") on top of a non-C62 standard code (HUR):
+		// the XML must fall back to the generic C62 so it stays EN16931-valid, and
+		// the label itself never leaks into the XML (display-only, #153).
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000, '2', InvoiceItem::UNIT_HOUR, 'Personen')];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		$this->assertStringContainsString('unitCode="C62"', $xml);
+		$this->assertStringNotContainsString('unitCode="HUR"', $xml);
+		$this->assertStringNotContainsString('Personen', $xml);
 	}
 
 	public function testStandardInvoiceCarriesTypeAmountsAndParties(): void {

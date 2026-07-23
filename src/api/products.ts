@@ -10,6 +10,7 @@ export interface ProductCreate {
 	name: string
 	description?: string | null
 	defaultUnitCode?: string
+	defaultUnitLabel?: string | null
 	defaultPriceE4?: number
 	defaultTaxRateBp?: number
 }

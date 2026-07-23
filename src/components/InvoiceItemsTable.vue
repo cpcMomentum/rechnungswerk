@@ -39,6 +39,9 @@
 										{{ t('rechnungswerk', UNIT_CODE_LABELS[code]) }}
 									</option>
 								</select>
+								<input v-model="item.unitLabel" class="rw-input rw-unit-label" type="text" maxlength="64"
+									:readonly="readonly" :placeholder="t('rechnungswerk', 'eigene Einheit')"
+									:title="t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.')" />
 							</td>
 							<td class="num">
 								<input v-model="item.priceInput" class="rw-input num" type="number"
@@ -138,5 +141,10 @@ function remove(index: number) {
 .empty-row {
 	text-align: center;
 	padding: 16px;
+}
+/* Optional free-text unit label (#153) below the standard-unit select. */
+.rw-unit-label {
+	margin-top: 4px;
+	font-size: 0.9em;
 }
 </style>

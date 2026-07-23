@@ -26,6 +26,8 @@ use OCP\DB\Types;
  * @method void setQuantity(string $quantity)
  * @method string getUnitCode()
  * @method void setUnitCode(string $unitCode)
+ * @method ?string getUnitLabel()
+ * @method void setUnitLabel(?string $unitLabel)
  * @method int getUnitPriceE4()
  * @method void setUnitPriceE4(int $unitPriceE4)
  * @method int getTaxRateBp()
@@ -75,6 +77,8 @@ class InvoiceItem extends Entity implements JsonSerializable {
 	/** Decimal string (e.g. "2.500") — line_total_cents stays the authoritative money value. */
 	protected ?string $quantity = null;
 	protected ?string $unitCode = null;
+	/** Optional free-text unit name for display (PDF/editor); XML uses C62 when set (#153). */
+	protected ?string $unitLabel = null;
 	/** Unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
 	protected ?int $unitPriceE4 = null;
 	/**
@@ -94,6 +98,7 @@ class InvoiceItem extends Entity implements JsonSerializable {
 		$this->addType('description', Types::TEXT);
 		$this->addType('quantity', Types::DECIMAL);
 		$this->addType('unitCode', Types::STRING);
+		$this->addType('unitLabel', Types::STRING);
 		$this->addType('unitPriceE4', Types::INTEGER);
 		$this->addType('unitPriceCents', Types::INTEGER);
 		$this->addType('taxRateBp', Types::INTEGER);
@@ -110,6 +115,7 @@ class InvoiceItem extends Entity implements JsonSerializable {
 			'description' => $this->getDescription(),
 			'quantity' => $this->getQuantity(),
 			'unitCode' => $this->getUnitCode(),
+			'unitLabel' => $this->getUnitLabel(),
 			'unitPriceE4' => $this->getUnitPriceE4(),
 			'taxRateBp' => $this->getTaxRateBp(),
 			'lineTotalCents' => $this->getLineTotalCents(),

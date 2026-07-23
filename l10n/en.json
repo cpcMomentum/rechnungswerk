@@ -394,7 +394,12 @@
         "Gramm": "Gram",
         "Tonne": "Tonne",
         "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.": "Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter.",
-        "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.": "Separate number circle, independent from invoices. Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter."
+        "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.": "Separate number circle, independent from invoices. Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter.",
+        "Eigene Einheit (optional)": "Custom unit (optional)",
+        "Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.": "Free-text name — shown on the PDF. In the e-invoice the unit is mapped to the generic \"piece\" so it stays valid.",
+        "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.": "Free-text name — shown on the PDF; in the e-invoice the unit is mapped to the generic \"piece\".",
+        "eigene Einheit": "custom unit",
+        "z. B. Personen, Sitzung": "e.g. persons, session"
     },
     "pluralForm": "nplurals=2; plural=(n != 1);"
 }
