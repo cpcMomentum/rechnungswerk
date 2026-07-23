@@ -42,7 +42,7 @@
 							</td>
 							<td class="num">
 								<input v-model="item.priceInput" class="rw-input num" type="number"
-									step="0.01" :readonly="readonly" />
+									step="0.0001" :readonly="readonly" />
 							</td>
 							<td class="num">
 								<select v-model.number="item.taxRateBp" class="rw-input" :disabled="readonly || smallBusiness">
@@ -98,7 +98,7 @@ import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product } from '@/types/api'
 import { emptyItem, itemFromProduct, type EditorItem } from '@/types/editor'
-import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
+import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
 import { lineTotalCents } from '@/utils/invoiceCalc'
 
 const items = defineModel<EditorItem[]>('items', { required: true })
@@ -109,7 +109,7 @@ const props = defineProps<{
 	defaultTaxRateBp?: number
 }>()
 
-const lineTotal = (item: EditorItem): number => lineTotalCents(item.quantity, euroInputToCents(item.priceInput))
+const lineTotal = (item: EditorItem): number => lineTotalCents(item.quantity, euroInputToE4(item.priceInput))
 
 // Under §19 small-business there is no VAT: force every line to 0 % so the
 // client preview matches what the server stores.

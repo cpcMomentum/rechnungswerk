@@ -380,7 +380,7 @@ class InvoiceService {
 				// VAT — become negative.
 				$copy->setQuantity(InvoiceCalculator::negateQuantity($item->getQuantity()));
 				$copy->setUnitCode($item->getUnitCode());
-				$copy->setUnitPriceCents($item->getUnitPriceCents());
+				$copy->setUnitPriceE4($item->getUnitPriceE4());
 				$copy->setTaxRateBp($item->getTaxRateBp());
 				$copy->setLineTotalCents(-$item->getLineTotalCents());
 				$copy->setSortOrder($item->getSortOrder());
@@ -472,7 +472,7 @@ class InvoiceService {
 				$line->setDescription($item->getDescription());
 				$line->setQuantity($item->getQuantity());
 				$line->setUnitCode($item->getUnitCode());
-				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setUnitPriceE4($item->getUnitPriceE4());
 				$line->setTaxRateBp($item->getTaxRateBp());
 				$line->setLineTotalCents($item->getLineTotalCents());
 				$line->setSortOrder($item->getSortOrder());
@@ -725,7 +725,7 @@ class InvoiceService {
 				continue;
 			}
 			$quantity = isset($row['quantity']) ? (string)$row['quantity'] : '1';
-			$unitPriceCents = (int)($row['unitPriceCents'] ?? 0);
+			$unitPriceE4 = (int)($row['unitPriceE4'] ?? 0);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
 			$name = (string)($row['name'] ?? '');
@@ -739,9 +739,9 @@ class InvoiceService {
 			$item->setDescription(isset($row['description']) && $row['description'] !== '' ? (string)$row['description'] : null);
 			$item->setQuantity($quantity);
 			$item->setUnitCode((string)($row['unitCode'] ?? InvoiceItem::UNIT_PIECE));
-			$item->setUnitPriceCents($unitPriceCents);
+			$item->setUnitPriceE4($unitPriceE4);
 			$item->setTaxRateBp($taxRateBp);
-			$item->setLineTotalCents(InvoiceCalculator::lineTotalCents($quantity, $unitPriceCents));
+			$item->setLineTotalCents(InvoiceCalculator::lineTotalCents($quantity, $unitPriceE4));
 			$item->setSortOrder($sort++);
 			$items[] = $item;
 		}
@@ -1179,7 +1179,7 @@ class InvoiceService {
 				$line->setDescription($item->getDescription());
 				$line->setQuantity($item->getQuantity());
 				$line->setUnitCode($item->getUnitCode());
-				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setUnitPriceE4($item->getUnitPriceE4());
 				$line->setTaxRateBp($item->getTaxRateBp());
 				$line->setLineTotalCents($item->getLineTotalCents());
 				$line->setSortOrder($item->getSortOrder());
@@ -1300,7 +1300,7 @@ class InvoiceService {
 				$line->setDescription($item->getDescription());
 				$line->setQuantity($item->getQuantity());
 				$line->setUnitCode($item->getUnitCode());
-				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setUnitPriceE4($item->getUnitPriceE4());
 				$line->setTaxRateBp($item->getTaxRateBp());
 				$line->setLineTotalCents($item->getLineTotalCents());
 				$line->setSortOrder($item->getSortOrder());

@@ -16,27 +16,34 @@ use PHPUnit\Framework\TestCase;
 
 class InvoiceCalculatorTest extends TestCase {
 
+	// Unit prices are passed in ten-thousandths of a euro (1/10000 €, #147):
+	// 12,50 € = 125000, 80,00 € = 800000, 2,00 € = 20000, 3,00 € = 30000.
 	public function testLineTotalWholeQuantity(): void {
 		// 3 × 12,50 € = 37,50 €
-		$this->assertSame(3750, InvoiceCalculator::lineTotalCents('3', 1250));
+		$this->assertSame(3750, InvoiceCalculator::lineTotalCents('3', 125000));
 	}
 
 	public function testLineTotalDecimalQuantity(): void {
 		// 2,5 h × 80,00 € = 200,00 €
-		$this->assertSame(20000, InvoiceCalculator::lineTotalCents('2.5', 8000));
+		$this->assertSame(20000, InvoiceCalculator::lineTotalCents('2.5', 800000));
 	}
 
 	public function testLineTotalCommaSeparatorIsAccepted(): void {
-		$this->assertSame(500, InvoiceCalculator::lineTotalCents('2,5', 200));
+		$this->assertSame(500, InvoiceCalculator::lineTotalCents('2,5', 20000));
 	}
 
 	public function testLineTotalRoundsToNearestCent(): void {
 		// 0,333 × 3,00 € = 0,999 € -> 1,00 €
-		$this->assertSame(100, InvoiceCalculator::lineTotalCents('0.333', 300));
+		$this->assertSame(100, InvoiceCalculator::lineTotalCents('0.333', 30000));
+	}
+
+	public function testLineTotalFourDecimalUnitPrice(): void {
+		// 1234 kWh × 0,3456 €/kWh = 426,4704 € -> 426,47 € (rounded once at the line, #147)
+		$this->assertSame(42647, InvoiceCalculator::lineTotalCents('1234', 3456));
 	}
 
 	public function testLineTotalEmptyQuantityIsZero(): void {
-		$this->assertSame(0, InvoiceCalculator::lineTotalCents('', 1250));
+		$this->assertSame(0, InvoiceCalculator::lineTotalCents('', 125000));
 	}
 
 	public function testComputeTotalsSingleRate(): void {

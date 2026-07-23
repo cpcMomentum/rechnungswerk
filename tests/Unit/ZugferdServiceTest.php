@@ -66,12 +66,12 @@ class ZugferdServiceTest extends TestCase {
 		return $inv;
 	}
 
-	private function item(int $unitPriceCents, int $taxRateBp, int $lineTotalCents, string $qty = '2'): InvoiceItem {
+	private function item(int $unitPriceE4, int $taxRateBp, int $lineTotalCents, string $qty = '2'): InvoiceItem {
 		$i = new InvoiceItem();
 		$i->setName('Beratung');
 		$i->setQuantity($qty);
 		$i->setUnitCode(InvoiceItem::UNIT_PIECE);
-		$i->setUnitPriceCents($unitPriceCents);
+		$i->setUnitPriceE4($unitPriceE4);
 		$i->setTaxRateBp($taxRateBp);
 		$i->setLineTotalCents($lineTotalCents);
 		$i->setSortOrder(0);
@@ -83,7 +83,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
@@ -97,6 +97,25 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('<ram:RateApplicablePercent>19.00</ram:RateApplicablePercent>', $xml);
 	}
 
+	public function testFourDecimalUnitPriceKeepsPrecisionInXml(): void {
+		// 1234 × 0,3456 €/Stk = 426,4704 € -> 426,47 € (rounded once, #147).
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(42647);
+		$invoice->setTotalCents(50750); // 426,47 € × 1,19 = 507,50 €
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 42647, 'taxCents' => 8103]]));
+		$items = [$this->item(3456, 1900, 42647, '1234')]; // unitPriceE4 = 3456 -> 0,3456 €
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		// The finer price (0,3456 €) is expressed exactly via a price base quantity
+		// of 100: net price 34,56 € per 100 units → 0,3456 €/unit, all amounts at
+		// two decimals. Line total and grand total stay in cents.
+		$this->assertStringContainsString('<ram:ChargeAmount>34.56</ram:ChargeAmount>', $xml);
+		$this->assertMatchesRegularExpression('/<ram:BasisQuantity[^>]*>100/', $xml);
+		$this->assertStringContainsString('<ram:LineTotalAmount>426.47</ram:LineTotalAmount>', $xml);
+		$this->assertStringContainsString('<ram:GrandTotalAmount>507.50</ram:GrandTotalAmount>', $xml);
+	}
+
 	public function testMixedTaxRatesProduceTwoBreakdownGroups(): void {
 		$invoice = $this->invoice();
 		$invoice->setSubtotalCents(30000); // 200,00 @19% + 100,00 @7%
@@ -106,8 +125,8 @@ class ZugferdServiceTest extends TestCase {
 			['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800],
 		]));
 		$items = [
-			$this->item(10000, 1900, 20000),
-			$this->item(10000, 700, 10000, '1'),
+			$this->item(1000000, 1900, 20000),
+			$this->item(1000000, 700, 10000, '1'),
 		];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
@@ -123,7 +142,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(20000); // no VAT
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 0, 'netCents' => 20000, 'taxCents' => 0]]));
-		$items = [$this->item(10000, 0, 20000)];
+		$items = [$this->item(1000000, 0, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings(1));
 
@@ -140,7 +159,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(20000); // no VAT charged under reverse charge
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 0]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
@@ -158,7 +177,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
@@ -174,7 +193,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
@@ -194,7 +213,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $settings);
 
@@ -214,7 +233,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $settings);
 
@@ -230,7 +249,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setTotalCents(-23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
 		// Storno line: negative quantity, positive net price, negative line total.
-		$items = [$this->item(10000, 1900, -20000, '-2')];
+		$items = [$this->item(1000000, 1900, -20000, '-2')];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
@@ -249,7 +268,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(-20000);
 		$invoice->setTotalCents(-23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => -20000, 'taxCents' => -3800]]));
-		$items = [$this->item(10000, 1900, -20000, '-2')];
+		$items = [$this->item(1000000, 1900, -20000, '-2')];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings(), 'RE-2026-0001', new DateTime('2026-05-16'));
 
@@ -272,7 +291,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$html = $this->renderHtml($invoice, $items, $this->settings(), true);
 
@@ -291,7 +310,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setTotalCents(23800);
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$committedHtml = $this->renderHtml($invoice, $items, $settings, false);
 		$this->assertStringContainsString('Zahlen mit Girocode', $committedHtml);
@@ -307,7 +326,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(23800);
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
 
@@ -326,7 +345,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setGreeting("Sehr geehrte Damen und Herren,\nvielen Dank für Ihren Auftrag.");
 		$invoice->setExtraText('Bitte geben Sie bei Zahlung die Rechnungsnummer an.');
 		$invoice->setCustomFields(json_encode(['Lieferung frei Haus', 'Es gelten unsere AGB.'], JSON_UNESCAPED_UNICODE));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$xml = $this->service->buildXml($invoice, $items, $this->settings());
 
@@ -351,7 +370,7 @@ class ZugferdServiceTest extends TestCase {
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
 		// Pre-#41 shape: abandoned key-value custom fields survive as "label: value" notes.
 		$invoice->setCustomFields(json_encode([['label' => 'Kostenstelle', 'value' => 'KST-4711']]));
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$this->assertSame(['Kostenstelle: KST-4711'], $invoice->getNotesArray());
 
@@ -378,7 +397,7 @@ class ZugferdServiceTest extends TestCase {
 	public function testQuoteRenderShowsAngebotTitleValidityAndFreeformNote(): void {
 		$quote = $this->quote();
 		$quote->setOfferFreeform(1);
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$html = $this->renderHtml($quote, $items, $this->settings(), false);
 
@@ -398,7 +417,7 @@ class ZugferdServiceTest extends TestCase {
 	public function testQuoteWithoutFreeformFlagOmitsTheFreeformNote(): void {
 		$quote = $this->quote();
 		$quote->setOfferFreeform(0);
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$html = $this->renderHtml($quote, $items, $this->settings(), false);
 
@@ -410,7 +429,7 @@ class ZugferdServiceTest extends TestCase {
 		$settings = $this->settings();
 		$settings->setGirocodeEnabled(1); // even enabled, a quote must not show it
 		$quote = $this->quote();
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$html = $this->renderHtml($quote, $items, $settings, false);
 
@@ -423,7 +442,7 @@ class ZugferdServiceTest extends TestCase {
 		$quote = $this->quote();
 		$quote->setStatus(Invoice::STATUS_DRAFT);
 		$quote->setNumber(null);
-		$items = [$this->item(10000, 1900, 20000)];
+		$items = [$this->item(1000000, 1900, 20000)];
 
 		$html = $this->renderHtml($quote, $items, $this->settings(), true);
 

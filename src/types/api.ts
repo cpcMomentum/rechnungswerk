@@ -29,7 +29,8 @@ export interface Product {
 	name: string
 	description: string | null
 	defaultUnitCode: UnitCode
-	defaultPriceCents: number
+	/** Default unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	defaultPriceE4: number
 	defaultTaxRateBp: number
 	createdAt: string | null
 	updatedAt: string | null
@@ -129,7 +130,8 @@ export interface InvoiceItem {
 	description: string | null
 	quantity: string
 	unitCode: UnitCode
-	unitPriceCents: number
+	/** Unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	unitPriceE4: number
 	taxRateBp: number
 	lineTotalCents: number
 	sortOrder: number

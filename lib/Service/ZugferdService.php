@@ -364,10 +364,11 @@ class ZugferdService {
 				$item->getName() ?? '',
 				$item->getDescription() !== null && $item->getDescription() !== '' ? $item->getDescription() : null,
 			);
-			$builder->setDocumentPositionNetPrice($this->toEuro($item->getUnitPriceCents()));
+			$unitCode = $item->getUnitCode() ?? InvoiceItem::UNIT_PIECE;
+			$this->applyNetPrice($builder, (int)$item->getUnitPriceE4(), $unitCode);
 			$builder->setDocumentPositionQuantity(
 				$this->quantityToFloat($item->getQuantity()),
-				$item->getUnitCode() ?? InvoiceItem::UNIT_PIECE,
+				$unitCode,
 			);
 			if ($exemptCategory !== null) {
 				$builder->addDocumentPositionTax($exemptCategory, ZugferdVatTypeCodes::VALUE_ADDED_TAX, 0.0);
@@ -526,6 +527,22 @@ class ZugferdService {
 		return round($cents / 100, 2);
 	}
 
+	/**
+	 * Write the item net price (BT-146) preserving the four-decimal precision of
+	 * the stored e4 value (#147). horstoeko serialises amounts with two decimals,
+	 * so a finer price (e4 not a whole cent) is expressed via a price base
+	 * quantity of 100 (BT-149/150): e4/100 is an exact two-decimal amount and the
+	 * per-unit price = (e4/100) / 100 keeps all four decimals. Whole-cent prices
+	 * use the ordinary per-unit form.
+	 */
+	private function applyNetPrice(ZugferdDocumentBuilder $builder, int $e4, string $unitCode): void {
+		if ($e4 % 100 === 0) {
+			$builder->setDocumentPositionNetPrice(round($e4 / 10000, 2));
+		} else {
+			$builder->setDocumentPositionNetPrice(round($e4 / 100, 2), 100.0, $unitCode);
+		}
+	}
+
 	// --- PDF rendering ---------------------------------------------------
 
 	/**
@@ -645,7 +662,7 @@ class ZugferdService {
 			$rows .= '<tr>'
 				. '<td>' . $e($item->getName()) . $desc . '</td>'
 				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e($this->unitLabel($item->getUnitCode())) . '</td>'
-				. '<td class="num">' . $this->formatMoney((int)$item->getUnitPriceCents()) . '</td>'
+				. '<td class="num">' . $this->formatUnitPrice((int)$item->getUnitPriceE4()) . '</td>'
 				. '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>'
 				. '<td class="num">' . $this->formatMoney((int)$item->getLineTotalCents()) . '</td>'
 				. '</tr>';
@@ -872,6 +889,18 @@ HTML;
 
 	private function formatMoney(int $cents): string {
 		return number_format($cents / 100, 2, ',', '.') . ' €';
+	}
+
+	/**
+	 * Unit price (1/10000 €, #147) formatted with 2–4 decimals: always at least
+	 * two, up to four, trailing zeros beyond the second decimal trimmed. So 2,00 €
+	 * stays "2,00 €", 0,3456 € shows "0,3456 €", 0,3500 € shows "0,35 €".
+	 */
+	private function formatUnitPrice(int $e4): string {
+		$s = number_format($e4 / 10000, 4, ',', '.');
+		// Trim trailing zeros beyond the second decimal, keeping at least two.
+		$s = preg_replace('/(,\d\d)(\d*?)0+$/', '$1$2', $s) ?? $s;
+		return $s . ' €';
 	}
 
 	private function formatQuantity(?string $quantity): string {
