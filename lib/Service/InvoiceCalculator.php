@@ -101,13 +101,16 @@ final class InvoiceCalculator {
 
 	/**
 	 * Render an invoice number from a format template.
-	 * Supported placeholders: {YYYY}, {YY} and {#…#} (zero-padded counter, width = number of '#').
-	 * Example: "RE-{YYYY}-{####}" with counter 7, year 2026 -> "RE-2026-0007".
+	 * Supported placeholders: {YYYY}, {YY}, {MM} (month), {DD} (day) — all taken
+	 * from the document's issue date — and {#…#} (zero-padded counter, width =
+	 * number of '#'). {MM}/{DD} are cosmetic: they do NOT count as a "year"
+	 * component for the yearly-reset collision guard (see formatHasYear).
+	 * Example: "RE-{YYYY}-{####}" with counter 7, 2026-05-… -> "RE-2026-0007".
 	 */
-	public static function formatNumber(string $format, int $counter, int $year): string {
+	public static function formatNumber(string $format, int $counter, \DateTimeInterface $date): string {
 		$result = str_replace(
-			['{YYYY}', '{YY}'],
-			[sprintf('%04d', $year), sprintf('%02d', $year % 100)],
+			['{YYYY}', '{YY}', '{MM}', '{DD}'],
+			[$date->format('Y'), $date->format('y'), $date->format('m'), $date->format('d')],
 			$format,
 		);
 		return (string)preg_replace_callback(

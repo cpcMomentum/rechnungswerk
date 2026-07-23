@@ -446,8 +446,9 @@ class SettingsService {
 	 * concurrent commits serialise and can never hand out the same sequential
 	 * number (a duplicate invoice number would violate GoBD).
 	 */
-	public function reserveNextNumber(int $year): string {
+	public function reserveNextNumber(\DateTimeInterface $date): string {
 		$this->getCompany();
+		$year = (int)$date->format('Y');
 
 		// Lock the company settings row for the rest of the caller's transaction.
 		$select = $this->db->getQueryBuilder();
@@ -489,7 +490,7 @@ class SettingsService {
 			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter(self::COMPANY_KEY)));
 		$update->executeStatement();
 
-		return InvoiceCalculator::formatNumber($format, $next, $year);
+		return InvoiceCalculator::formatNumber($format, $next, $date);
 	}
 
 	/**
@@ -502,8 +503,9 @@ class SettingsService {
 	 * MUST be called inside a DB transaction owned by the caller (the company
 	 * settings row is locked with SELECT ... FOR UPDATE for the rest of it).
 	 */
-	public function reserveNextQuoteNumber(int $year): string {
+	public function reserveNextQuoteNumber(\DateTimeInterface $date): string {
 		$this->getCompany();
+		$year = (int)$date->format('Y');
 
 		$select = $this->db->getQueryBuilder();
 		$select->select('quote_number_counter', 'quote_number_counter_year', 'quote_number_format', 'quote_number_reset_mode')
@@ -541,6 +543,6 @@ class SettingsService {
 			->where($update->expr()->eq('owner_user_id', $update->createNamedParameter(self::COMPANY_KEY)));
 		$update->executeStatement();
 
-		return InvoiceCalculator::formatNumber($format, $next, $year);
+		return InvoiceCalculator::formatNumber($format, $next, $date);
 	}
 }

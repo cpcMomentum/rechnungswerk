@@ -9,7 +9,7 @@ export interface ApiError {
 }
 
 /** UN/ECE Rec. 20 unit codes used in EN16931. Labels are translated at render time. */
-export const UNIT_CODES = ['C62', 'HUR', 'DAY', 'MON', 'KGM', 'LS'] as const
+export const UNIT_CODES = ['C62', 'HUR', 'DAY', 'MON', 'KGM', 'LS', 'KWH', 'LTR', 'MTR', 'KMT', 'MTK', 'GRM', 'TNE'] as const
 export type UnitCode = typeof UNIT_CODES[number]
 
 export const UNIT_CODE_LABELS: Record<UnitCode, string> = {
@@ -19,6 +19,13 @@ export const UNIT_CODE_LABELS: Record<UnitCode, string> = {
 	MON: 'Monat',
 	KGM: 'kg',
 	LS: 'Pauschal',
+	KWH: 'kWh',
+	LTR: 'Liter',
+	MTR: 'Meter',
+	KMT: 'Kilometer',
+	MTK: 'm²',
+	GRM: 'Gramm',
+	TNE: 'Tonne',
 }
 
 /** Tax rates in basis points (19 % = 1900). */

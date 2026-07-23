@@ -205,7 +205,6 @@ class InvoiceService {
 		$this->settingsService->getCompany();
 
 		$now = new DateTime();
-		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
@@ -216,7 +215,7 @@ class InvoiceService {
 			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 
-			$number = $this->settingsService->reserveNextNumber($year);
+			$number = $this->settingsService->reserveNextNumber($now);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
 			$invoice->setIssueDate($now);
@@ -331,7 +330,6 @@ class InvoiceService {
 		$this->settingsService->getCompany();
 
 		$now = new DateTime();
-		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
@@ -366,7 +364,7 @@ class InvoiceService {
 			$storno->setCommittedAt($now);
 			$storno->setCreatedAt($now);
 			$storno->setUpdatedAt($now);
-			$storno->setNumber($this->settingsService->reserveNextNumber($year));
+			$storno->setNumber($this->settingsService->reserveNextNumber($now));
 			$storno = $this->invoiceMapper->insert($storno);
 
 			foreach ($originalItems as $item) {
@@ -1015,7 +1013,6 @@ class InvoiceService {
 		$this->settingsService->getCompany();
 
 		$now = new DateTime();
-		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
@@ -1029,7 +1026,7 @@ class InvoiceService {
 				$quote->setNumber($this->reserveNextRevisionNumber($quote));
 				$this->markSourceSuperseded((int)$quote->getRelatedQuoteId(), $now);
 			} else {
-				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($year));
+				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($now));
 			}
 			$quote->setStatus(Invoice::STATUS_COMMITTED);
 			$quote->setIssueDate($now);

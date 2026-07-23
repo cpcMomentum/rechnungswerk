@@ -335,6 +335,35 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('RE-2026-0001', $html);
 	}
 
+	public function testSmallBusinessRenderHidesVatColumnAndSubtotal(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(20000); // no VAT
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 0, 'netCents' => 20000, 'taxCents' => 0]]));
+		$items = [$this->item(10000, 0, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(1), false);
+
+		$this->assertStringNotContainsString('<th class="num">USt</th>', $html);
+		$this->assertStringNotContainsString('Zwischensumme', $html);
+		$this->assertStringNotContainsString('Steuerfrei', $html);
+		$this->assertStringContainsString('§ 19 UStG', $html);
+		$this->assertStringContainsString('Gesamtbetrag', $html);
+	}
+
+	public function testRegularRenderShowsVatColumnAndSubtotal(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
+
+		$this->assertStringContainsString('<th class="num">USt</th>', $html);
+		$this->assertStringContainsString('Zwischensumme', $html);
+	}
+
 	public function testReferencesAndNotesAreExportedToXml(): void {
 		$invoice = $this->invoice();
 		$invoice->setSubtotalCents(20000);
