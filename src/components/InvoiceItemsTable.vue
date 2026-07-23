@@ -39,7 +39,7 @@
 										{{ t('rechnungswerk', UNIT_CODE_LABELS[code]) }}
 									</option>
 								</select>
-								<input v-model="item.unitLabel" class="rw-input rw-unit-label" type="text"
+								<input v-model="item.unitLabel" class="rw-input rw-unit-label" type="text" maxlength="64"
 									:readonly="readonly" :placeholder="t('rechnungswerk', 'eigene Einheit')"
 									:title="t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.')" />
 							</td>

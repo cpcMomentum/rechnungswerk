@@ -98,6 +98,9 @@ class ProductService {
 				throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
 			}
 		}
+		if (array_key_exists('defaultUnitLabel', $data) && mb_strlen(trim((string)($data['defaultUnitLabel'] ?? ''))) > 64) {
+			throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
+		}
 		if (array_key_exists('defaultTaxRateBp', $data) && (int)$data['defaultTaxRateBp'] < 0) {
 			throw new ValidationException('Der Steuersatz darf nicht negativ sein.');
 		}

@@ -732,6 +732,10 @@ class InvoiceService {
 			if (mb_strlen($name) > 255) {
 				throw new ValidationException('Positionsname darf maximal 255 Zeichen lang sein.');
 			}
+			$unitLabel = isset($row['unitLabel']) && trim((string)$row['unitLabel']) !== '' ? trim((string)$row['unitLabel']) : null;
+			if ($unitLabel !== null && mb_strlen($unitLabel) > 64) {
+				throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
+			}
 
 			$item = new InvoiceItem();
 			$item->setProductId(isset($row['productId']) && $row['productId'] !== null ? (int)$row['productId'] : null);
@@ -739,7 +743,7 @@ class InvoiceService {
 			$item->setDescription(isset($row['description']) && $row['description'] !== '' ? (string)$row['description'] : null);
 			$item->setQuantity($quantity);
 			$item->setUnitCode((string)($row['unitCode'] ?? InvoiceItem::UNIT_PIECE));
-			$item->setUnitLabel(isset($row['unitLabel']) && trim((string)$row['unitLabel']) !== '' ? trim((string)$row['unitLabel']) : null);
+			$item->setUnitLabel($unitLabel);
 			$item->setUnitPriceE4($unitPriceE4);
 			$item->setTaxRateBp($taxRateBp);
 			$item->setLineTotalCents(InvoiceCalculator::lineTotalCents($quantity, $unitPriceE4));

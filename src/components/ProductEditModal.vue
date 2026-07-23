@@ -38,7 +38,7 @@
 
 			<label class="field">
 				<span>{{ t('rechnungswerk', 'Eigene Einheit (optional)') }}</span>
-				<input v-model="form.defaultUnitLabel" class="input" type="text"
+				<input v-model="form.defaultUnitLabel" class="input" type="text" maxlength="64"
 					:placeholder="t('rechnungswerk', 'z. B. Personen, Sitzung')" />
 				<span class="hint">{{ t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.') }}</span>
 			</label>
