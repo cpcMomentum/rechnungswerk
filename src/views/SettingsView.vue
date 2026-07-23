@@ -82,7 +82,7 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
 					<input v-model="form.numberFormat" class="rw-input" type="text" /></label>
 				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.') }}
+					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
 				</p>
@@ -116,7 +116,7 @@
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
 					<input v-model="form.quoteNumberFormat" class="rw-input" type="text" placeholder="AN-{YYYY}-{####}" /></label>
 				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {####} fortlaufender Zähler.') }}
+					{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: quotePreview }) }}
 				</p>
@@ -165,6 +165,12 @@
 					@update:model-value="onToggleSmallBusiness">
 					{{ t('rechnungswerk', 'Kleinunternehmer nach §19 UStG (kein USt-Ausweis)') }}
 				</NcCheckboxRadioSwitch>
+				<label v-if="form.smallBusiness" class="rw-field">
+					<span>{{ t('rechnungswerk', 'Hinweistext auf der Rechnung (§ 19 UStG)') }}</span>
+					<textarea v-model="form.smallBusinessNote" class="rw-input" rows="2"
+						:placeholder="SMALL_BUSINESS_NOTE_DEFAULT" />
+					<span class="rw-hint">{{ t('rechnungswerk', 'Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.') }}</span>
+				</label>
 				<label v-if="!form.smallBusiness" class="rw-field tax-rate-field">
 					<span>{{ t('rechnungswerk', 'Standard-USt-Satz') }}</span>
 					<select v-model.number="form.defaultTaxRateBp" class="rw-input">
@@ -299,15 +305,14 @@
 				</NcCheckboxRadioSwitch>
 			</section>
 
-			<!-- Standardtexte -->
+			<!-- Standardtexte → jetzt eigene Verwaltung (#126/#141) -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede') }}</span>
-					<textarea v-model="form.greetingDefault" class="rw-input" rows="2" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Einleitung') }}</span>
-					<textarea v-model="form.introDefault" class="rw-input" rows="2" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext') }}</span>
-					<textarea v-model="form.closingDefault" class="rw-input" rows="2" /></label>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.') }}</p>
+				<NcButton @click="goToSnippets">
+					<template #icon><TextBoxIcon :size="20" /></template>
+					{{ t('rechnungswerk', 'Textbausteine verwalten') }}
+				</NcButton>
 			</section>
 
 			<!-- Zugriff & Administration -->
@@ -398,15 +403,17 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
+import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { TAX_RATES_BP, type Settings } from '@/types/api'
+import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'
 import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
@@ -415,8 +422,13 @@ import { previewFileName } from '@/utils/fileName'
 
 type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' | 'quoteNumberCounter' | 'quoteNumberCounterYear'>
 
+const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+
+function goToSnippets() {
+	router.push({ name: 'text-snippets' })
+}
 const archiveFolderPath = ref<string | null>(null)
 const archiveBusy = ref(false)
 const error = ref('')
@@ -427,6 +439,10 @@ const confirmResetMode = ref(false)
 const confirmQuoteResetMode = ref(false)
 const currentCounter = ref(0)
 const currentYear = ref(new Date().getFullYear())
+// Month/day for the {MM}/{DD} number preview (#143); illustrative — the real
+// number takes these from the invoice's issue date at commit time.
+const currentMonth = ref(new Date().getMonth() + 1)
+const currentDay = ref(new Date().getDate())
 const currentYearFromSettings = ref<number | null>(null)
 const currentQuoteCounter = ref(0)
 const currentQuoteYearFromSettings = ref<number | null>(null)
@@ -469,7 +485,7 @@ const preview = computed(() => {
 	const base = form.value.numberResetMode === 'continuous'
 		? currentCounter.value
 		: (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0)
-	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value)
+	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value, currentMonth.value, currentDay.value)
 })
 
 /** Live preview of the next quote number (#111), mirroring the invoice preview. */
@@ -480,7 +496,7 @@ const quotePreview = computed(() => {
 	const base = form.value.quoteNumberResetMode === 'continuous'
 		? currentQuoteCounter.value
 		: (currentYear.value === currentQuoteYearFromSettings.value ? currentQuoteCounter.value : 0)
-	return previewInvoiceNumber(form.value.quoteNumberFormat || 'AN-{YYYY}-{####}', base + 1, currentYear.value)
+	return previewInvoiceNumber(form.value.quoteNumberFormat || 'AN-{YYYY}-{####}', base + 1, currentYear.value, currentMonth.value, currentDay.value)
 })
 
 /** Live preview of the file-name scheme, fed with the number preview above. */
@@ -574,6 +590,7 @@ function hydrate() {
 		archiveSubfolder: s.archiveSubfolder,
 		girocodeEnabled: s.girocodeEnabled,
 		smallBusiness: s.smallBusiness,
+		smallBusinessNote: s.smallBusinessNote,
 		defaultTaxRateBp: s.defaultTaxRateBp,
 		defaultPaymentTermDays: s.defaultPaymentTermDays,
 		datevUploadMail: s.datevUploadMail,

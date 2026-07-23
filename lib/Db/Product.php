@@ -22,8 +22,10 @@ use OCP\DB\Types;
  * @method void setDescription(?string $description)
  * @method string getDefaultUnitCode()
  * @method void setDefaultUnitCode(string $defaultUnitCode)
- * @method int getDefaultPriceCents()
- * @method void setDefaultPriceCents(int $defaultPriceCents)
+ * @method ?string getDefaultUnitLabel()
+ * @method void setDefaultUnitLabel(?string $defaultUnitLabel)
+ * @method int getDefaultPriceE4()
+ * @method void setDefaultPriceE4(int $defaultPriceE4)
  * @method int getDefaultTaxRateBp()
  * @method void setDefaultTaxRateBp(int $defaultTaxRateBp)
  * @method ?\DateTime getCreatedAt()
@@ -36,6 +38,12 @@ class Product extends Entity implements JsonSerializable {
 	protected ?string $name = null;
 	protected ?string $description = null;
 	protected ?string $defaultUnitCode = null;
+	/** Optional free-text unit name for display; XML uses C62 when set (#153). */
+	protected ?string $defaultUnitLabel = null;
+	/** Default unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	protected ?int $defaultPriceE4 = null;
+	/** Deprecated legacy default price in cents (#147); kept only so the mapper can
+	 *  hydrate the still-present column, dropped with it in a later release. */
 	protected ?int $defaultPriceCents = null;
 	protected ?int $defaultTaxRateBp = null;
 	protected ?\DateTime $createdAt = null;
@@ -46,6 +54,8 @@ class Product extends Entity implements JsonSerializable {
 		$this->addType('name', Types::STRING);
 		$this->addType('description', Types::TEXT);
 		$this->addType('defaultUnitCode', Types::STRING);
+		$this->addType('defaultUnitLabel', Types::STRING);
+		$this->addType('defaultPriceE4', Types::INTEGER);
 		$this->addType('defaultPriceCents', Types::INTEGER);
 		$this->addType('defaultTaxRateBp', Types::INTEGER);
 		$this->addType('createdAt', Types::DATETIME);
@@ -58,7 +68,8 @@ class Product extends Entity implements JsonSerializable {
 			'name' => $this->getName(),
 			'description' => $this->getDescription(),
 			'defaultUnitCode' => $this->getDefaultUnitCode(),
-			'defaultPriceCents' => $this->getDefaultPriceCents(),
+			'defaultUnitLabel' => $this->getDefaultUnitLabel(),
+			'defaultPriceE4' => $this->getDefaultPriceE4(),
 			'defaultTaxRateBp' => $this->getDefaultTaxRateBp(),
 			'createdAt' => $this->getCreatedAt()?->format(\DateTimeInterface::ATOM),
 			'updatedAt' => $this->getUpdatedAt()?->format(\DateTimeInterface::ATOM),

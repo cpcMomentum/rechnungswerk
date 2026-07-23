@@ -205,7 +205,6 @@ class InvoiceService {
 		$this->settingsService->getCompany();
 
 		$now = new DateTime();
-		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
@@ -216,7 +215,7 @@ class InvoiceService {
 			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 
-			$number = $this->settingsService->reserveNextNumber($year);
+			$number = $this->settingsService->reserveNextNumber($now);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
 			$invoice->setIssueDate($now);
@@ -331,7 +330,6 @@ class InvoiceService {
 		$this->settingsService->getCompany();
 
 		$now = new DateTime();
-		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
@@ -366,7 +364,7 @@ class InvoiceService {
 			$storno->setCommittedAt($now);
 			$storno->setCreatedAt($now);
 			$storno->setUpdatedAt($now);
-			$storno->setNumber($this->settingsService->reserveNextNumber($year));
+			$storno->setNumber($this->settingsService->reserveNextNumber($now));
 			$storno = $this->invoiceMapper->insert($storno);
 
 			foreach ($originalItems as $item) {
@@ -380,7 +378,8 @@ class InvoiceService {
 				// VAT — become negative.
 				$copy->setQuantity(InvoiceCalculator::negateQuantity($item->getQuantity()));
 				$copy->setUnitCode($item->getUnitCode());
-				$copy->setUnitPriceCents($item->getUnitPriceCents());
+				$copy->setUnitLabel($item->getUnitLabel());
+				$copy->setUnitPriceE4($item->getUnitPriceE4());
 				$copy->setTaxRateBp($item->getTaxRateBp());
 				$copy->setLineTotalCents(-$item->getLineTotalCents());
 				$copy->setSortOrder($item->getSortOrder());
@@ -472,7 +471,8 @@ class InvoiceService {
 				$line->setDescription($item->getDescription());
 				$line->setQuantity($item->getQuantity());
 				$line->setUnitCode($item->getUnitCode());
-				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setUnitLabel($item->getUnitLabel());
+				$line->setUnitPriceE4($item->getUnitPriceE4());
 				$line->setTaxRateBp($item->getTaxRateBp());
 				$line->setLineTotalCents($item->getLineTotalCents());
 				$line->setSortOrder($item->getSortOrder());
@@ -725,12 +725,16 @@ class InvoiceService {
 				continue;
 			}
 			$quantity = isset($row['quantity']) ? (string)$row['quantity'] : '1';
-			$unitPriceCents = (int)($row['unitPriceCents'] ?? 0);
+			$unitPriceE4 = (int)($row['unitPriceE4'] ?? 0);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
 			$name = (string)($row['name'] ?? '');
 			if (mb_strlen($name) > 255) {
 				throw new ValidationException('Positionsname darf maximal 255 Zeichen lang sein.');
+			}
+			$unitLabel = isset($row['unitLabel']) && trim((string)$row['unitLabel']) !== '' ? trim((string)$row['unitLabel']) : null;
+			if ($unitLabel !== null && mb_strlen($unitLabel) > 64) {
+				throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
 			}
 
 			$item = new InvoiceItem();
@@ -739,9 +743,10 @@ class InvoiceService {
 			$item->setDescription(isset($row['description']) && $row['description'] !== '' ? (string)$row['description'] : null);
 			$item->setQuantity($quantity);
 			$item->setUnitCode((string)($row['unitCode'] ?? InvoiceItem::UNIT_PIECE));
-			$item->setUnitPriceCents($unitPriceCents);
+			$item->setUnitLabel($unitLabel);
+			$item->setUnitPriceE4($unitPriceE4);
 			$item->setTaxRateBp($taxRateBp);
-			$item->setLineTotalCents(InvoiceCalculator::lineTotalCents($quantity, $unitPriceCents));
+			$item->setLineTotalCents(InvoiceCalculator::lineTotalCents($quantity, $unitPriceE4));
 			$item->setSortOrder($sort++);
 			$items[] = $item;
 		}
@@ -1015,7 +1020,6 @@ class InvoiceService {
 		$this->settingsService->getCompany();
 
 		$now = new DateTime();
-		$year = (int)$now->format('Y');
 
 		$this->db->beginTransaction();
 		try {
@@ -1029,7 +1033,7 @@ class InvoiceService {
 				$quote->setNumber($this->reserveNextRevisionNumber($quote));
 				$this->markSourceSuperseded((int)$quote->getRelatedQuoteId(), $now);
 			} else {
-				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($year));
+				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($now));
 			}
 			$quote->setStatus(Invoice::STATUS_COMMITTED);
 			$quote->setIssueDate($now);
@@ -1179,7 +1183,8 @@ class InvoiceService {
 				$line->setDescription($item->getDescription());
 				$line->setQuantity($item->getQuantity());
 				$line->setUnitCode($item->getUnitCode());
-				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setUnitLabel($item->getUnitLabel());
+				$line->setUnitPriceE4($item->getUnitPriceE4());
 				$line->setTaxRateBp($item->getTaxRateBp());
 				$line->setLineTotalCents($item->getLineTotalCents());
 				$line->setSortOrder($item->getSortOrder());
@@ -1300,7 +1305,8 @@ class InvoiceService {
 				$line->setDescription($item->getDescription());
 				$line->setQuantity($item->getQuantity());
 				$line->setUnitCode($item->getUnitCode());
-				$line->setUnitPriceCents($item->getUnitPriceCents());
+				$line->setUnitLabel($item->getUnitLabel());
+				$line->setUnitPriceE4($item->getUnitPriceE4());
 				$line->setTaxRateBp($item->getTaxRateBp());
 				$line->setLineTotalCents($item->getLineTotalCents());
 				$line->setSortOrder($item->getSortOrder());

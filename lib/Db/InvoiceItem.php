@@ -26,8 +26,10 @@ use OCP\DB\Types;
  * @method void setQuantity(string $quantity)
  * @method string getUnitCode()
  * @method void setUnitCode(string $unitCode)
- * @method int getUnitPriceCents()
- * @method void setUnitPriceCents(int $unitPriceCents)
+ * @method ?string getUnitLabel()
+ * @method void setUnitLabel(?string $unitLabel)
+ * @method int getUnitPriceE4()
+ * @method void setUnitPriceE4(int $unitPriceE4)
  * @method int getTaxRateBp()
  * @method void setTaxRateBp(int $taxRateBp)
  * @method int getLineTotalCents()
@@ -43,6 +45,14 @@ class InvoiceItem extends Entity implements JsonSerializable {
 	public const UNIT_MONTH = 'MON';  // Monat
 	public const UNIT_KILOGRAM = 'KGM'; // kg
 	public const UNIT_LUMP_SUM = 'LS'; // Pauschal
+	// Further UN/ECE Rec. 20 codes (EN16931-valid) for common consumption units (#146).
+	public const UNIT_KWH = 'KWH';    // Kilowattstunde
+	public const UNIT_LITRE = 'LTR';  // Liter
+	public const UNIT_METRE = 'MTR';  // Meter
+	public const UNIT_KILOMETRE = 'KMT'; // Kilometer
+	public const UNIT_SQUARE_METRE = 'MTK'; // Quadratmeter
+	public const UNIT_GRAM = 'GRM';   // Gramm
+	public const UNIT_TONNE = 'TNE';  // Tonne
 
 	public const UNIT_CODES = [
 		self::UNIT_PIECE,
@@ -51,6 +61,13 @@ class InvoiceItem extends Entity implements JsonSerializable {
 		self::UNIT_MONTH,
 		self::UNIT_KILOGRAM,
 		self::UNIT_LUMP_SUM,
+		self::UNIT_KWH,
+		self::UNIT_LITRE,
+		self::UNIT_METRE,
+		self::UNIT_KILOMETRE,
+		self::UNIT_SQUARE_METRE,
+		self::UNIT_GRAM,
+		self::UNIT_TONNE,
 	];
 
 	protected ?int $invoiceId = null;
@@ -60,6 +77,15 @@ class InvoiceItem extends Entity implements JsonSerializable {
 	/** Decimal string (e.g. "2.500") — line_total_cents stays the authoritative money value. */
 	protected ?string $quantity = null;
 	protected ?string $unitCode = null;
+	/** Optional free-text unit name for display (PDF/editor); XML uses C62 when set (#153). */
+	protected ?string $unitLabel = null;
+	/** Unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	protected ?int $unitPriceE4 = null;
+	/**
+	 * Deprecated legacy unit price in cents (#147). The DB column still exists
+	 * (backfilled into unit_price_e4), so the mapper must be able to hydrate it;
+	 * unused otherwise and dropped together with the column in a later release.
+	 */
 	protected ?int $unitPriceCents = null;
 	protected ?int $taxRateBp = null;
 	protected ?int $lineTotalCents = null;
@@ -72,6 +98,8 @@ class InvoiceItem extends Entity implements JsonSerializable {
 		$this->addType('description', Types::TEXT);
 		$this->addType('quantity', Types::DECIMAL);
 		$this->addType('unitCode', Types::STRING);
+		$this->addType('unitLabel', Types::STRING);
+		$this->addType('unitPriceE4', Types::INTEGER);
 		$this->addType('unitPriceCents', Types::INTEGER);
 		$this->addType('taxRateBp', Types::INTEGER);
 		$this->addType('lineTotalCents', Types::INTEGER);
@@ -87,7 +115,8 @@ class InvoiceItem extends Entity implements JsonSerializable {
 			'description' => $this->getDescription(),
 			'quantity' => $this->getQuantity(),
 			'unitCode' => $this->getUnitCode(),
-			'unitPriceCents' => $this->getUnitPriceCents(),
+			'unitLabel' => $this->getUnitLabel(),
+			'unitPriceE4' => $this->getUnitPriceE4(),
 			'taxRateBp' => $this->getTaxRateBp(),
 			'lineTotalCents' => $this->getLineTotalCents(),
 			'sortOrder' => $this->getSortOrder(),

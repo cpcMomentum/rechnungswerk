@@ -32,12 +32,14 @@
 			<div class="rw-form-row">
 				<label class="rw-field invoice-no"><span>{{ isQuote ? t('rechnungswerk', 'Angebotsnummer') : t('rechnungswerk', 'Rechnungsnummer') }}</span>
 					<input class="rw-input" type="text" readonly :value="invoice?.number ?? t('rechnungswerk', '(wird vergeben)')" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
+				<label class="rw-field"><span>{{ isQuote ? t('rechnungswerk', 'Geplanter Leistungszeitraum (optional)') : t('rechnungswerk', 'Leistungsdatum /-zeitraum') }}</span>
 					<input v-model="form.performancePeriodStart" class="rw-input" type="date" :readonly="readonly" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'bis (optional)') }}</span>
 					<input v-model="form.performancePeriodEnd" class="rw-input" type="date" :readonly="readonly" /></label>
 			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
+			<p class="rw-hint">{{ isQuote
+				? t('rechnungswerk', 'Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.')
+				: t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
 			<details class="more">
 				<summary>{{ isQuote
 					? t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)')
@@ -116,10 +118,19 @@
 
 		<!-- Anrede & Einleitung (vor den Positionen) -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</h3>
+			<div class="rw-section-head">
+				<h3>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</h3>
+				<NcActions v-if="!readonly && openingSnippets.length > 0"
+					:menu-name="t('rechnungswerk', 'Vorlage einfügen')">
+					<template #icon><TextBoxIcon :size="18" /></template>
+					<NcActionButton v-for="s in openingSnippets" :key="s.id" @click="applyOpening(s)">
+						{{ s.label }}
+					</NcActionButton>
+				</NcActions>
+			</div>
 			<label class="rw-field"><span>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</span>
 				<textarea v-model="form.greeting" class="rw-input" rows="3" :readonly="readonly"
-					:placeholder="t('rechnungswerk', 'Anrede und Einleitung – Vorgabe aus den Einstellungen')" /></label>
+					:placeholder="t('rechnungswerk', 'Anrede und Einleitung – Vorgabe aus den Textbausteinen')" /></label>
 		</section>
 
 		<!-- Positionen -->
@@ -198,10 +209,19 @@
 
 		<!-- Schlusstext -->
 		<section class="rw-section">
-			<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
+			<div class="rw-section-head">
+				<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
+				<NcActions v-if="!readonly && closingSnippets.length > 0"
+					:menu-name="t('rechnungswerk', 'Vorlage einfügen')">
+					<template #icon><TextBoxIcon :size="18" /></template>
+					<NcActionButton v-for="s in closingSnippets" :key="s.id" @click="applyClosing(s)">
+						{{ s.label }}
+					</NcActionButton>
+				</NcActions>
+			</div>
 			<label class="rw-field"><span>{{ t('rechnungswerk', 'Schlusstext / Anmerkungen') }}</span>
 				<textarea v-model="form.extraText" class="rw-input" rows="3" :readonly="readonly"
-					:placeholder="t('rechnungswerk', 'Schlusstext – Vorgabe aus den Einstellungen')" /></label>
+					:placeholder="t('rechnungswerk', 'Schlusstext – Vorgabe aus den Textbausteinen')" /></label>
 		</section>
 
 		<!-- Notizen / Hinweise (BT-22) -->
@@ -351,13 +371,17 @@ import CustomerPicker from '@/components/CustomerPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useQuoteStore } from '@/stores/quoteStore'
 import { useProductStore } from '@/stores/productStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail } from '@/types/api'
+import { useTextSnippetStore } from '@/stores/textSnippetStore'
+import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail, type SnippetDocType, type TextSnippet } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
-import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
+import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 import { downloadQuotePdf, quotePreviewUrl, sendQuote } from '@/api/quotes'
@@ -370,6 +394,7 @@ const invoiceStore = useInvoiceStore()
 const quoteStore = useQuoteStore()
 const productStore = useProductStore()
 const settingsStore = useSettingsStore()
+const textSnippetStore = useTextSnippetStore()
 
 // The invoice editor doubles as the quote editor (#111): the mode is derived
 // from the route name ('quote-new'/'quote-detail' → quote). Everything below
@@ -379,6 +404,17 @@ const isQuote = computed(() => typeof route.name === 'string' && route.name.star
 // get/create/update/remove/commit surface; quote-only actions (accept/reject/
 // convert) and invoice-only ones (cancel) are called on their store directly.
 const docStore = computed(() => (isQuote.value ? quoteStore : invoiceStore))
+// Text snippets (#126/#141): the insertable templates and the auto-fill default
+// are scoped to this document's type so quotes carry their own wording.
+const snippetDocType = computed<SnippetDocType>(() => (isQuote.value ? 'quote' : 'invoice'))
+const openingSnippets = computed(() => textSnippetStore.forSlot(snippetDocType.value, 'opening'))
+const closingSnippets = computed(() => textSnippetStore.forSlot(snippetDocType.value, 'closing'))
+function applyOpening(snippet: TextSnippet) {
+	form.greeting = snippet.content ?? ''
+}
+function applyClosing(snippet: TextSnippet) {
+	form.extraText = snippet.content ?? ''
+}
 const listRoute = computed(() => (isQuote.value ? 'quotes' : 'invoices'))
 const detailRoute = computed(() => (isQuote.value ? 'quote-detail' : 'invoice-detail'))
 
@@ -478,11 +514,12 @@ const finalizeMessage = computed(() => {
 })
 
 const defaultMailBody = computed(() => {
-	const s = settingsStore.settings
-	// Opening already bundles salutation + intro (see onMounted / invoice.greeting).
+	// Opening already bundles salutation + intro (see onMounted / invoice.greeting);
+	// fall back to the default text snippet for this document type (#126/#141).
 	const opening = (invoice.value?.greeting
-		?? [s?.greetingDefault, s?.introDefault].filter(p => (p ?? '').trim() !== '').join('\n\n')).trim()
-	const closing = (invoice.value?.extraText ?? s?.closingDefault ?? '').trim()
+		?? textSnippetStore.defaultContent(snippetDocType.value, 'opening')).trim()
+	const closing = (invoice.value?.extraText
+		?? textSnippetStore.defaultContent(snippetDocType.value, 'closing')).trim()
 	const fallback = isQuote.value
 		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.')
 		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).')
@@ -501,7 +538,7 @@ const headerTitle = computed(() => {
 
 const totals = computed(() => computeTotals(items.value.map(i => ({
 	taxRateBp: i.taxRateBp,
-	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
+	lineTotalCents: lineTotalCents(i.quantity, euroInputToE4(i.priceInput)),
 })), taxExempt.value))
 
 // Bumped on every navigation-driven (re-)load below; load()/initNew() compare
@@ -513,7 +550,7 @@ let navToken = 0
 onMounted(async () => {
 	const token = ++navToken
 	try {
-		await Promise.all([productStore.fetchAll(), settingsStore.fetch()])
+		await Promise.all([productStore.fetchAll(), settingsStore.fetch(), textSnippetStore.ensureLoaded()])
 		if (token !== navToken) {
 			return
 		}
@@ -576,11 +613,11 @@ function resetEditor() {
 /** Defaults for a new invoice: text templates + seller-contact cascade. */
 async function initNew(token: number = navToken) {
 	const s = settingsStore.settings
-	// Opening = salutation + intro (rendered above the line items);
-	// the closing text is edited separately in its own field below.
-	form.greeting = [s?.greetingDefault, s?.introDefault]
-		.filter(p => (p ?? '').trim() !== '').join('\n\n')
-	form.extraText = s?.closingDefault ?? ''
+	// Opening = salutation + intro (rendered above the line items); the closing
+	// text is edited separately below. Both are pre-filled from the default text
+	// snippet for this document type (#126/#141), empty when none is flagged.
+	form.greeting = textSnippetStore.defaultContent(snippetDocType.value, 'opening')
+	form.extraText = textSnippetStore.defaultContent(snippetDocType.value, 'closing')
 	// Global default payment term (#117) pre-fills the due date on new invoices;
 	// a customer-specific term still overrides this on customer selection. A
 	// quote has no payment term, so it is left blank there.
@@ -707,7 +744,8 @@ function buildInput(): InvoiceInput {
 				description: i.description.trim() === '' ? null : i.description.trim(),
 				quantity: String(i.quantity).replace(',', '.'),
 				unitCode: i.unitCode,
-				unitPriceCents: euroInputToCents(i.priceInput),
+				unitLabel: i.unitLabel.trim() === '' ? null : i.unitLabel.trim(),
+				unitPriceE4: euroInputToE4(i.priceInput),
 				taxRateBp: i.taxRateBp,
 			})),
 	}
@@ -990,6 +1028,16 @@ function fail(e: unknown, fallback: string) {
 .rw-editor-head :deep(.breadcrumb) {
 	flex: 1 1 auto;
 	min-width: 0;
+}
+/* Section header with an inline "insert template" action (#126/#141). */
+.rw-section-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+.rw-section-head h3 {
+	margin: 0;
 }
 .more {
 	margin-top: 8px;

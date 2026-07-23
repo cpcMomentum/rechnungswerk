@@ -25,7 +25,7 @@
 
 				<label class="field">
 					<span>{{ t('rechnungswerk', 'Standard-Preis (€)') }}</span>
-					<input v-model="priceInput" class="input" type="number" step="0.01" min="0" inputmode="decimal" />
+					<input v-model="priceInput" class="input" type="number" step="0.0001" min="0" inputmode="decimal" />
 				</label>
 
 				<label class="field">
@@ -35,6 +35,13 @@
 					</select>
 				</label>
 			</div>
+
+			<label class="field">
+				<span>{{ t('rechnungswerk', 'Eigene Einheit (optional)') }}</span>
+				<input v-model="form.defaultUnitLabel" class="input" type="text" maxlength="64"
+					:placeholder="t('rechnungswerk', 'z. B. Personen, Sitzung')" />
+				<span class="hint">{{ t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.') }}</span>
+			</label>
 
 			<div class="actions">
 				<NcButton @click="$emit('close')">{{ t('rechnungswerk', 'Abbrechen') }}</NcButton>
@@ -54,7 +61,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
 import { escCloses } from '@/utils/modalEsc'
-import { centsToEuroInput, euroInputToCents, formatTaxRate } from '@/utils/money'
+import { e4ToEuroInput, euroInputToE4, formatTaxRate } from '@/utils/money'
 
 const props = defineProps<{
 	open: boolean
@@ -69,10 +76,11 @@ const emit = defineEmits<{
 
 const nameInput = ref<HTMLInputElement | null>(null)
 
-const form = reactive<{ name: string, description: string, defaultUnitCode: UnitCode, defaultTaxRateBp: number }>({
+const form = reactive<{ name: string, description: string, defaultUnitCode: UnitCode, defaultUnitLabel: string, defaultTaxRateBp: number }>({
 	name: '',
 	description: '',
 	defaultUnitCode: 'C62',
+	defaultUnitLabel: '',
 	defaultTaxRateBp: 1900,
 })
 const priceInput = ref('0.00')
@@ -91,8 +99,9 @@ watch(() => props.open, (open) => {
 	form.name = p?.name ?? ''
 	form.description = p?.description ?? ''
 	form.defaultUnitCode = (p?.defaultUnitCode ?? 'C62') as UnitCode
+	form.defaultUnitLabel = p?.defaultUnitLabel ?? ''
 	form.defaultTaxRateBp = p?.defaultTaxRateBp ?? 1900
-	priceInput.value = centsToEuroInput(p?.defaultPriceCents ?? 0)
+	priceInput.value = e4ToEuroInput(p?.defaultPriceE4 ?? 0)
 	nextTick(() => nameInput.value?.focus())
 }, { immediate: true })
 
@@ -104,7 +113,8 @@ function onSave() {
 		name: form.name.trim(),
 		description: form.description.trim() === '' ? null : form.description.trim(),
 		defaultUnitCode: form.defaultUnitCode,
-		defaultPriceCents: euroInputToCents(priceInput.value),
+		defaultUnitLabel: form.defaultUnitLabel.trim() === '' ? null : form.defaultUnitLabel.trim(),
+		defaultPriceE4: euroInputToE4(priceInput.value),
 		defaultTaxRateBp: form.defaultTaxRateBp,
 	})
 }

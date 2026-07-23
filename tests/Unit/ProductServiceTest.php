@@ -36,7 +36,7 @@ class ProductServiceTest extends TestCase {
 		$this->assertSame('Beratung', $product->getName());
 		$this->assertSame('alice', $product->getOwnerUserId());
 		$this->assertSame('C62', $product->getDefaultUnitCode());
-		$this->assertSame(0, $product->getDefaultPriceCents());
+		$this->assertSame(0, $product->getDefaultPriceE4());
 		$this->assertSame(1900, $product->getDefaultTaxRateBp());
 	}
 
@@ -47,12 +47,12 @@ class ProductServiceTest extends TestCase {
 			'name' => 'Stundensatz',
 			'description' => 'Entwicklung',
 			'defaultUnitCode' => 'HUR',
-			'defaultPriceCents' => 9500,
+			'defaultPriceE4' => 9500,
 			'defaultTaxRateBp' => 700,
 		]);
 
 		$this->assertSame('HUR', $product->getDefaultUnitCode());
-		$this->assertSame(9500, $product->getDefaultPriceCents());
+		$this->assertSame(9500, $product->getDefaultPriceE4());
 		$this->assertSame(700, $product->getDefaultTaxRateBp());
 		$this->assertSame('Entwicklung', $product->getDescription());
 	}
@@ -64,7 +64,7 @@ class ProductServiceTest extends TestCase {
 
 	public function testCreateRejectsNegativePrice(): void {
 		$this->expectException(ValidationException::class);
-		$this->service->create('alice', ['name' => 'X', 'defaultPriceCents' => -1]);
+		$this->service->create('alice', ['name' => 'X', 'defaultPriceE4' => -1]);
 	}
 
 	public function testUpdateRejectsEmptyNameWhenProvided(): void {

@@ -44,6 +44,9 @@ class ZugferdService {
 	/** §19 UStG exemption reason placed on the VAT breakdown (category E). */
 	private const SMALL_BUSINESS_REASON = 'Steuerbefreit gemäß § 19 UStG (Kleinunternehmer)';
 
+	/** Default §19 UStG hint printed on the invoice; configurable per company (#141). */
+	public const SMALL_BUSINESS_NOTE_DEFAULT = 'Gem. § 19 UStG enthält der Rechnungsbetrag keine Umsatzsteuer.';
+
 	public function __construct(
 		private readonly IRootFolder $rootFolder,
 		private readonly GirocodeService $girocodeService,
@@ -361,10 +364,16 @@ class ZugferdService {
 				$item->getName() ?? '',
 				$item->getDescription() !== null && $item->getDescription() !== '' ? $item->getDescription() : null,
 			);
-			$builder->setDocumentPositionNetPrice($this->toEuro($item->getUnitPriceCents()));
+			// A free-text unit label (#153) has no valid UN/ECE code, so the XML
+			// falls back to the generic C62 ("one/piece"); the label is only shown
+			// on the visible PDF. A standard unit uses its own code.
+			$unitCode = ($item->getUnitLabel() ?? '') !== ''
+				? InvoiceItem::UNIT_PIECE
+				: ($item->getUnitCode() ?? InvoiceItem::UNIT_PIECE);
+			$this->applyNetPrice($builder, (int)$item->getUnitPriceE4(), $unitCode);
 			$builder->setDocumentPositionQuantity(
 				$this->quantityToFloat($item->getQuantity()),
-				$item->getUnitCode() ?? InvoiceItem::UNIT_PIECE,
+				$unitCode,
 			);
 			if ($exemptCategory !== null) {
 				$builder->addDocumentPositionTax($exemptCategory, ZugferdVatTypeCodes::VALUE_ADDED_TAX, 0.0);
@@ -523,6 +532,22 @@ class ZugferdService {
 		return round($cents / 100, 2);
 	}
 
+	/**
+	 * Write the item net price (BT-146) preserving the four-decimal precision of
+	 * the stored e4 value (#147). horstoeko serialises amounts with two decimals,
+	 * so a finer price (e4 not a whole cent) is expressed via a price base
+	 * quantity of 100 (BT-149/150): e4/100 is an exact two-decimal amount and the
+	 * per-unit price = (e4/100) / 100 keeps all four decimals. Whole-cent prices
+	 * use the ordinary per-unit form.
+	 */
+	private function applyNetPrice(ZugferdDocumentBuilder $builder, int $e4, string $unitCode): void {
+		if ($e4 % 100 === 0) {
+			$builder->setDocumentPositionNetPrice(round($e4 / 10000, 2));
+		} else {
+			$builder->setDocumentPositionNetPrice(round($e4 / 100, 2), 100.0, $unitCode);
+		}
+	}
+
 	// --- PDF rendering ---------------------------------------------------
 
 	/**
@@ -633,32 +658,58 @@ class ZugferdService {
 
 		$smallBusiness = $settings->getSmallBusiness() === 1;
 		$exempt = $smallBusiness || $invoice->isTaxExemptCase();
+		// #144: A §19 small-business invoice must not show a VAT rate at all — a
+		// "0 %" column reads like a tax rate, which contradicts the exemption
+		// (0 % ≠ steuerbefreit). So for small business we drop the VAT column and
+		// the tax summary line entirely; net equals gross and the §19 note below
+		// the total carries the legal reason. Other VAT-exempt cases (reverse
+		// charge etc.) keep their column and their exemption line as before. The
+		// ZUGFeRD XML is unaffected — it still carries category "E" per position.
+		$hideVat = $smallBusiness;
 
 		$rows = '';
 		foreach ($items as $item) {
 			$desc = ($item->getDescription() ?? '') !== ''
 				? '<div class="item-desc">' . nl2br($e($item->getDescription())) . '</div>' : '';
 			$ratePercent = $exempt ? 0 : (int)$item->getTaxRateBp() / 100;
+			$vatCell = $hideVat
+				? ''
+				: '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>';
 			$rows .= '<tr>'
 				. '<td>' . $e($item->getName()) . $desc . '</td>'
-				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e($this->unitLabel($item->getUnitCode())) . '</td>'
-				. '<td class="num">' . $this->formatMoney((int)$item->getUnitPriceCents()) . '</td>'
-				. '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>'
+				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e(($item->getUnitLabel() ?? '') !== '' ? $item->getUnitLabel() : $this->unitLabel($item->getUnitCode())) . '</td>'
+				. '<td class="num">' . $this->formatUnitPrice((int)$item->getUnitPriceE4()) . '</td>'
+				. $vatCell
 				. '<td class="num">' . $this->formatMoney((int)$item->getLineTotalCents()) . '</td>'
 				. '</tr>';
 		}
 
-		$taxRows = '';
-		if ($exempt) {
-			$label = $smallBusiness ? 'Steuerfrei (§ 19 UStG)' : ($this->specialTaxCaseShort($invoice) ?? 'Steuerfrei');
-			$taxRows = '<tr><td>' . $e($label) . '</td><td class="num">' . $this->formatMoney(0) . '</td></tr>';
+		// Column layout + header row: 5 columns normally, 4 when the VAT column is
+		// hidden for §19 small business.
+		if ($hideVat) {
+			$itemsColgroup = '<colgroup><col style="width: 52%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"></colgroup>';
+			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Betrag</th>';
 		} else {
+			$itemsColgroup = '<colgroup><col style="width: 46%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 10%;"><col style="width: 16%;"></colgroup>';
+			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th>';
+		}
+
+		$taxRows = '';
+		if (!$hideVat && $exempt) {
+			$label = $this->specialTaxCaseShort($invoice) ?? 'Steuerfrei';
+			$taxRows = '<tr><td>' . $e($label) . '</td><td class="num">' . $this->formatMoney(0) . '</td></tr>';
+		} elseif (!$hideVat) {
 			foreach ($invoice->getTaxBreakdownArray() as $group) {
 				$ratePercent = (int)$group['rateBp'] / 100;
 				$label = 'USt ' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' % auf ' . $this->formatMoney((int)$group['netCents']);
 				$taxRows .= '<tr><td>' . $label . '</td><td class="num">' . $this->formatMoney((int)$group['taxCents']) . '</td></tr>';
 			}
 		}
+		// For §19 the net subtotal equals the total, so a separate "Zwischensumme"
+		// line would just repeat the amount — show only the grand total.
+		$subtotalRow = $hideVat
+			? ''
+			: '<tr><td>Zwischensumme</td><td class="num">' . $this->formatMoney((int)$invoice->getSubtotalCents()) . '</td></tr>';
 
 		$paymentInfo = '';
 		if (($settings->getIban() ?? '') !== '' && !$isQuote) {
@@ -710,6 +761,17 @@ class ZugferdService {
 		$exemptNote = (!$smallBusiness && $invoice->isTaxExemptCase()) ? $this->specialTaxCaseLabel($invoice) : null;
 		$exemptNoteHtml = $exemptNote !== null ? '<p class="exempt-note">' . $e($exemptNote) . '</p>' : '';
 
+		// §19 UStG small-business hint (#141): a configurable sentence printed on the
+		// invoice below the totals; falls back to the default wording when unset.
+		$smallBusinessNoteHtml = '';
+		if ($smallBusiness && !$isQuote) {
+			$note = trim((string)($settings->getSmallBusinessNote() ?? ''));
+			if ($note === '') {
+				$note = self::SMALL_BUSINESS_NOTE_DEFAULT;
+			}
+			$smallBusinessNoteHtml = '<p class="exempt-note">' . $e($note) . '</p>';
+		}
+
 		// Salutation + intro text belong ABOVE the line items.
 		$greeting = ($invoice->getGreeting() ?? '') !== '' ? '<p>' . nl2br($e($invoice->getGreeting())) . '</p>' : '';
 		$introHtml = $greeting !== '' ? '<div class="intro">' . $greeting . '</div>' : '';
@@ -758,10 +820,10 @@ h1 { font-size: 18pt; color: {$accent}; margin: 0 0 4px; }
 table.meta { font-size: 9pt; margin-bottom: 16px; }
 table.meta td { padding: 1px 8px 1px 0; }
 table.meta .meta-label { color: #666; }
-table.items { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+table.items { width: 100%; border-collapse: collapse; margin-bottom: 4px; table-layout: fixed; }
 table.items th { background: {$accent}; color: #fff; text-align: left; padding: 6px 8px; font-size: 9pt; }
-table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
-table.items td.num, table.items th.num { text-align: right; }
+table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; }
+table.items td.num, table.items th.num { text-align: right; white-space: nowrap; }
 .item-desc { color: #666; font-size: 8.5pt; margin-top: 2px; }
 .company-contact { font-size: 8.5pt; color: #555; margin-top: 2px; }
 .intro { margin: 0 0 14px; font-size: 9.5pt; }
@@ -796,16 +858,18 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 <table class="meta">{$metaHtml}</table>
 {$introHtml}
 <table class="items">
-  <thead><tr><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th></tr></thead>
+  {$itemsColgroup}
+  <thead><tr>{$itemsHead}</tr></thead>
   <tbody>{$rows}</tbody>
 </table>
 <div class="totals"><table>
-  <tr><td>Zwischensumme</td><td class="num">{$this->formatMoney((int)$invoice->getSubtotalCents())}</td></tr>
+  {$subtotalRow}
   {$taxRows}
   <tr class="grand"><td>Gesamtbetrag</td><td class="num">{$this->formatMoney((int)$invoice->getTotalCents())}</td></tr>
 </table></div>
 <div class="payment">
   {$exemptNoteHtml}
+  {$smallBusinessNoteHtml}
   {$quoteNoteHtml}
   {$termHtml}
   {$paymentInfo}
@@ -858,6 +922,18 @@ HTML;
 		return number_format($cents / 100, 2, ',', '.') . ' €';
 	}
 
+	/**
+	 * Unit price (1/10000 €, #147) formatted with 2–4 decimals: always at least
+	 * two, up to four, trailing zeros beyond the second decimal trimmed. So 2,00 €
+	 * stays "2,00 €", 0,3456 € shows "0,3456 €", 0,3500 € shows "0,35 €".
+	 */
+	private function formatUnitPrice(int $e4): string {
+		$s = number_format($e4 / 10000, 4, ',', '.');
+		// Trim trailing zeros beyond the second decimal, keeping at least two.
+		$s = preg_replace('/(,\d\d)(\d*?)0+$/', '$1$2', $s) ?? $s;
+		return $s . ' €';
+	}
+
 	private function formatQuantity(?string $quantity): string {
 		$value = $this->quantityToFloat($quantity);
 		$formatted = number_format($value, 3, ',', '.');
@@ -872,6 +948,13 @@ HTML;
 			InvoiceItem::UNIT_MONTH => 'Monat(e)',
 			InvoiceItem::UNIT_KILOGRAM => 'kg',
 			InvoiceItem::UNIT_LUMP_SUM => 'Pausch.',
+			InvoiceItem::UNIT_KWH => 'kWh',
+			InvoiceItem::UNIT_LITRE => 'Ltr.',
+			InvoiceItem::UNIT_METRE => 'm',
+			InvoiceItem::UNIT_KILOMETRE => 'km',
+			InvoiceItem::UNIT_SQUARE_METRE => 'm²',
+			InvoiceItem::UNIT_GRAM => 'g',
+			InvoiceItem::UNIT_TONNE => 't',
 			default => 'Stk.',
 		};
 	}

@@ -9,7 +9,7 @@ export interface ApiError {
 }
 
 /** UN/ECE Rec. 20 unit codes used in EN16931. Labels are translated at render time. */
-export const UNIT_CODES = ['C62', 'HUR', 'DAY', 'MON', 'KGM', 'LS'] as const
+export const UNIT_CODES = ['C62', 'HUR', 'DAY', 'MON', 'KGM', 'LS', 'KWH', 'LTR', 'MTR', 'KMT', 'MTK', 'GRM', 'TNE'] as const
 export type UnitCode = typeof UNIT_CODES[number]
 
 export const UNIT_CODE_LABELS: Record<UnitCode, string> = {
@@ -19,6 +19,13 @@ export const UNIT_CODE_LABELS: Record<UnitCode, string> = {
 	MON: 'Monat',
 	KGM: 'kg',
 	LS: 'Pauschal',
+	KWH: 'kWh',
+	LTR: 'Liter',
+	MTR: 'Meter',
+	KMT: 'Kilometer',
+	MTK: 'm²',
+	GRM: 'Gramm',
+	TNE: 'Tonne',
 }
 
 /** Tax rates in basis points (19 % = 1900). */
@@ -29,8 +36,39 @@ export interface Product {
 	name: string
 	description: string | null
 	defaultUnitCode: UnitCode
-	defaultPriceCents: number
+	/** Optional free-text unit name; XML uses C62 when set (#153). */
+	defaultUnitLabel: string | null
+	/** Default unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	defaultPriceE4: number
 	defaultTaxRateBp: number
+	createdAt: string | null
+	updatedAt: string | null
+}
+
+/** Default §19 UStG hint; mirrors ZugferdService::SMALL_BUSINESS_NOTE_DEFAULT (#141). */
+export const SMALL_BUSINESS_NOTE_DEFAULT = 'Gem. § 19 UStG enthält der Rechnungsbetrag keine Umsatzsteuer.'
+
+/** Text snippet catalog (#126/#141): reusable opening / closing texts per doc type. */
+export type SnippetDocType = 'invoice' | 'quote'
+export type SnippetSlot = 'opening' | 'closing'
+
+export const SNIPPET_DOC_TYPE_LABELS: Record<SnippetDocType, string> = {
+	invoice: 'Rechnung',
+	quote: 'Angebot',
+}
+export const SNIPPET_SLOT_LABELS: Record<SnippetSlot, string> = {
+	opening: 'Anrede & Einleitung',
+	closing: 'Schlusstext',
+}
+
+export interface TextSnippet {
+	id: number
+	docType: SnippetDocType
+	slot: SnippetSlot
+	label: string
+	content: string | null
+	isDefault: boolean
+	sortOrder: number
 	createdAt: string | null
 	updatedAt: string | null
 }
@@ -101,7 +139,10 @@ export interface InvoiceItem {
 	description: string | null
 	quantity: string
 	unitCode: UnitCode
-	unitPriceCents: number
+	/** Optional free-text unit name; XML uses C62 when set (#153). */
+	unitLabel: string | null
+	/** Unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	unitPriceE4: number
 	taxRateBp: number
 	lineTotalCents: number
 	sortOrder: number
@@ -222,6 +263,8 @@ export interface Settings {
 	archiveFolderPath?: string | null
 	girocodeEnabled: boolean
 	smallBusiness: boolean
+	/** Configurable §19 UStG hint printed on invoices; null = use default wording (#141). */
+	smallBusinessNote: string | null
 	defaultTaxRateBp: number
 	/** Global default payment term in days, pre-fills new invoices (#117). */
 	defaultPaymentTermDays: number | null

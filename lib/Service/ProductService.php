@@ -98,10 +98,13 @@ class ProductService {
 				throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
 			}
 		}
+		if (array_key_exists('defaultUnitLabel', $data) && mb_strlen(trim((string)($data['defaultUnitLabel'] ?? ''))) > 64) {
+			throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
+		}
 		if (array_key_exists('defaultTaxRateBp', $data) && (int)$data['defaultTaxRateBp'] < 0) {
 			throw new ValidationException('Der Steuersatz darf nicht negativ sein.');
 		}
-		if (array_key_exists('defaultPriceCents', $data) && (int)$data['defaultPriceCents'] < 0) {
+		if (array_key_exists('defaultPriceE4', $data) && (int)$data['defaultPriceE4'] < 0) {
 			throw new ValidationException('Der Preis darf nicht negativ sein.');
 		}
 	}
@@ -121,10 +124,14 @@ class ProductService {
 		} elseif ($isNew) {
 			$product->setDefaultUnitCode(InvoiceItem::UNIT_PIECE);
 		}
-		if (array_key_exists('defaultPriceCents', $data)) {
-			$product->setDefaultPriceCents((int)$data['defaultPriceCents']);
+		if (array_key_exists('defaultUnitLabel', $data)) {
+			$label = trim((string)($data['defaultUnitLabel'] ?? ''));
+			$product->setDefaultUnitLabel($label !== '' ? $label : null);
+		}
+		if (array_key_exists('defaultPriceE4', $data)) {
+			$product->setDefaultPriceE4((int)$data['defaultPriceE4']);
 		} elseif ($isNew) {
-			$product->setDefaultPriceCents(0);
+			$product->setDefaultPriceE4(0);
 		}
 		if (array_key_exists('defaultTaxRateBp', $data)) {
 			$product->setDefaultTaxRateBp((int)$data['defaultTaxRateBp']);

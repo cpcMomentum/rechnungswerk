@@ -22,17 +22,21 @@ use OCA\Rechnungswerk\Db\Settings;
 final class InvoiceCalculator {
 
 	/**
-	 * Line total in cents from a decimal quantity string and a unit price in cents.
-	 * Quantity may use "." or "," as decimal separator and carries up to 3 decimals.
+	 * Line total in cents from a decimal quantity string and a unit price in
+	 * ten-thousandths of a euro (1/10000 €, 4 decimals, #147). Quantity may use
+	 * "." or "," as decimal separator and carries up to 3 decimals. The result is
+	 * rounded to whole cents exactly once here — the finer price precision only
+	 * affects this single multiplication, never the summed amounts.
 	 */
-	public static function lineTotalCents(string $quantity, int $unitPriceCents): int {
+	public static function lineTotalCents(string $quantity, int $unitPriceE4): int {
 		$normalized = str_replace(',', '.', trim($quantity));
 		if ($normalized === '' || !is_numeric($normalized)) {
 			return 0;
 		}
 		// Quantity in milli-units (3 decimals), rounded to avoid float drift.
 		$milli = (int)round(((float)$normalized) * 1000);
-		return (int)round(($milli * $unitPriceCents) / 1000);
+		// milli-units (1/1000) × price (1/10000 €) → cents (1/100 €): / 100000.
+		return (int)round(($milli * $unitPriceE4) / 100000);
 	}
 
 	/**
@@ -97,13 +101,16 @@ final class InvoiceCalculator {
 
 	/**
 	 * Render an invoice number from a format template.
-	 * Supported placeholders: {YYYY}, {YY} and {#…#} (zero-padded counter, width = number of '#').
-	 * Example: "RE-{YYYY}-{####}" with counter 7, year 2026 -> "RE-2026-0007".
+	 * Supported placeholders: {YYYY}, {YY}, {MM} (month), {DD} (day) — all taken
+	 * from the document's issue date — and {#…#} (zero-padded counter, width =
+	 * number of '#'). {MM}/{DD} are cosmetic: they do NOT count as a "year"
+	 * component for the yearly-reset collision guard (see formatHasYear).
+	 * Example: "RE-{YYYY}-{####}" with counter 7, 2026-05-… -> "RE-2026-0007".
 	 */
-	public static function formatNumber(string $format, int $counter, int $year): string {
+	public static function formatNumber(string $format, int $counter, \DateTimeInterface $date): string {
 		$result = str_replace(
-			['{YYYY}', '{YY}'],
-			[sprintf('%04d', $year), sprintf('%02d', $year % 100)],
+			['{YYYY}', '{YY}', '{MM}', '{DD}'],
+			[$date->format('Y'), $date->format('y'), $date->format('m'), $date->format('d')],
 			$format,
 		);
 		return (string)preg_replace_callback(
