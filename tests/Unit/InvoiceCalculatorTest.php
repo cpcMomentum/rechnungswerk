@@ -117,15 +117,20 @@ class InvoiceCalculatorTest extends TestCase {
 	}
 
 	public function testFormatNumberPadsCounter(): void {
-		$this->assertSame('RE-2026-0007', InvoiceCalculator::formatNumber('RE-{YYYY}-{####}', 7, 2026));
+		$this->assertSame('RE-2026-0007', InvoiceCalculator::formatNumber('RE-{YYYY}-{####}', 7, new \DateTime('2026-05-15')));
 	}
 
 	public function testFormatNumberTwoDigitYearAndCounter(): void {
-		$this->assertSame('26-05', InvoiceCalculator::formatNumber('{YY}-{##}', 5, 2026));
+		$this->assertSame('26-05', InvoiceCalculator::formatNumber('{YY}-{##}', 5, new \DateTime('2026-05-15')));
 	}
 
 	public function testFormatNumberCounterExceedingWidthIsNotTruncated(): void {
-		$this->assertSame('RE-2026-12345', InvoiceCalculator::formatNumber('RE-{YYYY}-{####}', 12345, 2026));
+		$this->assertSame('RE-2026-12345', InvoiceCalculator::formatNumber('RE-{YYYY}-{####}', 12345, new \DateTime('2026-05-15')));
+	}
+
+	public function testFormatNumberExpandsMonthAndDay(): void {
+		// {MM}/{DD} come from the issue date, zero-padded (#143).
+		$this->assertSame('RE-2026-03-07-0042', InvoiceCalculator::formatNumber('RE-{YYYY}-{MM}-{DD}-{####}', 42, new \DateTime('2026-03-07')));
 	}
 
 	public function testNegateQuantityPrependsMinusPreservingFormat(): void {

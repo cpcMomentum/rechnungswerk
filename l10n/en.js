@@ -393,6 +393,8 @@ OC.L10N.register(
     "Kilometer" : "Kilometre",
     "m²" : "m²",
     "Gramm" : "Gram",
-    "Tonne" : "Tonne"
+    "Tonne" : "Tonne",
+    "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler." : "Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter.",
+    "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler." : "Separate number circle, independent from invoices. Placeholders: {YYYY} year, {YY} 2-digit year, {MM} month, {DD} day, {####} sequential counter."
 },
 "nplurals=2; plural=(n != 1);");
