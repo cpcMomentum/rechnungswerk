@@ -7,6 +7,42 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-23
+
+### Added
+- Textbausteine: eine verwaltete Bibliothek wiederverwendbarer Anrede-/
+  Einleitungs- und Schlusstexte, getrennt für Rechnungen und Angebote. Je
+  Dokumenttyp und Textbereich gibt es genau einen Standard-Baustein, der neue
+  Dokumente vorbefüllt; weitere Bausteine lassen sich im Editor per Klick
+  einfügen. Neuer Menüpunkt „Textbausteine" (#126, #141)
+- Kleinunternehmer-Hinweis (§ 19 UStG): der Hinweistext auf der Rechnung ist
+  jetzt frei konfigurierbar (#141)
+- Datums-Variablen `{MM}` (Monat) und `{DD}` (Tag) für die Rechnungs- und
+  Angebotsnummer, zusätzlich zu `{YYYY}`/`{YY}`/`{####}` (#143)
+- Weitere Einheiten zur Auswahl: kWh, Liter, Meter, Kilometer, m², Gramm, Tonne
+  (gültige UN/ECE-Codes, E-Rechnung bleibt valide) (#146)
+- Einzelpreise mit bis zu 4 Nachkommastellen (z. B. Energie 0,3456 €/kWh); die
+  Rundung auf ganze Cent erfolgt einmal beim Zeilenbetrag, Summen bleiben
+  zweistellig (#147)
+- Freitext-Einheiten: frei benannte Einheiten (z. B. „Personen", „Sitzung") für
+  Editor und PDF; die eingebettete E-Rechnung nutzt weiterhin einen gültigen
+  generischen Einheitencode (#153)
+
+### Changed
+- Kleinunternehmer (§ 19 UStG): Rechnungen und Angebote zeigen keine „0 %"-USt-
+  Spalte und keine „Steuerfrei 0,00 €"-Zeile mehr; da netto = brutto erscheint
+  nur der Gesamtbetrag mit dem § 19-Hinweis. Die eingebettete XML bleibt
+  unverändert korrekt (Kategorie „E") (#144)
+- Bei einem Angebot ist der Leistungszeitraum nicht mehr als § 14-UStG-
+  Pflichtangabe ausgewiesen, sondern als optionaler „Geplanter Leistungszeitraum"
+- Einheitliche Bedienung der Verwaltungslisten (Textbausteine, Kunden, Produkte):
+  Zeile anklickbar zum Bearbeiten, direkte Icon-Aktionen statt „…"-Menü
+
+### Fixed
+- Lange Produktnamen und Beschreibungen sprengen die Positionstabelle im PDF
+  nicht mehr; die Spalten bleiben stabil und die Einheit bricht nicht mehr in
+  eine neue Zeile um (#145)
+
 ## [0.2.0] - 2026-07-18
 
 ### Added
@@ -198,7 +234,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.8...v0.2.0
 [0.1.8]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.6...v0.1.7
