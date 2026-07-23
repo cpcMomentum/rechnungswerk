@@ -636,32 +636,58 @@ class ZugferdService {
 
 		$smallBusiness = $settings->getSmallBusiness() === 1;
 		$exempt = $smallBusiness || $invoice->isTaxExemptCase();
+		// #144: A §19 small-business invoice must not show a VAT rate at all — a
+		// "0 %" column reads like a tax rate, which contradicts the exemption
+		// (0 % ≠ steuerbefreit). So for small business we drop the VAT column and
+		// the tax summary line entirely; net equals gross and the §19 note below
+		// the total carries the legal reason. Other VAT-exempt cases (reverse
+		// charge etc.) keep their column and their exemption line as before. The
+		// ZUGFeRD XML is unaffected — it still carries category "E" per position.
+		$hideVat = $smallBusiness;
 
 		$rows = '';
 		foreach ($items as $item) {
 			$desc = ($item->getDescription() ?? '') !== ''
 				? '<div class="item-desc">' . nl2br($e($item->getDescription())) . '</div>' : '';
 			$ratePercent = $exempt ? 0 : (int)$item->getTaxRateBp() / 100;
+			$vatCell = $hideVat
+				? ''
+				: '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>';
 			$rows .= '<tr>'
 				. '<td>' . $e($item->getName()) . $desc . '</td>'
 				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e($this->unitLabel($item->getUnitCode())) . '</td>'
 				. '<td class="num">' . $this->formatMoney((int)$item->getUnitPriceCents()) . '</td>'
-				. '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>'
+				. $vatCell
 				. '<td class="num">' . $this->formatMoney((int)$item->getLineTotalCents()) . '</td>'
 				. '</tr>';
 		}
 
-		$taxRows = '';
-		if ($exempt) {
-			$label = $smallBusiness ? 'Steuerfrei (§ 19 UStG)' : ($this->specialTaxCaseShort($invoice) ?? 'Steuerfrei');
-			$taxRows = '<tr><td>' . $e($label) . '</td><td class="num">' . $this->formatMoney(0) . '</td></tr>';
+		// Column layout + header row: 5 columns normally, 4 when the VAT column is
+		// hidden for §19 small business.
+		if ($hideVat) {
+			$itemsColgroup = '<colgroup><col style="width: 52%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"></colgroup>';
+			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Betrag</th>';
 		} else {
+			$itemsColgroup = '<colgroup><col style="width: 46%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 10%;"><col style="width: 16%;"></colgroup>';
+			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th>';
+		}
+
+		$taxRows = '';
+		if (!$hideVat && $exempt) {
+			$label = $this->specialTaxCaseShort($invoice) ?? 'Steuerfrei';
+			$taxRows = '<tr><td>' . $e($label) . '</td><td class="num">' . $this->formatMoney(0) . '</td></tr>';
+		} elseif (!$hideVat) {
 			foreach ($invoice->getTaxBreakdownArray() as $group) {
 				$ratePercent = (int)$group['rateBp'] / 100;
 				$label = 'USt ' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' % auf ' . $this->formatMoney((int)$group['netCents']);
 				$taxRows .= '<tr><td>' . $label . '</td><td class="num">' . $this->formatMoney((int)$group['taxCents']) . '</td></tr>';
 			}
 		}
+		// For §19 the net subtotal equals the total, so a separate "Zwischensumme"
+		// line would just repeat the amount — show only the grand total.
+		$subtotalRow = $hideVat
+			? ''
+			: '<tr><td>Zwischensumme</td><td class="num">' . $this->formatMoney((int)$invoice->getSubtotalCents()) . '</td></tr>';
 
 		$paymentInfo = '';
 		if (($settings->getIban() ?? '') !== '' && !$isQuote) {
@@ -810,12 +836,12 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 <table class="meta">{$metaHtml}</table>
 {$introHtml}
 <table class="items">
-  <colgroup><col style="width: 46%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 10%;"><col style="width: 16%;"></colgroup>
-  <thead><tr><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th></tr></thead>
+  {$itemsColgroup}
+  <thead><tr>{$itemsHead}</tr></thead>
   <tbody>{$rows}</tbody>
 </table>
 <div class="totals"><table>
-  <tr><td>Zwischensumme</td><td class="num">{$this->formatMoney((int)$invoice->getSubtotalCents())}</td></tr>
+  {$subtotalRow}
   {$taxRows}
   <tr class="grand"><td>Gesamtbetrag</td><td class="num">{$this->formatMoney((int)$invoice->getTotalCents())}</td></tr>
 </table></div>
@@ -888,6 +914,13 @@ HTML;
 			InvoiceItem::UNIT_MONTH => 'Monat(e)',
 			InvoiceItem::UNIT_KILOGRAM => 'kg',
 			InvoiceItem::UNIT_LUMP_SUM => 'Pausch.',
+			InvoiceItem::UNIT_KWH => 'kWh',
+			InvoiceItem::UNIT_LITRE => 'Ltr.',
+			InvoiceItem::UNIT_METRE => 'm',
+			InvoiceItem::UNIT_KILOMETRE => 'km',
+			InvoiceItem::UNIT_SQUARE_METRE => 'm²',
+			InvoiceItem::UNIT_GRAM => 'g',
+			InvoiceItem::UNIT_TONNE => 't',
 			default => 'Stk.',
 		};
 	}

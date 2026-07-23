@@ -387,6 +387,13 @@ OC.L10N.register(
     "Vorgabe" : "Vorgabe",
     "Als Standard festlegen" : "Als Standard festlegen",
     "Standard-Vorlage" : "Standard-Vorlage",
+    "kWh" : "kWh",
+    "Liter" : "Liter",
+    "Meter" : "Meter",
+    "Kilometer" : "Kilometer",
+    "m²" : "m²",
+    "Gramm" : "Gramm",
+    "Tonne" : "Tonne",
     "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler." : "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.",
     "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler." : "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler."
 },

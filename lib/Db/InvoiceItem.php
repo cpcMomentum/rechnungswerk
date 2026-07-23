@@ -43,6 +43,14 @@ class InvoiceItem extends Entity implements JsonSerializable {
 	public const UNIT_MONTH = 'MON';  // Monat
 	public const UNIT_KILOGRAM = 'KGM'; // kg
 	public const UNIT_LUMP_SUM = 'LS'; // Pauschal
+	// Further UN/ECE Rec. 20 codes (EN16931-valid) for common consumption units (#146).
+	public const UNIT_KWH = 'KWH';    // Kilowattstunde
+	public const UNIT_LITRE = 'LTR';  // Liter
+	public const UNIT_METRE = 'MTR';  // Meter
+	public const UNIT_KILOMETRE = 'KMT'; // Kilometer
+	public const UNIT_SQUARE_METRE = 'MTK'; // Quadratmeter
+	public const UNIT_GRAM = 'GRM';   // Gramm
+	public const UNIT_TONNE = 'TNE';  // Tonne
 
 	public const UNIT_CODES = [
 		self::UNIT_PIECE,
@@ -51,6 +59,13 @@ class InvoiceItem extends Entity implements JsonSerializable {
 		self::UNIT_MONTH,
 		self::UNIT_KILOGRAM,
 		self::UNIT_LUMP_SUM,
+		self::UNIT_KWH,
+		self::UNIT_LITRE,
+		self::UNIT_METRE,
+		self::UNIT_KILOMETRE,
+		self::UNIT_SQUARE_METRE,
+		self::UNIT_GRAM,
+		self::UNIT_TONNE,
 	];
 
 	protected ?int $invoiceId = null;
