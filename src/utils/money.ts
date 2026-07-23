@@ -6,27 +6,6 @@
  * Conversion is centralised here to avoid float-rounding drift.
  */
 
-/** Cents (int) -> euro amount string with 2 decimals, e.g. 1250 -> "12.50". */
-export function centsToEuroInput(cents: number | null | undefined): string {
-	if (cents === null || cents === undefined) {
-		return ''
-	}
-	return (cents / 100).toFixed(2)
-}
-
-/** Euro input ("12,50" or "12.50") -> integer cents, rounded. */
-export function euroInputToCents(value: string | number | null | undefined): number {
-	if (value === null || value === undefined || value === '') {
-		return 0
-	}
-	const normalized = String(value).replace(',', '.').trim()
-	const euros = Number.parseFloat(normalized)
-	if (Number.isNaN(euros)) {
-		return 0
-	}
-	return Math.round(euros * 100)
-}
-
 /**
  * Unit price in ten-thousandths of a euro (#147) -> euro input string with 2–4
  * decimals: at least two, up to four, trailing zeros beyond the second trimmed.
