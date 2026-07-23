@@ -914,6 +914,13 @@ HTML;
 			InvoiceItem::UNIT_MONTH => 'Monat(e)',
 			InvoiceItem::UNIT_KILOGRAM => 'kg',
 			InvoiceItem::UNIT_LUMP_SUM => 'Pausch.',
+			InvoiceItem::UNIT_KWH => 'kWh',
+			InvoiceItem::UNIT_LITRE => 'Ltr.',
+			InvoiceItem::UNIT_METRE => 'm',
+			InvoiceItem::UNIT_KILOMETRE => 'km',
+			InvoiceItem::UNIT_SQUARE_METRE => 'm²',
+			InvoiceItem::UNIT_GRAM => 'g',
+			InvoiceItem::UNIT_TONNE => 't',
 			default => 'Stk.',
 		};
 	}
