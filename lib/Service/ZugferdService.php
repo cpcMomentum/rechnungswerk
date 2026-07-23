@@ -364,7 +364,12 @@ class ZugferdService {
 				$item->getName() ?? '',
 				$item->getDescription() !== null && $item->getDescription() !== '' ? $item->getDescription() : null,
 			);
-			$unitCode = $item->getUnitCode() ?? InvoiceItem::UNIT_PIECE;
+			// A free-text unit label (#153) has no valid UN/ECE code, so the XML
+			// falls back to the generic C62 ("one/piece"); the label is only shown
+			// on the visible PDF. A standard unit uses its own code.
+			$unitCode = ($item->getUnitLabel() ?? '') !== ''
+				? InvoiceItem::UNIT_PIECE
+				: ($item->getUnitCode() ?? InvoiceItem::UNIT_PIECE);
 			$this->applyNetPrice($builder, (int)$item->getUnitPriceE4(), $unitCode);
 			$builder->setDocumentPositionQuantity(
 				$this->quantityToFloat($item->getQuantity()),
@@ -672,7 +677,7 @@ class ZugferdService {
 				: '<td class="num">' . rtrim(rtrim(number_format($ratePercent, 1, ',', '.'), '0'), ',') . ' %</td>';
 			$rows .= '<tr>'
 				. '<td>' . $e($item->getName()) . $desc . '</td>'
-				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e($this->unitLabel($item->getUnitCode())) . '</td>'
+				. '<td class="num">' . $e($this->formatQuantity($item->getQuantity())) . ' ' . $e(($item->getUnitLabel() ?? '') !== '' ? $item->getUnitLabel() : $this->unitLabel($item->getUnitCode())) . '</td>'
 				. '<td class="num">' . $this->formatUnitPrice((int)$item->getUnitPriceE4()) . '</td>'
 				. $vatCell
 				. '<td class="num">' . $this->formatMoney((int)$item->getLineTotalCents()) . '</td>'

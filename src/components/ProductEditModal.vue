@@ -36,6 +36,13 @@
 				</label>
 			</div>
 
+			<label class="field">
+				<span>{{ t('rechnungswerk', 'Eigene Einheit (optional)') }}</span>
+				<input v-model="form.defaultUnitLabel" class="input" type="text"
+					:placeholder="t('rechnungswerk', 'z. B. Personen, Sitzung')" />
+				<span class="hint">{{ t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.') }}</span>
+			</label>
+
 			<div class="actions">
 				<NcButton @click="$emit('close')">{{ t('rechnungswerk', 'Abbrechen') }}</NcButton>
 				<NcButton variant="primary" :disabled="saving || !isValid" @click="onSave">
@@ -69,10 +76,11 @@ const emit = defineEmits<{
 
 const nameInput = ref<HTMLInputElement | null>(null)
 
-const form = reactive<{ name: string, description: string, defaultUnitCode: UnitCode, defaultTaxRateBp: number }>({
+const form = reactive<{ name: string, description: string, defaultUnitCode: UnitCode, defaultUnitLabel: string, defaultTaxRateBp: number }>({
 	name: '',
 	description: '',
 	defaultUnitCode: 'C62',
+	defaultUnitLabel: '',
 	defaultTaxRateBp: 1900,
 })
 const priceInput = ref('0.00')
@@ -91,6 +99,7 @@ watch(() => props.open, (open) => {
 	form.name = p?.name ?? ''
 	form.description = p?.description ?? ''
 	form.defaultUnitCode = (p?.defaultUnitCode ?? 'C62') as UnitCode
+	form.defaultUnitLabel = p?.defaultUnitLabel ?? ''
 	form.defaultTaxRateBp = p?.defaultTaxRateBp ?? 1900
 	priceInput.value = e4ToEuroInput(p?.defaultPriceE4 ?? 0)
 	nextTick(() => nameInput.value?.focus())
@@ -104,6 +113,7 @@ function onSave() {
 		name: form.name.trim(),
 		description: form.description.trim() === '' ? null : form.description.trim(),
 		defaultUnitCode: form.defaultUnitCode,
+		defaultUnitLabel: form.defaultUnitLabel.trim() === '' ? null : form.defaultUnitLabel.trim(),
 		defaultPriceE4: euroInputToE4(priceInput.value),
 		defaultTaxRateBp: form.defaultTaxRateBp,
 	})

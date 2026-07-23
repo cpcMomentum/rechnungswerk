@@ -744,6 +744,7 @@ function buildInput(): InvoiceInput {
 				description: i.description.trim() === '' ? null : i.description.trim(),
 				quantity: String(i.quantity).replace(',', '.'),
 				unitCode: i.unitCode,
+				unitLabel: i.unitLabel.trim() === '' ? null : i.unitLabel.trim(),
 				unitPriceE4: euroInputToE4(i.priceInput),
 				taxRateBp: i.taxRateBp,
 			})),

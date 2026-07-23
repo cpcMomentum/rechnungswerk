@@ -121,6 +121,10 @@ class ProductService {
 		} elseif ($isNew) {
 			$product->setDefaultUnitCode(InvoiceItem::UNIT_PIECE);
 		}
+		if (array_key_exists('defaultUnitLabel', $data)) {
+			$label = trim((string)($data['defaultUnitLabel'] ?? ''));
+			$product->setDefaultUnitLabel($label !== '' ? $label : null);
+		}
 		if (array_key_exists('defaultPriceE4', $data)) {
 			$product->setDefaultPriceE4((int)$data['defaultPriceE4']);
 		} elseif ($isNew) {

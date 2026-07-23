@@ -33,7 +33,7 @@
 							{{ p.name }}
 							<div v-if="p.description" class="rw-muted">{{ p.description }}</div>
 						</td>
-						<td>{{ t('rechnungswerk', unitLabel(p.defaultUnitCode)) }}</td>
+						<td>{{ p.defaultUnitLabel || t('rechnungswerk', unitLabel(p.defaultUnitCode)) }}</td>
 						<td class="num">{{ formatUnitPriceE4(p.defaultPriceE4) }}</td>
 						<td class="num">{{ formatTaxRate(p.defaultTaxRateBp) }}</td>
 						<td class="rw-col-actions">

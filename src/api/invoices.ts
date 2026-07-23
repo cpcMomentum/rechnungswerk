@@ -12,6 +12,7 @@ export interface InvoiceItemInput {
 	description?: string | null
 	quantity: string
 	unitCode: string
+	unitLabel?: string | null
 	unitPriceE4: number
 	taxRateBp: number
 }
