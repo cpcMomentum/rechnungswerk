@@ -381,7 +381,7 @@ import { useSettingsStore } from '@/stores/settingsStore'
 import { useTextSnippetStore } from '@/stores/textSnippetStore'
 import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail, type SnippetDocType, type TextSnippet } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
-import { formatCents, formatTaxRate, euroInputToCents } from '@/utils/money'
+import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 import { downloadQuotePdf, quotePreviewUrl, sendQuote } from '@/api/quotes'
@@ -538,7 +538,7 @@ const headerTitle = computed(() => {
 
 const totals = computed(() => computeTotals(items.value.map(i => ({
 	taxRateBp: i.taxRateBp,
-	lineTotalCents: lineTotalCents(i.quantity, euroInputToCents(i.priceInput)),
+	lineTotalCents: lineTotalCents(i.quantity, euroInputToE4(i.priceInput)),
 })), taxExempt.value))
 
 // Bumped on every navigation-driven (re-)load below; load()/initNew() compare
@@ -744,7 +744,7 @@ function buildInput(): InvoiceInput {
 				description: i.description.trim() === '' ? null : i.description.trim(),
 				quantity: String(i.quantity).replace(',', '.'),
 				unitCode: i.unitCode,
-				unitPriceCents: euroInputToCents(i.priceInput),
+				unitPriceE4: euroInputToE4(i.priceInput),
 				taxRateBp: i.taxRateBp,
 			})),
 	}

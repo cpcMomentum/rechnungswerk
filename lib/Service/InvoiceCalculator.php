@@ -22,17 +22,21 @@ use OCA\Rechnungswerk\Db\Settings;
 final class InvoiceCalculator {
 
 	/**
-	 * Line total in cents from a decimal quantity string and a unit price in cents.
-	 * Quantity may use "." or "," as decimal separator and carries up to 3 decimals.
+	 * Line total in cents from a decimal quantity string and a unit price in
+	 * ten-thousandths of a euro (1/10000 €, 4 decimals, #147). Quantity may use
+	 * "." or "," as decimal separator and carries up to 3 decimals. The result is
+	 * rounded to whole cents exactly once here — the finer price precision only
+	 * affects this single multiplication, never the summed amounts.
 	 */
-	public static function lineTotalCents(string $quantity, int $unitPriceCents): int {
+	public static function lineTotalCents(string $quantity, int $unitPriceE4): int {
 		$normalized = str_replace(',', '.', trim($quantity));
 		if ($normalized === '' || !is_numeric($normalized)) {
 			return 0;
 		}
 		// Quantity in milli-units (3 decimals), rounded to avoid float drift.
 		$milli = (int)round(((float)$normalized) * 1000);
-		return (int)round(($milli * $unitPriceCents) / 1000);
+		// milli-units (1/1000) × price (1/10000 €) → cents (1/100 €): / 100000.
+		return (int)round(($milli * $unitPriceE4) / 100000);
 	}
 
 	/**

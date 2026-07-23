@@ -7,7 +7,7 @@
  */
 
 import type { InvoiceItem, Product, UnitCode } from '@/types/api'
-import { centsToEuroInput } from '@/utils/money'
+import { e4ToEuroInput } from '@/utils/money'
 
 export interface EditorItem {
 	productId: number | null
@@ -38,7 +38,7 @@ export function itemFromProduct(product: Product, smallBusiness: boolean): Edito
 		description: product.description ?? '',
 		quantity: '1',
 		unitCode: product.defaultUnitCode,
-		priceInput: centsToEuroInput(product.defaultPriceCents),
+		priceInput: e4ToEuroInput(product.defaultPriceE4),
 		taxRateBp: smallBusiness ? 0 : product.defaultTaxRateBp,
 	}
 }
@@ -50,7 +50,7 @@ export function itemFromInvoiceItem(item: InvoiceItem): EditorItem {
 		description: item.description ?? '',
 		quantity: item.quantity,
 		unitCode: item.unitCode,
-		priceInput: centsToEuroInput(item.unitPriceCents),
+		priceInput: e4ToEuroInput(item.unitPriceE4),
 		taxRateBp: item.taxRateBp,
 	}
 }

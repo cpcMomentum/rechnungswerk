@@ -34,7 +34,7 @@
 							<div v-if="p.description" class="rw-muted">{{ p.description }}</div>
 						</td>
 						<td>{{ t('rechnungswerk', unitLabel(p.defaultUnitCode)) }}</td>
-						<td class="num">{{ formatCents(p.defaultPriceCents) }}</td>
+						<td class="num">{{ formatUnitPriceE4(p.defaultPriceE4) }}</td>
 						<td class="num">{{ formatTaxRate(p.defaultTaxRateBp) }}</td>
 						<td class="rw-col-actions">
 							<div class="rw-actions">
@@ -83,7 +83,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useProductStore } from '@/stores/productStore'
 import { UNIT_CODE_LABELS, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
-import { formatCents, formatTaxRate } from '@/utils/money'
+import { formatUnitPriceE4, formatTaxRate } from '@/utils/money'
 
 const store = useProductStore()
 const editorOpen = ref(false)

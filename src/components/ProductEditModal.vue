@@ -25,7 +25,7 @@
 
 				<label class="field">
 					<span>{{ t('rechnungswerk', 'Standard-Preis (€)') }}</span>
-					<input v-model="priceInput" class="input" type="number" step="0.01" min="0" inputmode="decimal" />
+					<input v-model="priceInput" class="input" type="number" step="0.0001" min="0" inputmode="decimal" />
 				</label>
 
 				<label class="field">
@@ -54,7 +54,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
 import { escCloses } from '@/utils/modalEsc'
-import { centsToEuroInput, euroInputToCents, formatTaxRate } from '@/utils/money'
+import { e4ToEuroInput, euroInputToE4, formatTaxRate } from '@/utils/money'
 
 const props = defineProps<{
 	open: boolean
@@ -92,7 +92,7 @@ watch(() => props.open, (open) => {
 	form.description = p?.description ?? ''
 	form.defaultUnitCode = (p?.defaultUnitCode ?? 'C62') as UnitCode
 	form.defaultTaxRateBp = p?.defaultTaxRateBp ?? 1900
-	priceInput.value = centsToEuroInput(p?.defaultPriceCents ?? 0)
+	priceInput.value = e4ToEuroInput(p?.defaultPriceE4 ?? 0)
 	nextTick(() => nameInput.value?.focus())
 }, { immediate: true })
 
@@ -104,7 +104,7 @@ function onSave() {
 		name: form.name.trim(),
 		description: form.description.trim() === '' ? null : form.description.trim(),
 		defaultUnitCode: form.defaultUnitCode,
-		defaultPriceCents: euroInputToCents(priceInput.value),
+		defaultPriceE4: euroInputToE4(priceInput.value),
 		defaultTaxRateBp: form.defaultTaxRateBp,
 	})
 }

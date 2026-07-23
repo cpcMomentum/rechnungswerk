@@ -26,8 +26,8 @@ use OCP\DB\Types;
  * @method void setQuantity(string $quantity)
  * @method string getUnitCode()
  * @method void setUnitCode(string $unitCode)
- * @method int getUnitPriceCents()
- * @method void setUnitPriceCents(int $unitPriceCents)
+ * @method int getUnitPriceE4()
+ * @method void setUnitPriceE4(int $unitPriceE4)
  * @method int getTaxRateBp()
  * @method void setTaxRateBp(int $taxRateBp)
  * @method int getLineTotalCents()
@@ -75,6 +75,13 @@ class InvoiceItem extends Entity implements JsonSerializable {
 	/** Decimal string (e.g. "2.500") — line_total_cents stays the authoritative money value. */
 	protected ?string $quantity = null;
 	protected ?string $unitCode = null;
+	/** Unit net price in ten-thousandths of a euro (1/10000 €, 4 decimals, #147). */
+	protected ?int $unitPriceE4 = null;
+	/**
+	 * Deprecated legacy unit price in cents (#147). The DB column still exists
+	 * (backfilled into unit_price_e4), so the mapper must be able to hydrate it;
+	 * unused otherwise and dropped together with the column in a later release.
+	 */
 	protected ?int $unitPriceCents = null;
 	protected ?int $taxRateBp = null;
 	protected ?int $lineTotalCents = null;
@@ -87,6 +94,7 @@ class InvoiceItem extends Entity implements JsonSerializable {
 		$this->addType('description', Types::TEXT);
 		$this->addType('quantity', Types::DECIMAL);
 		$this->addType('unitCode', Types::STRING);
+		$this->addType('unitPriceE4', Types::INTEGER);
 		$this->addType('unitPriceCents', Types::INTEGER);
 		$this->addType('taxRateBp', Types::INTEGER);
 		$this->addType('lineTotalCents', Types::INTEGER);
@@ -102,7 +110,7 @@ class InvoiceItem extends Entity implements JsonSerializable {
 			'description' => $this->getDescription(),
 			'quantity' => $this->getQuantity(),
 			'unitCode' => $this->getUnitCode(),
-			'unitPriceCents' => $this->getUnitPriceCents(),
+			'unitPriceE4' => $this->getUnitPriceE4(),
 			'taxRateBp' => $this->getTaxRateBp(),
 			'lineTotalCents' => $this->getLineTotalCents(),
 			'sortOrder' => $this->getSortOrder(),
