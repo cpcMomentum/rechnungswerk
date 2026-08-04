@@ -15,7 +15,7 @@ if [ -n "$CONFLICT_STAGED" ]; then
     CONFLICT_VIOLATIONS=""
     for file in $CONFLICT_STAGED; do
         [ -f "$file" ] || continue
-        MATCHES=$(git show ":$file" | grep -nE '^(<{7,}|={7,}|>{7,})' || true)
+        MATCHES=$(git show ":$file" | grep -nE '^(<{7,}|={7,}|>{7,}|[|]{7,})' || true)
         if [ -n "$MATCHES" ]; then
             CONFLICT_VIOLATIONS="${CONFLICT_VIOLATIONS}${file}:
 ${MATCHES}
