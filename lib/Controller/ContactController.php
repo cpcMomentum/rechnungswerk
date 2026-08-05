@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCA\Rechnungswerk\Service\UserContactService;
 use OCP\AppFramework\Controller;
@@ -32,6 +33,7 @@ class ContactController extends Controller {
 		private readonly IUserManager $userManager,
 		private readonly IAccountManager $accountManager,
 		private readonly UserContactService $userContactService,
+		private readonly CountryService $countryService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -166,6 +168,11 @@ class ContactController extends Controller {
 	 * Parse a vCard ADR value
 	 * (PObox;Ext;Street;Locality;Region;PostalCode;Country) into our fields.
 	 *
+	 * Das Landfeld ist laut RFC 6350 freier Text, iOS und Outlook schreiben dort
+	 * "Deutschland" oder "Germany". Wir uebersetzen das in den ISO-Code, den
+	 * unsere Spalten und EN16931 erwarten. Ein nicht zuordenbarer Name wird
+	 * verworfen statt den Import abzubrechen (#167).
+	 *
 	 * @return array{street: string, postalCode: string, city: string, country: string}
 	 */
 	private function parseAddress(string $adr): array {
@@ -174,7 +181,7 @@ class ContactController extends Controller {
 			'street' => trim($parts[2] ?? ''),
 			'city' => trim($parts[3] ?? ''),
 			'postalCode' => trim($parts[5] ?? ''),
-			'country' => trim($parts[6] ?? ''),
+			'country' => $this->countryService->resolve($parts[6] ?? null) ?? '',
 		];
 	}
 }

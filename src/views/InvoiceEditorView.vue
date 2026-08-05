@@ -87,8 +87,8 @@
 					<input v-model="form.recipientPostalCode" class="rw-input" type="text" :readonly="readonly" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Ort') }}</span>
 					<input v-model="form.recipientCity" class="rw-input" type="text" :readonly="readonly" /></label>
-				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Land') }}</span>
-					<input v-model="form.recipientCountry" class="rw-input" type="text" :readonly="readonly" /></label>
+				<label class="rw-field rw-field--country"><span>{{ t('rechnungswerk', 'Land') }}</span>
+					<CountrySelect v-model="form.recipientCountry" :disabled="readonly" /></label>
 			</div>
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr. (optional)') }}</span>
@@ -367,6 +367,7 @@ import CheckCircleIcon from 'vue-material-design-icons/CheckCircle.vue'
 import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import ContactPicker from '@/components/ContactPicker.vue'
+import CountrySelect from '@/components/CountrySelect.vue'
 import CustomerPicker from '@/components/CustomerPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'

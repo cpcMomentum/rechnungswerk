@@ -30,6 +30,7 @@ class InvoiceService {
 		private readonly ZugferdService $zugferdService,
 		private readonly ArchiveService $archiveService,
 		private readonly MailService $mailService,
+		private readonly CountryService $countryService,
 		private readonly IDBConnection $db,
 		private readonly LoggerInterface $logger,
 	) {
@@ -671,8 +672,7 @@ class InvoiceService {
 			$invoice->setCustomerId($customerId !== null && $customerId !== '' ? (int)$customerId : null);
 		}
 		if (array_key_exists('recipientCountry', $data)) {
-			$country = $data['recipientCountry'];
-			$invoice->setRecipientCountry($country !== null && $country !== '' ? (string)$country : 'DE');
+			$invoice->setRecipientCountry($this->resolveCountry($data['recipientCountry']));
 		} elseif ($invoice->getRecipientCountry() === null) {
 			$invoice->setRecipientCountry('DE');
 		}
@@ -1453,6 +1453,25 @@ class InvoiceService {
 		if ($status === Invoice::QUOTE_SUPERSEDED) {
 			throw new IllegalStateException('Dieses Angebot wurde bereits revidiert.');
 		}
+	}
+
+	/**
+	 * Laenderangabe in einen ISO-Code uebersetzen. Leer bedeutet Inland.
+	 * Ohne diese Pruefung landete ein Name wie "Deutschland" in einer
+	 * zwei Zeichen breiten Spalte und der Datenbankfehler kam als 500 an (#167).
+	 *
+	 * @throws ValidationException
+	 */
+	private function resolveCountry(mixed $value): string {
+		$raw = trim((string)($value ?? ''));
+		if ($raw === '') {
+			return 'DE';
+		}
+		$code = $this->countryService->resolve($raw);
+		if ($code === null) {
+			throw new ValidationException('"' . $raw . '" ist kein gültiges Land. Bitte aus der Liste wählen.');
+		}
+		return $code;
 	}
 
 	private function parseDate(mixed $value): ?DateTime {

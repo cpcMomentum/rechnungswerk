@@ -66,6 +66,15 @@
 .app-rechnungswerk .rw-field--narrow {
 	flex: 0 1 120px;
 }
+/*
+ * Laenderauswahl: breiter als --narrow, weil dort ganze Namen stehen (#167).
+ * 260px gemessen: darunter passen 20 von 250 Namen nicht, darunter
+ * "Bosnien und Herzegowina". Ab 260px bleiben acht Ueberseegebiete uebrig,
+ * die haengt der title-Tooltip auf.
+ */
+.app-rechnungswerk .rw-field--country {
+	flex: 0 1 260px;
+}
 .app-rechnungswerk .rw-field--inline {
 	flex-direction: row;
 	align-items: center;
