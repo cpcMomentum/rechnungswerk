@@ -194,19 +194,10 @@ class CustomerService {
 			}
 		}
 		if (array_key_exists('country', $data)) {
-			// Leer heisst Inland. Ein Name wie "Deutschland" wird uebersetzt,
-			// alles Unbekannte abgelehnt statt in die zwei Zeichen breite
-			// Spalte zu laufen und dort einen 500er auszuloesen (#167).
-			$raw = trim((string)($data['country'] ?? ''));
-			if ($raw === '') {
-				$customer->setCountry('DE');
-			} else {
-				$code = $this->countryService->resolve($raw);
-				if ($code === null) {
-					throw new ValidationException('"' . $raw . '" ist kein gültiges Land. Bitte aus der Liste wählen.');
-				}
-				$customer->setCountry($code);
-			}
+			// Leer heisst Inland, ein Name wie "Deutschland" wird uebersetzt,
+			// Unbekanntes abgelehnt statt in die zwei Zeichen breite Spalte
+			// zu laufen und dort einen 500er auszuloesen (#167).
+			$customer->setCountry($this->countryService->resolveForStorage($data['country']));
 		} elseif ($isNew) {
 			$customer->setCountry('DE');
 		}

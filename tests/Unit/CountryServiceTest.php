@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Tests\Unit;
 
+use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\CountryData;
 use OCA\Rechnungswerk\Service\CountryService;
 use PHPUnit\Framework\TestCase;
@@ -74,6 +75,21 @@ class CountryServiceTest extends TestCase {
 			'kein gueltiger Code' => ['XX'],
 			'Satzzeichen allein' => ['---'],
 		];
+	}
+
+	/** Der Schreibpfad, den Rechnung und Kunde teilen. */
+	public function testResolveForStorageTranslatesAndDefaults(): void {
+		$this->assertSame('DE', $this->service->resolveForStorage('Deutschland'));
+		$this->assertSame('AT', $this->service->resolveForStorage('Österreich'));
+		$this->assertSame('DE', $this->service->resolveForStorage(''), 'leer bedeutet Inland');
+		$this->assertSame('DE', $this->service->resolveForStorage(null));
+		$this->assertSame('DE', $this->service->resolveForStorage('   '));
+	}
+
+	public function testResolveForStorageRejectsUnknownCountry(): void {
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('Absurdistan');
+		$this->service->resolveForStorage('Absurdistan');
 	}
 
 	public function testKnownCodeChecksAgainstTheEn16931List(): void {

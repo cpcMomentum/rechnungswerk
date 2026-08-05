@@ -16,11 +16,9 @@ namespace OCA\Rechnungswerk\Service;
  * horstoeko/zugferd (ZugferdCountryCodes, die fuer EN16931 zulaessige Liste),
  * die Namen stammen aus den CLDR-Daten der PHP-Extension intl.
  *
- * Neu erzeugen mit dem Generator aus PR #171 (siehe Issue #167):
+ * Neu erzeugen mit dem Generator aus PR #173 (siehe Issue #167):
  * die Tabelle wird bewusst committet, damit zur Laufzeit keine
  * intl-Extension noetig ist - Nextcloud selbst behandelt intl als optional.
- *
- * @psalm-type CountryNames = array{0: string, 1: string}
  */
 final class CountryData {
 

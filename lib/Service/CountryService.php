@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
+use OCA\Rechnungswerk\Exception\ValidationException;
+
 /**
  * Uebersetzt Laenderangaben in ISO-3166-1-alpha-2-Codes (#167).
  *
@@ -93,6 +95,25 @@ class CountryService {
 			return $upper;
 		}
 		return $this->index()[$this->fold($value)] ?? null;
+	}
+
+	/**
+	 * Wie resolve(), aber mit den Regeln der Schreibpfade: leer bedeutet Inland,
+	 * Unbekanntes wird abgelehnt statt in die zwei Zeichen breite Spalte zu
+	 * laufen und dort einen Datenbankfehler auszuloesen (#167).
+	 *
+	 * @throws ValidationException
+	 */
+	public function resolveForStorage(mixed $value): string {
+		$raw = trim((string)($value ?? ''));
+		if ($raw === '') {
+			return 'DE';
+		}
+		$code = $this->resolve($raw);
+		if ($code === null) {
+			throw new ValidationException('"' . $raw . '" ist kein gültiges Land. Bitte aus der Liste wählen.');
+		}
+		return $code;
 	}
 
 	/** Ob der Code so in der EN16931-Liste steht. Erwartet bereits Grossbuchstaben. */
