@@ -30,8 +30,13 @@
 									:readonly="readonly" :placeholder="t('rechnungswerk', 'Leistung')" />
 							</td>
 							<td class="num">
+								<!-- Beim Verlassen wird der erkannte Wert zurueckgeschrieben.
+								     Wer "1.000" tippt und danach "1.000" mit passendem
+								     Zeilenbetrag sieht, erkennt sofort, ob die App ihn
+								     richtig verstanden hat (#157). -->
 								<input v-model="item.quantity" class="rw-input num" type="text"
-									inputmode="decimal" :readonly="readonly" />
+									inputmode="decimal" :readonly="readonly"
+									@blur="normalizeQuantity(item)" />
 							</td>
 							<td>
 								<select v-model="item.unitCode" class="rw-input" :disabled="readonly">
@@ -103,6 +108,7 @@ import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product } from '@/type
 import { emptyItem, itemFromProduct, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
 import { lineTotalCents } from '@/utils/invoiceCalc'
+import { formatForInput, parseQuantity } from '@/utils/numberInput'
 
 const items = defineModel<EditorItem[]>('items', { required: true })
 const props = defineProps<{
@@ -113,6 +119,18 @@ const props = defineProps<{
 }>()
 
 const lineTotal = (item: EditorItem): number => lineTotalCents(item.quantity, euroInputToE4(item.priceInput))
+
+/**
+ * Erkannten Mengenwert beim Verlassen des Feldes zurueckschreiben (#157).
+ * Eine unlesbare Eingabe bleibt stehen, damit der Nutzer sieht, was er getippt
+ * hat, und beim Speichern die Meldung des Servers dazu bekommt.
+ */
+function normalizeQuantity(item: EditorItem): void {
+	const parsed = parseQuantity(item.quantity)
+	if (parsed !== null) {
+		item.quantity = formatForInput(parsed)
+	}
+}
 
 // Under §19 small-business there is no VAT: force every line to 0 % so the
 // client preview matches what the server stores.
