@@ -20,6 +20,7 @@ class CustomerService {
 
 	public function __construct(
 		private readonly CustomerMapper $mapper,
+		private readonly CountryService $countryService,
 	) {
 	}
 
@@ -193,8 +194,10 @@ class CustomerService {
 			}
 		}
 		if (array_key_exists('country', $data)) {
-			$country = strtoupper(trim((string)$data['country']));
-			$customer->setCountry($country !== '' ? $country : 'DE');
+			// Leer heisst Inland, ein Name wie "Deutschland" wird uebersetzt,
+			// Unbekanntes abgelehnt statt in die zwei Zeichen breite Spalte
+			// zu laufen und dort einen 500er auszuloesen (#167).
+			$customer->setCountry($this->countryService->resolveForStorage($data['country']));
 		} elseif ($isNew) {
 			$customer->setCountry('DE');
 		}

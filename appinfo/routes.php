@@ -80,6 +80,9 @@ return [
 		['name' => 'contact#getMyContact', 'url' => '/api/v1/me/contact', 'verb' => 'GET'],
 		['name' => 'contact#saveMyContact', 'url' => '/api/v1/me/contact', 'verb' => 'PUT'],
 
+		// Laenderliste fuer die Auswahlfelder (#167)
+		['name' => 'country#index', 'url' => '/api/v1/countries', 'verb' => 'GET'],
+
 		// Access control / app admin
 		['name' => 'admin#permissionInfo',     'url' => '/api/v1/permission-info',     'verb' => 'GET'],
 		['name' => 'admin#getPermissions',     'url' => '/api/v1/permissions',         'verb' => 'GET'],
