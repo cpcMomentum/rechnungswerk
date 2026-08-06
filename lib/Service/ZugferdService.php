@@ -686,12 +686,19 @@ class ZugferdService {
 
 		// Column layout + header row: 5 columns normally, 4 when the VAT column is
 		// hidden for §19 small business.
+		//
+		// Die Breiten stehen an den Spaltenkoepfen, NICHT in einem <colgroup>:
+		// dompdf wertet <col style="width"> nicht aus. Zusammen mit dem
+		// table-layout: fixed aus #145 blieben dadurch keine verwertbaren Breiten
+		// uebrig und die Tabelle wurde gleichmaessig aufgeteilt, was die
+		// Bezeichnung viel zu frueh umbrach (#157).
 		if ($hideVat) {
-			$itemsColgroup = '<colgroup><col style="width: 52%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"></colgroup>';
-			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Betrag</th>';
+			$itemsHead = '<th style="width: 52%;">Bezeichnung</th><th class="num" style="width: 16%;">Menge</th>'
+				. '<th class="num" style="width: 16%;">Einzelpreis</th><th class="num" style="width: 16%;">Betrag</th>';
 		} else {
-			$itemsColgroup = '<colgroup><col style="width: 46%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 10%;"><col style="width: 16%;"></colgroup>';
-			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th>';
+			$itemsHead = '<th style="width: 46%;">Bezeichnung</th><th class="num" style="width: 14%;">Menge</th>'
+				. '<th class="num" style="width: 14%;">Einzelpreis</th><th class="num" style="width: 10%;">USt</th>'
+				. '<th class="num" style="width: 16%;">Betrag</th>';
 		}
 
 		$taxRows = '';
@@ -858,7 +865,6 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 <table class="meta">{$metaHtml}</table>
 {$introHtml}
 <table class="items">
-  {$itemsColgroup}
   <thead><tr>{$itemsHead}</tr></thead>
   <tbody>{$rows}</tbody>
 </table>

@@ -362,7 +362,7 @@ class ZugferdServiceTest extends TestCase {
 
 		$html = $this->renderHtml($invoice, $items, $this->settings(1), false);
 
-		$this->assertStringNotContainsString('<th class="num">USt</th>', $html);
+		$this->assertStringNotContainsString('>USt</th>', $html);
 		$this->assertStringNotContainsString('Zwischensumme', $html);
 		$this->assertStringNotContainsString('Steuerfrei', $html);
 		$this->assertStringContainsString('§ 19 UStG', $html);
@@ -378,8 +378,54 @@ class ZugferdServiceTest extends TestCase {
 
 		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
 
-		$this->assertStringContainsString('<th class="num">USt</th>', $html);
+		$this->assertStringContainsString('>USt</th>', $html);
 		$this->assertStringContainsString('Zwischensumme', $html);
+	}
+
+	/**
+	 * #157: Die Spaltenbreiten standen in einem <colgroup>, das dompdf nicht
+	 * auswertet. Zusammen mit table-layout: fixed teilte sich die Tabelle
+	 * dadurch gleichmaessig auf und brach die Bezeichnung viel zu frueh um.
+	 * Die Breiten muessen an den Spaltenkoepfen haengen.
+	 *
+	 * Wie die Tabelle am Ende wirklich aussieht, laesst sich nur am erzeugten
+	 * PDF messen, nicht am HTML. Dieser Test haelt nur fest, dass die Breiten
+	 * dort stehen, wo dompdf sie liest, und dass das colgroup nicht
+	 * zurueckkehrt.
+	 */
+	public function testItemTableCarriesColumnWidthsWhereDompdfReadsThem(): void {
+		$invoice = $this->invoice();
+		$items = [$this->item(10000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $this->settings(), false);
+
+		$this->assertStringNotContainsString('<colgroup', $html, 'dompdf wertet <col style="width"> nicht aus');
+		$this->assertMatchesRegularExpression('/<th style="width: \d+%;">Bezeichnung<\/th>/', $html);
+		$this->assertMatchesRegularExpression('/<th class="num" style="width: \d+%;">Menge<\/th>/', $html);
+		$this->assertMatchesRegularExpression('/<th class="num" style="width: \d+%;">USt<\/th>/', $html);
+
+		// Die Breiten muessen sich zu 100 % ergaenzen, sonst rechnet dompdf
+		// den Rest selbst und die Aufteilung stimmt wieder nicht.
+		preg_match_all('/<th[^>]*style="width: (\d+)%;"/', $html, $m);
+		$this->assertCount(5, $m[1], 'fuenf Spalten im Regelfall');
+		$this->assertSame(100, array_sum(array_map('intval', $m[1])));
+	}
+
+	/** #157: Der Editor nennt die Spalte "Bezeichnung", das PDF tat es nicht. */
+	public function testItemColumnIsNamedLikeInTheEditor(): void {
+		$html = $this->renderHtml($this->invoice(), [$this->item(10000, 1900, 20000)], $this->settings(), false);
+
+		$this->assertStringContainsString('>Bezeichnung</th>', $html);
+		$this->assertStringNotContainsString('>Beschreibung</th>', $html);
+	}
+
+	/** Auch der §19-Fall mit vier Spalten muss auf 100 % kommen. */
+	public function testSmallBusinessTableAlsoSumsToFullWidth(): void {
+		$html = $this->renderHtml($this->invoice(), [$this->item(10000, 0, 20000)], $this->settings(1), false);
+
+		preg_match_all('/<th[^>]*style="width: (\d+)%;"/', $html, $m);
+		$this->assertCount(4, $m[1], 'ohne USt-Spalte sind es vier');
+		$this->assertSame(100, array_sum(array_map('intval', $m[1])));
 	}
 
 	public function testReferencesAndNotesAreExportedToXml(): void {
