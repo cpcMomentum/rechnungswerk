@@ -570,6 +570,10 @@ class ZugferdService {
 	 */
 	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null, bool $preview = false): string {
 		$accent = $this->sanitizeColor($settings->getAccentColor()) ?? '#2c3e50';
+		// Die Kopfzeile der Positionstabelle liegt auf der Akzentfarbe. Weisse
+		// Schrift traegt dort nur auf dunklen Toenen, deshalb folgt die Schrift
+		// der Farbe statt umgekehrt (#171). Die Akzentfarbe bleibt unangetastet.
+		$accentText = ColorContrast::textColorOn($accent);
 		$logo = $this->loadLogoDataUri($settings);
 		$e = static fn (?string $s): string => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 
@@ -686,12 +690,19 @@ class ZugferdService {
 
 		// Column layout + header row: 5 columns normally, 4 when the VAT column is
 		// hidden for §19 small business.
+		//
+		// Die Breiten stehen an den Spaltenkoepfen, NICHT in einem <colgroup>:
+		// dompdf wertet <col style="width"> nicht aus. Zusammen mit dem
+		// table-layout: fixed aus #145 blieben dadurch keine verwertbaren Breiten
+		// uebrig und die Tabelle wurde gleichmaessig aufgeteilt, was die
+		// Bezeichnung viel zu frueh umbrach (#157).
 		if ($hideVat) {
-			$itemsColgroup = '<colgroup><col style="width: 52%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"></colgroup>';
-			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Betrag</th>';
+			$itemsHead = '<th style="width: 52%;">Bezeichnung</th><th class="num" style="width: 16%;">Menge</th>'
+				. '<th class="num" style="width: 16%;">Einzelpreis</th><th class="num" style="width: 16%;">Betrag</th>';
 		} else {
-			$itemsColgroup = '<colgroup><col style="width: 46%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 10%;"><col style="width: 16%;"></colgroup>';
-			$itemsHead = '<th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">USt</th><th class="num">Betrag</th>';
+			$itemsHead = '<th style="width: 46%;">Bezeichnung</th><th class="num" style="width: 14%;">Menge</th>'
+				. '<th class="num" style="width: 14%;">Einzelpreis</th><th class="num" style="width: 10%;">USt</th>'
+				. '<th class="num" style="width: 16%;">Betrag</th>';
 		}
 
 		$taxRows = '';
@@ -821,7 +832,7 @@ table.meta { font-size: 9pt; margin-bottom: 16px; }
 table.meta td { padding: 1px 8px 1px 0; }
 table.meta .meta-label { color: #666; }
 table.items { width: 100%; border-collapse: collapse; margin-bottom: 4px; table-layout: fixed; }
-table.items th { background: {$accent}; color: #fff; text-align: left; padding: 6px 8px; font-size: 9pt; }
+table.items th { background: {$accent}; color: {$accentText}; text-align: left; padding: 6px 8px; font-size: 9pt; }
 table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; }
 table.items td.num, table.items th.num { text-align: right; white-space: nowrap; }
 .item-desc { color: #666; font-size: 8.5pt; margin-top: 2px; }
@@ -858,7 +869,6 @@ td.girocode-label { padding-left: 10px; font-size: 8.5pt; color: #555; max-width
 <table class="meta">{$metaHtml}</table>
 {$introHtml}
 <table class="items">
-  {$itemsColgroup}
   <thead><tr>{$itemsHead}</tr></thead>
   <tbody>{$rows}</tbody>
 </table>
