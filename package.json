@@ -24,22 +24,22 @@
     "@nextcloud/axios": "^2.5.2",
     "@nextcloud/l10n": "^1.6.0",
     "@nextcloud/router": "^3.1.0",
-    "@nextcloud/vue": "^9.5.0",
+    "@nextcloud/vue": "^9.9.0",
     "pinia": "^2.3.1",
-    "vue": "^3.5.13",
+    "vue": "^3.5.40",
     "vue-material-design-icons": "^5.3.1",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@nextcloud/eslint-config": "^6.1.0",
-    "@vitejs/plugin-vue": "^6.0.0",
+    "@vitejs/plugin-vue": "^6.0.8",
     "@vue/test-utils": "^2.4.6",
-    "@vue/tsconfig": "^0.7.0",
-    "happy-dom": "^20.9.0",
-    "sass": "^1.70.0",
+    "@vue/tsconfig": "^0.9.1",
+    "happy-dom": "^20.11.1",
+    "sass": "^1.102.0",
     "typescript": "^5.7.2",
     "vite": "^7.3.6",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.10"
   },
   "engines": {
     "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
