@@ -383,6 +383,7 @@ import { useTextSnippetStore } from '@/stores/textSnippetStore'
 import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail, type SnippetDocType, type TextSnippet } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
+import { parseQuantity } from '@/utils/numberInput'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 import { downloadQuotePdf, quotePreviewUrl, sendQuote } from '@/api/quotes'
@@ -743,7 +744,9 @@ function buildInput(): InvoiceInput {
 				productId: i.productId,
 				name: i.name.trim(),
 				description: i.description.trim() === '' ? null : i.description.trim(),
-				quantity: String(i.quantity).replace(',', '.'),
+				// Unlesbares wird bewusst unveraendert gesendet, damit der Server die
+				// verstaendliche Meldung liefert statt hier still etwas zu erfinden (#157).
+				quantity: parseQuantity(i.quantity) ?? String(i.quantity),
 				unitCode: i.unitCode,
 				unitLabel: i.unitLabel.trim() === '' ? null : i.unitLabel.trim(),
 				unitPriceE4: euroInputToE4(i.priceInput),

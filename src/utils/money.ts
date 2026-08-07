@@ -6,6 +6,8 @@
  * Conversion is centralised here to avoid float-rounding drift.
  */
 
+import { parsePrice, parseQuantity } from './numberInput'
+
 /**
  * Unit price in ten-thousandths of a euro (#147) -> euro input string with 2–4
  * decimals: at least two, up to four, trailing zeros beyond the second trimmed.
@@ -18,13 +20,19 @@ export function e4ToEuroInput(e4: number | null | undefined): string {
 	return (e4 / 10000).toFixed(4).replace(/(\.\d\d)(\d*?)0+$/, '$1$2')
 }
 
-/** Euro input ("0,3456" or "0.3456") -> ten-thousandths of a euro, rounded (#147). */
+/**
+ * Euro input ("0,3456", "0.3456", "1.234,56") -> ten-thousandths of a euro (#147).
+ *
+ * Frueher wurde nur das ERSTE Komma ersetzt und dann geparst. "1.000" (tausend
+ * Euro) wurde dadurch zu 1,00 € und "1.234,5" zu 1,23 €, jeweils ohne Hinweis
+ * (#157). Die Auswertung folgt jetzt derselben Regel wie im Backend.
+ */
 export function euroInputToE4(value: string | number | null | undefined): number {
-	if (value === null || value === undefined || value === '') {
+	const parsed = parsePrice(value)
+	if (parsed === null) {
 		return 0
 	}
-	const euros = Number.parseFloat(String(value).replace(',', '.').trim())
-	return Number.isNaN(euros) ? 0 : Math.round(euros * 10000)
+	return Math.round(Number.parseFloat(parsed) * 10000)
 }
 
 /**

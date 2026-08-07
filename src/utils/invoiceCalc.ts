@@ -7,14 +7,17 @@
  */
 
 import type { TaxBreakdownRow } from '@/types/api'
+import { parseQuantity } from './numberInput'
 
 /**
  * Line total in cents from a decimal quantity string and a unit price in
  * ten-thousandths of a euro (1/10000 €, #147). Rounded to whole cents once.
  */
 export function lineTotalCents(quantity: string | number, unitPriceE4: number): number {
-	const normalized = String(quantity).replace(',', '.').trim()
-	if (normalized === '' || Number.isNaN(Number(normalized))) {
+	// Dieselbe Auswertung wie im Backend, sonst zeigt die Zeile einen anderen
+	// Betrag an, als gespeichert wird (#157).
+	const normalized = parseQuantity(quantity)
+	if (normalized === null) {
 		return 0
 	}
 	const milli = Math.round(Number(normalized) * 1000)

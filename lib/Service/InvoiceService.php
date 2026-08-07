@@ -724,7 +724,10 @@ class InvoiceService {
 			if (!is_array($row)) {
 				continue;
 			}
-			$quantity = isset($row['quantity']) ? (string)$row['quantity'] : '1';
+			// Ungeprueft lief die Menge frueher als Rohtext in eine numeric-Spalte:
+			// "99.999.999" brach mit einem 500er ab, "1.000" wurde still zu 1 und
+			// machte die Rechnung um Faktor 1000 falsch (#157).
+			$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
 			$unitPriceE4 = (int)($row['unitPriceE4'] ?? 0);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
