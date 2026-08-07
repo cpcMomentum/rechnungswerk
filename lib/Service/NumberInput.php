@@ -38,6 +38,10 @@ final class NumberInput {
 	public const QUANTITY_DECIMALS = 3;
 	public const QUANTITY_INTEGER_DIGITS = 9;
 
+	/** Preis: vier Nachkommastellen (1/10000 €, #147), gespeichert als bigint. */
+	public const PRICE_DECIMALS = 4;
+	public const PRICE_INTEGER_DIGITS = 9;
+
 	/**
 	 * Wertet eine Eingabe aus und gibt sie als normalisierten Dezimalstring
 	 * zurueck ("1000", "12.5", "-2"), oder null wenn sie nicht eindeutig als
@@ -151,6 +155,52 @@ final class NumberInput {
 			);
 		}
 		return $parsed;
+	}
+
+	/**
+	 * Preiseingabe in Zehntausendstel-Euro (1/10000 €, #147).
+	 *
+	 * Bis #180 rechnete ausschliesslich der Browser um und schickte die fertige
+	 * Zahl. Der Server sah damit nie, was eingegeben wurde, und konnte nichts
+	 * pruefen: "95" ist als unitPriceE4 ein voellig legaler Wert fuer 0,0095 €,
+	 * und ob jemand 95 Euro meinte, ist der Zahl nicht anzusehen. Die
+	 * Umrechnung gehoert deshalb hierher.
+	 *
+	 * Leere Eingabe bedeutet 0, das ist ein zulaessiger Preis.
+	 *
+	 * @throws \OCA\Rechnungswerk\Exception\ValidationException
+	 */
+	public static function parsePrice(mixed $value): int {
+		if ($value === null || (is_string($value) && trim($value) === '')) {
+			return 0;
+		}
+		$parsed = self::parse($value, self::PRICE_DECIMALS, self::PRICE_INTEGER_DIGITS);
+		if ($parsed === null) {
+			throw new \OCA\Rechnungswerk\Exception\ValidationException(
+				'"' . trim((string)$value) . '" ist kein gültiger Preis. Erlaubt sind Zahlen mit bis zu '
+				. self::PRICE_DECIMALS . ' Nachkommastellen, zum Beispiel 1.234,56 oder 0,3456.'
+			);
+		}
+		if (str_starts_with($parsed, '-')) {
+			throw new \OCA\Rechnungswerk\Exception\ValidationException('Der Preis darf nicht negativ sein.');
+		}
+		return self::toE4($parsed);
+	}
+
+	/**
+	 * Normalisierten Dezimalstring in Zehntausendstel umrechnen.
+	 *
+	 * Bewusst ueber Zeichenketten statt ueber Gleitkomma. Gemessen ueber alle
+	 * 9999 Werte von 0,0001 bis 0,9999: (int)((float)$s * 10000) weicht in 573
+	 * Faellen ab, etwa 0,0003 -> 2. Mit round() ginge es zwar auf, aber dann
+	 * haengt die Richtigkeit an einer Rundung, die man nicht vergessen darf.
+	 * Zeichenketten haben das Problem gar nicht.
+	 */
+	private static function toE4(string $decimal): int {
+		[$integer, $fraction] = str_contains($decimal, '.')
+			? explode('.', $decimal, 2)
+			: [$decimal, ''];
+		return (int)($integer . str_pad($fraction, self::PRICE_DECIMALS, '0'));
 	}
 
 	/** Ob $value sauber in Dreiergruppen getrennt ist, oder gar keine Gruppierung enthaelt. */

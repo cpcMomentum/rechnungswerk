@@ -47,7 +47,7 @@ class ProductServiceTest extends TestCase {
 			'name' => 'Stundensatz',
 			'description' => 'Entwicklung',
 			'defaultUnitCode' => 'HUR',
-			'defaultPriceE4' => 9500,
+			'defaultPriceInput' => '0,95',
 			'defaultTaxRateBp' => 700,
 		]);
 
@@ -64,7 +64,42 @@ class ProductServiceTest extends TestCase {
 
 	public function testCreateRejectsNegativePrice(): void {
 		$this->expectException(ValidationException::class);
-		$this->service->create('alice', ['name' => 'X', 'defaultPriceE4' => -1]);
+		$this->service->create('alice', ['name' => 'X', 'defaultPriceInput' => '-1']);
+	}
+
+	/**
+	 * #180: Der Standardpreis kommt als Rohtext und wird serverseitig
+	 * umgerechnet. Vorher rechnete allein der Browser, und der Server
+	 * uebernahm die Zahl ungeprueft.
+	 */
+	public function testCreateParsesGermanPriceNotation(): void {
+		$this->mapper->method('insert')->willReturnArgument(0);
+
+		$product = $this->service->create('alice', [
+			'name' => 'Tagessatz',
+			'defaultPriceInput' => '1.234,56',
+		]);
+
+		$this->assertSame(12345600, $product->getDefaultPriceE4(), '1.234,56 € sind 12345600 Zehntausendstel, nicht 1,23 €');
+	}
+
+	public function testCreateRejectsUnreadablePrice(): void {
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('auf Anfrage');
+		$this->service->create('alice', ['name' => 'X', 'defaultPriceInput' => 'auf Anfrage']);
+	}
+
+	/**
+	 * Eine vorberechnete Zahl wird NICHT mehr angenommen. Sonst bliebe genau
+	 * die Luecke offen, um die es in #180 geht: einer blossen Zahl ist nicht
+	 * anzusehen, ob 95 als 0,0095 € oder als 95 € gemeint war.
+	 */
+	public function testPrecomputedNumberIsIgnored(): void {
+		$this->mapper->method('insert')->willReturnArgument(0);
+
+		$product = $this->service->create('alice', ['name' => 'X', 'defaultPriceE4' => 950000]);
+
+		$this->assertSame(0, $product->getDefaultPriceE4(), 'ohne Rohtext bleibt der Standardwert');
 	}
 
 	public function testUpdateRejectsEmptyNameWhenProvided(): void {

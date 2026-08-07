@@ -104,9 +104,9 @@ class ProductService {
 		if (array_key_exists('defaultTaxRateBp', $data) && (int)$data['defaultTaxRateBp'] < 0) {
 			throw new ValidationException('Der Steuersatz darf nicht negativ sein.');
 		}
-		if (array_key_exists('defaultPriceE4', $data) && (int)$data['defaultPriceE4'] < 0) {
-			throw new ValidationException('Der Preis darf nicht negativ sein.');
-		}
+		// Der Preis wird in apply() ueber NumberInput::parsePrice() geprueft und
+		// umgerechnet (#180). Die frueher hier stehende Negativpruefung auf
+		// defaultPriceE4 ist darin aufgegangen.
 	}
 
 	/**
@@ -128,8 +128,11 @@ class ProductService {
 			$label = trim((string)($data['defaultUnitLabel'] ?? ''));
 			$product->setDefaultUnitLabel($label !== '' ? $label : null);
 		}
-		if (array_key_exists('defaultPriceE4', $data)) {
-			$product->setDefaultPriceE4((int)$data['defaultPriceE4']);
+		// Wie bei der Rechnungsposition: der Rohtext ist massgeblich, nicht die
+		// vom Browser vorberechnete Zahl (#180). Der Standardpreis fliesst ueber
+		// "Aus Produkt" in jede Rechnung, die Luecke waere sonst nur verschoben.
+		if (array_key_exists('defaultPriceInput', $data)) {
+			$product->setDefaultPriceE4(NumberInput::parsePrice($data['defaultPriceInput']));
 		} elseif ($isNew) {
 			$product->setDefaultPriceE4(0);
 		}

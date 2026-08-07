@@ -109,4 +109,64 @@ class NumberInputTest extends TestCase {
 		$this->assertNull(NumberInput::parse('0,34567', 4, 9));
 		$this->assertSame('1000', NumberInput::parse('1.000', 4, 9));
 	}
+
+	/**
+	 * #180: Der Preis wird jetzt serverseitig aus dem Rohtext gerechnet.
+	 *
+	 * @dataProvider priceProvider
+	 */
+	public function testParsePriceConvertsToTenThousandths(string $input, int $expected, string $why): void {
+		$this->assertSame($expected, NumberInput::parsePrice($input), $why);
+	}
+
+	/** @return array<string, array{0: string, 1: int, 2: string}> */
+	public static function priceProvider(): array {
+		return [
+			'ganze Euro' => ['95', 950000, '95,00 € sind 950000 Zehntausendstel'],
+			'zwei Nachkommastellen' => ['95,00', 950000, ''],
+			'vier Nachkommastellen' => ['0,3456', 3456, 'die feinere Preiseinheit aus #147'],
+			'englische Schreibweise' => ['0.3456', 3456, ''],
+			'Tausenderpunkt' => ['1.234,56', 12345600, 'nicht 1,23 €'],
+			'nur Tausenderpunkt' => ['1.000', 10000000, 'tausend Euro, nicht ein Euro'],
+			'null' => ['0', 0, ''],
+			'nachlaufende Nullen' => ['2,5000', 25000, ''],
+			'Grenzfall vierte Stelle' => ['0,0001', 1, 'kleinster darstellbarer Betrag'],
+		];
+	}
+
+	public function testParsePriceTreatsEmptyAsZero(): void {
+		$this->assertSame(0, NumberInput::parsePrice(null));
+		$this->assertSame(0, NumberInput::parsePrice(''));
+		$this->assertSame(0, NumberInput::parsePrice('   '));
+	}
+
+	public function testParsePriceRejectsUnreadableInput(): void {
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('gratis');
+		NumberInput::parsePrice('gratis');
+	}
+
+	public function testParsePriceRejectsTooManyDecimals(): void {
+		$this->expectException(ValidationException::class);
+		NumberInput::parsePrice('0,34567');
+	}
+
+	public function testParsePriceRejectsNegative(): void {
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('negativ');
+		NumberInput::parsePrice('-5');
+	}
+
+	/**
+	 * Die Umrechnung laeuft ueber Zeichenketten, nicht ueber Gleitkomma.
+	 * Gemessen ueber genau diesen Bereich: (int)((float)$s * 10000) weicht in
+	 * 573 von 9999 Faellen ab, der erste ist 0,0003 -> 2. Dieser Test deckt
+	 * jeden einzelnen Wert ab, damit die Umstellung auf Gleitkomma auffaellt.
+	 */
+	public function testConversionDoesNotDriftOnTheFourthDecimal(): void {
+		foreach (range(1, 9999) as $tenThousandths) {
+			$decimal = sprintf('0,%04d', $tenThousandths);
+			$this->assertSame($tenThousandths, NumberInput::parsePrice($decimal), $decimal);
+		}
+	}
 }

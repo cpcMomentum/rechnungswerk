@@ -11,7 +11,8 @@ export interface ProductCreate {
 	description?: string | null
 	defaultUnitCode?: string
 	defaultUnitLabel?: string | null
-	defaultPriceE4?: number
+	/** Standardpreis als Rohtext; der Server rechnet um und prüft (#180). */
+	defaultPriceInput?: string
 	defaultTaxRateBp?: number
 }
 

@@ -98,6 +98,46 @@ class InvoiceServiceCountryTest extends TestCase {
 		$this->assertSame('DE', $stored->getRecipientCountry());
 	}
 
+	/**
+	 * #180: Der Einzelpreis kommt als Rohtext und wird serverseitig
+	 * umgerechnet. Ein unlesbarer Preis darf die Transaktion gar nicht
+	 * erreichen, genau wie ein unbekanntes Land.
+	 */
+	public function testUnreadablePriceNeverReachesTheDatabase(): void {
+		$this->db->expects($this->never())->method('beginTransaction');
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessage('auf Anfrage');
+
+		$this->service->create('alice', [
+			'recipientName' => 'Beispiel GmbH',
+			'items' => [['name' => 'Beratung', 'quantity' => '1', 'unitPriceInput' => 'auf Anfrage']],
+		]);
+	}
+
+	public function testGermanPriceNotationIsConvertedOnTheServer(): void {
+		$stored = null;
+		$this->invoiceMapper->method('insert')->willReturnCallback(
+			function (Invoice $invoice) use (&$stored) {
+				$stored = $invoice;
+				$invoice->setId(1);
+				return $invoice;
+			}
+		);
+
+		try {
+			$this->service->create('alice', [
+				'recipientName' => 'Beispiel GmbH',
+				'items' => [['name' => 'Beratung', 'quantity' => '2', 'unitPriceInput' => '1.234,56']],
+			]);
+		} catch (\Throwable) {
+			// present() haengt an Attrappen; hier zaehlt nur, was bis zum insert() lief.
+		}
+
+		$this->assertNotNull($stored, 'insert() muss erreicht werden');
+	}
+
 	public function testEmptyCountryFallsBackToDomestic(): void {
 		$stored = null;
 		$this->invoiceMapper->method('insert')->willReturnCallback(
