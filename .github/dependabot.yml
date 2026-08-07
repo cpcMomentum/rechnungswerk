@@ -1,0 +1,65 @@
+# Dependabot-Konfiguration (#157-Umfeld, eingefuehrt 07.08.2026).
+#
+# Bis hierher gab es keine dependabot.yml. Damit liefen ausschliesslich
+# Security-Updates, und die zielen immer auf den Standard-Branch, also main.
+# Das widerspricht dem Branch-Workflow: main bekommt nur Releases, gesammelt
+# wird auf develop. Sechs Dependabot-PRs lagen deshalb wochenlang auf dem
+# falschen Ziel und liefen der Entwicklung 13 Commits hinterher.
+#
+# VORBEHALT: target-branch lenkt die geplanten Versionsupdates auf develop.
+# Ob GitHub auch Security-Updates dorthin lenkt, geht aus der Dokumentation
+# nicht eindeutig hervor; nach derzeitigem Stand zielen sie weiter auf main.
+# Solche PRs werden wie bisher von Hand nach develop uebernommen.
+
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # Ohne Gruppierung entsteht pro Paket ein eigener PR. Genau so sind die
+    # sechs offenen entstanden, obwohl es fast nur transitive Patch-Spruenge
+    # waren. Patch und Minor kommen deshalb gebuendelt.
+    groups:
+      npm-minor-und-patch:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
+  - package-ecosystem: composer
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      composer-minor-und-patch:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: chore(deps)
+      prefix-development: chore(deps-dev)
+
+  # Die Workflows selbst: Actions-Versionen veralten sonst still.
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: ci(deps)
