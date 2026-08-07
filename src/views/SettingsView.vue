@@ -55,8 +55,61 @@
 			<!-- Branding -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Branding') }}</h3>
-				<label class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
-					<input v-model="form.accentColor" class="color-input" type="color" /></label>
+				<div class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
+					<!-- NcColorPicker statt <input type="color">: Letzteres reicht auf
+					     macOS an den Farbdialog des Betriebssystems durch, den die
+					     Seite nicht wieder schliessen kann (#171). Der Default-Slot
+					     ist der Ausloeser des Popovers.
+					     advancedFields an, paletteOnly bewusst NICHT: eine
+					     Firmenfarbe ist vorgegeben, nicht auswaehlbar. -->
+					<div class="rw-accent">
+						<NcColorPicker :model-value="accentValue"
+							advanced-fields
+							@update:model-value="onAccentPicked">
+							<!-- Die Beschriftung steht daneben und ist nicht mehr wie beim
+							     vorherigen <label><input> implizit zugeordnet. -->
+							<button type="button"
+								class="rw-accent__trigger"
+								:aria-label="t('rechnungswerk', 'Akzentfarbe') + ': ' + accentValue.toUpperCase()"
+								:style="accentStyle">
+								{{ accentValue.toUpperCase() }}
+							</button>
+						</NcColorPicker>
+						<NcButton v-if="form.accentColor" variant="tertiary" @click="form.accentColor = null">
+							{{ t('rechnungswerk', 'Zurücksetzen') }}
+						</NcButton>
+					</div>
+				</div>
+
+				<!-- Musterstreifen: zeigt die Kopfzeile der Positionstabelle so, wie
+				     sie im PDF erscheint. Die Spaltentitel sind bewusst NICHT
+				     uebersetzt, weil das erzeugte PDF sie fest auf Deutsch setzt
+				     (ZugferdService::renderHtml). Eine Uebersetzung wuerde die
+				     Vorschau vom tatsaechlichen Dokument abweichen lassen. -->
+				<div class="rw-field">
+					<table class="rw-accent-preview">
+						<thead>
+							<tr :style="accentStyle">
+								<th>Beschreibung</th>
+								<th class="num">Menge</th>
+								<th class="num">Einzelpreis</th>
+								<th class="num">Betrag</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Beratungsleistung</td>
+								<td class="num">2</td>
+								<td class="num">95,00 €</td>
+								<td class="num">190,00 €</td>
+							</tr>
+						</tbody>
+					</table>
+					<p class="rw-hint">{{ t('rechnungswerk', 'So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.') }}</p>
+					<p v-if="accentNeedsDarkText" class="rw-hint">
+						{{ t('rechnungswerk', 'Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.') }}
+					</p>
+				</div>
 
 				<div class="rw-field">
 					<span>{{ t('rechnungswerk', 'Firmenlogo') }}</span>
@@ -409,6 +462,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
@@ -417,6 +471,7 @@ import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/type
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'
 import { getPermissions, updatePermissions, searchPrincipals, type Principal } from '@/api/permissions'
 import { formatTaxRate } from '@/utils/money'
+import { DEFAULT_ACCENT, textColorOn, whiteWouldFail } from '@/utils/colorUtils'
 import { previewInvoiceNumber } from '@/utils/invoiceNumber'
 import { previewFileName } from '@/utils/fileName'
 
@@ -446,6 +501,21 @@ const currentDay = ref(new Date().getDate())
 const currentYearFromSettings = ref<number | null>(null)
 const currentQuoteCounter = ref(0)
 const currentQuoteYearFromSettings = ref<number | null>(null)
+
+// Akzentfarbe (#171): leer bedeutet, dass die Rechnung auf die Standardfarbe
+// zurueckfaellt — deshalb zeigt die Vorschau dann genau diese.
+const accentValue = computed(() => form.value?.accentColor || DEFAULT_ACCENT)
+const accentStyle = computed(() => ({
+	background: accentValue.value,
+	color: textColorOn(accentValue.value),
+}))
+const accentNeedsDarkText = computed(() => whiteWouldFail(accentValue.value))
+
+function onAccentPicked(value: string | undefined): void {
+	if (form.value) {
+		form.value.accentColor = value ?? null
+	}
+}
 
 const appAdmins = ref<Principal[]>([])
 const appUsers = ref<Principal[]>([])
@@ -907,13 +977,43 @@ function fail(e: unknown, fallback: string) {
 	flex-direction: column;
 	gap: 16px;
 }
-.color-input {
-	width: 48px;
-	height: 32px;
-	padding: 0;
-	border: none;
-	background: none;
+/* Akzentfarbe (#171): Ausloeser des NcColorPicker plus Musterstreifen. */
+.rw-accent {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.rw-accent__trigger {
+	min-width: 96px;
+	height: 34px;
+	padding: 0 12px;
+	border: 1px solid var(--color-border-dark);
+	border-radius: var(--border-radius-element, var(--border-radius));
+	font-family: monospace;
+	font-size: 13px;
 	cursor: pointer;
+}
+/* Der Streifen bildet die PDF-Tabelle nach, deshalb feste Schriftgroessen
+   statt der Themevariablen: er soll zeigen, wie das Dokument aussieht. */
+.rw-accent-preview {
+	width: 100%;
+	max-width: 520px;
+	margin-top: 4px;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+.rw-accent-preview th {
+	padding: 6px 8px;
+	text-align: left;
+	font-weight: bold;
+}
+.rw-accent-preview td {
+	padding: 6px 8px;
+	border-bottom: 1px solid var(--color-border);
+}
+.rw-accent-preview .num {
+	text-align: right;
+	white-space: nowrap;
 }
 /* Access section: description above the picker, clear spacing between groups. */
 .rw-access-intro {
