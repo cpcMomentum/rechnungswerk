@@ -399,7 +399,10 @@
         "Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.": "Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.",
         "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.": "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.",
         "eigene Einheit": "eigene Einheit",
-        "z. B. Personen, Sitzung": "z. B. Personen, Sitzung"
+        "z. B. Personen, Sitzung": "z. B. Personen, Sitzung",
+        "Zurücksetzen": "Zurücksetzen",
+        "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.": "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.",
+        "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.": "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert."
     },
     "pluralForm": "nplurals=2; plural=(n != 1);"
 }
