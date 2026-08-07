@@ -399,7 +399,10 @@
         "Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.": "Free-text name — shown on the PDF. In the e-invoice the unit is mapped to the generic \"piece\" so it stays valid.",
         "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.": "Free-text name — shown on the PDF; in the e-invoice the unit is mapped to the generic \"piece\".",
         "eigene Einheit": "custom unit",
-        "z. B. Personen, Sitzung": "e.g. persons, session"
+        "z. B. Personen, Sitzung": "e.g. persons, session",
+        "Zurücksetzen": "Reset",
+        "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.": "This is how the header row of the line item table appears on the invoice.",
+        "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.": "White text would be too faint on this colour, so the invoice uses black instead. The colour itself stays unchanged."
     },
     "pluralForm": "nplurals=2; plural=(n != 1);"
 }

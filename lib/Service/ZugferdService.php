@@ -570,6 +570,10 @@ class ZugferdService {
 	 */
 	private function renderHtml(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null, bool $preview = false): string {
 		$accent = $this->sanitizeColor($settings->getAccentColor()) ?? '#2c3e50';
+		// Die Kopfzeile der Positionstabelle liegt auf der Akzentfarbe. Weisse
+		// Schrift traegt dort nur auf dunklen Toenen, deshalb folgt die Schrift
+		// der Farbe statt umgekehrt (#171). Die Akzentfarbe bleibt unangetastet.
+		$accentText = ColorContrast::textColorOn($accent);
 		$logo = $this->loadLogoDataUri($settings);
 		$e = static fn (?string $s): string => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 
@@ -828,7 +832,7 @@ table.meta { font-size: 9pt; margin-bottom: 16px; }
 table.meta td { padding: 1px 8px 1px 0; }
 table.meta .meta-label { color: #666; }
 table.items { width: 100%; border-collapse: collapse; margin-bottom: 4px; table-layout: fixed; }
-table.items th { background: {$accent}; color: #fff; text-align: left; padding: 6px 8px; font-size: 9pt; }
+table.items th { background: {$accent}; color: {$accentText}; text-align: left; padding: 6px 8px; font-size: 9pt; }
 table.items td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; vertical-align: top; word-wrap: break-word; }
 table.items td.num, table.items th.num { text-align: right; white-space: nowrap; }
 .item-desc { color: #666; font-size: 8.5pt; margin-top: 2px; }
