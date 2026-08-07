@@ -13,6 +13,7 @@ use OCA\Rechnungswerk\Db\Customer;
 use OCA\Rechnungswerk\Db\CustomerMapper;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\CustomerService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +26,7 @@ class CustomerServiceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(CustomerMapper::class);
-		$this->service = new CustomerService($this->mapper);
+		$this->service = new CustomerService($this->mapper, new CountryService());
 	}
 
 	private function freeNumber(): void {
@@ -67,6 +68,48 @@ class CustomerServiceTest extends TestCase {
 		$this->assertSame(30, $customer->getDefaultPaymentTermDays());
 		$this->assertSame(700, $customer->getDefaultTaxRateBp());
 		$this->assertSame('AT', $customer->getCountry());
+	}
+
+	/**
+	 * #167: Beim Uebernehmen aus dem Adressbuch kam "Deutschland" an und lief
+	 * ungeprueft in eine zwei Zeichen breite Spalte.
+	 */
+	public function testCreateTranslatesWrittenOutCountryName(): void {
+		$this->freeNumber();
+		$this->mapper->method('insert')->willReturnArgument(0);
+
+		$customer = $this->service->create('alice', [
+			'customerNumber' => '10003',
+			'name' => 'Beispiel GmbH',
+			'country' => 'Deutschland',
+		]);
+
+		$this->assertSame('DE', $customer->getCountry());
+	}
+
+	public function testCreateRejectsUnknownCountryInsteadOfHittingTheDatabase(): void {
+		$this->freeNumber();
+		$this->mapper->method('insert')->willReturnArgument(0);
+
+		$this->expectException(ValidationException::class);
+		$this->service->create('alice', [
+			'customerNumber' => '10004',
+			'name' => 'Beispiel GmbH',
+			'country' => 'Absurdistan',
+		]);
+	}
+
+	public function testCreateFallsBackToDomesticOnEmptyCountry(): void {
+		$this->freeNumber();
+		$this->mapper->method('insert')->willReturnArgument(0);
+
+		$customer = $this->service->create('alice', [
+			'customerNumber' => '10005',
+			'name' => 'Beispiel GmbH',
+			'country' => '',
+		]);
+
+		$this->assertSame('DE', $customer->getCountry());
 	}
 
 	public function testCreateRejectsEmptyName(): void {

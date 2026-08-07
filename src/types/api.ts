@@ -223,6 +223,12 @@ export interface MeContactDefaults {
 	email: string
 }
 
+/** Eintrag der Laenderauswahl (#167): ISO-3166-1-alpha-2-Code plus Anzeigename. */
+export interface Country {
+	code: string
+	label: string
+}
+
 export interface ContactMatch {
 	name: string
 	email: string

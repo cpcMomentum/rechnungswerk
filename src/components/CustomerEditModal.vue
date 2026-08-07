@@ -44,7 +44,7 @@
 				<div class="row">
 					<label class="field">
 						<span>{{ t('rechnungswerk', 'Land') }}</span>
-						<input v-model="form.country" class="input" type="text" maxlength="2" />
+						<CountrySelect v-model="form.country" select-class="input" />
 					</label>
 				</div>
 			</div>
@@ -126,6 +126,7 @@ import { translate as t } from '@nextcloud/l10n'
 import NcModal from '@nextcloud/vue/components/NcModal'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import CountrySelect from '@/components/CountrySelect.vue'
 import { TAX_RATES_BP, type Customer } from '@/types/api'
 import type { CustomerCreate } from '@/api/customers'
 import { escCloses } from '@/utils/modalEsc'

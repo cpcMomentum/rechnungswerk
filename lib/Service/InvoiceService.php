@@ -30,6 +30,7 @@ class InvoiceService {
 		private readonly ZugferdService $zugferdService,
 		private readonly ArchiveService $archiveService,
 		private readonly MailService $mailService,
+		private readonly CountryService $countryService,
 		private readonly IDBConnection $db,
 		private readonly LoggerInterface $logger,
 	) {
@@ -671,8 +672,7 @@ class InvoiceService {
 			$invoice->setCustomerId($customerId !== null && $customerId !== '' ? (int)$customerId : null);
 		}
 		if (array_key_exists('recipientCountry', $data)) {
-			$country = $data['recipientCountry'];
-			$invoice->setRecipientCountry($country !== null && $country !== '' ? (string)$country : 'DE');
+			$invoice->setRecipientCountry($this->countryService->resolveForStorage($data['recipientCountry']));
 		} elseif ($invoice->getRecipientCountry() === null) {
 			$invoice->setRecipientCountry('DE');
 		}
