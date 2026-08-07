@@ -7,6 +7,53 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-08-07
+
+Fehlerbehebungen aus Rückmeldungen von Nutzern. Zwei der Fehler erzeugten
+stillschweigend falsche Werte auf Rechnungen, die an Kunden gehen.
+
+### Fixed
+- Kontakte aus dem Nextcloud-Adressbuch lassen sich wieder übernehmen. Das
+  vCard-Feld für das Land enthält laut Standard einen frei geschriebenen Namen,
+  iOS und Outlook tragen dort „Deutschland" oder „Germany" ein. Der Wert lief
+  ungeprüft in eine Spalte für den zweistelligen Ländercode, wodurch das
+  Speichern des Entwurfs mit einem Fehler 500 abbrach und keine Vorschau mehr
+  erzeugt werden konnte. Ländernamen werden jetzt in beiden Sprachen erkannt
+  und umgesetzt, inklusive Schreibvarianten wie „Oesterreich" (#167)
+- Mengen und Einzelpreise in deutscher Schreibweise werden korrekt gelesen.
+  Bisher brach eine achtstellige Menge wie `99.999.999` mit einem Fehler 500 ab,
+  und eine Eingabe von `1.000` wurde ohne jeden Hinweis als 1 gespeichert, was
+  die Rechnung um den Faktor 1000 verfälschte. Dasselbe traf den Einzelpreis,
+  dort ohne Fehlermeldung als Warnsignal. Nicht lesbare Eingaben werden jetzt
+  mit einer verständlichen Meldung abgelehnt statt geraten (#157)
+- Die Spaltenbreiten der Positionstabelle passen wieder zum Inhalt. Seit 0.3.0
+  waren alle Spalten gleich breit, wodurch die Bezeichnung viel zu früh umbrach,
+  während die USt-Spalte Platz verschwendete (#157)
+- Die Kopfzeile der Positionstabelle bleibt bei jeder Akzentfarbe lesbar. Die
+  Schrift war fest weiß und verschwand auf hellen Firmenfarben; sie wechselt
+  jetzt auf Schwarz, wenn Weiß nicht mehr trägt. Die gewählte Farbe selbst
+  bleibt unverändert (#171)
+- Das Auswahlfeld für die Akzentfarbe öffnet nicht mehr den Farbdialog des
+  Betriebssystems, der sich unter macOS nicht wieder schließen ließ (#171)
+- Das ausgelieferte JavaScript enthält keinen Entwicklungscode mehr. Das
+  Bundle ist dadurch rund 100 KB kleiner und die Konsole bleibt frei von
+  Hydrations- und Prop-Warnungen (#168)
+
+### Added
+- Ein Musterstreifen in den Einstellungen zeigt beim Wählen der Akzentfarbe,
+  wie die Kopfzeile der Positionstabelle auf der Rechnung aussehen wird,
+  inklusive der daraus folgenden Schriftfarbe (#171)
+- Die Spalte für die Bezeichnung heißt im PDF jetzt wie im Editor
+  „Bezeichnung" statt „Beschreibung" (#157)
+
+### Security
+- dompdf auf 3.1.6 angehoben. Die Version schließt laut Release Notes gemeldete
+  Sicherheitslücken; dompdf erzeugt das Rechnungs-PDF
+
+### Changed
+- Weitere Abhängigkeiten aktualisiert: dompurify, fast-xml-parser, immutable,
+  postcss, fast-uri, brace-expansion, js-yaml
+
 ## [0.3.0] - 2026-07-23
 
 ### Added
@@ -234,7 +281,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.8...v0.2.0
 [0.1.8]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.7...v0.1.8
