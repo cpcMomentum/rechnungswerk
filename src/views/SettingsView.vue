@@ -70,7 +70,7 @@
 							     vorherigen <label><input> implizit zugeordnet. -->
 							<button type="button"
 								class="rw-accent__trigger"
-								:aria-label="t('rechnungswerk', 'Akzentfarbe')"
+								:aria-label="t('rechnungswerk', 'Akzentfarbe') + ': ' + accentValue.toUpperCase()"
 								:style="accentStyle">
 								{{ accentValue.toUpperCase() }}
 							</button>
