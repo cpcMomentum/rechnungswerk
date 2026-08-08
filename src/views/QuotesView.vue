@@ -59,14 +59,14 @@
 						<td class="rw-col-actions">
 							<div class="rw-actions">
 								<NcButton v-if="canConvert(q)"
-									type="tertiary"
+									variant="tertiary"
 									:aria-label="t('rechnungswerk', 'In Rechnung übernehmen')"
 									:title="t('rechnungswerk', 'In Rechnung übernehmen')"
 									@click.stop="convert(q.id)">
 									<template #icon><FileMoveOutlineIcon :size="20" /></template>
 								</NcButton>
 								<NcButton v-if="q.status !== 'draft'"
-									type="tertiary"
+									variant="tertiary"
 									:aria-label="t('rechnungswerk', 'PDF herunterladen')"
 									:title="t('rechnungswerk', 'PDF herunterladen')"
 									@click.stop="downloadPdf(q.id)">

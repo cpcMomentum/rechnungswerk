@@ -5,7 +5,7 @@
 			class="input"
 			type="text"
 			autocomplete="off"
-			:placeholder="t('rechnungswerk', 'Name eingeben oder Kontakt wählen …')"
+			:placeholder="t('rechnungswerk', 'Name eingeben oder Kontakt wählen …')"
 			@input="onInput(($event.target as HTMLInputElement).value)"
 			@focus="open = suggestions.length > 0"
 			@blur="onBlur" />

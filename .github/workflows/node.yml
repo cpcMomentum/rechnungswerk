@@ -36,6 +36,13 @@ jobs:
           rm -f package-lock.json
           npm install --no-audit --no-fund
 
+      # Bis 08.08.2026 hiess dieser Job "lint-and-build", ohne je zu linten
+      # (#210): das Paket war deklariert, aber es gab keine Konfiguration, kein
+      # Skript und keinen Schritt. Ein Pruefschritt, der nichts prueft, ist
+      # schlechter als keiner, weil er beruhigt.
+      - name: Lint
+        run: npm run lint
+
       - name: Typecheck
         run: npm run typecheck
 

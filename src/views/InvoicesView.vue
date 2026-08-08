@@ -94,14 +94,14 @@
 						<td class="rw-col-actions">
 							<div class="rw-actions">
 								<NcButton v-if="inv.invoiceType !== 'cancellation'"
-									type="tertiary"
+									variant="tertiary"
 									:aria-label="t('rechnungswerk', 'Duplizieren')"
 									:title="t('rechnungswerk', 'Als Vorlage für neue Rechnung duplizieren')"
 									@click.stop="duplicate(inv.id)">
 									<template #icon><ContentCopyIcon :size="20" /></template>
 								</NcButton>
 								<NcButton v-if="inv.status !== 'draft'"
-									type="tertiary"
+									variant="tertiary"
 									:aria-label="t('rechnungswerk', 'PDF herunterladen')"
 									:title="t('rechnungswerk', 'PDF herunterladen')"
 									@click.stop="downloadPdf(inv.id)">
