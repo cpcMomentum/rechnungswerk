@@ -35,10 +35,19 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 
     <bugs>https://github.com/cpcMomentum/rechnungswerk/issues</bugs>
     <repository type="git">https://github.com/cpcMomentum/rechnungswerk.git</repository>
+    <!--
+        Die Bilddateien werden vom Store live von main geladen, die LISTE der URLs
+        stammt dagegen aus dem info.xml des hochgeladenen Tarballs. Ein Austausch
+        unter bestehendem Dateinamen wirkt daher sofort; die drei neuen Eintraege
+        werden erst mit dem naechsten Release sichtbar.
+    -->
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/01-rechnungsliste.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/05-angebote.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/02-rechnung-editor.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/03-stammdaten.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/06-kunden.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/04-produktkatalog.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/07-textbausteine.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/cpcMomentum/rechnungswerk/main/screenshots/03-stammdaten.png</screenshot>
 
     <donation>https://ko-fi.com/AxDe888</donation>
 
