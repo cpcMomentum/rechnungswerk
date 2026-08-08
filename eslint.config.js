@@ -75,8 +75,10 @@ export default [
 			 * Fehlerbehandler ein console.error mit einheitlichem
 			 * "[rechnungswerk]"-Praefix neben der sichtbaren Fehlermeldung. Das
 			 * ist die einzige Spur, die bleibt, wenn jemand ein Problem meldet.
+			 * Nur error, nicht warn: der Code benutzt ausschliesslich console.error,
+			 * und eine Erlaubnis fuer etwas Unbenutztes waere eine offene Tuer.
 			 */
-			'no-console': ['error', { allow: ['error', 'warn'] }],
+			'no-console': ['error', { allow: ['error'] }],
 			/*
 			 * `x != null` ist absichtlich lose: es prueft null UND undefined in
 			 * einem Ausdruck. Ein `!==` daraus zu machen waere kein Aufraeumen,
