@@ -23,7 +23,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - **Stammdaten** — Firmendaten, Logo, Standardtexte, Nummernformat, Kleinunternehmer §19
     ]]></description>
 
-    <version>0.3.1</version>
+    <version>0.4.0</version>
     <licence>AGPL-3.0-or-later</licence>
 
     <author mail="axel.deffner@cpcmomentum.com" homepage="https://github.com/cpcMomentum">Axel Deffner</author>
@@ -49,6 +49,17 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
         <database>pgsql</database>
         <nextcloud min-version="31" max-version="34"/>
     </dependencies>
+
+    <!--
+        Raeumt Dateien weg, die eine Vorversion mitgeliefert hat und diese nicht
+        mehr. Nextclouds Update kopiert nur und loescht nichts, sodass sonst die
+        Integritaetspruefung EXTRA_FILE meldet. Siehe CleanupExtraFiles.
+    -->
+    <repair-steps>
+        <post-migration>
+            <step>OCA\Rechnungswerk\Migration\CleanupExtraFiles</step>
+        </post-migration>
+    </repair-steps>
 
     <navigations>
         <navigation>

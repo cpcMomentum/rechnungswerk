@@ -7,6 +7,55 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-08
+
+Festgeschriebene Rechnungen sind jetzt wirklich unveränderlich. Bisher entstand
+jedes PDF bei jedem Zugriff neu, aus den zu diesem Zeitpunkt gültigen
+Einstellungen. Eine bereits ausgestellte E-Rechnung konnte sich dadurch
+nachträglich ändern und ungültig werden.
+
+### Changed
+- **Der Beleg einer festgeschriebenen Rechnung wird beim Festschreiben abgelegt
+  und ab dann ausgeliefert**, statt bei jedem Zugriff neu zu entstehen. Damit
+  bekommen Download, Kundenversand, DATEV-Übergabe und die Ablage in Nextcloud
+  Files garantiert dieselbe Datei; vorher konnten zu einer Rechnung drei
+  verschiedene Dokumente existieren. Der Beleg ist nur einmal beschreibbar, seine
+  Prüfsumme steht am Datensatz, und der Dateiname ist mit eingefroren. Die Ablage
+  liegt im app-eigenen Speicher und damit in jeder Instanz-Sicherung, nicht im
+  Dateibaum des Nutzers, wo sie versehentlich zu ändern wäre (#181)
+- Der Kleinunternehmer-Fall steht jetzt an der Rechnung statt in den
+  Einstellungen. Ein Wechsel zwischen Kleinunternehmerregelung und
+  Regelbesteuerung ist ein völlig normaler, einmaliger Vorgang. Er machte vorher
+  aus jeder älteren 19-%-Rechnung rückwirkend eine steuerfreie: das eingebettete XML
+  wies `CategoryCode E` und 0,00 % aus, bei weiterhin ausgewiesenen 19,00 € Steuer.
+  Ein solches Dokument widerspricht sich selbst und verletzt EN 16931 (#181)
+- Bestandsrechnungen werden im Hintergrund nachgezogen, in Häppchen und ohne
+  Wartungsmodus. Nachträglich erzeugte Belege sind als solche gekennzeichnet und
+  im Rechnungseditor ausgewiesen: sie stimmen inhaltlich, entsprechen im Aussehen
+  aber dem heutigen Stand und nicht dem, was der Kunde damals bekommen hat. Für
+  Bestandsrechnungen ist das Original-Aussehen nicht wiederherstellbar (#181)
+
+### Fixed
+- Einzelpreise werden serverseitig aus der Eingabe berechnet und geprüft. Bisher
+  rechnete allein der Browser und schickte die fertige Zahl. Dem Server war nicht
+  anzusehen, ob `95` als 0,0095 € oder als 95 € gemeint war. Betrifft
+  Rechnungspositionen und den Standardpreis im Produktkatalog (#180)
+- Ein Storno übernimmt den Steuerfall der Original-Rechnung statt der aktuellen
+  Einstellungen. Sonst hätte die Gutschrift zu einer 19-%-Rechnung nach einem
+  Wechsel der Besteuerungsform 0 % ausgewiesen (#181)
+
+### Abhängigkeiten und Infrastruktur
+- phpmailer auf 7.1.1 angehoben. Der Mailversand wurde damit real geprüft, der
+  Anhang bleibt der eingefrorene Beleg
+- Frontend-Werkzeuge und Bibliotheken aktualisiert: vite 8, @nextcloud/l10n 3,
+  vue-router 5, pinia 4, @nextcloud/vue 9.9. Der Sprung auf vue-router 5 war ohne
+  pinia 4 nicht möglich und beseitigt zugleich eine doppelte Router-Version im
+  Abhängigkeitsbaum
+- GitHub-Actions auf checkout 7, setup-node 7 und github-script 9
+- Dependabot zielt jetzt auf `develop` und gruppiert Minor- und Patch-Updates
+- Der Workflow, der Issues beim Merge nach `develop` schließt, wertet Code in
+  PR-Texten nicht mehr als Anweisung
+
 ## [0.3.1] - 2026-08-07
 
 Fehlerbehebungen aus Rückmeldungen von Nutzern. Zwei der Fehler erzeugten
@@ -282,6 +331,7 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
 [Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...HEAD
+[0.4.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.1.8...v0.2.0
