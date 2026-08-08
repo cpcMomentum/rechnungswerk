@@ -78,6 +78,12 @@ use OCP\DB\Types;
  * @method void setOfferFreeform(?int $offerFreeform)
  * @method ?int getSmallBusiness()
  * @method void setSmallBusiness(?int $smallBusiness)
+ * @method ?string getDocumentSha256()
+ * @method void setDocumentSha256(?string $documentSha256)
+ * @method ?string getDocumentFileName()
+ * @method void setDocumentFileName(?string $documentFileName)
+ * @method ?\DateTime getDocumentFrozenAt()
+ * @method void setDocumentFrozenAt(?\DateTime $documentFrozenAt)
  * @method ?int getRelatedQuoteId()
  * @method void setRelatedQuoteId(?int $relatedQuoteId)
  * @method int getSubtotalCents()
@@ -237,6 +243,15 @@ class Invoice extends Entity implements JsonSerializable {
 	 * eine steuerfreie, bei unveraendert ausgewiesenem Steuerbetrag.
 	 */
 	protected ?int $smallBusiness = null;
+
+	/**
+	 * Der eingefrorene Beleg (#181, Schritt 2). Die Datei liegt im app-eigenen
+	 * Speicher (DocumentStore); hier stehen Pruefsumme, Dateiname zum Zeitpunkt
+	 * des Festschreibens und wann eingefroren wurde.
+	 */
+	protected ?string $documentSha256 = null;
+	protected ?string $documentFileName = null;
+	protected ?\DateTime $documentFrozenAt = null;
 	protected ?int $relatedQuoteId = null;
 	protected ?int $subtotalCents = null;
 	protected ?int $totalCents = null;
@@ -290,6 +305,9 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('quoteStatus', Types::STRING);
 		$this->addType('offerFreeform', Types::SMALLINT);
 		$this->addType('smallBusiness', Types::SMALLINT);
+		$this->addType('documentSha256', Types::STRING);
+		$this->addType('documentFileName', Types::STRING);
+		$this->addType('documentFrozenAt', Types::DATETIME);
 		$this->addType('relatedQuoteId', Types::INTEGER);
 		$this->addType('subtotalCents', Types::INTEGER);
 		$this->addType('totalCents', Types::INTEGER);
@@ -404,6 +422,7 @@ class Invoice extends Entity implements JsonSerializable {
 			'validUntil' => $this->formatDate($this->getValidUntil()),
 			'offerFreeform' => (bool)$this->getOfferFreeform(),
 			'smallBusiness' => (bool)$this->getSmallBusiness(),
+			'documentFrozenAt' => $this->getDocumentFrozenAt()?->format(DATE_ATOM),
 			'relatedQuoteId' => $this->getRelatedQuoteId(),
 			'subtotalCents' => $this->getSubtotalCents(),
 			'totalCents' => $this->getTotalCents(),

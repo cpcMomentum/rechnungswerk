@@ -15,6 +15,7 @@ use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ArchiveService;
 use OCA\Rechnungswerk\Service\CountryService;
+use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\MailService;
 use OCA\Rechnungswerk\Service\SettingsService;
@@ -50,6 +51,7 @@ class InvoiceServiceCountryTest extends TestCase {
 			$this->createMock(SettingsService::class),
 			$this->createMock(ZugferdService::class),
 			$this->createMock(ArchiveService::class),
+			$this->createMock(DocumentStore::class),
 			$this->createMock(MailService::class),
 			new CountryService(),
 			$this->db,

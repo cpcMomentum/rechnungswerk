@@ -29,6 +29,7 @@ class InvoiceService {
 		private readonly SettingsService $settingsService,
 		private readonly ZugferdService $zugferdService,
 		private readonly ArchiveService $archiveService,
+		private readonly DocumentStore $documentStore,
 		private readonly MailService $mailService,
 		private readonly CountryService $countryService,
 		private readonly IDBConnection $db,
@@ -248,10 +249,80 @@ class InvoiceService {
 		// Fire-and-forget DATEV hand-off AFTER the invoice is committed: the
 		// invoice is already legally finalised, so a mail failure must never
 		// roll it back — it is only logged. The result is surfaced to the UI.
+		// Beleg einfrieren, BEVOR er irgendwohin geht (#181, Schritt 2). Ab hier
+		// wird er nur noch gelesen, nie neu erzeugt: DATEV, Kundenversand,
+		// Download und Ablage bekommen damit garantiert dieselbe Datei.
+		//
+		// Ausserhalb der Transaktion, weil ein Dateisystem-Schreibvorgang sich
+		// nicht zurueckrollen laesst — und weil die Rechnungsnummer erst in der
+		// Transaktion entsteht, vorher gaebe es gar nichts zu rendern.
+		$this->freezeDocument($invoice);
+
 		$result = $this->present($invoice);
 		$result['datevMailSent'] = $this->maybeSendToDatev($invoice);
 		$result['archived'] = $this->maybeArchive($invoice);
 		return $result;
+	}
+
+	/**
+	 * Beleg beim Festschreiben ablegen (#181, Schritt 2).
+	 *
+	 * Ein Fehlschlag darf die bereits festgeschriebene Rechnung nicht kippen —
+	 * sie ist rechtlich fertig. Er wird protokolliert; die Rechnung bleibt dann
+	 * ohne eingefrorenen Beleg und faellt beim Abruf auf Neuerzeugung zurueck.
+	 * Schritt 3 zieht solche Faelle nach.
+	 */
+	private function freezeDocument(Invoice $invoice): void {
+		try {
+			if ($this->documentStore->has($invoice)) {
+				return;
+			}
+			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+			$settings = $this->settingsService->getCompany();
+			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+
+			$hash = $this->documentStore->freeze($invoice, $pdf);
+			$invoice->setDocumentSha256($hash);
+			$invoice->setDocumentFileName(InvoiceCalculator::buildPdfFileName($invoice, $settings));
+			$invoice->setDocumentFrozenAt(new DateTime());
+			$this->invoiceMapper->update($invoice);
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: Beleg konnte nicht eingefroren werden', [
+				'invoice' => $invoice->getId(),
+				'number' => $invoice->getNumber(),
+				'exception' => $e,
+			]);
+		}
+	}
+
+	/**
+	 * Der auszuliefernde Beleg: der eingefrorene, wenn es einen gibt.
+	 *
+	 * Der Rueckfall auf Neuerzeugung gilt Rechnungen aus der Zeit vor dieser
+	 * Aenderung und dem seltenen Fall, dass das Einfrieren fehlschlug. Er ist
+	 * bewusst still, aber am Datensatz erkennbar: ohne documentFrozenAt ist der
+	 * Beleg nicht der urspruengliche.
+	 *
+	 * @return array{filename: string, content: string}
+	 */
+	private function documentFor(Invoice $invoice): array {
+		$frozen = $this->documentStore->read($invoice);
+		if ($frozen !== null) {
+			$name = (string)$invoice->getDocumentFileName();
+			if ($name === '') {
+				$name = InvoiceCalculator::buildPdfFileName($invoice, $this->settingsService->getCompany());
+			}
+			return ['filename' => $name, 'content' => $frozen];
+		}
+
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$settings = $this->settingsService->getCompany();
+		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+		return [
+			'filename' => InvoiceCalculator::buildPdfFileName($invoice, $settings),
+			'content' => $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate),
+		];
 	}
 
 	/**
@@ -266,9 +337,9 @@ class InvoiceService {
 			if ($settings->getDatevAutoSend() !== 1 || $target === null || $target === '') {
 				return false;
 			}
-			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+			// Derselbe eingefrorene Beleg, den auch Kunde und Download bekommen (#181).
+			$document = $this->documentFor($invoice);
+			$pdf = $document['content'];
 			$number = (string)$invoice->getNumber();
 			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
@@ -276,7 +347,7 @@ class InvoiceService {
 				"Automatische DATEV-Übergabe aus RechnungsWerk.\n\nRechnung: " . $number
 					. "\n\nDie E-Rechnung (ZUGFeRD-PDF) ist als Anhang beigefügt.",
 				$pdf,
-				InvoiceCalculator::buildPdfFileName($invoice, $settings),
+				$document['filename'],
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
@@ -314,10 +385,11 @@ class InvoiceService {
 			throw new ValidationException('Ein Betreff ist erforderlich.');
 		}
 		$settings = $this->settingsService->getCompany();
-		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, InvoiceCalculator::buildPdfFileName($invoice, $settings), $settings, $this->settingsService->getSmtpConfig());
+		// Der Kunde bekommt exakt den eingefrorenen Beleg (#181). Vorher wurde er
+		// zum Sendezeitpunkt neu erzeugt und konnte sich damit von dem
+		// unterscheiden, was beim Festschreiben ins Archiv ging.
+		$document = $this->documentFor($invoice);
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $document['content'], $document['filename'], $settings, $this->settingsService->getSmtpConfig());
 	}
 
 	/**
@@ -410,6 +482,12 @@ class InvoiceService {
 			$this->db->rollBack();
 			throw $e;
 		}
+
+		// Auch der Storno ist ab hier festgeschrieben und muss seinen Beleg
+		// einfrieren (#181, Schritt 2) — sonst wuerde jeder DATEV-/Kunden-/
+		// Download-Zugriff auf ihn weiterhin neu erzeugen, waehrend das fuer die
+		// Originalrechnung bereits ausgeschlossen ist.
+		$this->freezeDocument($storno);
 
 		// Hand the cancellation document to DATEV as well (same fire-and-forget
 		// rule as commit): the original was already transmitted, so the storno
@@ -510,9 +588,16 @@ class InvoiceService {
 	private function maybeArchive(Invoice $invoice): ?bool {
 		try {
 			$settings = $this->settingsService->getCompany();
+			// Vorpruefen statt den Beleg (documentFor) unbedingt an ArchiveService
+			// zu uebergeben: PHP wertet Funktionsargumente vor dem Aufruf aus, das
+			// wuerde bei jedem Festschreiben lesen/erzeugen, auch wenn die Ablage
+			// gar nicht aktiviert ist.
+			if ($settings->getArchiveEnabled() !== 1 || $settings->getArchiveFolderId() === null) {
+				return false;
+			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-			return $this->archiveService->maybeArchive($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+			return $this->archiveService->maybeArchive($invoice, $items, $settings, $relatedNumber, $relatedIssueDate, $this->documentFor($invoice));
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: Ablage-Aufruf fehlgeschlagen', [
 				'exception' => $e,
@@ -535,11 +620,8 @@ class InvoiceService {
 		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
 		}
-		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$settings = $this->settingsService->getCompany();
-		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		return ['filename' => InvoiceCalculator::buildPdfFileName($invoice, $settings), 'content' => $content];
+		// Der eingefrorene Beleg, nicht ein neu erzeugter (#181, Schritt 2).
+		return $this->documentFor($invoice);
 	}
 
 	/**
