@@ -171,6 +171,11 @@ class InvoiceServiceDocumentTest extends TestCase {
 		$settings->setDatevAutoSend(1);
 		$settings->setDatevUploadMail('datev@example.com');
 		$settings->setSmallBusiness(0);
+		// Ablage einschalten: seit der Vorpruefung wird ArchiveService bei
+		// abgeschalteter Ablage gar nicht mehr aufgerufen, der Test pruefte
+		// sonst nichts.
+		$settings->setArchiveEnabled(1);
+		$settings->setArchiveFolderId(42);
 
 		$settingsService = $this->createMock(SettingsService::class);
 		$settingsService->method('getCompany')->willReturn($settings);
