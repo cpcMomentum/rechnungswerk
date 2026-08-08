@@ -34,7 +34,7 @@
     "@nextcloud/eslint-config": "^6.1.0",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",
-    "@vue/tsconfig": "^0.7.0",
+    "@vue/tsconfig": "^0.9.1",
     "happy-dom": "^20.9.0",
     "sass": "^1.70.0",
     "typescript": "^5.7.2",
