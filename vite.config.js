@@ -2,6 +2,14 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
+// import.meta.dirname statt __dirname: Vite 8 warnt, dass __dirname vom
+// kuenftigen Standard-Config-Loader ('native') nicht mehr unterstuetzt wird.
+// Diese Datei ist ESM ("type": "module"), __dirname funktionierte bisher nur,
+// weil Vite die Konfiguration vorher nach CJS umschreibt. Mit dem nativen
+// Loader waere es ein Laufzeitfehler beim Build — jetzt statt beim naechsten
+// Major.
+const dirname = import.meta.dirname
+
 export default defineConfig(({ mode }) => ({
   plugins: [vue()],
   define: {
@@ -23,8 +31,8 @@ export default defineConfig(({ mode }) => ({
   },
   resolve: {
     alias: {
-      vue: resolve(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js'),
-      '@': resolve(__dirname, 'src'),
+      vue: resolve(dirname, 'node_modules/vue/dist/vue.esm-bundler.js'),
+      '@': resolve(dirname, 'src'),
     },
     dedupe: ['vue'],
   },
@@ -32,7 +40,7 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     emptyOutDir: true,
     lib: {
-      entry: resolve(__dirname, 'src/main.js'),
+      entry: resolve(dirname, 'src/main.js'),
       name: 'rechnungswerk',
       formats: ['iife'],
       fileName: () => 'js/rechnungswerk-main.js',
