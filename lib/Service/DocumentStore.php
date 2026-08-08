@@ -82,7 +82,7 @@ class DocumentStore {
 				return null;
 			}
 			$content = $folder->getFile($this->fileName($invoice))->getContent();
-		} catch (FilesNotFoundException|\Throwable $e) {
+		} catch (\Throwable $e) {
 			$this->logger->warning('Rechnungswerk: eingefrorener Beleg nicht lesbar', [
 				'invoice' => $invoice->getId(),
 				'exception' => $e,
