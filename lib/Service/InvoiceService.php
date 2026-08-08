@@ -483,6 +483,12 @@ class InvoiceService {
 			throw $e;
 		}
 
+		// Auch der Storno ist ab hier festgeschrieben und muss seinen Beleg
+		// einfrieren (#181, Schritt 2) — sonst wuerde jeder DATEV-/Kunden-/
+		// Download-Zugriff auf ihn weiterhin neu erzeugen, waehrend das fuer die
+		// Originalrechnung bereits ausgeschlossen ist.
+		$this->freezeDocument($storno);
+
 		// Hand the cancellation document to DATEV as well (same fire-and-forget
 		// rule as commit): the original was already transmitted, so the storno
 		// must follow to keep the DATEV beleg state consistent. A mail failure is
@@ -582,6 +588,13 @@ class InvoiceService {
 	private function maybeArchive(Invoice $invoice): ?bool {
 		try {
 			$settings = $this->settingsService->getCompany();
+			// Vorpruefen statt den Beleg (documentFor) unbedingt an ArchiveService
+			// zu uebergeben: PHP wertet Funktionsargumente vor dem Aufruf aus, das
+			// wuerde bei jedem Festschreiben lesen/erzeugen, auch wenn die Ablage
+			// gar nicht aktiviert ist.
+			if ($settings->getArchiveEnabled() !== 1 || $settings->getArchiveFolderId() === null) {
+				return false;
+			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
 			return $this->archiveService->maybeArchive($invoice, $items, $settings, $relatedNumber, $relatedIssueDate, $this->documentFor($invoice));
