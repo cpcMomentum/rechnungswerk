@@ -13,7 +13,13 @@ export interface InvoiceItemInput {
 	quantity: string
 	unitCode: string
 	unitLabel?: string | null
-	unitPriceE4: number
+	/**
+	 * Einzelpreis als Rohtext, so wie eingegeben ("95", "0,3456", "1.234,56").
+	 * Der Server rechnet um und prüft; er nimmt bewusst KEINE vorberechnete
+	 * Zahl mehr entgegen, weil einer Zahl nicht anzusehen ist, ob 95 als
+	 * 0,0095 € oder als 95 € gemeint war (#180).
+	 */
+	unitPriceInput: string
 	taxRateBp: number
 }
 

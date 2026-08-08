@@ -61,7 +61,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
 import { escCloses } from '@/utils/modalEsc'
-import { e4ToEuroInput, euroInputToE4, formatTaxRate } from '@/utils/money'
+import { e4ToEuroInput, formatTaxRate } from '@/utils/money'
 
 const props = defineProps<{
 	open: boolean
@@ -114,7 +114,8 @@ function onSave() {
 		description: form.description.trim() === '' ? null : form.description.trim(),
 		defaultUnitCode: form.defaultUnitCode,
 		defaultUnitLabel: form.defaultUnitLabel.trim() === '' ? null : form.defaultUnitLabel.trim(),
-		defaultPriceE4: euroInputToE4(priceInput.value),
+		// Rohtext statt vorberechneter Zahl: der Server rechnet um und prueft (#180).
+		defaultPriceInput: priceInput.value,
 		defaultTaxRateBp: form.defaultTaxRateBp,
 	})
 }

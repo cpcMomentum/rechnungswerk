@@ -44,17 +44,21 @@ class ArchiveService {
 	 * committed, so a filing failure is logged but never bubbles up.
 	 *
 	 * @param InvoiceItem[] $items
+	 * @param array{filename: string, content: string}|null $document bereits eingefrorener Beleg (#181)
 	 * @return bool|null true = filed, false = skipped (disabled/no folder),
 	 *                   null = attempted but failed
 	 */
-	public function maybeArchive(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): ?bool {
+	public function maybeArchive(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null, ?array $document = null): ?bool {
 		if ($settings->getArchiveEnabled() !== 1 || $settings->getArchiveFolderId() === null) {
 			return false;
 		}
 		try {
 			$target = $this->resolveTargetFolder($settings, $invoice);
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-			$name = $this->uniqueName($target, InvoiceCalculator::buildPdfFileName($invoice, $settings));
+			// Bevorzugt der bereits eingefrorene Beleg (#181, Schritt 2): die Kopie
+			// in Files soll dieselbe Datei sein, die Kunde und Download bekommen,
+			// nicht eine zweite Erzeugung desselben Inhalts.
+			$pdf = $document['content'] ?? $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+			$name = $this->uniqueName($target, $document['filename'] ?? InvoiceCalculator::buildPdfFileName($invoice, $settings));
 			$target->newFile($name, $pdf);
 			return true;
 		} catch (\Throwable $e) {

@@ -14,6 +14,7 @@ use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
+use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
@@ -29,6 +30,7 @@ class InvoiceService {
 		private readonly SettingsService $settingsService,
 		private readonly ZugferdService $zugferdService,
 		private readonly ArchiveService $archiveService,
+		private readonly DocumentStore $documentStore,
 		private readonly MailService $mailService,
 		private readonly CountryService $countryService,
 		private readonly IDBConnection $db,
@@ -83,11 +85,18 @@ class InvoiceService {
 		$invoice->setCreatedAt($now);
 		$invoice->setUpdatedAt($now);
 		$this->applyHeader($invoice, $data);
+		// Positionen VOR der Transaktion auswerten: eine unlesbare Menge oder ein
+		// unlesbarer Preis soll die Datenbank gar nicht erst anfassen, so wie es
+		// beim Empfaengerland in applyHeader() schon der Fall ist (#180).
+		// Nebeneffekt: der Settings-Zugriff darin kann eine Zeile anlegen, und ein
+		// fehlschlagender INSERT wuerde die Transaktion auf PostgreSQL abbrechen —
+		// dieselbe Ueberlegung wie in commit().
+		$items = $this->extractItems($data);
 
 		$this->db->beginTransaction();
 		try {
 			$invoice = $this->invoiceMapper->insert($invoice);
-			$this->replaceItems($invoice, $this->extractItems($data));
+			$this->replaceItems($invoice, $items);
 			$this->recomputeTotals($invoice);
 			$this->invoiceMapper->update($invoice);
 			$this->db->commit();
@@ -122,6 +131,8 @@ class InvoiceService {
 	public function update(int $id, array $data): array {
 		// Fast 404/409 outside the transaction for a quick user-visible error.
 		$this->assertDraft($this->findById($id));
+		// Wie in create(): Eingaben auswerten, bevor die Transaktion aufgeht (#180).
+		$items = array_key_exists('items', $data) ? $this->extractItems($data) : null;
 
 		$this->db->beginTransaction();
 		try {
@@ -131,8 +142,8 @@ class InvoiceService {
 			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 			$this->applyHeader($invoice, $data);
-			if (array_key_exists('items', $data)) {
-				$this->replaceItems($invoice, $this->extractItems($data));
+			if ($items !== null) {
+				$this->replaceItems($invoice, $items);
 			}
 			$this->recomputeTotals($invoice);
 			$invoice->setUpdatedAt(new DateTime());
@@ -239,10 +250,115 @@ class InvoiceService {
 		// Fire-and-forget DATEV hand-off AFTER the invoice is committed: the
 		// invoice is already legally finalised, so a mail failure must never
 		// roll it back — it is only logged. The result is surfaced to the UI.
+		// Beleg einfrieren, BEVOR er irgendwohin geht (#181, Schritt 2). Ab hier
+		// wird er nur noch gelesen, nie neu erzeugt: DATEV, Kundenversand,
+		// Download und Ablage bekommen damit garantiert dieselbe Datei.
+		//
+		// Ausserhalb der Transaktion, weil ein Dateisystem-Schreibvorgang sich
+		// nicht zurueckrollen laesst — und weil die Rechnungsnummer erst in der
+		// Transaktion entsteht, vorher gaebe es gar nichts zu rendern.
+		$this->freezeDocument($invoice);
+
 		$result = $this->present($invoice);
 		$result['datevMailSent'] = $this->maybeSendToDatev($invoice);
 		$result['archived'] = $this->maybeArchive($invoice);
 		return $result;
+	}
+
+	/**
+	 * Beleg ablegen (#181, Schritt 2), regulaer beim Festschreiben.
+	 *
+	 * Ein Fehlschlag darf die bereits festgeschriebene Rechnung nicht kippen —
+	 * sie ist rechtlich fertig. Er wird protokolliert; die Rechnung bleibt dann
+	 * ohne eingefrorenen Beleg und faellt beim Abruf auf Neuerzeugung zurueck.
+	 * Der Hintergrundauftrag aus Schritt 3 nimmt sie beim naechsten Lauf mit.
+	 *
+	 * Oeffentlich, weil der Nachzieh-Auftrag (DocumentBackfillService) genau
+	 * diesen Weg gehen muss: wuerde er die Erzeugung nachbauen, koennten sich
+	 * nachgezogene und regulaer eingefrorene Belege auseinanderentwickeln, sobald
+	 * sich an einer der beiden Stellen etwas aendert.
+	 *
+	 * @param bool $backfilled true, wenn der Beleg nicht beim Festschreiben,
+	 *   sondern nachtraeglich entsteht — das gehoert an den Datensatz, weil ein
+	 *   nachgezogener Beleg inhaltlich stimmt, im Aussehen aber der heutige Stand ist
+	 * @return bool ob am Ende ein eingefrorener Beleg vorliegt
+	 */
+	public function freezeDocument(Invoice $invoice, bool $backfilled = false): bool {
+		try {
+			$settings = $this->settingsService->getCompany();
+
+			// Liegt die Datei schon, wird nie neu gerendert: die Ablage ist nur
+			// einmal beschreibbar. Fehlen dann noch die Angaben am Datensatz — die
+			// Datei war geschrieben, das Update danach scheiterte —, werden sie aus
+			// dem abgelegten Inhalt nachgezogen. Ohne das bliebe document_frozen_at
+			// leer und der Hintergrundauftrag griffe dieselbe Rechnung endlos auf.
+			$existing = $this->documentStore->read($invoice);
+			if ($existing !== null) {
+				if ($invoice->getDocumentFrozenAt() === null) {
+					$this->stampDocument($invoice, hash('sha256', $existing), $settings, $backfilled);
+				}
+				return true;
+			}
+
+			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+
+			$this->stampDocument($invoice, $this->documentStore->freeze($invoice, $pdf), $settings, $backfilled);
+			return true;
+		} catch (\Throwable $e) {
+			$this->logger->error('Rechnungswerk: Beleg konnte nicht eingefroren werden', [
+				'invoice' => $invoice->getId(),
+				'number' => $invoice->getNumber(),
+				'exception' => $e,
+			]);
+			return false;
+		}
+	}
+
+	/**
+	 * Die Angaben zum eingefrorenen Beleg an die Rechnung schreiben.
+	 *
+	 * Der Dateiname entsteht aus dem aktuellen Namensschema. Beim Festschreiben
+	 * ist das genau der Name, den der Kunde bekommt; beim Nachziehen ist es der
+	 * beste verfuegbare Stand — welchen Namen die Datei damals trug, steht
+	 * nirgends im Datensatz.
+	 */
+	private function stampDocument(Invoice $invoice, string $hash, Settings $settings, bool $backfilled): void {
+		$invoice->setDocumentSha256($hash);
+		$invoice->setDocumentFileName(InvoiceCalculator::buildPdfFileName($invoice, $settings));
+		$invoice->setDocumentFrozenAt(new DateTime());
+		$invoice->setDocumentBackfilled($backfilled ? 1 : 0);
+		$this->invoiceMapper->update($invoice);
+	}
+
+	/**
+	 * Der auszuliefernde Beleg: der eingefrorene, wenn es einen gibt.
+	 *
+	 * Der Rueckfall auf Neuerzeugung gilt Rechnungen aus der Zeit vor dieser
+	 * Aenderung und dem seltenen Fall, dass das Einfrieren fehlschlug. Er ist
+	 * bewusst still, aber am Datensatz erkennbar: ohne documentFrozenAt ist der
+	 * Beleg nicht der urspruengliche.
+	 *
+	 * @return array{filename: string, content: string}
+	 */
+	private function documentFor(Invoice $invoice): array {
+		$frozen = $this->documentStore->read($invoice);
+		if ($frozen !== null) {
+			$name = (string)$invoice->getDocumentFileName();
+			if ($name === '') {
+				$name = InvoiceCalculator::buildPdfFileName($invoice, $this->settingsService->getCompany());
+			}
+			return ['filename' => $name, 'content' => $frozen];
+		}
+
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		$settings = $this->settingsService->getCompany();
+		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
+		return [
+			'filename' => InvoiceCalculator::buildPdfFileName($invoice, $settings),
+			'content' => $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate),
+		];
 	}
 
 	/**
@@ -257,9 +373,9 @@ class InvoiceService {
 			if ($settings->getDatevAutoSend() !== 1 || $target === null || $target === '') {
 				return false;
 			}
-			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+			// Derselbe eingefrorene Beleg, den auch Kunde und Download bekommen (#181).
+			$document = $this->documentFor($invoice);
+			$pdf = $document['content'];
 			$number = (string)$invoice->getNumber();
 			$messageId = $this->mailService->sendInvoicePdf(
 				$target,
@@ -267,7 +383,7 @@ class InvoiceService {
 				"Automatische DATEV-Übergabe aus RechnungsWerk.\n\nRechnung: " . $number
 					. "\n\nDie E-Rechnung (ZUGFeRD-PDF) ist als Anhang beigefügt.",
 				$pdf,
-				InvoiceCalculator::buildPdfFileName($invoice, $settings),
+				$document['filename'],
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
@@ -305,10 +421,11 @@ class InvoiceService {
 			throw new ValidationException('Ein Betreff ist erforderlich.');
 		}
 		$settings = $this->settingsService->getCompany();
-		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-		$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, InvoiceCalculator::buildPdfFileName($invoice, $settings), $settings, $this->settingsService->getSmtpConfig());
+		// Der Kunde bekommt exakt den eingefrorenen Beleg (#181). Vorher wurde er
+		// zum Sendezeitpunkt neu erzeugt und konnte sich damit von dem
+		// unterscheiden, was beim Festschreiben ins Archiv ging.
+		$document = $this->documentFor($invoice);
+		$this->mailService->sendInvoicePdf($to, $subject, $body, $document['content'], $document['filename'], $settings, $this->settingsService->getSmtpConfig());
 	}
 
 	/**
@@ -386,7 +503,10 @@ class InvoiceService {
 				$copy->setSortOrder($item->getSortOrder());
 				$this->itemMapper->insert($copy);
 			}
-			$this->recomputeTotals($storno);
+			// Der Storno korrigiert das Original und muss dessen Steuerfall fort-
+			// fuehren, nicht den heutigen Einstellungsstand — sonst kann sich der
+			// Fall zwischen Original und Storno unterscheiden (#181).
+			$this->recomputeTotals($storno, (int)$original->getSmallBusiness() === 1);
 			$this->invoiceMapper->update($storno);
 
 			$original->setStatus(Invoice::STATUS_CANCELLED);
@@ -398,6 +518,12 @@ class InvoiceService {
 			$this->db->rollBack();
 			throw $e;
 		}
+
+		// Auch der Storno ist ab hier festgeschrieben und muss seinen Beleg
+		// einfrieren (#181, Schritt 2) — sonst wuerde jeder DATEV-/Kunden-/
+		// Download-Zugriff auf ihn weiterhin neu erzeugen, waehrend das fuer die
+		// Originalrechnung bereits ausgeschlossen ist.
+		$this->freezeDocument($storno);
 
 		// Hand the cancellation document to DATEV as well (same fire-and-forget
 		// rule as commit): the original was already transmitted, so the storno
@@ -498,9 +624,16 @@ class InvoiceService {
 	private function maybeArchive(Invoice $invoice): ?bool {
 		try {
 			$settings = $this->settingsService->getCompany();
+			// Vorpruefen statt den Beleg (documentFor) unbedingt an ArchiveService
+			// zu uebergeben: PHP wertet Funktionsargumente vor dem Aufruf aus, das
+			// wuerde bei jedem Festschreiben lesen/erzeugen, auch wenn die Ablage
+			// gar nicht aktiviert ist.
+			if ($settings->getArchiveEnabled() !== 1 || $settings->getArchiveFolderId() === null) {
+				return false;
+			}
 			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-			return $this->archiveService->maybeArchive($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
+			return $this->archiveService->maybeArchive($invoice, $items, $settings, $relatedNumber, $relatedIssueDate, $this->documentFor($invoice));
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: Ablage-Aufruf fehlgeschlagen', [
 				'exception' => $e,
@@ -523,11 +656,8 @@ class InvoiceService {
 		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
 		}
-		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		$settings = $this->settingsService->getCompany();
-		[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
-		$content = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
-		return ['filename' => InvoiceCalculator::buildPdfFileName($invoice, $settings), 'content' => $content];
+		// Der eingefrorene Beleg, nicht ein neu erzeugter (#181, Schritt 2).
+		return $this->documentFor($invoice);
 	}
 
 	/**
@@ -728,7 +858,11 @@ class InvoiceService {
 			// "99.999.999" brach mit einem 500er ab, "1.000" wurde still zu 1 und
 			// machte die Rechnung um Faktor 1000 falsch (#157).
 			$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
-			$unitPriceE4 = (int)($row['unitPriceE4'] ?? 0);
+			// Der Preis kommt als Rohtext und wird HIER umgerechnet (#180). Vorher
+			// rechnete allein der Browser und schickte die fertige Zahl; der Server
+			// konnte sie nicht pruefen, weil einer blossen Zahl nicht anzusehen ist,
+			// ob 95 als 0,0095 € oder als 95 € gemeint war.
+			$unitPriceE4 = NumberInput::parsePrice($row['unitPriceInput'] ?? null);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
 			$name = (string)($row['name'] ?? '');
@@ -768,7 +902,14 @@ class InvoiceService {
 		}
 	}
 
-	private function recomputeTotals(Invoice $invoice): void {
+	/**
+	 * @param bool|null $smallBusinessOverride Erzwingt den Kleinunternehmer-Fall
+	 *  statt ihn aus den aktuellen Einstellungen zu lesen. Fuer eine Korrektur
+	 *  (Storno), die den Steuerfall der Original-Rechnung fortfuehren muss —
+	 *  sonst faellt genau der mit #181 behobene Fehler fuer Storno-Belege wieder
+	 *  an, wenn zwischen Original und Storno die Einstellung gewechselt wurde.
+	 */
+	private function recomputeTotals(Invoice $invoice, ?bool $smallBusinessOverride = null): void {
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$lines = array_map(
 			static fn (InvoiceItem $i): array => [
@@ -780,7 +921,13 @@ class InvoiceService {
 		// VAT is dropped to 0 for §19 small businesses and for special tax cases
 		// (reverse charge / intra-community / export) — see ZugferdService for the
 		// matching EN16931 category codes and exemption reasons.
-		$smallBusiness = $this->settingsService->getCompany()->getSmallBusiness() === 1;
+		$smallBusiness = $smallBusinessOverride ?? ($this->settingsService->getCompany()->getSmallBusiness() === 1);
+		// Den Fall an der Rechnung festhalten (#181). Hier und nicht anderswo,
+		// weil an dieser Stelle ohnehin die Summen daraus entstehen — so koennen
+		// gespeicherter Schalter und gespeicherte Betraege nicht auseinanderlaufen.
+		// Solange die Rechnung ein Entwurf ist, folgt sie damit dem aktuellen
+		// Stand; ab dem Festschreiben ist sie unveraenderlich.
+		$invoice->setSmallBusiness($smallBusiness ? 1 : 0);
 		$taxExempt = $smallBusiness || $invoice->isTaxExemptCase();
 		$totals = InvoiceCalculator::computeTotals($lines, $taxExempt);
 		$invoice->setSubtotalCents($totals['subtotalCents']);
@@ -962,11 +1109,13 @@ class InvoiceService {
 		$quote->setCreatedAt($now);
 		$quote->setUpdatedAt($now);
 		$this->applyHeader($quote, $data);
+		// Wie in create(): Eingaben auswerten, bevor die Transaktion aufgeht (#180).
+		$items = $this->extractItems($data);
 
 		$this->db->beginTransaction();
 		try {
 			$quote = $this->invoiceMapper->insert($quote);
-			$this->replaceItems($quote, $this->extractItems($data));
+			$this->replaceItems($quote, $items);
 			$this->recomputeTotals($quote);
 			$this->invoiceMapper->update($quote);
 			$this->db->commit();

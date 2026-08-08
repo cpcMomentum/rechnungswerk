@@ -193,6 +193,10 @@ export interface Invoice {
 	datevStatus: string | null
 	datevStatusAt: string | null
 	committedAt: string | null
+	/** When the document was frozen (#181); null = it is still rendered on every access. */
+	documentFrozenAt: string | null
+	/** True if the frozen document was regenerated later, not created at commit time (#181). */
+	documentBackfilled: boolean
 	/** Payment date (#117); set = paid, null = open. */
 	paidAt: string | null
 	/** Derived payment status; null for drafts and cancellation documents. */

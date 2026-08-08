@@ -76,6 +76,16 @@ use OCP\DB\Types;
  * @method void setQuoteStatus(?string $quoteStatus)
  * @method ?int getOfferFreeform()
  * @method void setOfferFreeform(?int $offerFreeform)
+ * @method ?int getSmallBusiness()
+ * @method void setSmallBusiness(?int $smallBusiness)
+ * @method ?string getDocumentSha256()
+ * @method void setDocumentSha256(?string $documentSha256)
+ * @method ?string getDocumentFileName()
+ * @method void setDocumentFileName(?string $documentFileName)
+ * @method ?\DateTime getDocumentFrozenAt()
+ * @method void setDocumentFrozenAt(?\DateTime $documentFrozenAt)
+ * @method ?int getDocumentBackfilled()
+ * @method void setDocumentBackfilled(?int $documentBackfilled)
  * @method ?int getRelatedQuoteId()
  * @method void setRelatedQuoteId(?int $relatedQuoteId)
  * @method int getSubtotalCents()
@@ -225,6 +235,35 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?\DateTime $validUntil = null;
 	protected ?string $quoteStatus = null;
 	protected ?int $offerFreeform = null;
+
+	/**
+	 * Ob diese Rechnung unter der Kleinunternehmerregelung entstanden ist (#181).
+	 *
+	 * Steht an der Rechnung und nicht in den Einstellungen, weil die Beleg-
+	 * Erzeugung sie sonst bei jedem Zugriff neu bewertet: ein spaeterer Wechsel
+	 * der Besteuerungsform machte damit rueckwirkend aus einer 19-%-Rechnung
+	 * eine steuerfreie, bei unveraendert ausgewiesenem Steuerbetrag.
+	 */
+	protected ?int $smallBusiness = null;
+
+	/**
+	 * Der eingefrorene Beleg (#181, Schritt 2). Die Datei liegt im app-eigenen
+	 * Speicher (DocumentStore); hier stehen Pruefsumme, Dateiname zum Zeitpunkt
+	 * des Festschreibens und wann eingefroren wurde.
+	 */
+	protected ?string $documentSha256 = null;
+	protected ?string $documentFileName = null;
+	protected ?\DateTime $documentFrozenAt = null;
+
+	/**
+	 * Ob der Beleg erst nachtraeglich erzeugt wurde (#181, Schritt 3).
+	 *
+	 * 0 heisst: beim Festschreiben entstanden, also das Dokument, das der Kunde
+	 * bekommen hat. 1 heisst: vom Hintergrundauftrag nachgezogen — inhaltlich
+	 * korrekt, aber im Aussehen der heutige Stand, nicht der damalige. NULL sind
+	 * Rechnungen, bei denen noch gar nichts eingefroren ist.
+	 */
+	protected ?int $documentBackfilled = null;
 	protected ?int $relatedQuoteId = null;
 	protected ?int $subtotalCents = null;
 	protected ?int $totalCents = null;
@@ -277,6 +316,11 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('validUntil', Types::DATE);
 		$this->addType('quoteStatus', Types::STRING);
 		$this->addType('offerFreeform', Types::SMALLINT);
+		$this->addType('smallBusiness', Types::SMALLINT);
+		$this->addType('documentSha256', Types::STRING);
+		$this->addType('documentFileName', Types::STRING);
+		$this->addType('documentFrozenAt', Types::DATETIME);
+		$this->addType('documentBackfilled', Types::SMALLINT);
 		$this->addType('relatedQuoteId', Types::INTEGER);
 		$this->addType('subtotalCents', Types::INTEGER);
 		$this->addType('totalCents', Types::INTEGER);
@@ -390,6 +434,9 @@ class Invoice extends Entity implements JsonSerializable {
 			// derived and added by the service layer, just like paymentStatus.
 			'validUntil' => $this->formatDate($this->getValidUntil()),
 			'offerFreeform' => (bool)$this->getOfferFreeform(),
+			'smallBusiness' => (bool)$this->getSmallBusiness(),
+			'documentFrozenAt' => $this->getDocumentFrozenAt()?->format(DATE_ATOM),
+			'documentBackfilled' => (bool)$this->getDocumentBackfilled(),
 			'relatedQuoteId' => $this->getRelatedQuoteId(),
 			'subtotalCents' => $this->getSubtotalCents(),
 			'totalCents' => $this->getTotalCents(),
