@@ -82,6 +82,56 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * Festgeschriebene Belege ohne eingefrorenes Dokument (#181, Schritt 3).
+	 *
+	 * Das sind zwei Gruppen: der Bestand aus der Zeit vor Schritt 2, und die
+	 * seltenen Faelle, in denen das Einfrieren beim Festschreiben fehlschlug.
+	 * Beide holt der Hintergrundauftrag nach.
+	 *
+	 * Nur echte Belege: Angebote (#111) werden nicht eingefroren, ein Angebot ist
+	 * kein Beleg. Stornos gehoeren dazu, sie sind eigenstaendige Dokumente.
+	 * Entwuerfe haben noch keine Nummer und nichts einzufrieren.
+	 *
+	 * Aeltestes zuerst, damit der Bestand in einer nachvollziehbaren Reihenfolge
+	 * abgearbeitet wird und der Fortschritt bei jedem Lauf am selben Ende weitergeht.
+	 *
+	 * @param int $limit Groesse eines Haeppchens
+	 * @return Invoice[]
+	 */
+	public function findWithoutFrozenDocument(int $limit): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName);
+		$this->whereDocumentMissing($qb);
+		$qb->orderBy('id', 'ASC')->setMaxResults($limit);
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Restbestand fuer das Protokoll des Nachzieh-Auftrags: bei einem Lauf, der
+	 * Haeppchen fuer Haeppchen arbeitet, ist "wie viel noch" die Zahl, an der man
+	 * Fortschritt von Stillstand unterscheidet.
+	 */
+	public function countWithoutFrozenDocument(): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select($qb->func()->count('*', 'cnt'))->from($this->tableName);
+		$this->whereDocumentMissing($qb);
+		$result = $qb->executeQuery();
+		$count = (int)$result->fetchOne();
+		$result->closeCursor();
+		return $count;
+	}
+
+	/** Die Bedingung fuer "festgeschrieben, aber kein eingefrorener Beleg" — an einer Stelle. */
+	private function whereDocumentMissing(IQueryBuilder $qb): void {
+		$qb->where($qb->expr()->in('invoice_type', $qb->createNamedParameter(Invoice::INVOICE_TYPES, IQueryBuilder::PARAM_STR_ARRAY)))
+			->andWhere($qb->expr()->in('status', $qb->createNamedParameter(
+				[Invoice::STATUS_COMMITTED, Invoice::STATUS_CANCELLED],
+				IQueryBuilder::PARAM_STR_ARRAY,
+			)))
+			->andWhere($qb->expr()->isNull('document_frozen_at'));
+	}
+
+	/**
 	 * Quote numbers belonging to one revision family (#111 Modell B): the base
 	 * number itself ("AN-2026-0007") and its revisions ("AN-2026-0007-1", …).
 	 * Used to pick the next free revision suffix. The base is escaped so a literal

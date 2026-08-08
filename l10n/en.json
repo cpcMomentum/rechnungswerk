@@ -353,6 +353,7 @@
         "Abgelehnt": "Rejected",
         "Übernommen": "Converted",
         "Revision von {number}": "Revision of {number}",
+        "Dieser Beleg wurde nicht beim Festschreiben abgelegt, sondern später aus dem Datensatz erzeugt. Beträge, Positionen und Steuerausweis stimmen; Firmendaten und Layout entsprechen dem heutigen Stand, nicht dem von damals.": "This document was not stored when the invoice was finalised but generated later from the record. Amounts, line items and the tax breakdown are correct; company data and layout reflect today’s state, not that of the time.",
         "Revidieren": "Revise",
         "Angebot revidieren": "Revise quote",
         "Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?": "An editable copy is created as a new quote revision. On finalisation it receives a revision number (e.g. AN-…-1) and this quote is marked as “revised”. Continue?",

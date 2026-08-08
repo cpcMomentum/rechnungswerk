@@ -14,6 +14,7 @@ use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
+use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
@@ -265,35 +266,70 @@ class InvoiceService {
 	}
 
 	/**
-	 * Beleg beim Festschreiben ablegen (#181, Schritt 2).
+	 * Beleg ablegen (#181, Schritt 2), regulaer beim Festschreiben.
 	 *
 	 * Ein Fehlschlag darf die bereits festgeschriebene Rechnung nicht kippen —
 	 * sie ist rechtlich fertig. Er wird protokolliert; die Rechnung bleibt dann
 	 * ohne eingefrorenen Beleg und faellt beim Abruf auf Neuerzeugung zurueck.
-	 * Schritt 3 zieht solche Faelle nach.
+	 * Der Hintergrundauftrag aus Schritt 3 nimmt sie beim naechsten Lauf mit.
+	 *
+	 * Oeffentlich, weil der Nachzieh-Auftrag (DocumentBackfillService) genau
+	 * diesen Weg gehen muss: wuerde er die Erzeugung nachbauen, koennten sich
+	 * nachgezogene und regulaer eingefrorene Belege auseinanderentwickeln, sobald
+	 * sich an einer der beiden Stellen etwas aendert.
+	 *
+	 * @param bool $backfilled true, wenn der Beleg nicht beim Festschreiben,
+	 *   sondern nachtraeglich entsteht — das gehoert an den Datensatz, weil ein
+	 *   nachgezogener Beleg inhaltlich stimmt, im Aussehen aber der heutige Stand ist
+	 * @return bool ob am Ende ein eingefrorener Beleg vorliegt
 	 */
-	private function freezeDocument(Invoice $invoice): void {
+	public function freezeDocument(Invoice $invoice, bool $backfilled = false): bool {
 		try {
-			if ($this->documentStore->has($invoice)) {
-				return;
-			}
-			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 			$settings = $this->settingsService->getCompany();
+
+			// Liegt die Datei schon, wird nie neu gerendert: die Ablage ist nur
+			// einmal beschreibbar. Fehlen dann noch die Angaben am Datensatz — die
+			// Datei war geschrieben, das Update danach scheiterte —, werden sie aus
+			// dem abgelegten Inhalt nachgezogen. Ohne das bliebe document_frozen_at
+			// leer und der Hintergrundauftrag griffe dieselbe Rechnung endlos auf.
+			$existing = $this->documentStore->read($invoice);
+			if ($existing !== null) {
+				if ($invoice->getDocumentFrozenAt() === null) {
+					$this->stampDocument($invoice, hash('sha256', $existing), $settings, $backfilled);
+				}
+				return true;
+			}
+
+			$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 			[$relatedNumber, $relatedIssueDate] = $this->relatedReference($invoice);
 			$pdf = $this->zugferdService->generatePdf($invoice, $items, $settings, $relatedNumber, $relatedIssueDate);
 
-			$hash = $this->documentStore->freeze($invoice, $pdf);
-			$invoice->setDocumentSha256($hash);
-			$invoice->setDocumentFileName(InvoiceCalculator::buildPdfFileName($invoice, $settings));
-			$invoice->setDocumentFrozenAt(new DateTime());
-			$this->invoiceMapper->update($invoice);
+			$this->stampDocument($invoice, $this->documentStore->freeze($invoice, $pdf), $settings, $backfilled);
+			return true;
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: Beleg konnte nicht eingefroren werden', [
 				'invoice' => $invoice->getId(),
 				'number' => $invoice->getNumber(),
 				'exception' => $e,
 			]);
+			return false;
 		}
+	}
+
+	/**
+	 * Die Angaben zum eingefrorenen Beleg an die Rechnung schreiben.
+	 *
+	 * Der Dateiname entsteht aus dem aktuellen Namensschema. Beim Festschreiben
+	 * ist das genau der Name, den der Kunde bekommt; beim Nachziehen ist es der
+	 * beste verfuegbare Stand — welchen Namen die Datei damals trug, steht
+	 * nirgends im Datensatz.
+	 */
+	private function stampDocument(Invoice $invoice, string $hash, Settings $settings, bool $backfilled): void {
+		$invoice->setDocumentSha256($hash);
+		$invoice->setDocumentFileName(InvoiceCalculator::buildPdfFileName($invoice, $settings));
+		$invoice->setDocumentFrozenAt(new DateTime());
+		$invoice->setDocumentBackfilled($backfilled ? 1 : 0);
+		$this->invoiceMapper->update($invoice);
 	}
 
 	/**

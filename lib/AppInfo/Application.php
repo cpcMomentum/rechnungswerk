@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\AppInfo;
 
 use OCA\Rechnungswerk\BackgroundJob\DatevConfirmationJob;
+use OCA\Rechnungswerk\BackgroundJob\DocumentBackfillJob;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -37,6 +38,11 @@ class Application extends App implements IBootstrap {
 	public function boot(IBootContext $context): void {
 		// Register the DATEV confirmation poller. IJobList::add is idempotent,
 		// so re-adding on every boot is safe.
-		$context->getServerContainer()->get(IJobList::class)->add(DatevConfirmationJob::class);
+		$jobList = $context->getServerContainer()->get(IJobList::class);
+		$jobList->add(DatevConfirmationJob::class);
+		// Zieht die Belege des Bestands nach (#181, Schritt 3). Bleibt dauerhaft
+		// registriert: er faengt auch die seltenen Faelle ein, in denen das
+		// Einfrieren beim Festschreiben fehlschlaegt.
+		$jobList->add(DocumentBackfillJob::class);
 	}
 }
