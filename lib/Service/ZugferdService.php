@@ -151,7 +151,12 @@ class ZugferdService {
 	 * @param InvoiceItem[] $items
 	 */
 	private function buildDocument(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null): ZugferdDocumentBuilder {
-		$smallBusiness = $settings->getSmallBusiness() === 1;
+		// Der Steuerfall kommt aus der RECHNUNG, nicht aus den Einstellungen (#181).
+		// Andernfalls bewertet jeder Zugriff den Beleg neu: nach einem Wechsel der
+		// Besteuerungsform rendert eine festgeschriebene 19-%-Rechnung als
+		// steuerfrei, waehrend sie weiter 19,00 EUR Steuer ausweist — ein XML,
+		// das EN16931 verletzt.
+		$smallBusiness = (int)$invoice->getSmallBusiness() === 1;
 		$builder = ZugferdDocumentBuilder::createNew(ZugferdProfiles::PROFILE_EN16931);
 
 		// Document type: 380 for invoices, 384 (EN16931 corrected invoice) for
@@ -660,7 +665,12 @@ class ZugferdService {
 			$metaHtml .= '<tr><td class="meta-label">' . $label . '</td><td>' . $value . '</td></tr>';
 		}
 
-		$smallBusiness = $settings->getSmallBusiness() === 1;
+		// Der Steuerfall kommt aus der RECHNUNG, nicht aus den Einstellungen (#181).
+		// Andernfalls bewertet jeder Zugriff den Beleg neu: nach einem Wechsel der
+		// Besteuerungsform rendert eine festgeschriebene 19-%-Rechnung als
+		// steuerfrei, waehrend sie weiter 19,00 EUR Steuer ausweist — ein XML,
+		// das EN16931 verletzt.
+		$smallBusiness = (int)$invoice->getSmallBusiness() === 1;
 		$exempt = $smallBusiness || $invoice->isTaxExemptCase();
 		// #144: A §19 small-business invoice must not show a VAT rate at all — a
 		// "0 %" column reads like a tax rate, which contradicts the exemption

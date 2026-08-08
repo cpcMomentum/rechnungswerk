@@ -76,6 +76,8 @@ use OCP\DB\Types;
  * @method void setQuoteStatus(?string $quoteStatus)
  * @method ?int getOfferFreeform()
  * @method void setOfferFreeform(?int $offerFreeform)
+ * @method ?int getSmallBusiness()
+ * @method void setSmallBusiness(?int $smallBusiness)
  * @method ?int getRelatedQuoteId()
  * @method void setRelatedQuoteId(?int $relatedQuoteId)
  * @method int getSubtotalCents()
@@ -225,6 +227,16 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?\DateTime $validUntil = null;
 	protected ?string $quoteStatus = null;
 	protected ?int $offerFreeform = null;
+
+	/**
+	 * Ob diese Rechnung unter der Kleinunternehmerregelung entstanden ist (#181).
+	 *
+	 * Steht an der Rechnung und nicht in den Einstellungen, weil die Beleg-
+	 * Erzeugung sie sonst bei jedem Zugriff neu bewertet: ein spaeterer Wechsel
+	 * der Besteuerungsform machte damit rueckwirkend aus einer 19-%-Rechnung
+	 * eine steuerfreie, bei unveraendert ausgewiesenem Steuerbetrag.
+	 */
+	protected ?int $smallBusiness = null;
 	protected ?int $relatedQuoteId = null;
 	protected ?int $subtotalCents = null;
 	protected ?int $totalCents = null;
@@ -277,6 +289,7 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('validUntil', Types::DATE);
 		$this->addType('quoteStatus', Types::STRING);
 		$this->addType('offerFreeform', Types::SMALLINT);
+		$this->addType('smallBusiness', Types::SMALLINT);
 		$this->addType('relatedQuoteId', Types::INTEGER);
 		$this->addType('subtotalCents', Types::INTEGER);
 		$this->addType('totalCents', Types::INTEGER);
@@ -390,6 +403,7 @@ class Invoice extends Entity implements JsonSerializable {
 			// derived and added by the service layer, just like paymentStatus.
 			'validUntil' => $this->formatDate($this->getValidUntil()),
 			'offerFreeform' => (bool)$this->getOfferFreeform(),
+			'smallBusiness' => (bool)$this->getSmallBusiness(),
 			'relatedQuoteId' => $this->getRelatedQuoteId(),
 			'subtotalCents' => $this->getSubtotalCents(),
 			'totalCents' => $this->getTotalCents(),

@@ -395,7 +395,10 @@ class InvoiceService {
 				$copy->setSortOrder($item->getSortOrder());
 				$this->itemMapper->insert($copy);
 			}
-			$this->recomputeTotals($storno);
+			// Der Storno korrigiert das Original und muss dessen Steuerfall fort-
+			// fuehren, nicht den heutigen Einstellungsstand — sonst kann sich der
+			// Fall zwischen Original und Storno unterscheiden (#181).
+			$this->recomputeTotals($storno, (int)$original->getSmallBusiness() === 1);
 			$this->invoiceMapper->update($storno);
 
 			$original->setStatus(Invoice::STATUS_CANCELLED);
@@ -781,7 +784,14 @@ class InvoiceService {
 		}
 	}
 
-	private function recomputeTotals(Invoice $invoice): void {
+	/**
+	 * @param bool|null $smallBusinessOverride Erzwingt den Kleinunternehmer-Fall
+	 *  statt ihn aus den aktuellen Einstellungen zu lesen. Fuer eine Korrektur
+	 *  (Storno), die den Steuerfall der Original-Rechnung fortfuehren muss —
+	 *  sonst faellt genau der mit #181 behobene Fehler fuer Storno-Belege wieder
+	 *  an, wenn zwischen Original und Storno die Einstellung gewechselt wurde.
+	 */
+	private function recomputeTotals(Invoice $invoice, ?bool $smallBusinessOverride = null): void {
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$lines = array_map(
 			static fn (InvoiceItem $i): array => [
@@ -793,7 +803,13 @@ class InvoiceService {
 		// VAT is dropped to 0 for §19 small businesses and for special tax cases
 		// (reverse charge / intra-community / export) — see ZugferdService for the
 		// matching EN16931 category codes and exemption reasons.
-		$smallBusiness = $this->settingsService->getCompany()->getSmallBusiness() === 1;
+		$smallBusiness = $smallBusinessOverride ?? ($this->settingsService->getCompany()->getSmallBusiness() === 1);
+		// Den Fall an der Rechnung festhalten (#181). Hier und nicht anderswo,
+		// weil an dieser Stelle ohnehin die Summen daraus entstehen — so koennen
+		// gespeicherter Schalter und gespeicherte Betraege nicht auseinanderlaufen.
+		// Solange die Rechnung ein Entwurf ist, folgt sie damit dem aktuellen
+		// Stand; ab dem Festschreiben ist sie unveraenderlich.
+		$invoice->setSmallBusiness($smallBusiness ? 1 : 0);
 		$taxExempt = $smallBusiness || $invoice->isTaxExemptCase();
 		$totals = InvoiceCalculator::computeTotals($lines, $taxExempt);
 		$invoice->setSubtotalCents($totals['subtotalCents']);
