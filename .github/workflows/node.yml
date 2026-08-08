@@ -26,7 +26,11 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          # Node 24 statt 20: @nextcloud/eslint-config 9 nutzt findPackageJSON aus
+          # node:module, das es erst ab 22.14 gibt (engines: ^22.14 || ^24 || >=26).
+          # Unter Node 20 bricht der Lint mit einem SyntaxError ab — lokal fiel das
+          # nicht auf, weil dort Node 26 laeuft.
+          node-version: '24'
 
       - name: Abhaengigkeiten installieren
         # npm/cli#4828: ein auf anderem OS erzeugter Lock laesst das plattform-
