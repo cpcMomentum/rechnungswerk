@@ -33,6 +33,11 @@ use OCP\Migration\SimpleMigrationStep;
  * Kein Nachbefuellen hier: das Rendern von tausend PDFs im occ upgrade waeren
  * Minuten Wartungsmodus mit Abbruchrisiko. Bestandszeilen bleiben NULL, was der
  * Hintergrundauftrag als "noch nicht dran" liest.
+ *
+ * Dazu ein Index auf (invoice_type, status, document_frozen_at): der Auftrag
+ * fragt genau diese Spalten alle fuenf Minuten ab, dauerhaft — auch wenn der
+ * Bestand laengst durch ist. Ohne Index waere das ein Full-Table-Scan bei
+ * jedem Lauf, fuer immer.
  */
 class Version001900Date20260808150000 extends SimpleMigrationStep {
 
@@ -41,7 +46,7 @@ class Version001900Date20260808150000 extends SimpleMigrationStep {
 	}
 
 	public function description(): string {
-		return 'Add rechnungswerk_invoice.document_backfilled to tell documents frozen at commit time apart from those regenerated later (#181 step 3).';
+		return 'Add rechnungswerk_invoice.document_backfilled and an index on (invoice_type, status, document_frozen_at) for the backfill job query (#181 step 3).';
 	}
 
 	#[\Override]
@@ -56,6 +61,10 @@ class Version001900Date20260808150000 extends SimpleMigrationStep {
 
 		if (!$table->hasColumn('document_backfilled')) {
 			$table->addColumn('document_backfilled', Types::SMALLINT, ['notnull' => false, 'default' => null]);
+		}
+
+		if (!$table->hasIndex('rw_invoice_backfill_pending')) {
+			$table->addIndex(['invoice_type', 'status', 'document_frozen_at'], 'rw_invoice_backfill_pending');
 		}
 
 		return $schema;
