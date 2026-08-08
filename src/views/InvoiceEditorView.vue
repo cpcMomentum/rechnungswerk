@@ -25,6 +25,12 @@
 			:text="isQuote
 				? t('rechnungswerk', 'Dieses Angebot ist festgeschrieben und kann nicht mehr geändert werden.')
 				: t('rechnungswerk', 'Diese Rechnung ist festgeschrieben und kann nicht mehr geändert werden.')" />
+		<!-- Nachgezogener Beleg (#181, Schritt 3). Das gehört sichtbar an die Rechnung:
+		     der Beleg stimmt inhaltlich, ist im Aussehen aber der heutige Stand und
+		     nicht das, was der Kunde damals bekommen hat. Ohne den Hinweis
+		     verspräche die Ablage für den Bestand mehr, als sie halten kann. -->
+		<NcNoteCard v-if="!isQuote && invoice?.documentBackfilled" type="info"
+			:text="t('rechnungswerk', 'Dieser Beleg wurde nicht beim Festschreiben abgelegt, sondern später aus dem Datensatz erzeugt. Beträge, Positionen und Steuerausweis stimmen; Firmendaten und Layout entsprechen dem heutigen Stand, nicht dem von damals.')" />
 
 		<!-- Kopfdaten -->
 		<section class="rw-section">

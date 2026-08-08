@@ -230,4 +230,97 @@ class InvoiceServiceDocumentTest extends TestCase {
 		$service->commit(7);
 	}
 
+	/** Ein regulär beim Festschreiben eingefrorener Beleg ist nicht nachgezogen. */
+	public function testFreezingAtCommitTimeIsNotMarkedAsBackfilled(): void {
+		$invoice = $this->committedInvoice();
+		$invoice->setDocumentSha256(null);
+		$invoice->setDocumentFileName(null);
+		$invoice->setDocumentFrozenAt(null);
+		$this->documentStore->method('read')->willReturn(null);
+		$this->documentStore->method('freeze')->willReturn(hash('sha256', self::RENDERED));
+		$this->invoiceMapper->expects($this->once())->method('update');
+
+		$this->assertTrue($this->service->freezeDocument($invoice));
+		$this->assertSame(0, $invoice->getDocumentBackfilled());
+		$this->assertSame(hash('sha256', self::RENDERED), $invoice->getDocumentSha256());
+		$this->assertNotNull($invoice->getDocumentFrozenAt());
+	}
+
+	/** Der Nachzieh-Lauf (#181, Schritt 3) kennzeichnet den Beleg als nachträglich erzeugt. */
+	public function testBackfillMarksTheDocumentAsRegeneratedLater(): void {
+		$invoice = $this->committedInvoice();
+		$invoice->setDocumentSha256(null);
+		$invoice->setDocumentFileName(null);
+		$invoice->setDocumentFrozenAt(null);
+		$this->documentStore->method('read')->willReturn(null);
+		$this->documentStore->method('freeze')->willReturn(hash('sha256', self::RENDERED));
+
+		$this->assertTrue($this->service->freezeDocument($invoice, true));
+		$this->assertSame(1, $invoice->getDocumentBackfilled());
+		$this->assertSame('RE-2026-0007.pdf', $invoice->getDocumentFileName());
+	}
+
+	/**
+	 * Liegt die Datei, fehlen aber die Angaben am Datensatz — die Ablage gelang,
+	 * das Update danach nicht —, werden sie aus dem abgelegten Inhalt nachgezogen
+	 * und NICHT neu gerendert: die Ablage ist nur einmal beschreibbar, ein
+	 * zweiter Schreibversuch wäre ein Fehler. Ohne diesen Zweig bliebe
+	 * document_frozen_at leer und der Hintergrundauftrag griffe dieselbe Rechnung
+	 * bei jedem Lauf erneut auf.
+	 */
+	public function testAnOrphanedFileGetsItsRecordRepairedInsteadOfBeingRewritten(): void {
+		$invoice = $this->committedInvoice();
+		$invoice->setDocumentSha256(null);
+		$invoice->setDocumentFileName(null);
+		$invoice->setDocumentFrozenAt(null);
+		$this->documentStore->method('read')->willReturn(self::FROZEN);
+		$this->documentStore->expects($this->never())->method('freeze');
+		$this->zugferdService->expects($this->never())->method('generatePdf');
+
+		$this->assertTrue($this->service->freezeDocument($invoice, true));
+		$this->assertSame(hash('sha256', self::FROZEN), $invoice->getDocumentSha256());
+		$this->assertSame(1, $invoice->getDocumentBackfilled());
+	}
+
+	/** Ist schon alles eingefroren, wird nichts angefasst. */
+	public function testAnAlreadyFrozenDocumentIsLeftAlone(): void {
+		$invoice = $this->committedInvoice();
+		$this->documentStore->method('read')->willReturn(self::FROZEN);
+		$this->documentStore->expects($this->never())->method('freeze');
+		$this->invoiceMapper->expects($this->never())->method('update');
+
+		$this->assertTrue($this->service->freezeDocument($invoice, true));
+		$this->assertNull($invoice->getDocumentBackfilled());
+	}
+
+	/**
+	 * Ein Fehlschlag wird gemeldet, nicht geworfen: beim Festschreiben darf er die
+	 * rechtlich fertige Rechnung nicht kippen, und im Nachzieh-Lauf nicht das
+	 * restliche Häppchen mitnehmen.
+	 */
+	public function testAFailureIsReportedInsteadOfThrown(): void {
+		$invoice = $this->committedInvoice();
+		$invoice->setDocumentFrozenAt(null);
+		$this->documentStore->method('read')->willReturn(null);
+
+		$zugferd = $this->createMock(ZugferdService::class);
+		$zugferd->method('generatePdf')->willThrowException(new \RuntimeException('Logo unlesbar'));
+		$service = new InvoiceService(
+			$this->invoiceMapper,
+			$this->itemMapper,
+			$this->settingsService,
+			$zugferd,
+			$this->archiveService,
+			$this->documentStore,
+			$this->mailService,
+			$this->createMock(CountryService::class),
+			$this->db,
+			$this->createMock(LoggerInterface::class),
+		);
+
+		$this->assertFalse($service->freezeDocument($invoice, true));
+		$this->assertNull($invoice->getDocumentFrozenAt());
+		$this->assertNull($invoice->getDocumentBackfilled());
+	}
+
 }
