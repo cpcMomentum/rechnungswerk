@@ -6,7 +6,7 @@
  * Conversion is centralised here to avoid float-rounding drift.
  */
 
-import { parsePrice, parseQuantity } from './numberInput'
+import { parsePrice } from './numberInput'
 
 /**
  * Unit price in ten-thousandths of a euro (#147) -> euro input string with 2–4

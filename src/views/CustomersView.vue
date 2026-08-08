@@ -44,7 +44,7 @@
 						<td>{{ [c.postalCode, c.city].filter(Boolean).join(' ') }}</td>
 						<td class="rw-col-actions">
 							<div class="rw-actions">
-								<NcButton type="tertiary"
+								<NcButton variant="tertiary"
 									:aria-label="t('rechnungswerk', 'Löschen')"
 									:title="t('rechnungswerk', 'Löschen')"
 									@click.stop="askDelete(c)">
@@ -61,7 +61,7 @@
 			:open="editorOpen"
 			:customer="editing"
 			:saving="saving"
-			:taken-numbers="takenNumbers"
+			:takenNumbers="takenNumbers"
 			:prefill="prefill"
 			@close="editorOpen = false"
 			@save="onSave" />
@@ -79,7 +79,7 @@
 			:open="deleteTarget !== null"
 			:name="t('rechnungswerk', 'Kunde löschen')"
 			:message="deleteTarget ? t('rechnungswerk', '„{name}“ wirklich löschen?', { name: deleteTarget.name }) : ''"
-			:confirm-label="t('rechnungswerk', 'Löschen')"
+			:confirmLabel="t('rechnungswerk', 'Löschen')"
 			destructive
 			@close="deleteTarget = null"
 			@confirm="confirmDelete" />

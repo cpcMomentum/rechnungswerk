@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>()
 
 function onUpdateOpen(value: boolean) {
-	if (!value) emit('close')
+	if (!value) { emit('close') }
 }
 </script>
 

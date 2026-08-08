@@ -85,7 +85,7 @@
 				<template #icon><PlusIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Position hinzufügen') }}
 			</NcButton>
-			<NcActions v-if="products.length > 0" :menu-name="t('rechnungswerk', 'Aus Produkt')">
+			<NcActions v-if="products.length > 0" :menuName="t('rechnungswerk', 'Aus Produkt')">
 				<template #icon><PackageVariantIcon :size="20" /></template>
 				<NcActionButton v-for="p in products" :key="p.id" @click="addFromProduct(p)">
 					{{ p.name }}

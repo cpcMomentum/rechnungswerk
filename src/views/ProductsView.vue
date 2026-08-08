@@ -38,7 +38,7 @@
 						<td class="num">{{ formatTaxRate(p.defaultTaxRateBp) }}</td>
 						<td class="rw-col-actions">
 							<div class="rw-actions">
-								<NcButton type="tertiary"
+								<NcButton variant="tertiary"
 									:aria-label="t('rechnungswerk', 'Löschen')"
 									:title="t('rechnungswerk', 'Löschen')"
 									@click.stop="askDelete(p)">
@@ -62,7 +62,7 @@
 			:open="deleteTarget !== null"
 			:name="t('rechnungswerk', 'Produkt löschen')"
 			:message="deleteTarget ? t('rechnungswerk', '„{name}“ wirklich löschen?', { name: deleteTarget.name }) : ''"
-			:confirm-label="t('rechnungswerk', 'Löschen')"
+			:confirmLabel="t('rechnungswerk', 'Löschen')"
 			destructive
 			@close="deleteTarget = null"
 			@confirm="confirmDelete" />

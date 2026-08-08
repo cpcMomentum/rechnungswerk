@@ -44,7 +44,7 @@
 				<div class="row">
 					<label class="field">
 						<span>{{ t('rechnungswerk', 'Land') }}</span>
-						<CountrySelect v-model="form.country" select-class="input" />
+						<CountrySelect v-model="form.country" selectClass="input" />
 					</label>
 				</div>
 			</div>

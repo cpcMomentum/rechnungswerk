@@ -45,6 +45,11 @@ export function parseNumberInput(
 		return null
 	}
 	// Leerzeichen inklusive geschütztem und schmalem geschütztem entfernen.
+	// Die beiden Sonderzeichen im Ausdruck sind Absicht (U+00A0, U+202F): Zahlen
+	// aus Tabellen und Zwischenablagen tragen sie als Tausendertrenner. Genau
+	// hier wurden Mengen und Preise still verfälscht (#157), deshalb bleibt der
+	// Ausdruck unangetastet.
+	// eslint-disable-next-line no-irregular-whitespace -- s. o., bewusst
 	let s = String(value).replace(/[\s  ]+/g, '')
 	if (s === '') {
 		return null
