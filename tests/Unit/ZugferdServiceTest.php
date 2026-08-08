@@ -52,6 +52,13 @@ class ZugferdServiceTest extends TestCase {
 		return $s;
 	}
 
+	/** Rechnung unter der Kleinunternehmerregelung (#181: der Fall haengt an der Rechnung, nicht an den Einstellungen). */
+	private function smallBusinessInvoice(string $type = Invoice::TYPE_INVOICE): Invoice {
+		$inv = $this->invoice($type);
+		$inv->setSmallBusiness(1);
+		return $inv;
+	}
+
 	private function invoice(string $type = Invoice::TYPE_INVOICE): Invoice {
 		$inv = new Invoice();
 		$inv->setStatus(Invoice::STATUS_COMMITTED);
@@ -155,8 +162,51 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('<ram:TaxTotalAmount currencyID="EUR">45.00</ram:TaxTotalAmount>', $xml);
 	}
 
-	public function testSmallBusinessIsTaxExemptCategoryE(): void {
+	/**
+	 * #181: Der gemessene Fall. Eine festgeschriebene 19-%-Rechnung darf sich
+	 * nicht veraendern, wenn spaeter der Kleinunternehmer-Schalter in den
+	 * Einstellungen umgelegt wird.
+	 *
+	 * Vorher rendert dieselbe Rechnung mit CategoryCode E und 0,00 %, waehrend
+	 * TaxTotalAmount weiter 19,00 ausweist — ein XML, das EN16931 verletzt,
+	 * ausgeloest durch einen einmaligen, voellig normalen Vorgang.
+	 */
+	public function testCommittedInvoiceIgnoresLaterSettingsChange(): void {
 		$invoice = $this->invoice();
+		$invoice->setSmallBusiness(0);
+		$invoice->setSubtotalCents(10000);
+		$invoice->setTotalCents(11900);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 10000, 'taxCents' => 1900]]));
+		$items = [$this->item(1000000, 1900, 10000, '1')];
+
+		$vorher = $this->service->buildXml($invoice, $items, $this->settings(0));
+		$nachher = $this->service->buildXml($invoice, $items, $this->settings(1));
+
+		$this->assertSame($vorher, $nachher, 'Die Umstellung auf Kleinunternehmer darf eine bestehende Rechnung nicht anfassen');
+		$this->assertStringContainsString('<ram:CategoryCode>S</ram:CategoryCode>', $nachher);
+		$this->assertStringContainsString('<ram:RateApplicablePercent>19.00</ram:RateApplicablePercent>', $nachher);
+		$this->assertStringNotContainsString('<ram:CategoryCode>E</ram:CategoryCode>', $nachher);
+		$this->assertStringNotContainsString('§ 19 UStG', $nachher);
+	}
+
+	/** Und die Gegenrichtung: eine §19-Rechnung bleibt steuerfrei. */
+	public function testSmallBusinessInvoiceStaysExemptAfterSwitchingToRegularTaxation(): void {
+		$invoice = $this->smallBusinessInvoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(20000);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 0, 'netCents' => 20000, 'taxCents' => 0]]));
+		$items = [$this->item(1000000, 0, 20000)];
+
+		$vorher = $this->service->buildXml($invoice, $items, $this->settings(1));
+		$nachher = $this->service->buildXml($invoice, $items, $this->settings(0));
+
+		$this->assertSame($vorher, $nachher);
+		$this->assertStringContainsString('<ram:CategoryCode>E</ram:CategoryCode>', $nachher);
+		$this->assertStringContainsString('§ 19 UStG', $nachher);
+	}
+
+	public function testSmallBusinessIsTaxExemptCategoryE(): void {
+		$invoice = $this->smallBusinessInvoice();
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(20000); // no VAT
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 0, 'netCents' => 20000, 'taxCents' => 0]]));
@@ -354,7 +404,7 @@ class ZugferdServiceTest extends TestCase {
 	}
 
 	public function testSmallBusinessRenderHidesVatColumnAndSubtotal(): void {
-		$invoice = $this->invoice();
+		$invoice = $this->smallBusinessInvoice();
 		$invoice->setSubtotalCents(20000);
 		$invoice->setTotalCents(20000); // no VAT
 		$invoice->setTaxBreakdown(json_encode([['rateBp' => 0, 'netCents' => 20000, 'taxCents' => 0]]));
@@ -421,7 +471,7 @@ class ZugferdServiceTest extends TestCase {
 
 	/** Auch der §19-Fall mit vier Spalten muss auf 100 % kommen. */
 	public function testSmallBusinessTableAlsoSumsToFullWidth(): void {
-		$html = $this->renderHtml($this->invoice(), [$this->item(10000, 0, 20000)], $this->settings(1), false);
+		$html = $this->renderHtml($this->smallBusinessInvoice(), [$this->item(10000, 0, 20000)], $this->settings(1), false);
 
 		preg_match_all('/<th[^>]*style="width: (\d+)%;"/', $html, $m);
 		$this->assertCount(4, $m[1], 'ohne USt-Spalte sind es vier');

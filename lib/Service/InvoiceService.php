@@ -781,6 +781,12 @@ class InvoiceService {
 		// (reverse charge / intra-community / export) — see ZugferdService for the
 		// matching EN16931 category codes and exemption reasons.
 		$smallBusiness = $this->settingsService->getCompany()->getSmallBusiness() === 1;
+		// Den Fall an der Rechnung festhalten (#181). Hier und nicht anderswo,
+		// weil an dieser Stelle ohnehin die Summen daraus entstehen — so koennen
+		// gespeicherter Schalter und gespeicherte Betraege nicht auseinanderlaufen.
+		// Solange die Rechnung ein Entwurf ist, folgt sie damit dem aktuellen
+		// Stand; ab dem Festschreiben ist sie unveraenderlich.
+		$invoice->setSmallBusiness($smallBusiness ? 1 : 0);
 		$taxExempt = $smallBusiness || $invoice->isTaxExemptCase();
 		$totals = InvoiceCalculator::computeTotals($lines, $taxExempt);
 		$invoice->setSubtotalCents($totals['subtotalCents']);
