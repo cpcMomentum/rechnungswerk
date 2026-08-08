@@ -215,8 +215,13 @@
 }
 .app-rechnungswerk .rw-chip--active {
 	background: var(--color-primary-element-light);
+	/* --color-primary-element-text-dark heisst NICHT "dunkler Text", sondern
+	   "Text fuer das dunkle Primaerelement" — auf NC 34 loest es zu #ededed auf,
+	   also fast weiss. Auf dem hellen Hintergrund (#e5eff5) ergab das Kontrast
+	   1,00: die Beschriftung des aktiven Filters war unsichtbar. Der normale
+	   Textton passt hier, weil der Hintergrund die helle Primaervariante ist. */
 	border-color: var(--color-primary-element);
-	color: var(--color-primary-element-text-dark, var(--color-main-text));
+	color: var(--color-main-text);
 }
 .app-rechnungswerk .rw-chip--active .rw-chip__n {
 	color: inherit;
