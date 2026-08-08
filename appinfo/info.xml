@@ -50,6 +50,17 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
         <nextcloud min-version="31" max-version="34"/>
     </dependencies>
 
+    <!--
+        Raeumt Dateien weg, die eine Vorversion mitgeliefert hat und diese nicht
+        mehr. Nextclouds Update kopiert nur und loescht nichts, sodass sonst die
+        Integritaetspruefung EXTRA_FILE meldet. Siehe CleanupExtraFiles.
+    -->
+    <repair-steps>
+        <post-migration>
+            <step>OCA\Rechnungswerk\Migration\CleanupExtraFiles</step>
+        </post-migration>
+    </repair-steps>
+
     <navigations>
         <navigation>
             <name>RechnungsWerk</name>
