@@ -83,11 +83,18 @@ class InvoiceService {
 		$invoice->setCreatedAt($now);
 		$invoice->setUpdatedAt($now);
 		$this->applyHeader($invoice, $data);
+		// Positionen VOR der Transaktion auswerten: eine unlesbare Menge oder ein
+		// unlesbarer Preis soll die Datenbank gar nicht erst anfassen, so wie es
+		// beim Empfaengerland in applyHeader() schon der Fall ist (#180).
+		// Nebeneffekt: der Settings-Zugriff darin kann eine Zeile anlegen, und ein
+		// fehlschlagender INSERT wuerde die Transaktion auf PostgreSQL abbrechen —
+		// dieselbe Ueberlegung wie in commit().
+		$items = $this->extractItems($data);
 
 		$this->db->beginTransaction();
 		try {
 			$invoice = $this->invoiceMapper->insert($invoice);
-			$this->replaceItems($invoice, $this->extractItems($data));
+			$this->replaceItems($invoice, $items);
 			$this->recomputeTotals($invoice);
 			$this->invoiceMapper->update($invoice);
 			$this->db->commit();
@@ -122,6 +129,8 @@ class InvoiceService {
 	public function update(int $id, array $data): array {
 		// Fast 404/409 outside the transaction for a quick user-visible error.
 		$this->assertDraft($this->findById($id));
+		// Wie in create(): Eingaben auswerten, bevor die Transaktion aufgeht (#180).
+		$items = array_key_exists('items', $data) ? $this->extractItems($data) : null;
 
 		$this->db->beginTransaction();
 		try {
@@ -131,8 +140,8 @@ class InvoiceService {
 			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 			$this->applyHeader($invoice, $data);
-			if (array_key_exists('items', $data)) {
-				$this->replaceItems($invoice, $this->extractItems($data));
+			if ($items !== null) {
+				$this->replaceItems($invoice, $items);
 			}
 			$this->recomputeTotals($invoice);
 			$invoice->setUpdatedAt(new DateTime());
@@ -728,7 +737,11 @@ class InvoiceService {
 			// "99.999.999" brach mit einem 500er ab, "1.000" wurde still zu 1 und
 			// machte die Rechnung um Faktor 1000 falsch (#157).
 			$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
-			$unitPriceE4 = (int)($row['unitPriceE4'] ?? 0);
+			// Der Preis kommt als Rohtext und wird HIER umgerechnet (#180). Vorher
+			// rechnete allein der Browser und schickte die fertige Zahl; der Server
+			// konnte sie nicht pruefen, weil einer blossen Zahl nicht anzusehen ist,
+			// ob 95 als 0,0095 € oder als 95 € gemeint war.
+			$unitPriceE4 = NumberInput::parsePrice($row['unitPriceInput'] ?? null);
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
 			$name = (string)($row['name'] ?? '');
@@ -962,11 +975,13 @@ class InvoiceService {
 		$quote->setCreatedAt($now);
 		$quote->setUpdatedAt($now);
 		$this->applyHeader($quote, $data);
+		// Wie in create(): Eingaben auswerten, bevor die Transaktion aufgeht (#180).
+		$items = $this->extractItems($data);
 
 		$this->db->beginTransaction();
 		try {
 			$quote = $this->invoiceMapper->insert($quote);
-			$this->replaceItems($quote, $this->extractItems($data));
+			$this->replaceItems($quote, $items);
 			$this->recomputeTotals($quote);
 			$this->invoiceMapper->update($quote);
 			$this->db->commit();

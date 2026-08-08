@@ -90,17 +90,35 @@ describe('parsePrice', () => {
 	})
 })
 
+/**
+ * Seit #180 rechnet der Server den Preis aus dem Rohtext; euroInputToE4 treibt
+ * nur noch die Live-Vorschau im Editor. Beide müssen trotzdem zum selben
+ * Ergebnis kommen, sonst zeigt die Zeile einen anderen Betrag an als der, der
+ * gespeichert wird. Die Fälle sind deckungsgleich mit dem priceProvider in
+ * tests/Unit/NumberInputTest.php.
+ */
 describe('euroInputToE4', () => {
 	it.each([
-		['2', 20000, ''],
-		['2,00', 20000, ''],
-		['0,3456', 3456, ''],
+		['95', 950000, 'ganze Euro'],
+		['95,00', 950000, ''],
+		['0,3456', 3456, 'die feinere Preiseinheit aus #147'],
+		['0.3456', 3456, 'englische Schreibweise'],
+		['1.234,56', 12345600, 'nicht 1,23 €'],
 		['1.000', 10000000, 'tausend Euro, nicht ein Euro'],
-		['1.234,5', 12345000, 'nicht 1,23 €'],
-		['', 0, ''],
-		['abc', 0, ''],
+		['0', 0, ''],
+		['2,5000', 25000, 'nachlaufende Nullen'],
+		['0,0001', 1, 'kleinster darstellbarer Betrag'],
+		['', 0, 'leer bedeutet 0'],
+		['abc', 0, 'unlesbares gibt 0 in der Vorschau; der Server lehnt es ab'],
 	])('%s ergibt %s e4', (input, expected) => {
 		expect(euroInputToE4(input)).toBe(expected)
+	})
+
+	it('driftet nicht auf der vierten Nachkommastelle', () => {
+		for (let i = 1; i <= 9999; i++) {
+			const decimal = '0,' + String(i).padStart(4, '0')
+			expect(euroInputToE4(decimal)).toBe(i)
+		}
 	})
 })
 

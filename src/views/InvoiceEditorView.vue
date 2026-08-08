@@ -749,7 +749,8 @@ function buildInput(): InvoiceInput {
 				quantity: parseQuantity(i.quantity) ?? String(i.quantity),
 				unitCode: i.unitCode,
 				unitLabel: i.unitLabel.trim() === '' ? null : i.unitLabel.trim(),
-				unitPriceE4: euroInputToE4(i.priceInput),
+				// Rohtext statt vorberechneter Zahl: der Server rechnet um und prueft (#180).
+				unitPriceInput: i.priceInput,
 				taxRateBp: i.taxRateBp,
 			})),
 	}
