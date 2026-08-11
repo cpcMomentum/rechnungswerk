@@ -7,6 +7,12 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-08-11
+
+Mengen und Preise blieben beim Speichern nicht zuverlässig stehen. Gemeldet von
+@yummiweb (#223), und beim Prüfen kam ein zweiter Fall derselben Ursache heraus,
+der Beträge schon beim ersten Speichern verfälschte.
+
 ### Fixed
 - **Mengen und Preise bleiben über Speichern und Wiederöffnen unverändert.** Die
   Menge steht mit drei Nachkommastellen in der Datenbank, wird also als „1.000"
@@ -24,6 +30,11 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
   Textfelder in deutscher Schreibweise und werden von derselben Regel
   ausgewertet. Wer die Regelung mit vier Nachkommastellen nutzt, sollte seine
   Standardpreise und offenen Entwürfe prüfen (#223)
+- Die Beschriftung des aktiven Filters über der Rechnungs- und Angebotsliste war
+  praktisch unsichtbar: heller Text auf hellem Grund, gemessener Kontrast 1,00.
+  Ursache war die Nextcloud-Variable `--color-primary-element-text-dark`, die
+  nicht „dunkler Text" bedeutet, sondern „Text für das dunkle Primärelement", und
+  auf Nextcloud 34 zu fast Weiß auflöst. Jetzt 13,63 (#217)
 
 ### Changed
 - Zahleneingaben werden nur noch in deutscher Schreibweise gelesen: das Komma
@@ -33,6 +44,9 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
   Diese Deutung war die Ursache des Fehlers oben, denn sie lässt „1.234" zwischen
   1234 und 1,234 offen. Im Preisfeld sind dadurch die Pfeiltasten des Browsers
   entfallen; ein negativer Preis wird weiterhin abgelehnt (#223)
+- Der Entwicklungs-Build verlangt jetzt Node `^22.14 || ^24 || >=26`. Das betrifft
+  nur, wer die App selbst baut; für den Betrieb ändert sich nichts. Nachtrag zu
+  0.4.0, wo die Anforderung mit angehoben wurde, ohne hier zu stehen
 
 ## [0.4.0] - 2026-08-08
 
@@ -357,7 +371,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.2.0...v0.3.0
