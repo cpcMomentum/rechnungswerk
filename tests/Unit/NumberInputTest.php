@@ -14,11 +14,58 @@ use OCA\Rechnungswerk\Service\NumberInput;
 use PHPUnit\Framework\TestCase;
 
 /**
- * #157. Die Faelle sind deckungsgleich mit src/utils/numberInput.spec.ts.
+ * #157. Die Faelle stehen in tests/fixtures/number-input-cases.json und werden
+ * von src/utils/numberInput.spec.ts aus derselben Datei gelesen (#229).
+ *
  * Weichen beide Seiten ab, zeigt das Formular etwas anderes an, als gespeichert
- * wird.
+ * wird. Bis #229 war die Deckungsgleichheit nur eine Zusicherung im Kommentar,
+ * und die Tabelle stand doppelt da: wer eine Seite aenderte und die andere
+ * vergass, bekam zwei gruene Suiten und trotzdem zwei Wahrheiten.
+ *
+ * Geteilt wird nur die Auswertungsregel. Was eine Seite allein betrifft, steht
+ * weiter hier: PHP wirft bei unlesbarer Eingabe eine Ausnahme, der Browser gibt
+ * fuer die Vorschau 0 zurueck, und PHP kennt Eingabetypen (null, Array), die es
+ * im Formular gar nicht gibt.
  */
 class NumberInputTest extends TestCase {
+
+	/** @return array<string, mixed> */
+	private static function sharedCases(): array {
+		$path = __DIR__ . '/../fixtures/number-input-cases.json';
+		$raw = file_get_contents($path);
+		if ($raw === false) {
+			self::fail('Geteilte Falltabelle nicht lesbar: ' . $path);
+		}
+		return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+	}
+
+	/**
+	 * Faelle unter ihrer Begruendung ablegen, damit ein Fehlschlag sagt, welche
+	 * Eigenschaft gebrochen ist.
+	 *
+	 * Ein doppelter Schluessel wuerde den ersten Fall lautlos ueberschreiben: er
+	 * wuerde nie wieder geprueft, ohne dass irgendetwas rot wird. Das ist genau
+	 * die Sorte stillen Verlusts, gegen die diese Datei antritt (#229), deshalb
+	 * bricht sie hier ab statt zu ueberschreiben.
+	 *
+	 * @param array<string, array<int, mixed>> $out
+	 * @param array<int, mixed> $case
+	 */
+	private static function addCase(array &$out, string $why, string $fallback, array $case): void {
+		$key = $why !== '' ? $why : $fallback;
+		if (array_key_exists($key, $out)) {
+			throw new \LogicException('Doppelte Begruendung in der geteilten Falltabelle: ' . $key);
+		}
+		$out[$key] = $case;
+	}
+
+	/** Ohne Faelle prueft der Rest dieser Datei nichts. */
+	public function testSharedCaseTableIsReadable(): void {
+		$cases = self::sharedCases();
+		$this->assertGreaterThan(10, count($cases['quantity']['accepted']));
+		$this->assertGreaterThan(10, count($cases['quantity']['rejected']));
+		$this->assertGreaterThan(5, count($cases['price']['toE4']));
+	}
 
 	/** @dataProvider quantityProvider */
 	public function testParsesGermanNumberInput(string $input, string $expected, string $why): void {
@@ -29,26 +76,18 @@ class NumberInputTest extends TestCase {
 		);
 	}
 
-	/** @return array<string, array{0: string, 1: string, 2: string}> */
+	/**
+	 * Die akzeptierten Faelle aus der geteilten Tabelle. Der Schluessel ist die
+	 * Begruendung, damit ein Fehlschlag sagt, welche Eigenschaft gebrochen ist.
+	 *
+	 * @return array<string, array{0: string, 1: string, 2: string}>
+	 */
 	public static function quantityProvider(): array {
-		return [
-			'einfache Zahl' => ['2', '2', ''],
-			'Tausenderpunkt' => ['1.000', '1000', 'der Fall, der still zu 1 wurde'],
-			'mehrere Tausendergruppen' => ['99.999.999', '99999999', 'der gemeldete 500er'],
-			'Dezimalkomma' => ['12,5', '12.5', ''],
-			'deutsch gemischt' => ['1.234,5', '1234.5', 'Punkt gruppiert, Komma trennt die Dezimalstellen'],
-			'drei Nachkommastellen' => ['1,875', '1.875', ''],
-			'Leerzeichen' => [' 1 000 ', '1000', 'Leerzeichen als Gruppierung'],
-			'geschuetztes Leerzeichen' => ["1\u{00A0}000", '1000', ''],
-			'fuehrende Nullen' => ['007', '7', ''],
-			'nachlaufende Null' => ['2,50', '2.5', ''],
-			'nur Nachkommastellen' => [',5', '0.5', ''],
-			'negativ' => ['-2', '-2', 'Stornobelege tragen negative Mengen'],
-			'negativ mit Komma' => ['-1.234,5', '-1234.5', ''],
-			'Plus' => ['+3', '3', ''],
-			'negative Null' => ['-0', '0', 'kein negatives Null'],
-			'neun Vorkommastellen' => ['999999999', '999999999', 'Grenze von numeric(12,3)'],
-		];
+		$out = [];
+		foreach (self::sharedCases()['quantity']['accepted'] as [$input, $expected, $why]) {
+			self::addCase($out, $why, $input, [$input, $expected, $why]);
+		}
+		return $out;
 	}
 
 	/** @dataProvider rejectedProvider */
@@ -59,27 +98,20 @@ class NumberInputTest extends TestCase {
 		);
 	}
 
-	/** @return array<string, array{0: mixed, 1: string}> */
+	/**
+	 * Die abgelehnten Faelle aus der geteilten Tabelle, ergaenzt um die Eingabetypen,
+	 * die es nur auf der PHP-Seite gibt: aus dem Formular kommt immer ein String.
+	 *
+	 * @return array<string, array{0: mixed, 1: string}>
+	 */
 	public static function rejectedProvider(): array {
-		return [
-			'Text' => ['abc', ''],
-			'leer' => ['', ''],
-			'nur Leerzeichen' => ['   ', ''],
-			'nur Trennzeichen' => [',', ''],
-			'zwei Kommata' => ['1,2,3', ''],
-			'zwei Punkte ohne Gruppenmuster' => ['1.2.3', 'keine sauberen Dreiergruppen'],
-			'kaputte Gruppierung' => ['1.23,5', 'Gruppierung muss in Dreiergruppen stehen'],
-			'zu viele Nachkommastellen' => ['1,2345', 'die Spalte fasst drei'],
-			'zehn Vorkommastellen' => ['1000000000', 'numeric(12,3) fasst neun'],
-			'Waehrungszeichen' => ['12 €', ''],
-			'null' => [null, ''],
-			'Array' => [[1], ''],
-			// Seit #223 abgelehnt statt gedeutet. Der Punkt ist ausschliesslich
-			// Tausendertrenner; sonst bleibt "1.234" zwischen 1234 und 1,234 offen.
-			'Dezimalpunkt' => ['12.5', 'englische Schreibweise, der Punkt gruppiert nicht'],
-			'englisch gemischt' => ['1,234.5', 'gemischte Schreibweise'],
-			'altes Maschinenformat des Preisfeldes' => ['0.3456', 'kam aus dem type=number-Feld'],
-		];
+		$out = [];
+		foreach (self::sharedCases()['quantity']['rejected'] as [$input, $why]) {
+			self::addCase($out, $why, $input, [$input, $why]);
+		}
+		self::addCase($out, 'null (nur PHP)', '', [null, 'aus dem Formular kommt immer ein String']);
+		self::addCase($out, 'Array (nur PHP)', '', [[1], 'aus dem Formular kommt immer ein String']);
+		return $out;
 	}
 
 	public function testQuantityDefaultsToOneWhenEmpty(): void {
@@ -143,18 +175,20 @@ class NumberInputTest extends TestCase {
 		$this->assertSame($expected, NumberInput::parsePrice($input), $why);
 	}
 
-	/** @return array<string, array{0: string, 1: int, 2: string}> */
+	/**
+	 * Die Preisumrechnung aus der geteilten Tabelle. Leere und unlesbare Eingaben
+	 * stehen nicht darin: hier werfen sie eine Ausnahme, im Browser ergeben sie
+	 * fuer die Vorschau 0. Beide Verhalten sind gewollt und werden je Seite
+	 * einzeln geprueft.
+	 *
+	 * @return array<string, array{0: string, 1: int, 2: string}>
+	 */
 	public static function priceProvider(): array {
-		return [
-			'ganze Euro' => ['95', 950000, '95,00 € sind 950000 Zehntausendstel'],
-			'zwei Nachkommastellen' => ['95,00', 950000, ''],
-			'vier Nachkommastellen' => ['0,3456', 3456, 'die feinere Preiseinheit aus #147'],
-			'Tausenderpunkt' => ['1.234,56', 12345600, 'nicht 1,23 €'],
-			'nur Tausenderpunkt' => ['1.000', 10000000, 'tausend Euro, nicht ein Euro'],
-			'null' => ['0', 0, ''],
-			'nachlaufende Nullen' => ['2,5000', 25000, ''],
-			'Grenzfall vierte Stelle' => ['0,0001', 1, 'kleinster darstellbarer Betrag'],
-		];
+		$out = [];
+		foreach (self::sharedCases()['price']['toE4'] as [$input, $expected, $why]) {
+			self::addCase($out, $why, $input, [$input, $expected, $why]);
+		}
+		return $out;
 	}
 
 	public function testParsePriceTreatsEmptyAsZero(): void {
