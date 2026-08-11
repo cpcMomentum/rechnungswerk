@@ -49,8 +49,14 @@
 									:title="t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.')" />
 							</td>
 							<td class="num">
-								<input v-model="item.priceInput" class="rw-input num" type="number"
-									step="0.0001" :readonly="readonly" />
+								<!-- Textfeld, nicht type="number" (#223): ein Zahlenfeld liefert
+								     immer Maschinenformat mit Punkt, waehrend Browser und Server
+								     den Inhalt deutsch lesen. Aus 1,234 € wurden so 1.234 €,
+								     schon beim ersten Speichern. Menge und Preis benutzen jetzt
+								     dieselbe Schreibweise und denselben Parser. -->
+								<input v-model="item.priceInput" class="rw-input num" type="text"
+									inputmode="decimal" :readonly="readonly"
+									@blur="normalizePrice(item)" />
 							</td>
 							<td class="num">
 								<select v-model.number="item.taxRateBp" class="rw-input" :disabled="readonly || smallBusiness">
@@ -85,7 +91,7 @@
 				<template #icon><PlusIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Position hinzufügen') }}
 			</NcButton>
-			<NcActions v-if="products.length > 0" :menu-name="t('rechnungswerk', 'Aus Produkt')">
+			<NcActions v-if="products.length > 0" :menuName="t('rechnungswerk', 'Aus Produkt')">
 				<template #icon><PackageVariantIcon :size="20" /></template>
 				<NcActionButton v-for="p in products" :key="p.id" @click="addFromProduct(p)">
 					{{ p.name }}
@@ -106,9 +112,9 @@ import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product } from '@/types/api'
 import { emptyItem, itemFromProduct, type EditorItem } from '@/types/editor'
-import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
+import { formatCents, formatTaxRate, euroInputToE4, e4ToEuroInput } from '@/utils/money'
 import { lineTotalCents } from '@/utils/invoiceCalc'
-import { formatForInput, parseQuantity } from '@/utils/numberInput'
+import { formatForInput, parsePrice, parseQuantity } from '@/utils/numberInput'
 
 const items = defineModel<EditorItem[]>('items', { required: true })
 const props = defineProps<{
@@ -129,6 +135,17 @@ function normalizeQuantity(item: EditorItem): void {
 	const parsed = parseQuantity(item.quantity)
 	if (parsed !== null) {
 		item.quantity = formatForInput(parsed)
+	}
+}
+
+/**
+ * Dasselbe fuer den Preis (#223). Angezeigt wird, was gespeichert wird: der Weg
+ * geht bewusst ueber e4 und zurueck, also genau durch die Umrechnung, die auch
+ * der Server vornimmt. Eine unlesbare Eingabe bleibt stehen.
+ */
+function normalizePrice(item: EditorItem): void {
+	if (parsePrice(item.priceInput) !== null) {
+		item.priceInput = e4ToEuroInput(euroInputToE4(item.priceInput))
 	}
 }
 

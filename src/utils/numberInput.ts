@@ -4,7 +4,7 @@
  */
 
 /**
- * Zahleneingaben in deutscher Schreibweise auswerten (#157).
+ * Zahleneingaben in deutscher Schreibweise auswerten (#157, verschaerft mit #223).
  *
  * Zwilling von lib/Service/NumberInput.php, mit deckungsgleichen Testfaellen.
  * Weichen beide Seiten ab, zeigt das Formular etwas anderes an, als gespeichert
@@ -13,6 +13,19 @@
  * Vorher ersetzte der Editor nur das ERSTE Komma durch einen Punkt und liess
  * Tausenderpunkte stehen. "1.000" wurde dadurch zu 1, "1.234,5" zu 1,23 — beides
  * ohne jeden Hinweis, auf einer Rechnung, die an Kunden geht.
+ *
+ * Die Regel ist seit #223 eng und ohne Ausnahme:
+ *   - das Komma trennt die Dezimalstellen, hoechstens eines
+ *   - der Punkt gruppiert Tausender und muss in Dreiergruppen stehen
+ *   - alles andere wird abgelehnt statt gedeutet
+ *
+ * Bis #223 galt zusaetzlich das LETZTE Trennzeichen als Dezimaltrennzeichen,
+ * womit auch "1,234.5" lesbar war. Diese Deutung war der eigentliche Fehler:
+ * sie laesst "1.234" zwischen 1234 und 1,234 offen. Genau daran wurden Mengen
+ * und Preise um den Faktor 1000 verfaelscht, sobald ein gespeicherter Wert
+ * ("1.000" aus einer numeric(12,3)-Spalte) in ein Feld zurueckgeschrieben wurde.
+ * Maschinenformat gehoert deshalb nie ungewandelt in ein Feld — dafuer gibt es
+ * decimalToInput().
  */
 
 /** Menge: numeric(12,3) in der Datenbank. */
@@ -23,13 +36,12 @@ export const QUANTITY_INTEGER_DIGITS = 9
 export const PRICE_DECIMALS = 4
 export const PRICE_INTEGER_DIGITS = 9
 
-/** Ob der Wert sauber in Dreiergruppen getrennt ist, oder gar keine Gruppierung enthält. */
-function isGrouped(value: string, groupChar: string): boolean {
-	if (!value.includes(groupChar)) {
+/** Ob der Vorkommateil sauber in Dreiergruppen getrennt ist, oder gar keinen Punkt enthält. */
+function isGrouped(value: string): boolean {
+	if (!value.includes('.')) {
 		return /^\d*$/.test(value)
 	}
-	const g = groupChar === '.' ? '\\.' : ','
-	return new RegExp(`^\\d{1,3}(${g}\\d{3})+$`).test(value)
+	return /^\d{1,3}(\.\d{3})+$/.test(value)
 }
 
 /**
@@ -45,6 +57,11 @@ export function parseNumberInput(
 		return null
 	}
 	// Leerzeichen inklusive geschütztem und schmalem geschütztem entfernen.
+	// Die beiden Sonderzeichen im Ausdruck sind Absicht (U+00A0, U+202F): Zahlen
+	// aus Tabellen und Zwischenablagen tragen sie als Tausendertrenner. Genau
+	// hier wurden Mengen und Preise still verfälscht (#157), deshalb bleibt der
+	// Ausdruck unangetastet.
+	// eslint-disable-next-line no-irregular-whitespace -- s. o., bewusst
 	let s = String(value).replace(/[\s  ]+/g, '')
 	if (s === '') {
 		return null
@@ -61,42 +78,32 @@ export function parseNumberInput(
 		return null
 	}
 
-	const lastDot = s.lastIndexOf('.')
-	const lastComma = s.lastIndexOf(',')
+	// Das Komma trennt die Dezimalstellen, der Punkt gruppiert Tausender. Ein
+	// zweites Komma, oder ein Punkt hinter dem Komma, ist keine deutsche
+	// Schreibweise und wird abgelehnt statt gedeutet (#223).
+	const firstComma = s.indexOf(',')
 	let integer: string
 	let fraction: string
 
-	if (lastDot >= 0 && lastComma >= 0) {
-		const decimalPos = Math.max(lastDot, lastComma)
-		const groupChar = s[decimalPos] === ',' ? '.' : ','
-		integer = s.slice(0, decimalPos)
-		fraction = s.slice(decimalPos + 1)
-		if (!isGrouped(integer, groupChar)) {
+	if (firstComma >= 0) {
+		if (s.includes(',', firstComma + 1)) {
 			return null
 		}
-		integer = integer.split(groupChar).join('')
-	} else if (lastComma >= 0) {
-		if ((s.match(/,/g) || []).length > 1) {
+		integer = s.slice(0, firstComma)
+		fraction = s.slice(firstComma + 1)
+		if (fraction.includes('.')) {
 			return null
-		}
-		integer = s.slice(0, lastComma)
-		fraction = s.slice(lastComma + 1)
-	} else if (lastDot >= 0) {
-		if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
-			// "1.000" ist die deutsche Tausendertrennung, nicht 1,0.
-			integer = s.split('.').join('')
-			fraction = ''
-		} else {
-			if ((s.match(/\./g) || []).length > 1) {
-				return null
-			}
-			integer = s.slice(0, lastDot)
-			fraction = s.slice(lastDot + 1)
 		}
 	} else {
 		integer = s
 		fraction = ''
 	}
+
+	// "1.000" ist die deutsche Tausendertrennung, nicht 1,0.
+	if (!isGrouped(integer)) {
+		return null
+	}
+	integer = integer.split('.').join('')
 
 	// Ein Trennzeichen ohne jede Ziffer ist keine Zahl.
 	if (integer === '' && fraction === '') {
@@ -149,6 +156,9 @@ export function parsePrice(value: string | number | null | undefined): string | 
  * Erkannten Wert in deutscher Schreibweise zurückgeben, um ihn beim Verlassen
  * des Feldes anzuzeigen. Wer "1.000" tippt und danach "1.000" mit dem passenden
  * Zeilenbetrag sieht, erkennt sofort, ob die App ihn richtig verstanden hat.
+ *
+ * Erwartet einen Dezimalstring mit Punkt ("1234.5"). Nachkommastellen bleiben
+ * unverändert, damit ein Preis seine zwei Stellen behält ("1000.00" -> "1.000,00").
  */
 export function formatForInput(normalized: string | null): string {
 	if (normalized === null) {
@@ -159,4 +169,38 @@ export function formatForInput(normalized: string | null): string {
 	const digits = sign ? int.slice(1) : int
 	const grouped = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 	return sign + grouped + (frac ? ',' + frac : '')
+}
+
+/**
+ * Gespeicherten Wert in die Schreibweise des Eingabefeldes wandeln (#223).
+ *
+ * Die Menge steht als numeric(12,3) in der Datenbank, die Datenbank liefert
+ * deshalb "1.000" — mit dem Punkt als DEZIMALtrennzeichen. Genau dieser String
+ * lief bis #223 unverändert ins Mengenfeld und wurde dort regelkonform als
+ * Tausendertrennung gelesen: aus der Menge 1 wurde beim nächsten Speichern 1000.
+ *
+ * Bedeutungslose Nullen fallen weg, damit im Feld "1" steht und nicht "1,000".
+ * Was kein Maschinenwert ist, bleibt unverändert stehen, statt still zu
+ * verschwinden.
+ */
+export function decimalToInput(value: string | number | null | undefined): string {
+	if (value === null || value === undefined) {
+		return ''
+	}
+	let s = String(value).trim()
+	if (s === '') {
+		return ''
+	}
+	if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(s)) {
+		return s
+	}
+	const negative = s.startsWith('-')
+	if (negative || s.startsWith('+')) {
+		s = s.slice(1)
+	}
+	const [rawInt, rawFrac = ''] = s.split('.')
+	const int = rawInt.replace(/^0+/, '') || '0'
+	const frac = rawFrac.replace(/0+$/, '')
+	const zero = int === '0' && frac === ''
+	return formatForInput((negative && !zero ? '-' : '') + int + (frac !== '' ? '.' + frac : ''))
 }

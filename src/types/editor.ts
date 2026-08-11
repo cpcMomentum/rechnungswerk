@@ -4,10 +4,15 @@
  *
  * UI-only shape for editing invoice line items. Price is held as a euro input
  * string while editing; it is converted to integer cents on save.
+ *
+ * Menge und Preis stehen hier in deutscher Schreibweise, so wie die Felder sie
+ * anzeigen und wie Browser und Server sie lesen. Gespeicherte Werte muessen dafuer
+ * gewandelt werden — sie kommen als Maschinenformat aus der API (#223).
  */
 
 import type { InvoiceItem, Product, UnitCode } from '@/types/api'
 import { e4ToEuroInput } from '@/utils/money'
+import { decimalToInput } from '@/utils/numberInput'
 
 export interface EditorItem {
 	productId: number | null
@@ -28,7 +33,7 @@ export function emptyItem(defaultTaxRateBp = 1900): EditorItem {
 		quantity: '1',
 		unitCode: 'C62',
 		unitLabel: '',
-		priceInput: '0.00',
+		priceInput: '0,00',
 		taxRateBp: defaultTaxRateBp,
 	}
 }
@@ -51,7 +56,10 @@ export function itemFromInvoiceItem(item: InvoiceItem): EditorItem {
 		productId: item.productId,
 		name: item.name,
 		description: item.description ?? '',
-		quantity: item.quantity,
+		// Die API liefert die Menge als Dezimalwert der numeric(12,3)-Spalte, also
+		// "1.000" fuer die Menge 1. Ungewandelt liest das Feld darin die deutsche
+		// Tausendertrennung und speichert 1000 (#223).
+		quantity: decimalToInput(item.quantity),
 		unitCode: item.unitCode,
 		unitLabel: item.unitLabel ?? '',
 		priceInput: e4ToEuroInput(item.unitPriceE4),

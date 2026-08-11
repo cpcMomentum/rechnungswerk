@@ -127,7 +127,7 @@
 			<div class="rw-section-head">
 				<h3>{{ t('rechnungswerk', 'Anrede & Einleitung') }}</h3>
 				<NcActions v-if="!readonly && openingSnippets.length > 0"
-					:menu-name="t('rechnungswerk', 'Vorlage einfügen')">
+					:menuName="t('rechnungswerk', 'Vorlage einfügen')">
 					<template #icon><TextBoxIcon :size="18" /></template>
 					<NcActionButton v-for="s in openingSnippets" :key="s.id" @click="applyOpening(s)">
 						{{ s.label }}
@@ -146,8 +146,8 @@
 				v-model:items="items"
 				:products="productStore.products"
 				:readonly="readonly"
-				:small-business="settingsStore.settings?.smallBusiness ?? false"
-				:default-tax-rate-bp="settingsStore.settings?.defaultTaxRateBp ?? 1900" />
+				:smallBusiness="settingsStore.settings?.smallBusiness ?? false"
+				:defaultTaxRateBp="settingsStore.settings?.defaultTaxRateBp ?? 1900" />
 		</section>
 
 		<!-- Steuer & Summen -->
@@ -193,7 +193,7 @@
 					<input class="rw-input" type="text" readonly :value="dueDatePreview || '—'" /></label>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Skonto') }}</span>
 					<input v-model="form.discountTerms" class="rw-input" type="text" :readonly="readonly"
-						:placeholder="t('rechnungswerk', 'z. B. 2 % bei Zahlung bis …')" /></label>
+						:placeholder="t('rechnungswerk', 'z. B. 2 % bei Zahlung bis …')" /></label>
 			</div>
 		</section>
 
@@ -218,7 +218,7 @@
 			<div class="rw-section-head">
 				<h3>{{ t('rechnungswerk', 'Schlusstext') }}</h3>
 				<NcActions v-if="!readonly && closingSnippets.length > 0"
-					:menu-name="t('rechnungswerk', 'Vorlage einfügen')">
+					:menuName="t('rechnungswerk', 'Vorlage einfügen')">
 					<template #icon><TextBoxIcon :size="18" /></template>
 					<NcActionButton v-for="s in closingSnippets" :key="s.id" @click="applyClosing(s)">
 						{{ s.label }}
@@ -304,33 +304,33 @@
 		<ConfirmDialog :open="dialog === 'finalize'"
 			:name="isQuote ? t('rechnungswerk', 'Angebot festschreiben') : t('rechnungswerk', 'Rechnung festschreiben')"
 			:message="finalizeMessage"
-			:confirm-label="t('rechnungswerk', 'Festschreiben')"
+			:confirmLabel="t('rechnungswerk', 'Festschreiben')"
 			@close="dialog = null" @confirm="doFinalize" />
 		<ConfirmDialog :open="dialog === 'delete'"
 			:name="isQuote ? t('rechnungswerk', 'Angebot löschen') : t('rechnungswerk', 'Entwurf löschen')"
 			:message="isQuote ? t('rechnungswerk', 'Diesen Angebots-Entwurf wirklich löschen?') : t('rechnungswerk', 'Diesen Entwurf wirklich löschen?')"
-			:confirm-label="t('rechnungswerk', 'Löschen')" destructive
+			:confirmLabel="t('rechnungswerk', 'Löschen')" destructive
 			@close="dialog = null" @confirm="doDelete" />
 		<ConfirmDialog :open="dialog === 'cancel'"
 			:name="t('rechnungswerk', 'Rechnung stornieren')"
 			:message="t('rechnungswerk', 'Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Stornorechnung erstellen')" destructive
+			:confirmLabel="t('rechnungswerk', 'Stornorechnung erstellen')" destructive
 			@close="dialog = null" @confirm="doCancel" />
 		<ConfirmDialog :open="dialog === 'convert'"
 			:name="t('rechnungswerk', 'In Rechnung übernehmen')"
 			:message="t('rechnungswerk', 'Aus diesem Angebot wird ein neuer Rechnungs-Entwurf mit denselben Positionen erstellt. Das Angebot wird als „übernommen“ markiert. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Rechnung erstellen')"
+			:confirmLabel="t('rechnungswerk', 'Rechnung erstellen')"
 			@close="dialog = null" @confirm="doConvert" />
 		<ConfirmDialog :open="dialog === 'revise'"
 			:name="t('rechnungswerk', 'Angebot revidieren')"
 			:message="t('rechnungswerk', 'Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Revision erstellen')"
+			:confirmLabel="t('rechnungswerk', 'Revision erstellen')"
 			@close="dialog = null" @confirm="doRevise" />
 
 		<SendInvoiceDialog
 			:open="sendDialogOpen"
 			:invoice="invoice"
-			:default-body="defaultMailBody"
+			:defaultBody="defaultMailBody"
 			:saving="sending"
 			:kind="isQuote ? 'quote' : 'invoice'"
 			@close="sendDialogOpen = false"
@@ -389,7 +389,6 @@ import { useTextSnippetStore } from '@/stores/textSnippetStore'
 import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail, type SnippetDocType, type TextSnippet } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
-import { parseQuantity } from '@/utils/numberInput'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 import { downloadQuotePdf, quotePreviewUrl, sendQuote } from '@/api/quotes'
@@ -417,12 +416,18 @@ const docStore = computed(() => (isQuote.value ? quoteStore : invoiceStore))
 const snippetDocType = computed<SnippetDocType>(() => (isQuote.value ? 'quote' : 'invoice'))
 const openingSnippets = computed(() => textSnippetStore.forSlot(snippetDocType.value, 'opening'))
 const closingSnippets = computed(() => textSnippetStore.forSlot(snippetDocType.value, 'closing'))
+// Die beiden Einfüge-Funktionen stehen bei den Textbausteinen, `form` entsteht
+// erst weiter unten (Zeile ~454). Zur Laufzeit unkritisch, weil sie erst auf
+// Klick laufen — der Hinweis ist trotzdem berechtigt, deshalb hier benannt
+// statt die Regel projektweit aufzuweichen.
+/* eslint-disable @typescript-eslint/no-use-before-define -- form wird erst nach diesem Block angelegt */
 function applyOpening(snippet: TextSnippet) {
 	form.greeting = snippet.content ?? ''
 }
 function applyClosing(snippet: TextSnippet) {
 	form.extraText = snippet.content ?? ''
 }
+/* eslint-enable @typescript-eslint/no-use-before-define */
 const listRoute = computed(() => (isQuote.value ? 'quotes' : 'invoices'))
 const detailRoute = computed(() => (isQuote.value ? 'quote-detail' : 'invoice-detail'))
 
@@ -750,9 +755,11 @@ function buildInput(): InvoiceInput {
 				productId: i.productId,
 				name: i.name.trim(),
 				description: i.description.trim() === '' ? null : i.description.trim(),
-				// Unlesbares wird bewusst unveraendert gesendet, damit der Server die
-				// verstaendliche Meldung liefert statt hier still etwas zu erfinden (#157).
-				quantity: parseQuantity(i.quantity) ?? String(i.quantity),
+				// Rohtext statt vorberechneter Zahl, genau wie der Preis seit #180: der
+				// Server wertet aus und prueft, mit derselben Regel wie das Formular.
+				// Vorher ging hier der normalisierte Wert raus ("12.5"), den die jetzt
+				// eng gefasste deutsche Regel zu Recht ablehnen wuerde (#223).
+				quantity: i.quantity,
 				unitCode: i.unitCode,
 				unitLabel: i.unitLabel.trim() === '' ? null : i.unitLabel.trim(),
 				// Rohtext statt vorberechneter Zahl: der Server rechnet um und prueft (#180).

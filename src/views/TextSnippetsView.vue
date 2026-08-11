@@ -37,7 +37,7 @@
 								</td>
 								<td class="rw-snippet-actions">
 									<div class="rw-actions">
-										<NcButton type="tertiary"
+										<NcButton variant="tertiary"
 											:aria-label="s.isDefault ? t('rechnungswerk', 'Standard-Vorlage') : t('rechnungswerk', 'Als Standard festlegen')"
 											:title="s.isDefault ? t('rechnungswerk', 'Standard-Vorlage') : t('rechnungswerk', 'Als Standard festlegen')"
 											@click.stop="setDefault(s)">
@@ -46,7 +46,7 @@
 												<StarOutlineIcon v-else :size="20" class="rw-star" />
 											</template>
 										</NcButton>
-										<NcButton type="tertiary"
+										<NcButton variant="tertiary"
 											:aria-label="t('rechnungswerk', 'Löschen')"
 											:title="t('rechnungswerk', 'Löschen')"
 											@click.stop="askDelete(s)">
@@ -72,7 +72,7 @@
 			:open="deleteTarget !== null"
 			:name="t('rechnungswerk', 'Textbaustein löschen')"
 			:message="deleteTarget ? t('rechnungswerk', '„{name}“ wirklich löschen?', { name: deleteTarget.label }) : ''"
-			:confirm-label="t('rechnungswerk', 'Löschen')"
+			:confirmLabel="t('rechnungswerk', 'Löschen')"
 			destructive
 			@close="deleteTarget = null"
 			@confirm="confirmDelete" />

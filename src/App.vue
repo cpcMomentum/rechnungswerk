@@ -1,5 +1,5 @@
 <template>
-	<NcContent app-name="rechnungswerk">
+	<NcContent appName="rechnungswerk">
 		<template v-if="!store.loaded">
 			<NcAppContent>
 				<NcLoadingIcon class="rw-app-loading" :size="44" />

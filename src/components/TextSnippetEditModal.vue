@@ -34,7 +34,7 @@
 				<textarea v-model="form.content" class="input" rows="6" />
 			</label>
 
-			<NcCheckboxRadioSwitch :model-value="form.isDefault" @update:model-value="(v) => form.isDefault = v">
+			<NcCheckboxRadioSwitch :modelValue="form.isDefault" @update:modelValue="(v) => form.isDefault = v">
 				{{ t('rechnungswerk', 'Als Standard für neue Dokumente verwenden') }}
 			</NcCheckboxRadioSwitch>
 			<p class="hint">{{ t('rechnungswerk', 'Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.') }}</p>

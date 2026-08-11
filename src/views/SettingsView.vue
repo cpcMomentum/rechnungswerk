@@ -42,9 +42,9 @@
 					<input v-model="form.bankName" class="rw-input" type="text" /></label>
 				<NcCheckboxRadioSwitch
 					type="switch"
-					:model-value="form.girocodeEnabled"
+					:modelValue="form.girocodeEnabled"
 					:disabled="!form.iban && !form.girocodeEnabled"
-					@update:model-value="(v: boolean) => { if (form) form.girocodeEnabled = v }">
+					@update:modelValue="(v: boolean) => { if (form) form.girocodeEnabled = v }">
 					{{ t('rechnungswerk', 'Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen') }}
 				</NcCheckboxRadioSwitch>
 				<p class="rw-hint">
@@ -63,9 +63,9 @@
 					     advancedFields an, paletteOnly bewusst NICHT: eine
 					     Firmenfarbe ist vorgegeben, nicht auswaehlbar. -->
 					<div class="rw-accent">
-						<NcColorPicker :model-value="accentValue"
-							advanced-fields
-							@update:model-value="onAccentPicked">
+						<NcColorPicker :modelValue="accentValue"
+							advancedFields
+							@update:modelValue="onAccentPicked">
 							<!-- Die Beschriftung steht daneben und ist nicht mehr wie beim
 							     vorherigen <label><input> implizit zugeordnet. -->
 							<button type="button"
@@ -145,16 +145,16 @@
 						type="radio"
 						name="rw-reset-mode"
 						value="yearly"
-						:model-value="form.numberResetMode"
-						@update:model-value="onSelectResetMode">
+						:modelValue="form.numberResetMode"
+						@update:modelValue="onSelectResetMode">
 						{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
 					</NcCheckboxRadioSwitch>
 					<NcCheckboxRadioSwitch
 						type="radio"
 						name="rw-reset-mode"
 						value="continuous"
-						:model-value="form.numberResetMode"
-						@update:model-value="onSelectResetMode">
+						:modelValue="form.numberResetMode"
+						@update:modelValue="onSelectResetMode">
 						{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
 					</NcCheckboxRadioSwitch>
 				</div>
@@ -179,16 +179,16 @@
 						type="radio"
 						name="rw-quote-reset-mode"
 						value="yearly"
-						:model-value="form.quoteNumberResetMode"
-						@update:model-value="onSelectQuoteResetMode">
+						:modelValue="form.quoteNumberResetMode"
+						@update:modelValue="onSelectQuoteResetMode">
 						{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
 					</NcCheckboxRadioSwitch>
 					<NcCheckboxRadioSwitch
 						type="radio"
 						name="rw-quote-reset-mode"
 						value="continuous"
-						:model-value="form.quoteNumberResetMode"
-						@update:model-value="onSelectQuoteResetMode">
+						:modelValue="form.quoteNumberResetMode"
+						@update:modelValue="onSelectQuoteResetMode">
 						{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
 					</NcCheckboxRadioSwitch>
 				</div>
@@ -214,8 +214,8 @@
 				<h3>{{ t('rechnungswerk', 'Steuer') }}</h3>
 				<NcCheckboxRadioSwitch
 					type="switch"
-					:model-value="form.smallBusiness"
-					@update:model-value="onToggleSmallBusiness">
+					:modelValue="form.smallBusiness"
+					@update:modelValue="onToggleSmallBusiness">
 					{{ t('rechnungswerk', 'Kleinunternehmer nach §19 UStG (kein USt-Ausweis)') }}
 				</NcCheckboxRadioSwitch>
 				<label v-if="form.smallBusiness" class="rw-field">
@@ -249,9 +249,9 @@
 					<input v-model="form.datevUploadMail" class="rw-input" type="email" /></label>
 				<NcCheckboxRadioSwitch
 					type="switch"
-					:model-value="form.datevAutoSend"
+					:modelValue="form.datevAutoSend"
 					:disabled="!form.datevUploadMail"
-					@update:model-value="onToggleDatevAutoSend">
+					@update:modelValue="onToggleDatevAutoSend">
 					{{ t('rechnungswerk', 'E-Rechnung beim Festschreiben automatisch an DATEV senden') }}
 				</NcCheckboxRadioSwitch>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.') }}</p>
@@ -281,9 +281,9 @@
 				</div>
 				<NcCheckboxRadioSwitch
 					type="switch"
-					:model-value="form.archiveEnabled"
+					:modelValue="form.archiveEnabled"
 					:disabled="!form.archiveFolderId"
-					@update:model-value="onToggleArchive">
+					@update:modelValue="onToggleArchive">
 					{{ t('rechnungswerk', 'ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen') }}
 				</NcCheckboxRadioSwitch>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Unterordner (optional)') }}</span>
@@ -351,9 +351,9 @@
 							:placeholder="form.imapPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
 				</div>
 				<NcCheckboxRadioSwitch
-					:model-value="form.imapCleanup"
+					:modelValue="form.imapCleanup"
 					:disabled="!form.imapHost"
-					@update:model-value="(v) => form.imapCleanup = v">
+					@update:modelValue="(v) => form.imapCleanup = v">
 					{{ t('rechnungswerk', 'Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)') }}
 				</NcCheckboxRadioSwitch>
 			</section>
@@ -380,9 +380,9 @@
 						:options="searchResults"
 						:loading="searching"
 						:multiple="true"
-						:close-on-select="false"
+						keepOpen
 						label="displayName"
-						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
 						@search="onPrincipalSearch">
 						<template #no-options>{{ noOptionsText }}</template>
 					</NcSelect>
@@ -395,9 +395,9 @@
 						:options="searchResults"
 						:loading="searching"
 						:multiple="true"
-						:close-on-select="false"
+						keepOpen
 						label="displayName"
-						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
 						@search="onPrincipalSearch">
 						<template #no-options>{{ noOptionsText }}</template>
 					</NcSelect>
@@ -416,7 +416,7 @@
 			:open="confirmSmallBusiness"
 			:name="t('rechnungswerk', 'Kleinunternehmer §19 aktivieren')"
 			:message="t('rechnungswerk', 'Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Aktivieren')"
+			:confirmLabel="t('rechnungswerk', 'Aktivieren')"
 			@close="confirmSmallBusiness = false"
 			@confirm="applySmallBusiness" />
 
@@ -424,7 +424,7 @@
 			:open="confirmDatevAutoSend"
 			:name="t('rechnungswerk', 'Automatischen DATEV-Versand aktivieren')"
 			:message="t('rechnungswerk', 'Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Aktivieren')"
+			:confirmLabel="t('rechnungswerk', 'Aktivieren')"
 			@close="confirmDatevAutoSend = false"
 			@confirm="applyDatevAutoSend" />
 
@@ -432,7 +432,7 @@
 			:open="confirmArchive"
 			:name="t('rechnungswerk', 'Automatische Ablage aktivieren')"
 			:message="t('rechnungswerk', 'Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Aktivieren')"
+			:confirmLabel="t('rechnungswerk', 'Aktivieren')"
 			@close="confirmArchive = false"
 			@confirm="applyArchive" />
 
@@ -440,7 +440,7 @@
 			:open="confirmResetMode"
 			:name="t('rechnungswerk', 'Nummernkreis auf „Fortlaufend“ stellen')"
 			:message="t('rechnungswerk', 'Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Fortlaufend aktivieren')"
+			:confirmLabel="t('rechnungswerk', 'Fortlaufend aktivieren')"
 			@close="confirmResetMode = false"
 			@confirm="applyResetMode" />
 
@@ -448,7 +448,7 @@
 			:open="confirmQuoteResetMode"
 			:name="t('rechnungswerk', 'Angebots-Nummernkreis auf „Fortlaufend“ stellen')"
 			:message="t('rechnungswerk', 'Der Angebots-Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Fortfahren?')"
-			:confirm-label="t('rechnungswerk', 'Fortlaufend aktivieren')"
+			:confirmLabel="t('rechnungswerk', 'Fortlaufend aktivieren')"
 			@close="confirmQuoteResetMode = false"
 			@confirm="applyQuoteResetMode" />
 	</div>
@@ -538,7 +538,7 @@ const logoSrc = computed(() => (form.value?.logoFileId ? logoUrl(form.value.logo
 /** Context-aware empty-state text so users know they have to type to search. */
 const noOptionsText = computed(() => {
 	if (searching.value) {
-		return t('rechnungswerk', 'Suche läuft …')
+		return t('rechnungswerk', 'Suche läuft …')
 	}
 	if (lastQuery.value.trim().length < 2) {
 		return t('rechnungswerk', 'Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.')
