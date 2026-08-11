@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
 	decimalToInput,
@@ -21,49 +23,32 @@ import type { InvoiceItem } from '@/types/api'
 const q = (v: string) => parseNumberInput(v, QUANTITY_DECIMALS, QUANTITY_INTEGER_DIGITS)
 
 /**
- * #157. Die Fälle sind deckungsgleich mit tests/Unit/NumberInputTest.php.
- * Weichen beide Seiten ab, zeigt das Formular etwas anderes an, als gespeichert wird.
+ * Die geteilte Falltabelle, die auch tests/Unit/NumberInputTest.php liest (#229).
+ *
+ * Vorher stand dieselbe Tabelle zweimal da, hier und im PHP-Test, und die
+ * Deckungsgleichheit war nur eine Zusicherung im Kommentar. Wer eine Seite
+ * änderte und die andere vergass, bekam zwei grüne Suiten und trotzdem ein
+ * Formular, das etwas anderes anzeigt als gespeichert wird. Jetzt gibt es eine
+ * Quelle, und ein abweichender Zwilling wird rot.
  */
+const CASES = JSON.parse(
+	readFileSync(join(import.meta.dirname, '../../tests/fixtures/number-input-cases.json'), 'utf8'),
+) as {
+	quantity: { accepted: [string, string, string][], rejected: [string, string][] }
+	price: { toE4: [string, number, string][] }
+}
+
 describe('parseNumberInput', () => {
-	it.each([
-		['2', '2', ''],
-		['1.000', '1000', 'der Fall, der still zu 1 wurde'],
-		['99.999.999', '99999999', 'der gemeldete 500er'],
-		['12,5', '12.5', ''],
-		['1.234,5', '1234.5', 'Punkt gruppiert, Komma trennt die Dezimalstellen'],
-		['1,875', '1.875', ''],
-		[' 1 000 ', '1000', 'Leerzeichen als Gruppierung'],
-		['1 000', '1000', 'geschütztes Leerzeichen'],
-		['007', '7', ''],
-		['2,50', '2.5', ''],
-		[',5', '0.5', ''],
-		['-2', '-2', 'Stornobelege tragen negative Mengen'],
-		['-1.234,5', '-1234.5', ''],
-		['+3', '3', ''],
-		['-0', '0', 'kein negatives Null'],
-		['999999999', '999999999', 'Grenze von numeric(12,3)'],
-	])('%s ergibt %s (%s)', (input, expected) => {
+	it('liest die geteilte Falltabelle, sonst prueft dieser Test nichts', () => {
+		expect(CASES.quantity.accepted.length).toBeGreaterThan(10)
+		expect(CASES.quantity.rejected.length).toBeGreaterThan(10)
+	})
+
+	it.each(CASES.quantity.accepted)('%s ergibt %s (%s)', (input, expected) => {
 		expect(q(input)).toBe(expected)
 	})
 
-	it.each([
-		['abc', ''],
-		['', ''],
-		['   ', ''],
-		[',', 'Trennzeichen ohne Ziffer'],
-		['1,2,3', ''],
-		['1.2.3', 'keine sauberen Dreiergruppen'],
-		['1.23,5', 'Gruppierung muss in Dreiergruppen stehen'],
-		['1,2345', 'die Spalte fasst drei Nachkommastellen'],
-		['1000000000', 'numeric(12,3) fasst neun Vorkommastellen'],
-		['12 €', ''],
-		// Seit #223 abgelehnt statt gedeutet. Der Punkt ist ausschliesslich
-		// Tausendertrenner; sonst bleibt "1.234" zwischen 1234 und 1,234 offen.
-		['12.5', 'englische Schreibweise, der Punkt gruppiert nicht'],
-		['1,234.5', 'gemischte Schreibweise'],
-		['0.3456', 'das alte Maschinenformat des Preisfeldes'],
-		['1.0000', 'keine saubere Dreiergruppe'],
-	])('lehnt %s ab (%s)', (input) => {
+	it.each(CASES.quantity.rejected)('lehnt %s ab (%s)', (input) => {
 		expect(q(input)).toBeNull()
 	})
 
@@ -101,23 +86,24 @@ describe('parsePrice', () => {
  * Seit #180 rechnet der Server den Preis aus dem Rohtext; euroInputToE4 treibt
  * nur noch die Live-Vorschau im Editor. Beide müssen trotzdem zum selben
  * Ergebnis kommen, sonst zeigt die Zeile einen anderen Betrag an als der, der
- * gespeichert wird. Die Fälle sind deckungsgleich mit dem priceProvider in
- * tests/Unit/NumberInputTest.php.
+ * gespeichert wird — deshalb dieselbe Falltabelle wie NumberInput::parsePrice()
+ * auf der PHP-Seite (#229).
  */
 describe('euroInputToE4', () => {
+	it.each(CASES.price.toE4)('%s ergibt %s e4 (%s)', (input, expected) => {
+		expect(euroInputToE4(input)).toBe(expected)
+	})
+
+	/**
+	 * Nur im Browser: unlesbares ergibt hier 0, damit die Live-Vorschau weiterläuft,
+	 * während der Server dieselbe Eingabe mit einer Meldung ablehnt. Diese Fälle
+	 * gehören deshalb nicht in die geteilte Tabelle.
+	 */
 	it.each([
-		['95', 950000, 'ganze Euro'],
-		['95,00', 950000, ''],
-		['0,3456', 3456, 'die feinere Preiseinheit aus #147'],
-		['0.3456', 0, 'englische Schreibweise wird seit #223 nicht mehr gedeutet'],
-		['1.234,56', 12345600, 'nicht 1,23 €'],
-		['1.000', 10000000, 'tausend Euro, nicht ein Euro'],
-		['0', 0, ''],
-		['2,5000', 25000, 'nachlaufende Nullen'],
-		['0,0001', 1, 'kleinster darstellbarer Betrag'],
 		['', 0, 'leer bedeutet 0'],
 		['abc', 0, 'unlesbares gibt 0 in der Vorschau; der Server lehnt es ab'],
-	])('%s ergibt %s e4', (input, expected) => {
+		['0.3456', 0, 'englische Schreibweise wird seit #223 nicht mehr gedeutet'],
+	])('%s ergibt in der Vorschau %s e4 (%s)', (input, expected) => {
 		expect(euroInputToE4(input)).toBe(expected)
 	})
 

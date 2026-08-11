@@ -1,0 +1,75 @@
+{
+	"_comment": [
+		"Die geteilten Faelle fuer die Auswertung von Zahleneingaben (#157, #223, #229).",
+		"",
+		"src/utils/numberInput.ts und lib/Service/NumberInput.php sind Zwillinge: dieselbe",
+		"Regel, einmal im Browser fuer die Vorschau, einmal auf dem Server fuer das, was",
+		"gespeichert wird. Weichen sie ab, zeigt das Formular etwas anderes an, als in der",
+		"Rechnung steht. Bis #229 stand diese Zusicherung nur im Kommentar und die",
+		"Falltabellen doppelt: wer eine Seite aenderte und die andere vergass, bekam zwei",
+		"gruene Suiten und trotzdem zwei Wahrheiten.",
+		"",
+		"Diese Datei ist die eine Wahrheit. Vitest liest sie, PHPUnit liest sie. Ein neuer",
+		"Fall wird einmal geschrieben und zwingend von beiden Seiten geprueft.",
+		"",
+		"Geteilt wird nur, was geteilt IST: die Auswertungsregel. Was eine Seite allein",
+		"betrifft, bleibt in ihrer Suite - PHP wirft bei unlesbarer Eingabe eine Ausnahme,",
+		"der Browser gibt fuer die Vorschau 0 zurueck; PHP kennt ausserdem Eingabetypen",
+		"(null, Array), die es im Formular nicht gibt.",
+		"",
+		"Die Menge ist numeric(12,3): 3 Nachkommastellen, 9 Vorkommastellen."
+	],
+
+	"quantity": {
+		"accepted": [
+			["2", "2", "einfache Zahl"],
+			["1.000", "1000", "der Fall, der still zu 1 wurde (#157)"],
+			["99.999.999", "99999999", "der gemeldete 500er (#157)"],
+			["12,5", "12.5", "Dezimalkomma"],
+			["1.234,5", "1234.5", "Punkt gruppiert, Komma trennt die Dezimalstellen"],
+			["1,875", "1.875", "drei Nachkommastellen"],
+			[" 1 000 ", "1000", "Leerzeichen als Gruppierung"],
+			["1 000", "1000", "geschuetztes Leerzeichen, so kommt es aus Tabellen"],
+			["007", "7", "fuehrende Nullen"],
+			["2,50", "2.5", "nachlaufende Null"],
+			[",5", "0.5", "nur Nachkommastellen"],
+			["-2", "-2", "Stornobelege tragen negative Mengen"],
+			["-1.234,5", "-1234.5", "negativ mit Gruppierung"],
+			["+3", "3", "fuehrendes Plus"],
+			["-0", "0", "kein negatives Null"],
+			["999999999", "999999999", "Grenze von numeric(12,3)"]
+		],
+
+		"rejected": [
+			["abc", "Text"],
+			["", "leer"],
+			["   ", "nur Leerzeichen"],
+			[",", "Trennzeichen ohne Ziffer"],
+			["1,2,3", "zwei Kommata"],
+			["1.2.3", "keine sauberen Dreiergruppen"],
+			["1.23,5", "Gruppierung muss in Dreiergruppen stehen"],
+			["1,2345", "die Spalte fasst drei Nachkommastellen"],
+			["1000000000", "numeric(12,3) fasst neun Vorkommastellen"],
+			["12 €", "Waehrungszeichen"],
+			["12.5", "englische Schreibweise, der Punkt gruppiert nicht (#223)"],
+			["1,234.5", "gemischte Schreibweise (#223)"],
+			["0.3456", "das alte Maschinenformat des Preisfeldes (#223)"],
+			["1.0000", "vier Stellen sind keine Dreiergruppe"]
+		]
+	},
+
+	"price": {
+		"_comment": "Preis in Zehntausendstel Euro (1/10000 €, #147), 4 Nachkommastellen.",
+		"toE4": [
+			["95", 950000, "ganze Euro: 95,00 € sind 950000 Zehntausendstel"],
+			["95,00", 950000, "zwei Nachkommastellen"],
+			["0,3456", 3456, "die feinere Preiseinheit aus #147"],
+			["1.234,56", 12345600, "nicht 1,23 €"],
+			["1.000", 10000000, "tausend Euro, nicht ein Euro"],
+			["0", 0, "null"],
+			["2,5000", 25000, "nachlaufende Nullen"],
+			["0,0001", 1, "kleinster darstellbarer Betrag"],
+			["1,234", 12340, "der zweite Fall aus #223: als Maschinenformat waeren es 1234 €"]
+		]
+	}
+}
