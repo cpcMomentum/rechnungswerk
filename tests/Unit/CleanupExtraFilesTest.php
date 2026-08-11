@@ -27,6 +27,8 @@ use PHPUnit\Framework\TestCase;
  * NICHT tut.
  */
 class CleanupExtraFilesTest extends TestCase {
+	/** Der Einstiegspunkt, an dem der Schritt erkennt, ob die Signatur zu diesem Build gehoert. */
+	private const ENTRY = 'js/rechnungswerk-main.mjs';
 
 	private string $appPath;
 
@@ -39,9 +41,6 @@ class CleanupExtraFilesTest extends TestCase {
 		mkdir($this->appPath . '/lib', 0777, true);
 		mkdir($this->appPath . '/js', 0777, true);
 	}
-
-	/** Der Einstiegspunkt, an dem der Schritt erkennt, ob die Signatur zu diesem Build gehoert. */
-	private const ENTRY = 'js/rechnungswerk-main.mjs';
 
 	protected function tearDown(): void {
 		$this->removeTree($this->appPath);
