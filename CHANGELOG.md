@@ -7,6 +7,33 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Fixed
+- **Mengen und Preise bleiben über Speichern und Wiederöffnen unverändert.** Die
+  Menge steht mit drei Nachkommastellen in der Datenbank, wird also als „1.000"
+  geliefert, wobei der Punkt ein Dezimaltrennzeichen ist. Dieser Wert lief
+  unverändert ins Eingabefeld, wo er seit 0.3.1 regelkonform als deutsche
+  Tausendertrennung gelesen wurde: aus der Menge 1 wurde beim nächsten Speichern
+  1000, aus 10,00 € Zeilensumme 10.000,00 €. Gespeicherte Werte werden jetzt in
+  die Schreibweise des Feldes gewandelt, statt ungewandelt hineinzulaufen.
+  Nebenbei verschwindet damit die alte Anzeige-Merkwürdigkeit, dass die Menge 1
+  als „1.000" dastand (#223)
+- **Preise mit drei Nachkommastellen wurden beim ersten Speichern um den Faktor
+  1000 verfälscht.** Das Preisfeld war ein Zahlenfeld des Browsers und lieferte
+  deshalb immer Maschinenformat mit Punkt: 1,234 € kam als „1.234" an und wurde
+  serverseitig deutsch als 1.234,00 € gelesen. Preis und Menge sind jetzt beide
+  Textfelder in deutscher Schreibweise und werden von derselben Regel
+  ausgewertet. Wer die Regelung mit vier Nachkommastellen nutzt, sollte seine
+  Standardpreise und offenen Entwürfe prüfen (#223)
+
+### Changed
+- Zahleneingaben werden nur noch in deutscher Schreibweise gelesen: das Komma
+  trennt die Nachkommastellen, der Punkt die Tausender. Englische und gemischte
+  Schreibweisen wie „12.5" oder „1,234.5" werden jetzt mit einer erklärenden
+  Meldung abgelehnt, statt anhand des letzten Trennzeichens gedeutet zu werden.
+  Diese Deutung war die Ursache des Fehlers oben, denn sie lässt „1.234" zwischen
+  1234 und 1,234 offen. Im Preisfeld sind dadurch die Pfeiltasten des Browsers
+  entfallen; ein negativer Preis wird weiterhin abgelehnt (#223)
+
 ## [0.4.0] - 2026-08-08
 
 Festgeschriebene Rechnungen sind jetzt wirklich unveränderlich. Bisher entstand

@@ -25,7 +25,10 @@
 
 				<label class="field">
 					<span>{{ t('rechnungswerk', 'Standard-Preis (€)') }}</span>
-					<input v-model="priceInput" class="input" type="number" step="0.0001" min="0" inputmode="decimal" />
+					<!-- Textfeld wie in der Positionstabelle (#223): der Inhalt wird deutsch
+					     gelesen, also muss er deutsch dastehen. -->
+					<input v-model="priceInput" class="input" type="text" inputmode="decimal"
+						@blur="normalizePrice" />
 				</label>
 
 				<label class="field">
@@ -61,7 +64,8 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product, type UnitCode } from '@/types/api'
 import type { ProductCreate } from '@/api/products'
 import { escCloses } from '@/utils/modalEsc'
-import { e4ToEuroInput, formatTaxRate } from '@/utils/money'
+import { e4ToEuroInput, euroInputToE4, formatTaxRate } from '@/utils/money'
+import { parsePrice } from '@/utils/numberInput'
 
 const props = defineProps<{
 	open: boolean
@@ -83,7 +87,14 @@ const form = reactive<{ name: string, description: string, defaultUnitCode: Unit
 	defaultUnitLabel: '',
 	defaultTaxRateBp: 1900,
 })
-const priceInput = ref('0.00')
+const priceInput = ref('0,00')
+
+/** Angezeigt wird, was gespeichert wird; Unlesbares bleibt stehen (#223). */
+function normalizePrice(): void {
+	if (parsePrice(priceInput.value) !== null) {
+		priceInput.value = e4ToEuroInput(euroInputToE4(priceInput.value))
+	}
+}
 
 const title = computed(() => props.product
 	? t('rechnungswerk', 'Produkt bearbeiten')

@@ -36,9 +36,7 @@ class NumberInputTest extends TestCase {
 			'Tausenderpunkt' => ['1.000', '1000', 'der Fall, der still zu 1 wurde'],
 			'mehrere Tausendergruppen' => ['99.999.999', '99999999', 'der gemeldete 500er'],
 			'Dezimalkomma' => ['12,5', '12.5', ''],
-			'Dezimalpunkt' => ['12.5', '12.5', 'englische Schreibweise bleibt lesbar'],
-			'deutsch gemischt' => ['1.234,5', '1234.5', 'letztes Trennzeichen ist das Dezimaltrennzeichen'],
-			'englisch gemischt' => ['1,234.5', '1234.5', 'dito, andersherum'],
+			'deutsch gemischt' => ['1.234,5', '1234.5', 'Punkt gruppiert, Komma trennt die Dezimalstellen'],
 			'drei Nachkommastellen' => ['1,875', '1.875', ''],
 			'Leerzeichen' => [' 1 000 ', '1000', 'Leerzeichen als Gruppierung'],
 			'geschuetztes Leerzeichen' => ["1\u{00A0}000", '1000', ''],
@@ -76,6 +74,11 @@ class NumberInputTest extends TestCase {
 			'Waehrungszeichen' => ['12 €', ''],
 			'null' => [null, ''],
 			'Array' => [[1], ''],
+			// Seit #223 abgelehnt statt gedeutet. Der Punkt ist ausschliesslich
+			// Tausendertrenner; sonst bleibt "1.234" zwischen 1234 und 1,234 offen.
+			'Dezimalpunkt' => ['12.5', 'englische Schreibweise, der Punkt gruppiert nicht'],
+			'englisch gemischt' => ['1,234.5', 'gemischte Schreibweise'],
+			'altes Maschinenformat des Preisfeldes' => ['0.3456', 'kam aus dem type=number-Feld'],
 		];
 	}
 
@@ -111,6 +114,27 @@ class NumberInputTest extends TestCase {
 	}
 
 	/**
+	 * #223. Das Preisfeld war ein type="number" und lieferte deshalb
+	 * Maschinenformat mit Dezimalpunkt: "0.3456" fuer 0,3456 €. Hier wurde das
+	 * deutsch gelesen, also als 3456 €, und zwar schon beim ersten Speichern.
+	 * Das Feld schickt jetzt deutsche Schreibweise, und Maschinenformat wird
+	 * abgelehnt statt gedeutet.
+	 */
+	public function testMachineNotationFromTheOldPriceFieldIsRejected(): void {
+		$this->expectException(ValidationException::class);
+		NumberInput::parsePrice('0.3456');
+	}
+
+	/**
+	 * Die Kehrseite, die bleiben muss: "1.234" ist als deutsche Schreibweise
+	 * eindeutig und bedeutet eintausendzweihundertvierunddreissig Euro. Genau
+	 * deshalb durfte der Ladepfad diesen String nie fuer 1,234 € erzeugen.
+	 */
+	public function testThousandSeparatorKeepsItsGermanMeaningInPrices(): void {
+		$this->assertSame(12340000, NumberInput::parsePrice('1.234'));
+	}
+
+	/**
 	 * #180: Der Preis wird jetzt serverseitig aus dem Rohtext gerechnet.
 	 *
 	 * @dataProvider priceProvider
@@ -125,7 +149,6 @@ class NumberInputTest extends TestCase {
 			'ganze Euro' => ['95', 950000, '95,00 € sind 950000 Zehntausendstel'],
 			'zwei Nachkommastellen' => ['95,00', 950000, ''],
 			'vier Nachkommastellen' => ['0,3456', 3456, 'die feinere Preiseinheit aus #147'],
-			'englische Schreibweise' => ['0.3456', 3456, ''],
 			'Tausenderpunkt' => ['1.234,56', 12345600, 'nicht 1,23 €'],
 			'nur Tausenderpunkt' => ['1.000', 10000000, 'tausend Euro, nicht ein Euro'],
 			'null' => ['0', 0, ''],

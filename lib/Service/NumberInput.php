@@ -18,15 +18,18 @@ namespace OCA\Rechnungswerk\Service;
  * Rechnung. Beides ist keine Fehlbedienung: 1.000 und 12,5 sind die Schreibweise,
  * die deutsche Nutzer verwenden.
  *
- * Die Regel:
+ * Die Regel, seit #223 eng und ohne Ausnahme:
  *   - Leerzeichen fallen weg, auch geschuetzte
- *   - kommen "." und "," beide vor, ist das LETZTE das Dezimaltrennzeichen und
- *     das andere Gruppierung ("1.234,5" und "1,234.5" sind beide eindeutig)
- *   - nur "," ist immer Dezimaltrennzeichen
- *   - nur "." ist Gruppierung, wenn es dem Dreiergruppenmuster folgt ("1.000"),
- *     sonst Dezimalpunkt ("12.5")
- *   - Gruppierung muss sauber in Dreiergruppen stehen, sonst wird abgelehnt
+ *   - das Komma trennt die Dezimalstellen, hoechstens eines
+ *   - der Punkt gruppiert Tausender und muss sauber in Dreiergruppen stehen
  *   - was danach kein sauberer Zahlwert ist, wird abgelehnt statt geraten
+ *
+ * Bis #223 galt zusaetzlich das LETZTE Trennzeichen als Dezimaltrennzeichen,
+ * womit auch "1,234.5" und "12.5" lesbar waren. Diese Deutung war der eigentliche
+ * Fehler: sie laesst "1.234" zwischen 1234 und 1,234 offen. Genau daran wurde der
+ * Preis um den Faktor 1000 verfaelscht, weil das Preisfeld ein type="number" war
+ * und damit Maschinenformat lieferte ("1.234" fuer 1,234 €), das hier deutsch
+ * gelesen wurde. Beide Felder sind jetzt deutsche Textfelder.
  *
  * Dieselbe Regel liegt als src/utils/numberInput.ts im Frontend, mit
  * deckungsgleichen Testfaellen. Weichen beide Seiten ab, zeigt das Formular
@@ -71,40 +74,30 @@ final class NumberInput {
 			return null;
 		}
 
-		$lastDot = strrpos($s, '.');
-		$lastComma = strrpos($s, ',');
+		// Das Komma trennt die Dezimalstellen, der Punkt gruppiert Tausender. Ein
+		// zweites Komma, oder ein Punkt hinter dem Komma, ist keine deutsche
+		// Schreibweise und wird abgelehnt statt gedeutet (#223).
+		$firstComma = strpos($s, ',');
 
-		if ($lastDot !== false && $lastComma !== false) {
-			$decimalPos = max($lastDot, $lastComma);
-			$groupChar = $s[$decimalPos] === ',' ? '.' : ',';
-			$integer = substr($s, 0, $decimalPos);
-			$fraction = substr($s, $decimalPos + 1);
-			if (!self::isGrouped($integer, $groupChar)) {
-				return null;
-			}
-			$integer = str_replace($groupChar, '', $integer);
-		} elseif ($lastComma !== false) {
+		if ($firstComma !== false) {
 			if (substr_count($s, ',') > 1) {
 				return null;
 			}
-			$integer = substr($s, 0, $lastComma);
-			$fraction = substr($s, $lastComma + 1);
-		} elseif ($lastDot !== false) {
-			if (preg_match('/^\d{1,3}(\.\d{3})+$/', $s) === 1) {
-				// "1.000" ist die deutsche Tausendertrennung, nicht 1,0.
-				$integer = str_replace('.', '', $s);
-				$fraction = '';
-			} else {
-				if (substr_count($s, '.') > 1) {
-					return null;
-				}
-				$integer = substr($s, 0, $lastDot);
-				$fraction = substr($s, $lastDot + 1);
+			$integer = substr($s, 0, $firstComma);
+			$fraction = substr($s, $firstComma + 1);
+			if (str_contains($fraction, '.')) {
+				return null;
 			}
 		} else {
 			$integer = $s;
 			$fraction = '';
 		}
+
+		// "1.000" ist die deutsche Tausendertrennung, nicht 1,0.
+		if (!self::isGrouped($integer)) {
+			return null;
+		}
+		$integer = str_replace('.', '', $integer);
 
 		// Ein Trennzeichen ohne jede Ziffer ist keine Zahl.
 		if ($integer === '' && $fraction === '') {
@@ -150,8 +143,9 @@ final class NumberInput {
 		$parsed = self::parse($value, self::QUANTITY_DECIMALS, self::QUANTITY_INTEGER_DIGITS);
 		if ($parsed === null) {
 			throw new \OCA\Rechnungswerk\Exception\ValidationException(
-				'"' . trim((string)$value) . '" ist keine gültige Menge. Erlaubt sind Zahlen mit bis zu '
-				. self::QUANTITY_DECIMALS . ' Nachkommastellen, zum Beispiel 1.000 oder 12,5.'
+				'"' . trim((string)$value) . '" ist keine gültige Menge. Das Komma trennt die '
+				. 'Nachkommastellen, der Punkt die Tausender: 12,5 oder 1.000 (eintausend). Erlaubt '
+				. 'sind bis zu ' . self::QUANTITY_DECIMALS . ' Nachkommastellen.'
 			);
 		}
 		return $parsed;
@@ -177,8 +171,9 @@ final class NumberInput {
 		$parsed = self::parse($value, self::PRICE_DECIMALS, self::PRICE_INTEGER_DIGITS);
 		if ($parsed === null) {
 			throw new \OCA\Rechnungswerk\Exception\ValidationException(
-				'"' . trim((string)$value) . '" ist kein gültiger Preis. Erlaubt sind Zahlen mit bis zu '
-				. self::PRICE_DECIMALS . ' Nachkommastellen, zum Beispiel 1.234,56 oder 0,3456.'
+				'"' . trim((string)$value) . '" ist kein gültiger Preis. Das Komma trennt die '
+				. 'Nachkommastellen, der Punkt die Tausender: 1.234,56 oder 0,3456. Erlaubt sind '
+				. 'bis zu ' . self::PRICE_DECIMALS . ' Nachkommastellen.'
 			);
 		}
 		if (str_starts_with($parsed, '-')) {
@@ -203,11 +198,11 @@ final class NumberInput {
 		return (int)($integer . str_pad($fraction, self::PRICE_DECIMALS, '0'));
 	}
 
-	/** Ob $value sauber in Dreiergruppen getrennt ist, oder gar keine Gruppierung enthaelt. */
-	private static function isGrouped(string $value, string $groupChar): bool {
-		if (!str_contains($value, $groupChar)) {
+	/** Ob der Vorkommateil sauber in Dreiergruppen getrennt ist, oder gar keinen Punkt enthaelt. */
+	private static function isGrouped(string $value): bool {
+		if (!str_contains($value, '.')) {
 			return preg_match('/^\d*$/', $value) === 1;
 		}
-		return preg_match('/^\d{1,3}(' . preg_quote($groupChar, '/') . '\d{3})+$/', $value) === 1;
+		return preg_match('/^\d{1,3}(\.\d{3})+$/', $value) === 1;
 	}
 }

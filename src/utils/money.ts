@@ -6,22 +6,29 @@
  * Conversion is centralised here to avoid float-rounding drift.
  */
 
-import { parsePrice } from './numberInput'
+import { formatForInput, parsePrice } from './numberInput'
 
 /**
- * Unit price in ten-thousandths of a euro (#147) -> euro input string with 2–4
- * decimals: at least two, up to four, trailing zeros beyond the second trimmed.
- * 20000 -> "2.00", 3456 -> "0.3456", 3500 -> "0.35".
+ * Unit price in ten-thousandths of a euro (#147) -> euro input string in German
+ * notation with 2–4 decimals: at least two, up to four, trailing zeros beyond
+ * the second trimmed. 20000 -> "2,00", 3456 -> "0,3456", 3500 -> "0,35".
+ *
+ * Die deutsche Schreibweise ist Pflicht, nicht Kosmetik (#223): der Rueckgabewert
+ * landet im Preisfeld, und dessen Inhalt wird von euroInputToE4() und vom Server
+ * nach deutscher Regel gelesen. Solange hier "1.234" herauskam, wurde daraus beim
+ * Speichern 1.234,00 € statt 1,234 € — und zwar sofort, nicht erst beim
+ * Wiederoeffnen.
  */
 export function e4ToEuroInput(e4: number | null | undefined): string {
 	if (e4 === null || e4 === undefined) {
 		return ''
 	}
-	return (e4 / 10000).toFixed(4).replace(/(\.\d\d)(\d*?)0+$/, '$1$2')
+	return formatForInput((e4 / 10000).toFixed(4).replace(/(\.\d\d)(\d*?)0+$/, '$1$2'))
 }
 
 /**
- * Euro input ("0,3456", "0.3456", "1.234,56") -> ten-thousandths of a euro (#147).
+ * Euro input in German notation ("0,3456", "1.234,56") -> ten-thousandths of a
+ * euro (#147). Englische Schreibweise wird seit #223 abgelehnt, nicht gedeutet.
  *
  * Frueher wurde nur das ERSTE Komma ersetzt und dann geparst. "1.000" (tausend
  * Euro) wurde dadurch zu 1,00 € und "1.234,5" zu 1,23 €, jeweils ohne Hinweis
