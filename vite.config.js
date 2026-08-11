@@ -39,22 +39,41 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // ES-Modul statt iife (#221).
+    //
+    // Anlass: @nextcloud/dialogs laedt seinen FilePicker per dynamischem Import.
+    // Das erzwingt Code-Splitting, und iife kann das nicht — der Build brach mit
+    // INVALID_OPTION ab. Weder `codeSplitting: false` noch `inlineDynamicImports`
+    // half; nachgewiesen mit einem Debug-Plugin, dass der Bundler bei EINEM
+    // Eintrag genau `{format:"iife", codeSplitting:false}` erhielt und trotzdem
+    // ablehnte.
+    //
+    // Die offizielle Nextcloud-Vite-Konfiguration (@nextcloud/vite-config) liefert
+    // ohnehin `.mjs` mit Chunks aus. Das einzelne iife-Bundle war der Sonderfall,
+    // weshalb dieses Problem uns traf und offizielle Apps nicht. Nextclouds
+    // Skript-Aufloesung bevorzugt `.mjs` von sich aus
+    // (JSResourceLocator::appendScriptIfExist: "Try to find ES6 script file
+    // (.mjs) with fallback to plain javascript (.js)"), deshalb bleibt
+    // templates/index.php mit Util::addScript(...) unveraendert.
     lib: {
       entry: resolve(dirname, 'src/main.js'),
       name: 'rechnungswerk',
-      formats: ['iife'],
-      fileName: () => 'js/rechnungswerk-main.js',
+      formats: ['es'],
+      fileName: () => 'js/rechnungswerk-main.mjs',
     },
     rollupOptions: {
       output: {
+        // Chunks mit Inhalts-Hash. Der Hash ist kein Selbstzweck: Chunks werden
+        // vom Modullader ohne NCs `?v=`-Parameter geholt, ein gleichnamiger
+        // Chunk kaeme nach einem Update aus dem Browser-Cache. Dass dabei alte
+        // Dateien liegenbleiben, raeumt CleanupExtraFiles auf — der Schritt
+        // deckt jetzt js/ mit ab, nicht mehr nur vendor/.
+        chunkFileNames: 'js/[name]-[hash].chunk.mjs',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name && assetInfo.name.endsWith('.css')) {
             return 'css/rechnungswerk-main.css'
           }
           return 'css/[name][extname]'
-        },
-        globals: {
-          vue: 'Vue',
         },
       },
     },

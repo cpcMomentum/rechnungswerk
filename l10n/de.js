@@ -404,6 +404,7 @@ OC.L10N.register(
     "z. B. Personen, Sitzung" : "z. B. Personen, Sitzung",
     "Zurücksetzen" : "Zurücksetzen",
     "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung." : "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.",
-    "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert." : "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert."
+    "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert." : "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.",
+    "Auswählen" : "Auswählen"
 },
 "nplurals=2; plural=(n != 1);");

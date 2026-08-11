@@ -30,9 +30,20 @@ use OCP\Migration\IRepairStep;
  *
  * Abgeglichen wird gegen signature.json, nicht gegen eine gepflegte Liste: die
  * Signatur ist die verbindliche Aussage darueber, was zur Auslieferung gehoert,
- * und sie veraltet nicht. Angetastet wird ausschliesslich vendor/ — dort liegt
- * reiner Composer-Output, der exakt der Signatur entsprechen muss. Alles
- * andere bleibt unberuehrt, auch wenn es unsigniert ist.
+ * und sie veraltet nicht.
+ *
+ * Angetastet werden ausschliesslich vendor/ und js/ — beides reiner Build- bzw.
+ * Composer-Output, der exakt der Signatur entsprechen muss. Alles andere bleibt
+ * unberuehrt, auch wenn es unsigniert ist.
+ *
+ * js/ kam mit #221 dazu: seit der Umstellung auf ES-Module (noetig, weil
+ * @nextcloud/dialogs seinen FilePicker per dynamischem Import laedt) besteht das
+ * Frontend nicht mehr aus einer Datei, sondern aus einem Einstiegspunkt und
+ * Chunks mit Inhalts-Hash im Namen. Der Hash ist Absicht: Chunks werden vom
+ * Modullader ohne NCs `?v=`-Parameter geholt, ein gleichnamiger Chunk kaeme nach
+ * einem Update aus dem Browser-Cache. Die Kehrseite ist, dass jede Version
+ * andere Dateinamen mitbringt und die alten liegenbleiben — genau der Fall, fuer
+ * den dieser Schritt existiert.
  */
 class CleanupExtraFiles implements IRepairStep {
 
@@ -42,6 +53,15 @@ class CleanupExtraFiles implements IRepairStep {
 	 * Release traegt gut 2.700 Eintraege.
 	 */
 	private const MIN_SIGNED = 500;
+
+	/**
+	 * Nur reiner Build- und Composer-Output. Handgeschriebenes (lib/, templates/,
+	 * l10n/, appinfo/) bleibt tabu, auch wenn dort einmal etwas unsigniert liegt.
+	 */
+	private const MANAGED_DIRS = ['vendor', 'js'];
+
+	/** Der Einstiegspunkt; dient als Beleg, dass die Signatur zu diesem Build gehoert. */
+	private const ENTRY_FILE = 'js/rechnungswerk-main.mjs';
 
 	public function __construct(
 		private readonly IAppManager $appManager,
@@ -64,14 +84,40 @@ class CleanupExtraFiles implements IRepairStep {
 			return;
 		}
 
-		$vendorPath = $appPath . '/vendor';
-		if (!is_dir($vendorPath)) {
-			return;
+		$removed = 0;
+		foreach (self::MANAGED_DIRS as $dir) {
+			if ($dir === 'js' && !isset($signed[self::ENTRY_FILE])) {
+				// Kohaerenz-Pruefung: beschreibt die Signatur ueberhaupt DIESEN Build?
+				// Kennt sie den Einstiegspunkt nicht, stammt sie aus einer anderen
+				// Version — dann wuerde das Aufraeumen die frisch gebauten Chunks
+				// loeschen und die App unbenutzbar machen. Genau das passiert bei
+				// lokalen Deploys, die eine signature.json vom letzten Release
+				// mitbringen. Im Zweifel nichts anfassen.
+				$output->info('Rechnungswerk: signature.json passt nicht zu diesem Build, js/ wird nicht aufgeraeumt');
+				continue;
+			}
+			$removed += $this->cleanDir($appPath, $appPath . '/' . $dir, $signed);
+		}
+
+		if ($removed > 0) {
+			$output->info('Rechnungswerk: ' . $removed . ' Datei(en) aus einer Vorversion entfernt');
+		}
+	}
+
+	/**
+	 * Alles in $path entfernen, was nicht signiert ist.
+	 *
+	 * @param array<string, true> $signed
+	 * @return int Zahl der entfernten Dateien
+	 */
+	private function cleanDir(string $appPath, string $path, array $signed): int {
+		if (!is_dir($path)) {
+			return 0;
 		}
 
 		$removed = 0;
 		$iterator = new \RecursiveIteratorIterator(
-			new \RecursiveDirectoryIterator($vendorPath, \FilesystemIterator::SKIP_DOTS),
+			new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
 			\RecursiveIteratorIterator::CHILD_FIRST,
 		);
 		foreach ($iterator as $item) {
@@ -94,10 +140,7 @@ class CleanupExtraFiles implements IRepairStep {
 				$removed++;
 			}
 		}
-
-		if ($removed > 0) {
-			$output->info('Rechnungswerk: ' . $removed . ' Datei(en) aus einer Vorversion entfernt');
-		}
+		return $removed;
 	}
 
 	/**

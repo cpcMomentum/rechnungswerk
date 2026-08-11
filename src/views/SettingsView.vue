@@ -458,6 +458,11 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
+// FilePicker statt des seit NC 30 veralteten OC.dialogs (#221). Das Stylesheet
+// gehoert dazu: der Dialog wird von @nextcloud/dialogs selbst gerendert, ohne
+// den Import stehen Dateiliste und Kopfzeile ungestylt da.
+import { getFilePickerBuilder, FilePickerClosed } from '@nextcloud/dialogs'
+import '@nextcloud/dialogs/style.css'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -777,33 +782,56 @@ function applyQuoteResetMode() {
 	}
 }
 
-/** Pick a logo from the user's files (raster image) and store it immediately. */
-function onPickArchiveFolder() {
-	OC.dialogs.filepicker(
-		t('rechnungswerk', 'Zielordner für die Ablage wählen'),
-		async (path: string) => {
-			if (!path) {
-				return
-			}
-			archiveBusy.value = true
-			error.value = ''
-			try {
-				const res = await setArchiveFolder(path)
-				if (form.value) {
-					form.value.archiveFolderId = res.archiveFolderId
-				}
-				archiveFolderPath.value = res.archiveFolderPath
-			} catch (e) {
-				fail(e, t('rechnungswerk', 'Zielordner konnte nicht gesetzt werden.'))
-			} finally {
-				archiveBusy.value = false
-			}
-		},
-		false,
-		'httpd/unix-directory',
-		true,
-		OC.dialogs.FILEPICKER_TYPE_CHOOSE,
-	)
+/**
+ * Zielordner für die Ablage wählen (#221).
+ *
+ * Statt `OC.dialogs.filepicker` mit Callback jetzt der FilePicker aus
+ * @nextcloud/dialogs, der ein Promise liefert. Bewusst `addButton` und nicht
+ * `setType`: letzteres ist im Paket selbst als veraltet markiert, und eine
+ * Veraltung gegen eine andere zu tauschen waere am Ziel dieses Issues vorbei.
+ *
+ * `pick()` gibt bei Einzelauswahl den Pfad als Zeichenkette zurueck, genau wie
+ * der alte Callback — `setArchiveFolder()` bleibt deshalb unveraendert.
+ */
+async function onPickArchiveFolder() {
+	let path: string
+	try {
+		path = await getFilePickerBuilder(t('rechnungswerk', 'Zielordner für die Ablage wählen'))
+			.setMultiSelect(false)
+			.setMimeTypeFilter(['httpd/unix-directory'])
+			.allowDirectories(true)
+			.addButton({
+				label: t('rechnungswerk', 'Auswählen'),
+				variant: 'primary',
+				callback: () => {},
+			})
+			.build()
+			.pick()
+	} catch (e) {
+		// Abbruch ist keine Fehlbedienung: der Dialog wirft beim Schliessen ohne
+		// Auswahl. Nur echte Fehler duerfen eine Meldung erzeugen.
+		if (e instanceof FilePickerClosed) {
+			return
+		}
+		fail(e, t('rechnungswerk', 'Zielordner konnte nicht gesetzt werden.'))
+		return
+	}
+	if (!path) {
+		return
+	}
+	archiveBusy.value = true
+	error.value = ''
+	try {
+		const res = await setArchiveFolder(path)
+		if (form.value) {
+			form.value.archiveFolderId = res.archiveFolderId
+		}
+		archiveFolderPath.value = res.archiveFolderPath
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Zielordner konnte nicht gesetzt werden.'))
+	} finally {
+		archiveBusy.value = false
+	}
 }
 
 /** Clear the archive target; the server also switches the toggle off. */
@@ -824,31 +852,42 @@ async function onRemoveArchiveFolder() {
 	}
 }
 
-function onPickLogo() {
-	OC.dialogs.filepicker(
-		t('rechnungswerk', 'Firmenlogo wählen'),
-		async (path: string) => {
-			if (!path) {
-				return
-			}
-			logoBusy.value = true
-			error.value = ''
-			try {
-				const res = await setLogo(path)
-				if (form.value) {
-					form.value.logoFileId = res.logoFileId
-				}
-			} catch (e) {
-				fail(e, t('rechnungswerk', 'Logo konnte nicht gesetzt werden.'))
-			} finally {
-				logoBusy.value = false
-			}
-		},
-		false,
-		['image/png', 'image/jpeg', 'image/gif'],
-		true,
-		OC.dialogs.FILEPICKER_TYPE_CHOOSE,
-	)
+/** Firmenlogo aus den eigenen Dateien wählen und sofort speichern (#221, s. o.). */
+async function onPickLogo() {
+	let path: string
+	try {
+		path = await getFilePickerBuilder(t('rechnungswerk', 'Firmenlogo wählen'))
+			.setMultiSelect(false)
+			.setMimeTypeFilter(['image/png', 'image/jpeg', 'image/gif'])
+			.addButton({
+				label: t('rechnungswerk', 'Auswählen'),
+				variant: 'primary',
+				callback: () => {},
+			})
+			.build()
+			.pick()
+	} catch (e) {
+		if (e instanceof FilePickerClosed) {
+			return
+		}
+		fail(e, t('rechnungswerk', 'Logo konnte nicht gesetzt werden.'))
+		return
+	}
+	if (!path) {
+		return
+	}
+	logoBusy.value = true
+	error.value = ''
+	try {
+		const res = await setLogo(path)
+		if (form.value) {
+			form.value.logoFileId = res.logoFileId
+		}
+	} catch (e) {
+		fail(e, t('rechnungswerk', 'Logo konnte nicht gesetzt werden.'))
+	} finally {
+		logoBusy.value = false
+	}
 }
 
 /** Remove the company logo immediately. */

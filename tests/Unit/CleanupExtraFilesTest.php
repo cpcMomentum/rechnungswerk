@@ -37,7 +37,11 @@ class CleanupExtraFilesTest extends TestCase {
 		mkdir($this->appPath . '/vendor/paket/src', 0777, true);
 		mkdir($this->appPath . '/vendor/paket/tests', 0777, true);
 		mkdir($this->appPath . '/lib', 0777, true);
+		mkdir($this->appPath . '/js', 0777, true);
 	}
+
+	/** Der Einstiegspunkt, an dem der Schritt erkennt, ob die Signatur zu diesem Build gehoert. */
+	private const ENTRY = 'js/rechnungswerk-main.mjs';
 
 	protected function tearDown(): void {
 		$this->removeTree($this->appPath);
@@ -100,7 +104,54 @@ class CleanupExtraFilesTest extends TestCase {
 	}
 
 	/**
-	 * Ausserhalb von vendor/ wird nichts angetastet, auch nichts Unsigniertes.
+	 * #221: Chunks aus einer Vorversion muessen weg, die der aktuellen bleiben.
+	 *
+	 * Seit der Umstellung auf ES-Module traegt jeder Chunk einen Inhalts-Hash im
+	 * Namen. Jede Version bringt damit andere Dateinamen mit, und NCs Update
+	 * loescht die alten nicht — ohne diesen Schritt sammelt sich js/ zu und die
+	 * Integritaetspruefung meldet EXTRA_FILE.
+	 */
+	public function testStaleChunksAreRemovedAndCurrentOnesKept(): void {
+		file_put_contents($this->appPath . '/' . self::ENTRY, 'export{}');
+		file_put_contents($this->appPath . '/js/FilePicker-NEU.chunk.mjs', 'export{}');
+		file_put_contents($this->appPath . '/js/FilePicker-ALT.chunk.mjs', 'export{}');
+		file_put_contents($this->appPath . '/js/rechnungswerk-main.js', '// iife aus 0.4.1');
+		$this->writeSignature([self::ENTRY, 'js/FilePicker-NEU.chunk.mjs']);
+
+		$this->service()->run($this->createMock(IOutput::class));
+
+		$this->assertFileExists($this->appPath . '/' . self::ENTRY, 'Einstiegspunkt muss bleiben');
+		$this->assertFileExists($this->appPath . '/js/FilePicker-NEU.chunk.mjs', 'Aktueller Chunk muss bleiben');
+		$this->assertFileDoesNotExist($this->appPath . '/js/FilePicker-ALT.chunk.mjs', 'Chunk der Vorversion muss weg');
+		$this->assertFileDoesNotExist($this->appPath . '/js/rechnungswerk-main.js', 'Das alte iife-Bundle muss weg');
+	}
+
+	/**
+	 * Die wichtigste Absicherung an js/: kennt die Signatur den Einstiegspunkt
+	 * nicht, stammt sie aus einer anderen Version. Dann darf der Schritt js/ NICHT
+	 * anfassen, sonst loescht er die frisch gebauten Chunks und die App startet
+	 * nicht mehr. Genau das passiert bei lokalen Deploys, die eine signature.json
+	 * vom letzten Release mitbringen.
+	 */
+	public function testForeignSignatureNeverTouchesJs(): void {
+		file_put_contents($this->appPath . '/' . self::ENTRY, 'export{}');
+		file_put_contents($this->appPath . '/js/FilePicker-NEU.chunk.mjs', 'export{}');
+		file_put_contents($this->appPath . '/vendor/paket/tests/Alt.php', '<?php');
+		// Signatur ohne den Einstiegspunkt = gehoert nicht zu diesem Build.
+		$this->writeSignature(['vendor/paket/src/Echt.php']);
+
+		$this->service()->run($this->createMock(IOutput::class));
+
+		$this->assertFileExists($this->appPath . '/' . self::ENTRY, 'Einstiegspunkt darf nicht geloescht werden');
+		$this->assertFileExists($this->appPath . '/js/FilePicker-NEU.chunk.mjs', 'Chunk darf nicht geloescht werden');
+		$this->assertFileDoesNotExist(
+			$this->appPath . '/vendor/paket/tests/Alt.php',
+			'vendor/ wird davon nicht ausgebremst',
+		);
+	}
+
+	/**
+	 * Ausserhalb von vendor/ und js/ wird nichts angetastet, auch nichts Unsigniertes.
 	 * Dort liegt eigener Code, nicht Composer-Output, und ein Fehlgriff waere
 	 * nicht wiederherstellbar.
 	 */

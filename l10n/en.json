@@ -403,7 +403,8 @@
         "z. B. Personen, Sitzung": "e.g. persons, session",
         "Zurücksetzen": "Reset",
         "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.": "This is how the header row of the line item table appears on the invoice.",
-        "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.": "White text would be too faint on this colour, so the invoice uses black instead. The colour itself stays unchanged."
+        "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.": "White text would be too faint on this colour, so the invoice uses black instead. The colour itself stays unchanged.",
+        "Auswählen": "Select"
     },
     "pluralForm": "nplurals=2; plural=(n != 1);"
 }
