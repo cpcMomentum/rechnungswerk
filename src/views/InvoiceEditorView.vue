@@ -389,7 +389,6 @@ import { useTextSnippetStore } from '@/stores/textSnippetStore'
 import { INVOICE_STATUS_LABELS, INVOICE_TYPE_LABELS, QUOTE_STATUS_LABELS, type ContactMatch, type Customer, type InvoiceDetail, type SnippetDocType, type TextSnippet } from '@/types/api'
 import { emptyItem, itemFromInvoiceItem, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToE4 } from '@/utils/money'
-import { parseQuantity } from '@/utils/numberInput'
 import { computeTotals, lineTotalCents } from '@/utils/invoiceCalc'
 import { downloadInvoicePdf, invoicePreviewUrl, sendInvoice, type InvoiceInput } from '@/api/invoices'
 import { downloadQuotePdf, quotePreviewUrl, sendQuote } from '@/api/quotes'
@@ -756,9 +755,11 @@ function buildInput(): InvoiceInput {
 				productId: i.productId,
 				name: i.name.trim(),
 				description: i.description.trim() === '' ? null : i.description.trim(),
-				// Unlesbares wird bewusst unveraendert gesendet, damit der Server die
-				// verstaendliche Meldung liefert statt hier still etwas zu erfinden (#157).
-				quantity: parseQuantity(i.quantity) ?? String(i.quantity),
+				// Rohtext statt vorberechneter Zahl, genau wie der Preis seit #180: der
+				// Server wertet aus und prueft, mit derselben Regel wie das Formular.
+				// Vorher ging hier der normalisierte Wert raus ("12.5"), den die jetzt
+				// eng gefasste deutsche Regel zu Recht ablehnen wuerde (#223).
+				quantity: i.quantity,
 				unitCode: i.unitCode,
 				unitLabel: i.unitLabel.trim() === '' ? null : i.unitLabel.trim(),
 				// Rohtext statt vorberechneter Zahl: der Server rechnet um und prueft (#180).
