@@ -39,6 +39,26 @@ class NumberInputTest extends TestCase {
 		return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
 	}
 
+	/**
+	 * Faelle unter ihrer Begruendung ablegen, damit ein Fehlschlag sagt, welche
+	 * Eigenschaft gebrochen ist.
+	 *
+	 * Ein doppelter Schluessel wuerde den ersten Fall lautlos ueberschreiben: er
+	 * wuerde nie wieder geprueft, ohne dass irgendetwas rot wird. Das ist genau
+	 * die Sorte stillen Verlusts, gegen die diese Datei antritt (#229), deshalb
+	 * bricht sie hier ab statt zu ueberschreiben.
+	 *
+	 * @param array<string, array<int, mixed>> $out
+	 * @param array<int, mixed> $case
+	 */
+	private static function addCase(array &$out, string $why, string $fallback, array $case): void {
+		$key = $why !== '' ? $why : $fallback;
+		if (array_key_exists($key, $out)) {
+			throw new \LogicException('Doppelte Begruendung in der geteilten Falltabelle: ' . $key);
+		}
+		$out[$key] = $case;
+	}
+
 	/** Ohne Faelle prueft der Rest dieser Datei nichts. */
 	public function testSharedCaseTableIsReadable(): void {
 		$cases = self::sharedCases();
@@ -65,7 +85,7 @@ class NumberInputTest extends TestCase {
 	public static function quantityProvider(): array {
 		$out = [];
 		foreach (self::sharedCases()['quantity']['accepted'] as [$input, $expected, $why]) {
-			$out[$why !== '' ? $why : $input] = [$input, $expected, $why];
+			self::addCase($out, $why, $input, [$input, $expected, $why]);
 		}
 		return $out;
 	}
@@ -87,10 +107,10 @@ class NumberInputTest extends TestCase {
 	public static function rejectedProvider(): array {
 		$out = [];
 		foreach (self::sharedCases()['quantity']['rejected'] as [$input, $why]) {
-			$out[$why !== '' ? $why : $input] = [$input, $why];
+			self::addCase($out, $why, $input, [$input, $why]);
 		}
-		$out['null'] = [null, 'nur auf der PHP-Seite moeglich'];
-		$out['Array'] = [[1], 'nur auf der PHP-Seite moeglich'];
+		self::addCase($out, 'null (nur PHP)', '', [null, 'aus dem Formular kommt immer ein String']);
+		self::addCase($out, 'Array (nur PHP)', '', [[1], 'aus dem Formular kommt immer ein String']);
 		return $out;
 	}
 
@@ -166,7 +186,7 @@ class NumberInputTest extends TestCase {
 	public static function priceProvider(): array {
 		$out = [];
 		foreach (self::sharedCases()['price']['toE4'] as [$input, $expected, $why]) {
-			$out[$why !== '' ? $why : $input] = [$input, $expected, $why];
+			self::addCase($out, $why, $input, [$input, $expected, $why]);
 		}
 		return $out;
 	}

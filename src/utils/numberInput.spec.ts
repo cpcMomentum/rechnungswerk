@@ -39,9 +39,13 @@ const CASES = JSON.parse(
 }
 
 describe('parseNumberInput', () => {
+	// Deckungsgleich mit testSharedCaseTableIsReadable() auf der PHP-Seite: beide
+	// Suiten prüfen alle drei Gruppen, sonst könnte eine leere Gruppe auf einer
+	// Seite unbemerkt durchlaufen.
 	it('liest die geteilte Falltabelle, sonst prueft dieser Test nichts', () => {
 		expect(CASES.quantity.accepted.length).toBeGreaterThan(10)
 		expect(CASES.quantity.rejected.length).toBeGreaterThan(10)
+		expect(CASES.price.toE4.length).toBeGreaterThan(5)
 	})
 
 	it.each(CASES.quantity.accepted)('%s ergibt %s (%s)', (input, expected) => {
