@@ -84,7 +84,7 @@ class ProductService {
 		try {
 			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Produkt nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Produkt nicht gefunden.'));
 		}
 	}
 

@@ -86,7 +86,7 @@ class CustomerService {
 		try {
 			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Kunde nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Kunde nicht gefunden.'));
 		}
 	}
 

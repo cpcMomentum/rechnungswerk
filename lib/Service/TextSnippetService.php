@@ -108,7 +108,7 @@ class TextSnippetService {
 		try {
 			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Textbaustein nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Textbaustein nicht gefunden.'));
 		}
 	}
 
