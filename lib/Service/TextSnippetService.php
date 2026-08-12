@@ -16,12 +16,14 @@ use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
+use OCP\IL10N;
 
 class TextSnippetService {
 
 	public function __construct(
 		private readonly TextSnippetMapper $mapper,
 		private readonly IDBConnection $db,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -106,7 +108,7 @@ class TextSnippetService {
 		try {
 			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Textbaustein nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Textbaustein nicht gefunden.'));
 		}
 	}
 
@@ -118,17 +120,17 @@ class TextSnippetService {
 		if (!$partial || array_key_exists('label', $data)) {
 			$label = trim((string)($data['label'] ?? ''));
 			if ($label === '') {
-				throw new ValidationException('Ein Name ist erforderlich.');
+				throw new ValidationException($this->l10n->t('Ein Name ist erforderlich.'));
 			}
 			if (mb_strlen($label) > 255) {
-				throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Der Name darf höchstens 255 Zeichen lang sein.'));
 			}
 		}
 		if (array_key_exists('docType', $data) && !in_array((string)$data['docType'], TextSnippet::DOC_TYPES, true)) {
-			throw new ValidationException('Ungültiger Dokumenttyp.');
+			throw new ValidationException($this->l10n->t('Ungültiger Dokumenttyp.'));
 		}
 		if (array_key_exists('slot', $data) && !in_array((string)$data['slot'], TextSnippet::SLOTS, true)) {
-			throw new ValidationException('Ungültiger Textbereich.');
+			throw new ValidationException($this->l10n->t('Ungültiger Textbereich.'));
 		}
 	}
 

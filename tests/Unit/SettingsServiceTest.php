@@ -25,6 +25,8 @@ use PHPUnit\Framework\TestCase;
  */
 class SettingsServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private SettingsMapper $mapper;
 	private SettingsService $service;
 
@@ -35,7 +37,7 @@ class SettingsServiceTest extends TestCase {
 		$crypto = $this->createMock(ICrypto::class);
 		$crypto->method('encrypt')->willReturnCallback(static fn (string $v): string => 'enc:' . $v);
 		$crypto->method('decrypt')->willReturnCallback(static fn (string $v): string => str_replace('enc:', '', $v));
-		$this->service = new SettingsService($this->mapper, $db, $crypto);
+		$this->service = new SettingsService($this->mapper, $db, $crypto, $this->l10nStub());
 	}
 
 	public function testGetCompanyInsertsDefaultsOnFirstAccess(): void {

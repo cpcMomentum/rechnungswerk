@@ -17,9 +17,11 @@ use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
+use OCA\Rechnungswerk\Exception\NumberFormatException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class InvoiceService {
@@ -35,6 +37,8 @@ class InvoiceService {
 		private readonly CountryService $countryService,
 		private readonly IDBConnection $db,
 		private readonly LoggerInterface $logger,
+		private readonly NumberFormatMessage $numberFormatMessage,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -206,10 +210,10 @@ class InvoiceService {
 
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		if (count($items) === 0) {
-			throw new ValidationException('Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.');
+			throw new ValidationException($this->l10n->t('Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.'));
 		}
 		if (($invoice->getRecipientName() ?? '') === '') {
-			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Empfänger ist zum Festschreiben erforderlich.'));
 		}
 
 		// Create the settings row outside the transaction: a failed INSERT would
@@ -415,10 +419,10 @@ class InvoiceService {
 	public function sendToCustomer(int $id, string $to, string $subject, string $body): void {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException('Nur festgeschriebene Rechnungen können versendet werden.');
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können versendet werden.'));
 		}
 		if (trim($subject) === '') {
-			throw new ValidationException('Ein Betreff ist erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Betreff ist erforderlich.'));
 		}
 		$settings = $this->settingsService->getCompany();
 		// Der Kunde bekommt exakt den eingefrorenen Beleg (#181). Vorher wurde er
@@ -442,7 +446,7 @@ class InvoiceService {
 	public function cancel(int $id, string $userId): array {
 		$original = $this->assertInvoiceType($this->findById($id));
 		if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
 		}
 
 		$this->settingsService->getCompany();
@@ -455,7 +459,7 @@ class InvoiceService {
 			// cancel cannot create two storno documents for the same invoice.
 			$original = $this->findByIdForUpdate($id);
 			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-				throw new IllegalStateException('Nur festgeschriebene Rechnungen können storniert werden.');
+				throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
 			}
 			$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
@@ -552,7 +556,7 @@ class InvoiceService {
 		// invoice would yield a nonsensical negative draft. Cancelled *invoices*
 		// keep their positive amounts and stay duplicable.
 		if ($original->getInvoiceType() === Invoice::TYPE_CANCELLATION) {
-			throw new IllegalStateException('Stornobelege können nicht dupliziert werden.');
+			throw new IllegalStateException($this->l10n->t('Stornobelege können nicht dupliziert werden.'));
 		}
 		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
@@ -654,7 +658,7 @@ class InvoiceService {
 	public function generatePdf(int $id): array {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.'));
 		}
 		// Der eingefrorene Beleg, nicht ein neu erzeugter (#181, Schritt 2).
 		return $this->documentFor($invoice);
@@ -672,7 +676,7 @@ class InvoiceService {
 	public function generatePreviewPdf(int $id): array {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.');
+			throw new IllegalStateException($this->l10n->t('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.'));
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getCompany();
@@ -734,7 +738,7 @@ class InvoiceService {
 		try {
 			return $this->invoiceMapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Rechnung nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
 		}
 	}
 
@@ -749,7 +753,7 @@ class InvoiceService {
 	 */
 	private function assertInvoiceType(Invoice $invoice): Invoice {
 		if (!in_array($invoice->getInvoiceType(), Invoice::INVOICE_TYPES, true)) {
-			throw new NotFoundException('Rechnung nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
 		}
 		return $invoice;
 	}
@@ -761,7 +765,7 @@ class InvoiceService {
 		try {
 			return $this->invoiceMapper->findOneForUpdate($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Rechnung nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
 		}
 	}
 
@@ -770,7 +774,7 @@ class InvoiceService {
 	 */
 	private function assertDraft(Invoice $invoice): void {
 		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException('Festgeschriebene oder stornierte Rechnungen können nicht mehr geändert werden.');
+			throw new IllegalStateException($this->l10n->t('Festgeschriebene oder stornierte Rechnungen können nicht mehr geändert werden.'));
 		}
 	}
 
@@ -857,21 +861,29 @@ class InvoiceService {
 			// Ungeprueft lief die Menge frueher als Rohtext in eine numeric-Spalte:
 			// "99.999.999" brach mit einem 500er ab, "1.000" wurde still zu 1 und
 			// machte die Rechnung um Faktor 1000 falsch (#157).
-			$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
-			// Der Preis kommt als Rohtext und wird HIER umgerechnet (#180). Vorher
-			// rechnete allein der Browser und schickte die fertige Zahl; der Server
-			// konnte sie nicht pruefen, weil einer blossen Zahl nicht anzusehen ist,
-			// ob 95 als 0,0095 € oder als 95 € gemeint war.
-			$unitPriceE4 = NumberInput::parsePrice($row['unitPriceInput'] ?? null);
+			//
+			// Der Preis kommt ebenfalls als Rohtext und wird HIER umgerechnet (#180).
+			// Vorher rechnete allein der Browser und schickte die fertige Zahl; der
+			// Server konnte sie nicht pruefen, weil einer blossen Zahl nicht anzusehen
+			// ist, ob 95 als 0,0095 € oder als 95 € gemeint war.
+			//
+			// NumberInput wirft ohne Prosa, damit es statisch bleiben kann; den
+			// uebersetzten Satz macht NumberFormatMessage daraus (#235).
+			try {
+				$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
+				$unitPriceE4 = NumberInput::parsePrice($row['unitPriceInput'] ?? null);
+			} catch (NumberFormatException $e) {
+				throw $this->numberFormatMessage->asValidationException($e);
+			}
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
 			$name = (string)($row['name'] ?? '');
 			if (mb_strlen($name) > 255) {
-				throw new ValidationException('Positionsname darf maximal 255 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Positionsname darf maximal 255 Zeichen lang sein.'));
 			}
 			$unitLabel = isset($row['unitLabel']) && trim((string)$row['unitLabel']) !== '' ? trim((string)$row['unitLabel']) : null;
 			if ($unitLabel !== null && mb_strlen($unitLabel) > 64) {
-				throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Die eigene Einheit darf höchstens 64 Zeichen lang sein.'));
 			}
 
 			$item = new InvoiceItem();
@@ -1062,7 +1074,7 @@ class InvoiceService {
 	private function assertPayable(Invoice $invoice): Invoice {
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
 			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
-			throw new IllegalStateException('Nur festgeschriebene Rechnungen können als bezahlt markiert werden.');
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können als bezahlt markiert werden.'));
 		}
 		return $invoice;
 	}
@@ -1162,10 +1174,10 @@ class InvoiceService {
 
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
 		if (count($items) === 0) {
-			throw new ValidationException('Ein Angebot ohne Positionen kann nicht festgeschrieben werden.');
+			throw new ValidationException($this->l10n->t('Ein Angebot ohne Positionen kann nicht festgeschrieben werden.'));
 		}
 		if (($quote->getRecipientName() ?? '') === '') {
-			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Empfänger ist zum Festschreiben erforderlich.'));
 		}
 
 		// Create the settings row outside the transaction (see commit()).
@@ -1227,7 +1239,7 @@ class InvoiceService {
 		}
 		$base = (string)$root->getNumber();
 		if ($base === '') {
-			throw new ValidationException('Das Ursprungsangebot hat keine Nummer und kann nicht revidiert werden.');
+			throw new ValidationException($this->l10n->t('Das Ursprungsangebot hat keine Nummer und kann nicht revidiert werden.'));
 		}
 		$existing = $this->invoiceMapper->findQuoteNumbersInFamily($base);
 		return InvoiceCalculator::nextRevisionNumber($base, $existing);
@@ -1383,7 +1395,7 @@ class InvoiceService {
 		try {
 			$quote = $this->assertCommittedQuote($this->findByIdForUpdate($id));
 			if ($quote->getQuoteStatus() === Invoice::QUOTE_CONVERTED) {
-				throw new IllegalStateException('Ein übernommenes Angebot kann nicht mehr geändert werden.');
+				throw new IllegalStateException($this->l10n->t('Ein übernommenes Angebot kann nicht mehr geändert werden.'));
 			}
 			$quote->setQuoteStatus($outcome);
 			$quote->setUpdatedAt(new DateTime());
@@ -1503,7 +1515,7 @@ class InvoiceService {
 	public function generateQuotePreviewPdf(int $id): array {
 		$quote = $this->assertQuoteType($this->findById($id));
 		if ($quote->getStatus() !== Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException('Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden.');
+			throw new IllegalStateException($this->l10n->t('Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden.'));
 		}
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
 		$settings = $this->settingsService->getCompany();
@@ -1519,7 +1531,7 @@ class InvoiceService {
 	public function sendQuoteToCustomer(int $id, string $to, string $subject, string $body): void {
 		$quote = $this->assertCommittedQuote($this->findById($id));
 		if (trim($subject) === '') {
-			throw new ValidationException('Ein Betreff ist erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Betreff ist erforderlich.'));
 		}
 		$settings = $this->settingsService->getCompany();
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
@@ -1542,7 +1554,7 @@ class InvoiceService {
 	 */
 	private function assertQuoteType(Invoice $quote): Invoice {
 		if ($quote->getInvoiceType() !== Invoice::TYPE_QUOTE) {
-			throw new NotFoundException('Angebot nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Angebot nicht gefunden.'));
 		}
 		return $quote;
 	}
@@ -1553,7 +1565,7 @@ class InvoiceService {
 	private function assertQuoteDraft(Invoice $quote): Invoice {
 		$this->assertQuoteType($quote);
 		if ($quote->getStatus() !== Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException('Festgeschriebene Angebote können nicht mehr geändert werden.');
+			throw new IllegalStateException($this->l10n->t('Festgeschriebene Angebote können nicht mehr geändert werden.'));
 		}
 		return $quote;
 	}
@@ -1564,7 +1576,7 @@ class InvoiceService {
 	private function assertCommittedQuote(Invoice $quote): Invoice {
 		$this->assertQuoteType($quote);
 		if ($quote->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException('Diese Aktion ist nur für festgeschriebene Angebote möglich.');
+			throw new IllegalStateException($this->l10n->t('Diese Aktion ist nur für festgeschriebene Angebote möglich.'));
 		}
 		return $quote;
 	}
@@ -1581,10 +1593,10 @@ class InvoiceService {
 	private function assertQuoteConvertible(Invoice $quote): void {
 		$status = $quote->getQuoteStatus();
 		if ($status === Invoice::QUOTE_CONVERTED) {
-			throw new IllegalStateException('Dieses Angebot wurde bereits in eine Rechnung übernommen.');
+			throw new IllegalStateException($this->l10n->t('Dieses Angebot wurde bereits in eine Rechnung übernommen.'));
 		}
 		if ($status === Invoice::QUOTE_REJECTED) {
-			throw new IllegalStateException('Ein abgelehntes Angebot kann nicht in eine Rechnung übernommen werden.');
+			throw new IllegalStateException($this->l10n->t('Ein abgelehntes Angebot kann nicht in eine Rechnung übernommen werden.'));
 		}
 	}
 
@@ -1600,10 +1612,10 @@ class InvoiceService {
 	private function assertQuoteRevisable(Invoice $quote): void {
 		$status = $quote->getQuoteStatus();
 		if ($status === Invoice::QUOTE_CONVERTED) {
-			throw new IllegalStateException('Ein übernommenes Angebot kann nicht mehr revidiert werden.');
+			throw new IllegalStateException($this->l10n->t('Ein übernommenes Angebot kann nicht mehr revidiert werden.'));
 		}
 		if ($status === Invoice::QUOTE_SUPERSEDED) {
-			throw new IllegalStateException('Dieses Angebot wurde bereits revidiert.');
+			throw new IllegalStateException($this->l10n->t('Dieses Angebot wurde bereits revidiert.'));
 		}
 	}
 

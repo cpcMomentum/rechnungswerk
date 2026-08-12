@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
+use OCA\Rechnungswerk\Exception\NumberFormatException;
+
 /**
  * Zahleneingaben in deutscher Schreibweise auswerten (#157).
  *
@@ -134,7 +136,11 @@ final class NumberInput {
 	 * Menge auswerten. Leere Eingabe bedeutet 1, so wie der Editor eine neue
 	 * Position anlegt.
 	 *
-	 * @throws \OCA\Rechnungswerk\Exception\ValidationException
+	 * Wirft ohne Prosa (#235): den Satz formuliert der aufrufende Service, der
+	 * einen Uebersetzer hat. Diese Klasse bleibt statisch und damit der Zwilling
+	 * von src/utils/numberInput.ts.
+	 *
+	 * @throws NumberFormatException
 	 */
 	public static function parseQuantity(mixed $value): string {
 		if ($value === null || (is_string($value) && trim($value) === '')) {
@@ -142,10 +148,9 @@ final class NumberInput {
 		}
 		$parsed = self::parse($value, self::QUANTITY_DECIMALS, self::QUANTITY_INTEGER_DIGITS);
 		if ($parsed === null) {
-			throw new \OCA\Rechnungswerk\Exception\ValidationException(
-				'"' . trim((string)$value) . '" ist keine gültige Menge. Das Komma trennt die '
-				. 'Nachkommastellen, der Punkt die Tausender: 12,5 oder 1.000 (eintausend). Erlaubt '
-				. 'sind bis zu ' . self::QUANTITY_DECIMALS . ' Nachkommastellen.'
+			throw new NumberFormatException(
+				trim((string)$value),
+				NumberFormatException::KIND_QUANTITY,
 			);
 		}
 		return $parsed;
@@ -162,7 +167,9 @@ final class NumberInput {
 	 *
 	 * Leere Eingabe bedeutet 0, das ist ein zulaessiger Preis.
 	 *
-	 * @throws \OCA\Rechnungswerk\Exception\ValidationException
+	 * Wirft ohne Prosa, siehe parseQuantity() (#235).
+	 *
+	 * @throws NumberFormatException
 	 */
 	public static function parsePrice(mixed $value): int {
 		if ($value === null || (is_string($value) && trim($value) === '')) {
@@ -170,14 +177,17 @@ final class NumberInput {
 		}
 		$parsed = self::parse($value, self::PRICE_DECIMALS, self::PRICE_INTEGER_DIGITS);
 		if ($parsed === null) {
-			throw new \OCA\Rechnungswerk\Exception\ValidationException(
-				'"' . trim((string)$value) . '" ist kein gültiger Preis. Das Komma trennt die '
-				. 'Nachkommastellen, der Punkt die Tausender: 1.234,56 oder 0,3456. Erlaubt sind '
-				. 'bis zu ' . self::PRICE_DECIMALS . ' Nachkommastellen.'
+			throw new NumberFormatException(
+				trim((string)$value),
+				NumberFormatException::KIND_PRICE,
 			);
 		}
 		if (str_starts_with($parsed, '-')) {
-			throw new \OCA\Rechnungswerk\Exception\ValidationException('Der Preis darf nicht negativ sein.');
+			throw new NumberFormatException(
+				trim((string)$value),
+				NumberFormatException::KIND_PRICE,
+				NumberFormatException::REASON_NEGATIVE,
+			);
 		}
 		return self::toE4($parsed);
 	}

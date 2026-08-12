@@ -12,6 +12,7 @@ namespace OCA\Rechnungswerk\Service;
 use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\IConfig;
+use OCP\IL10N;
 
 /**
  * Per-user seller-contact default (#47, cascade level 2). Stored as user-scoped
@@ -26,6 +27,7 @@ class UserContactService {
 
 	public function __construct(
 		private readonly IConfig $config,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -51,16 +53,16 @@ class UserContactService {
 		$email = trim((string)($data['email'] ?? ''));
 
 		if (mb_strlen($person) > 255) {
-			throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
+			throw new ValidationException($this->l10n->t('Der Name darf höchstens 255 Zeichen lang sein.'));
 		}
 		if (mb_strlen($phone) > 64) {
-			throw new ValidationException('Die Telefonnummer darf höchstens 64 Zeichen lang sein.');
+			throw new ValidationException($this->l10n->t('Die Telefonnummer darf höchstens 64 Zeichen lang sein.'));
 		}
 		if (mb_strlen($email) > 255) {
-			throw new ValidationException('Die E-Mail-Adresse darf höchstens 255 Zeichen lang sein.');
+			throw new ValidationException($this->l10n->t('Die E-Mail-Adresse darf höchstens 255 Zeichen lang sein.'));
 		}
 		if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-			throw new ValidationException('Bitte eine gültige E-Mail-Adresse angeben.');
+			throw new ValidationException($this->l10n->t('Bitte eine gültige E-Mail-Adresse angeben.'));
 		}
 
 		$this->config->setUserValue($userId, Application::APP_ID, self::KEY_PERSON, $person);

@@ -20,6 +20,7 @@ use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\MailService;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCA\Rechnungswerk\Service\ZugferdService;
 use OCP\IDBConnection;
@@ -35,6 +36,8 @@ use Psr\Log\LoggerInterface;
  * nie die Frage.
  */
 class InvoiceServiceDocumentTest extends TestCase {
+
+	use TranslatorStub;
 
 	private const FROZEN = '%PDF-1.7 eingefrorener Beleg';
 	private const RENDERED = '%PDF-1.7 frisch gerendert';
@@ -78,6 +81,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(CountryService::class),
 			$this->db,
 			$this->createMock(LoggerInterface::class),
+			new NumberFormatMessage($this->l10nStub()),
+			$this->l10nStub(),
 		);
 	}
 
@@ -200,6 +205,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(CountryService::class),
 			$this->db,
 			$this->createMock(LoggerInterface::class),
+			new NumberFormatMessage($this->l10nStub()),
+			$this->l10nStub(),
 		);
 
 		// Dieselbe Datei geht auch in die Ablage — hier mitgeprueft, statt eine
@@ -316,6 +323,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(CountryService::class),
 			$this->db,
 			$this->createMock(LoggerInterface::class),
+			new NumberFormatMessage($this->l10nStub()),
+			$this->l10nStub(),
 		);
 
 		$this->assertFalse($service->freezeDocument($invoice, true));

@@ -18,6 +18,7 @@ use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\MailService;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCA\Rechnungswerk\Service\ZugferdService;
 use OCP\IDBConnection;
@@ -34,6 +35,8 @@ use Psr\Log\LoggerInterface;
  * Zeichen breite Spalte, der Insert brach ab und der Nutzer sah einen 500er.
  */
 class InvoiceServiceCountryTest extends TestCase {
+
+	use TranslatorStub;
 
 	private IDBConnection $db;
 	private InvoiceMapper $invoiceMapper;
@@ -53,9 +56,11 @@ class InvoiceServiceCountryTest extends TestCase {
 			$this->createMock(ArchiveService::class),
 			$this->createMock(DocumentStore::class),
 			$this->createMock(MailService::class),
-			new CountryService(),
+			new CountryService($this->l10nStub()),
 			$this->db,
 			$this->createMock(LoggerInterface::class),
+			new NumberFormatMessage($this->l10nStub()),
+			$this->l10nStub(),
 		);
 	}
 

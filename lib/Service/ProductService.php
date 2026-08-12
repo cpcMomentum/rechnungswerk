@@ -14,13 +14,17 @@ use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\Product;
 use OCA\Rechnungswerk\Db\ProductMapper;
 use OCA\Rechnungswerk\Exception\NotFoundException;
+use OCA\Rechnungswerk\Exception\NumberFormatException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IL10N;
 
 class ProductService {
 
 	public function __construct(
 		private readonly ProductMapper $mapper,
+		private readonly NumberFormatMessage $numberFormatMessage,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -80,7 +84,7 @@ class ProductService {
 		try {
 			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Produkt nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Produkt nicht gefunden.'));
 		}
 	}
 
@@ -92,17 +96,17 @@ class ProductService {
 		if (!$partial || array_key_exists('name', $data)) {
 			$name = trim((string)($data['name'] ?? ''));
 			if ($name === '') {
-				throw new ValidationException('Ein Name ist erforderlich.');
+				throw new ValidationException($this->l10n->t('Ein Name ist erforderlich.'));
 			}
 			if (mb_strlen($name) > 255) {
-				throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Der Name darf höchstens 255 Zeichen lang sein.'));
 			}
 		}
 		if (array_key_exists('defaultUnitLabel', $data) && mb_strlen(trim((string)($data['defaultUnitLabel'] ?? ''))) > 64) {
-			throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
+			throw new ValidationException($this->l10n->t('Die eigene Einheit darf höchstens 64 Zeichen lang sein.'));
 		}
 		if (array_key_exists('defaultTaxRateBp', $data) && (int)$data['defaultTaxRateBp'] < 0) {
-			throw new ValidationException('Der Steuersatz darf nicht negativ sein.');
+			throw new ValidationException($this->l10n->t('Der Steuersatz darf nicht negativ sein.'));
 		}
 		// Der Preis wird in apply() ueber NumberInput::parsePrice() geprueft und
 		// umgerechnet (#180). Die frueher hier stehende Negativpruefung auf
@@ -132,7 +136,13 @@ class ProductService {
 		// vom Browser vorberechnete Zahl (#180). Der Standardpreis fliesst ueber
 		// "Aus Produkt" in jede Rechnung, die Luecke waere sonst nur verschoben.
 		if (array_key_exists('defaultPriceInput', $data)) {
-			$product->setDefaultPriceE4(NumberInput::parsePrice($data['defaultPriceInput']));
+			// NumberInput wirft ohne Prosa (#235); den uebersetzten Satz macht
+			// NumberFormatMessage daraus.
+			try {
+				$product->setDefaultPriceE4(NumberInput::parsePrice($data['defaultPriceInput']));
+			} catch (NumberFormatException $e) {
+				throw $this->numberFormatMessage->asValidationException($e);
+			}
 		} elseif ($isNew) {
 			$product->setDefaultPriceE4(0);
 		}

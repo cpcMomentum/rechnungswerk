@@ -20,6 +20,8 @@ use PHPUnit\Framework\TestCase;
 
 class MailServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private function settings(?string $fromEmail, ?string $fromName = null): Settings {
 		$s = new Settings();
 		$s->setSmtpFromEmail($fromEmail);
@@ -46,7 +48,7 @@ class MailServiceTest extends TestCase {
 		$message->expects($this->once())->method('setPlainBody')->with('Text');
 		$message->expects($this->once())->method('attach')->with($attachment);
 
-		$service = new MailService($mailer);
+		$service = new MailService($mailer, $this->l10nStub());
 		$service->sendInvoicePdf('kunde@example.com', 'Rechnung RE-1', 'Text', 'PDFBYTES', 'RE-1.pdf', $this->settings('rechnung@firma.de', 'Firma GmbH'));
 	}
 
@@ -61,7 +63,7 @@ class MailServiceTest extends TestCase {
 		// No configured from address -> the mailer's system sender is used.
 		$message->expects($this->never())->method('setFrom');
 
-		$service = new MailService($mailer);
+		$service = new MailService($mailer, $this->l10nStub());
 		$service->sendInvoicePdf('kunde@example.com', 'Betreff', 'Text', 'PDF', 'a.pdf', $this->settings(null));
 	}
 
@@ -69,7 +71,7 @@ class MailServiceTest extends TestCase {
 		$mailer = $this->createMock(IMailer::class);
 		$mailer->method('validateMailAddress')->willReturn(false);
 
-		$service = new MailService($mailer);
+		$service = new MailService($mailer, $this->l10nStub());
 		$this->expectException(ValidationException::class);
 		$service->sendInvoicePdf('not-an-email', 'B', 'T', 'PDF', 'a.pdf', $this->settings(null));
 	}
@@ -82,7 +84,7 @@ class MailServiceTest extends TestCase {
 		$mailer->method('createAttachment')->willReturn($this->createMock(IAttachment::class));
 		$mailer->method('send')->willReturn(['kunde@example.com' => 'rejected']);
 
-		$service = new MailService($mailer);
+		$service = new MailService($mailer, $this->l10nStub());
 		$this->expectException(\RuntimeException::class);
 		$service->sendInvoicePdf('kunde@example.com', 'B', 'T', 'PDF', 'a.pdf', $this->settings('rechnung@firma.de'));
 	}
@@ -95,7 +97,7 @@ class MailServiceTest extends TestCase {
 	 * @dataProvider smtpConfigProvider
 	 */
 	public function testBuildPhpMailerMapsConfig(array $cfg, string $expectedSecure, bool $expectedAuth): void {
-		$service = new MailService($this->createMock(IMailer::class));
+		$service = new MailService($this->createMock(IMailer::class), $this->l10nStub());
 		$method = new \ReflectionMethod(MailService::class, 'buildPhpMailer');
 		$method->setAccessible(true);
 		/** @var PHPMailer $mail */
