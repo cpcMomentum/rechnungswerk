@@ -13,10 +13,10 @@ use OCA\Rechnungswerk\Db\Product;
 use OCA\Rechnungswerk\Db\ProductMapper;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 use OCA\Rechnungswerk\Service\ProductService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use PHPUnit\Framework\TestCase;
-use OCA\Rechnungswerk\Service\NumberFormatMessage;
 
 class ProductServiceTest extends TestCase {
 

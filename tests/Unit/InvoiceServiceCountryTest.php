@@ -18,12 +18,12 @@ use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\MailService;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCA\Rechnungswerk\Service\ZugferdService;
 use OCP\IDBConnection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use OCA\Rechnungswerk\Service\NumberFormatMessage;
 
 /**
  * Regressionstest zu #167 auf dem Pfad, der tatsaechlich gemeldet wurde:

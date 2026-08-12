@@ -17,8 +17,8 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception as DBException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-use OCP\Security\ICrypto;
 use OCP\IL10N;
+use OCP\Security\ICrypto;
 
 class SettingsService {
 

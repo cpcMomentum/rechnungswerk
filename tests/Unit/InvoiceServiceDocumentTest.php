@@ -20,12 +20,12 @@ use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\MailService;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCA\Rechnungswerk\Service\ZugferdService;
 use OCP\IDBConnection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use OCA\Rechnungswerk\Service\NumberFormatMessage;
 
 /**
  * #181, Schritt 2: die Ausgabewege liefern den eingefrorenen Beleg.

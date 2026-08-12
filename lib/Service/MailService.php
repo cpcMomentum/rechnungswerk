@@ -11,9 +11,9 @@ namespace OCA\Rechnungswerk\Service;
 
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCP\IL10N;
 use OCP\Mail\IMailer;
 use PHPMailer\PHPMailer\PHPMailer;
-use OCP\IL10N;
 
 /**
  * Sends invoice PDFs by email.
