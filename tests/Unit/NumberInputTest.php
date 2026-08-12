@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Tests\Unit;
 
-use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Exception\NumberFormatException;
 use OCA\Rechnungswerk\Service\NumberInput;
 use PHPUnit\Framework\TestCase;
 
@@ -120,10 +120,21 @@ class NumberInputTest extends TestCase {
 		$this->assertSame('1', NumberInput::parseQuantity('   '));
 	}
 
+	/**
+	 * Seit #235 wirft NumberInput ohne Prosa: den Satz formuliert der Service, der
+	 * einen Uebersetzer hat. Geprueft wird deshalb der Sachverhalt — welcher Wert,
+	 * welche Art Feld — und nicht mehr ein deutscher Satz. Der beanstandete Wert
+	 * muss mitkommen, sonst kann der Service die Meldung nicht bilden.
+	 */
 	public function testQuantityRejectionCarriesTheOffendingValue(): void {
-		$this->expectException(ValidationException::class);
-		$this->expectExceptionMessage('99.99.9');
-		NumberInput::parseQuantity('99.99.9');
+		try {
+			NumberInput::parseQuantity('99.99.9');
+			$this->fail('Erwartete NumberFormatException');
+		} catch (NumberFormatException $e) {
+			$this->assertSame('99.99.9', $e->getValue());
+			$this->assertSame(NumberFormatException::KIND_QUANTITY, $e->getKind());
+			$this->assertSame(NumberFormatException::REASON_UNREADABLE, $e->getReason());
+		}
 	}
 
 	/**
@@ -153,7 +164,7 @@ class NumberInputTest extends TestCase {
 	 * abgelehnt statt gedeutet.
 	 */
 	public function testMachineNotationFromTheOldPriceFieldIsRejected(): void {
-		$this->expectException(ValidationException::class);
+		$this->expectException(NumberFormatException::class);
 		NumberInput::parsePrice('0.3456');
 	}
 
@@ -198,20 +209,29 @@ class NumberInputTest extends TestCase {
 	}
 
 	public function testParsePriceRejectsUnreadableInput(): void {
-		$this->expectException(ValidationException::class);
-		$this->expectExceptionMessage('gratis');
-		NumberInput::parsePrice('gratis');
+		try {
+			NumberInput::parsePrice('gratis');
+			$this->fail('Erwartete NumberFormatException');
+		} catch (NumberFormatException $e) {
+			$this->assertSame('gratis', $e->getValue());
+			$this->assertSame(NumberFormatException::KIND_PRICE, $e->getKind());
+		}
 	}
 
 	public function testParsePriceRejectsTooManyDecimals(): void {
-		$this->expectException(ValidationException::class);
+		$this->expectException(NumberFormatException::class);
 		NumberInput::parsePrice('0,34567');
 	}
 
+	/** Der Grund muss unterscheidbar sein, sonst formuliert der Service den falschen Satz. */
 	public function testParsePriceRejectsNegative(): void {
-		$this->expectException(ValidationException::class);
-		$this->expectExceptionMessage('negativ');
-		NumberInput::parsePrice('-5');
+		try {
+			NumberInput::parsePrice('-5');
+			$this->fail('Erwartete NumberFormatException');
+		} catch (NumberFormatException $e) {
+			$this->assertSame(NumberFormatException::REASON_NEGATIVE, $e->getReason());
+			$this->assertSame(NumberFormatException::KIND_PRICE, $e->getKind());
+		}
 	}
 
 	/**

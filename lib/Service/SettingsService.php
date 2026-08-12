@@ -18,6 +18,7 @@ use OCP\DB\Exception as DBException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Security\ICrypto;
+use OCP\IL10N;
 
 class SettingsService {
 
@@ -38,6 +39,7 @@ class SettingsService {
 		private readonly SettingsMapper $mapper,
 		private readonly IDBConnection $db,
 		private readonly ICrypto $crypto,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -256,25 +258,25 @@ class SettingsService {
 	private function validate(array $data, Settings $current): void {
 		if (array_key_exists('numberResetMode', $data)
 			&& !in_array((string)$data['numberResetMode'], Settings::RESET_MODES, true)) {
-			throw new ValidationException('Ungültiger Nummernkreis-Modus.');
+			throw new ValidationException($this->l10n->t('Ungültiger Nummernkreis-Modus.'));
 		}
 
 		if (array_key_exists('numberFormat', $data)) {
 			$format = trim((string)$data['numberFormat']);
 			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
-				throw new ValidationException('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
+				throw new ValidationException($this->l10n->t('Das Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.'));
 			}
 		}
 
 		if (array_key_exists('quoteNumberResetMode', $data)
 			&& !in_array((string)$data['quoteNumberResetMode'], Settings::RESET_MODES, true)) {
-			throw new ValidationException('Ungültiger Angebots-Nummernkreis-Modus.');
+			throw new ValidationException($this->l10n->t('Ungültiger Angebots-Nummernkreis-Modus.'));
 		}
 
 		if (array_key_exists('quoteNumberFormat', $data)) {
 			$format = trim((string)$data['quoteNumberFormat']);
 			if ($format !== '' && !preg_match('/\{#+\}/', $format)) {
-				throw new ValidationException('Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.');
+				throw new ValidationException($this->l10n->t('Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.'));
 			}
 		}
 
@@ -284,10 +286,10 @@ class SettingsService {
 				// {nummer} keeps file names unique per invoice — without it,
 				// mails and the NC filing would silently overwrite each other.
 				if (!str_contains($format, '{nummer}')) {
-					throw new ValidationException('Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.');
+					throw new ValidationException($this->l10n->t('Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.'));
 				}
 				if (preg_match('/[\/\\\\]/', $format)) {
-					throw new ValidationException('Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten.');
+					throw new ValidationException($this->l10n->t('Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten.'));
 				}
 				// Reject unknown {…} tokens early instead of rendering them literally.
 				$unknown = array_diff(
@@ -295,8 +297,8 @@ class SettingsService {
 					InvoiceCalculator::FILE_NAME_PLACEHOLDERS,
 				);
 				if ($unknown !== []) {
-					throw new ValidationException(sprintf('Unbekannte Platzhalter im Dateinamen-Schema: %s. Erlaubt sind %s.',
-						implode(', ', $unknown), implode(', ', InvoiceCalculator::FILE_NAME_PLACEHOLDERS)));
+					throw new ValidationException($this->l10n->t('Unbekannte Platzhalter im Dateinamen-Schema: %1$s. Erlaubt sind %2$s.',
+						[implode(', ', $unknown), implode(', ', InvoiceCalculator::FILE_NAME_PLACEHOLDERS)]));
 				}
 			}
 		}
@@ -304,7 +306,7 @@ class SettingsService {
 		if (array_key_exists('archiveEnabled', $data) && !empty($data['archiveEnabled'])) {
 			$effectiveFolderId = $current->getArchiveFolderId();
 			if ($effectiveFolderId === null) {
-				throw new ValidationException('Für die Ablage muss zuerst ein Zielordner gewählt werden.');
+				throw new ValidationException($this->l10n->t('Für die Ablage muss zuerst ein Zielordner gewählt werden.'));
 			}
 		}
 
@@ -315,7 +317,7 @@ class SettingsService {
 				? trim((string)$data['iban'])
 				: trim((string)$current->getIban());
 			if ($effectiveIban === '') {
-				throw new ValidationException('Für den Girocode muss eine IBAN hinterlegt sein.');
+				throw new ValidationException($this->l10n->t('Für den Girocode muss eine IBAN hinterlegt sein.'));
 			}
 		}
 
@@ -323,15 +325,15 @@ class SettingsService {
 			$pattern = trim((string)$data['archiveSubfolder']);
 			if ($pattern !== '') {
 				if (str_contains($pattern, '..')) {
-					throw new ValidationException('Der Unterordner darf kein ".." enthalten.');
+					throw new ValidationException($this->l10n->t('Der Unterordner darf kein ".." enthalten.'));
 				}
 				$unknown = array_diff(
 					preg_match_all('/\{[^{}]*\}/', $pattern, $m) ? $m[0] : [],
 					ArchiveService::SUBFOLDER_PLACEHOLDERS,
 				);
 				if ($unknown !== []) {
-					throw new ValidationException(sprintf('Unbekannte Platzhalter im Unterordner: %s. Erlaubt sind %s.',
-						implode(', ', $unknown), implode(', ', ArchiveService::SUBFOLDER_PLACEHOLDERS)));
+					throw new ValidationException($this->l10n->t('Unbekannte Platzhalter im Unterordner: %1$s. Erlaubt sind %2$s.',
+						[implode(', ', $unknown), implode(', ', ArchiveService::SUBFOLDER_PLACEHOLDERS)]));
 				}
 			}
 		}
@@ -351,7 +353,7 @@ class SettingsService {
 				: ($current->getNumberResetMode() ?: Settings::DEFAULT_RESET_MODE);
 			if ($effectiveMode === Settings::RESET_MODE_YEARLY
 				&& !InvoiceCalculator::formatHasYear($effectiveFormat)) {
-				throw new ValidationException('Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern.');
+				throw new ValidationException($this->l10n->t('Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern.'));
 			}
 		}
 
@@ -368,7 +370,7 @@ class SettingsService {
 				: ($current->getQuoteNumberResetMode() ?: Settings::DEFAULT_RESET_MODE);
 			if ($effectiveMode === Settings::RESET_MODE_YEARLY
 				&& !InvoiceCalculator::formatHasYear($effectiveFormat)) {
-				throw new ValidationException('Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Angebotsnummern.');
+				throw new ValidationException($this->l10n->t('Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Angebotsnummern.'));
 			}
 		}
 
@@ -385,24 +387,24 @@ class SettingsService {
 		];
 		foreach ($maxLengths as $field => $max) {
 			if (array_key_exists($field, $data) && $data[$field] !== null && mb_strlen((string)$data[$field]) > $max) {
-				throw new ValidationException(sprintf('Feld "%s" darf höchstens %d Zeichen lang sein.', $field, $max));
+				throw new ValidationException($this->l10n->t('Feld "%1$s" darf höchstens %2$d Zeichen lang sein.', [$field, $max]));
 			}
 		}
 
 		if (!empty($data['accentColor']) && !preg_match('/^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string)$data['accentColor'])) {
-			throw new ValidationException('Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein.');
+			throw new ValidationException($this->l10n->t('Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein.'));
 		}
 
 		if (array_key_exists('smtpPort', $data) && $data['smtpPort'] !== null && $data['smtpPort'] !== '') {
 			$port = (int)$data['smtpPort'];
 			if ($port < 1 || $port > 65535) {
-				throw new ValidationException('Der SMTP-Port muss zwischen 1 und 65535 liegen.');
+				throw new ValidationException($this->l10n->t('Der SMTP-Port muss zwischen 1 und 65535 liegen.'));
 			}
 		}
 
 		foreach (['datevUploadMail', 'smtpFromEmail', 'contactEmail'] as $emailField) {
 			if (!empty($data[$emailField]) && filter_var((string)$data[$emailField], FILTER_VALIDATE_EMAIL) === false) {
-				throw new ValidationException('Bitte eine gültige E-Mail-Adresse angeben.');
+				throw new ValidationException($this->l10n->t('Bitte eine gültige E-Mail-Adresse angeben.'));
 			}
 		}
 	}

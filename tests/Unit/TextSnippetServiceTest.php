@@ -20,13 +20,15 @@ use PHPUnit\Framework\TestCase;
 
 class TextSnippetServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private TextSnippetMapper $mapper;
 	private TextSnippetService $service;
 
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(TextSnippetMapper::class);
-		$this->service = new TextSnippetService($this->mapper, $this->createMock(IDBConnection::class));
+		$this->service = new TextSnippetService($this->mapper, $this->createMock(IDBConnection::class), $this->l10nStub());
 	}
 
 	public function testCreateAppliesDefaults(): void {

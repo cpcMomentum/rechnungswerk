@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Service;
 
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCP\IL10N;
 
 /**
  * Uebersetzt Laenderangaben in ISO-3166-1-alpha-2-Codes (#167).
@@ -21,6 +22,11 @@ use OCA\Rechnungswerk\Exception\ValidationException;
  * Speichern mit einem Datenbankfehler ab.
  */
 class CountryService {
+
+	public function __construct(
+		private readonly IL10N $l10n,
+	) {
+	}
 
 	/** Diese Codes stehen in der Auswahlliste oben, alles andere folgt alphabetisch. */
 	private const PRIORITY = ['DE', 'AT', 'CH'];
@@ -111,7 +117,7 @@ class CountryService {
 		}
 		$code = $this->resolve($raw);
 		if ($code === null) {
-			throw new ValidationException('"' . $raw . '" ist kein gültiges Land. Bitte aus der Liste wählen.');
+			throw new ValidationException($this->l10n->t('"%s" ist kein gültiges Land. Bitte aus der Liste wählen.', [$raw]));
 		}
 		return $code;
 	}

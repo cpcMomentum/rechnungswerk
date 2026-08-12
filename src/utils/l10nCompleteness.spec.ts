@@ -29,7 +29,9 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const SRC = join(import.meta.dirname, '..')
-const L10N = join(SRC, '..', 'l10n')
+const ROOT = join(SRC, '..')
+const L10N = join(ROOT, 'l10n')
+const LIB = join(ROOT, 'lib')
 
 /** Label-Konstanten in types/api.ts, deren Werte dynamisch durch t() laufen. */
 const LABEL_MAPS = [
@@ -41,21 +43,31 @@ const LABEL_MAPS = [
 	'QUOTE_STATUS_LABELS',
 ]
 
-function sourceFiles(dir: string): string[] {
+function filesUnder(dir: string, pattern: RegExp): string[] {
 	return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
 		const path = join(dir, entry.name)
 		if (entry.isDirectory()) {
-			return sourceFiles(path)
+			return filesUnder(path, pattern)
 		}
-		if (!/\.(vue|ts|js)$/.test(entry.name) || entry.name.endsWith('.spec.ts')) {
+		if (!pattern.test(entry.name) || entry.name.endsWith('.spec.ts')) {
 			return []
 		}
 		return [path]
 	})
 }
 
+const sourceFiles = (dir: string) => filesUnder(dir, /\.(vue|ts|js)$/)
+
 /** Einfach-gequotete JS-Zeichenkette entschärfen. */
 function unescape(raw: string): string {
+	return raw.replace(/\\'/g, "'").replace(/\\\\/g, '\\')
+}
+
+/**
+ * Dasselbe für PHP. In einfachen Anführungszeichen kennt PHP genau zwei
+ * Maskierungen, \' und \\ — alles andere bleibt wörtlich, auch \n.
+ */
+function unescapePhp(raw: string): string {
 	return raw.replace(/\\'/g, "'").replace(/\\\\/g, '\\')
 }
 
@@ -90,7 +102,18 @@ function translatableStrings(): Map<string, string[]> {
 		}
 	}
 
-	// 3. Beschriftungen der Filter-Chips: { key: '…', label: '…' }, ebenfalls
+	// 3. Backend: $this->l10n->t('…') in lib/ (#235). Ohne diesen Schritt melden
+	//    die 41 Meldungen der Services als Waisen — sie landen in denselben vier
+	//    Dateien wie die Frontend-Strings, weil Nextcloud sie zusammen ausliefert.
+	const phpLiteral = /l10n->t\(\s*'((?:[^'\\]|\\.)*)'/g
+	for (const file of filesUnder(LIB, /\.php$/)) {
+		const source = readFileSync(file, 'utf8')
+		for (const match of source.matchAll(phpLiteral)) {
+			add(unescapePhp(match[1]), file.slice(ROOT.length + 1))
+		}
+	}
+
+	// 4. Beschriftungen der Filter-Chips: { key: '…', label: '…' }, ebenfalls
 	//    dynamisch als t('rechnungswerk', f.label).
 	for (const file of sourceFiles(join(SRC, 'views'))) {
 		const source = readFileSync(file, 'utf8')

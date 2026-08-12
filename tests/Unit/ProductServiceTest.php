@@ -16,8 +16,11 @@ use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ProductService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use PHPUnit\Framework\TestCase;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 
 class ProductServiceTest extends TestCase {
+
+	use TranslatorStub;
 
 	private ProductMapper $mapper;
 	private ProductService $service;
@@ -25,7 +28,7 @@ class ProductServiceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(ProductMapper::class);
-		$this->service = new ProductService($this->mapper);
+		$this->service = new ProductService($this->mapper, new NumberFormatMessage($this->l10nStub()), $this->l10nStub());
 	}
 
 	public function testCreateAppliesDefaults(): void {

@@ -26,6 +26,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ContactControllerAddressTest extends TestCase {
 
+	use TranslatorStub;
+
 	/**
 	 * Fuer jeden Aufruf ein frischer Mock: mehrere willReturn() auf demselben
 	 * Mock wuerden sich nicht ueberschreiben, sondern der erste bliebe gueltig.
@@ -55,7 +57,7 @@ class ContactControllerAddressTest extends TestCase {
 			$this->createMock(IUserManager::class),
 			$this->createMock(IAccountManager::class),
 			$this->createMock(UserContactService::class),
-			new CountryService(),
+			new CountryService($this->l10nStub()),
 		);
 
 		$data = $controller->search('Beispiel')->getData();

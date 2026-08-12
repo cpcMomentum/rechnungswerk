@@ -17,9 +17,11 @@ use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
+use OCA\Rechnungswerk\Exception\NumberFormatException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 class InvoiceService {
@@ -35,6 +37,8 @@ class InvoiceService {
 		private readonly CountryService $countryService,
 		private readonly IDBConnection $db,
 		private readonly LoggerInterface $logger,
+		private readonly NumberFormatMessage $numberFormatMessage,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -206,10 +210,10 @@ class InvoiceService {
 
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		if (count($items) === 0) {
-			throw new ValidationException('Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.');
+			throw new ValidationException($this->l10n->t('Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.'));
 		}
 		if (($invoice->getRecipientName() ?? '') === '') {
-			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Empfänger ist zum Festschreiben erforderlich.'));
 		}
 
 		// Create the settings row outside the transaction: a failed INSERT would
@@ -418,7 +422,7 @@ class InvoiceService {
 			throw new IllegalStateException('Nur festgeschriebene Rechnungen können versendet werden.');
 		}
 		if (trim($subject) === '') {
-			throw new ValidationException('Ein Betreff ist erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Betreff ist erforderlich.'));
 		}
 		$settings = $this->settingsService->getCompany();
 		// Der Kunde bekommt exakt den eingefrorenen Beleg (#181). Vorher wurde er
@@ -857,21 +861,29 @@ class InvoiceService {
 			// Ungeprueft lief die Menge frueher als Rohtext in eine numeric-Spalte:
 			// "99.999.999" brach mit einem 500er ab, "1.000" wurde still zu 1 und
 			// machte die Rechnung um Faktor 1000 falsch (#157).
-			$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
-			// Der Preis kommt als Rohtext und wird HIER umgerechnet (#180). Vorher
-			// rechnete allein der Browser und schickte die fertige Zahl; der Server
-			// konnte sie nicht pruefen, weil einer blossen Zahl nicht anzusehen ist,
-			// ob 95 als 0,0095 € oder als 95 € gemeint war.
-			$unitPriceE4 = NumberInput::parsePrice($row['unitPriceInput'] ?? null);
+			//
+			// Der Preis kommt ebenfalls als Rohtext und wird HIER umgerechnet (#180).
+			// Vorher rechnete allein der Browser und schickte die fertige Zahl; der
+			// Server konnte sie nicht pruefen, weil einer blossen Zahl nicht anzusehen
+			// ist, ob 95 als 0,0095 € oder als 95 € gemeint war.
+			//
+			// NumberInput wirft ohne Prosa, damit es statisch bleiben kann; den
+			// uebersetzten Satz macht NumberFormatMessage daraus (#235).
+			try {
+				$quantity = NumberInput::parseQuantity($row['quantity'] ?? null);
+				$unitPriceE4 = NumberInput::parsePrice($row['unitPriceInput'] ?? null);
+			} catch (NumberFormatException $e) {
+				throw $this->numberFormatMessage->asValidationException($e);
+			}
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
 
 			$name = (string)($row['name'] ?? '');
 			if (mb_strlen($name) > 255) {
-				throw new ValidationException('Positionsname darf maximal 255 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Positionsname darf maximal 255 Zeichen lang sein.'));
 			}
 			$unitLabel = isset($row['unitLabel']) && trim((string)$row['unitLabel']) !== '' ? trim((string)$row['unitLabel']) : null;
 			if ($unitLabel !== null && mb_strlen($unitLabel) > 64) {
-				throw new ValidationException('Die eigene Einheit darf höchstens 64 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Die eigene Einheit darf höchstens 64 Zeichen lang sein.'));
 			}
 
 			$item = new InvoiceItem();
@@ -1162,10 +1174,10 @@ class InvoiceService {
 
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
 		if (count($items) === 0) {
-			throw new ValidationException('Ein Angebot ohne Positionen kann nicht festgeschrieben werden.');
+			throw new ValidationException($this->l10n->t('Ein Angebot ohne Positionen kann nicht festgeschrieben werden.'));
 		}
 		if (($quote->getRecipientName() ?? '') === '') {
-			throw new ValidationException('Ein Empfänger ist zum Festschreiben erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Empfänger ist zum Festschreiben erforderlich.'));
 		}
 
 		// Create the settings row outside the transaction (see commit()).
@@ -1227,7 +1239,7 @@ class InvoiceService {
 		}
 		$base = (string)$root->getNumber();
 		if ($base === '') {
-			throw new ValidationException('Das Ursprungsangebot hat keine Nummer und kann nicht revidiert werden.');
+			throw new ValidationException($this->l10n->t('Das Ursprungsangebot hat keine Nummer und kann nicht revidiert werden.'));
 		}
 		$existing = $this->invoiceMapper->findQuoteNumbersInFamily($base);
 		return InvoiceCalculator::nextRevisionNumber($base, $existing);
@@ -1519,7 +1531,7 @@ class InvoiceService {
 	public function sendQuoteToCustomer(int $id, string $to, string $subject, string $body): void {
 		$quote = $this->assertCommittedQuote($this->findById($id));
 		if (trim($subject) === '') {
-			throw new ValidationException('Ein Betreff ist erforderlich.');
+			throw new ValidationException($this->l10n->t('Ein Betreff ist erforderlich.'));
 		}
 		$settings = $this->settingsService->getCompany();
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
