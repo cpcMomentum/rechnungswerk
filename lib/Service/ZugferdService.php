@@ -26,6 +26,7 @@ use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\Settings;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
+use OCP\ITempManager;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -51,6 +52,7 @@ class ZugferdService {
 		private readonly IRootFolder $rootFolder,
 		private readonly GirocodeService $girocodeService,
 		private readonly LoggerInterface $logger,
+		private readonly ITempManager $tempManager,
 	) {
 	}
 
@@ -563,11 +565,62 @@ class ZugferdService {
 		$options = new Options();
 		$options->set('defaultFont', 'DejaVu Sans');
 		$options->set('isRemoteEnabled', false);
+		if (($fontCache = $this->fontCacheDir()) !== null) {
+			$options->set('fontCache', $fontCache);
+		}
 		$dompdf = new Dompdf($options);
 		$dompdf->loadHtml($html, 'UTF-8');
 		$dompdf->setPaper('A4');
 		$dompdf->render();
 		return (string)$dompdf->output();
+	}
+
+	/**
+	 * Verzeichnis fuer dompdfs Font-Cache.
+	 *
+	 * Ohne Vorgabe legt dompdf ihn neben die Schriften im eigenen Paket, also
+	 * INNERHALB von vendor/ (Options::__construct: setFontCache(getFontDir())).
+	 * Damit entstehen beim ersten erzeugten PDF unsignierte Dateien in der
+	 * Auslieferung, und die Integritaetspruefung meldet sie fortan als
+	 * EXTRA_FILE — bei einer Rechnungs-App die unangenehmste Meldung ueberhaupt
+	 * (#241). Die App darf nicht in ihr eigenes Auslieferungsverzeichnis
+	 * schreiben.
+	 *
+	 * Laesst sich kein beschreibbares Verzeichnis herstellen, bleibt es bei
+	 * dompdfs Vorgabe: ein fehlender Cache darf die Rechnungserzeugung nicht
+	 * verhindern, er kostet nur das erneute Parsen der Schriftmetriken.
+	 */
+	private function fontCacheDir(): ?string {
+		$base = rtrim((string)$this->tempManager->getTempBaseDir(), '/');
+		if ($base !== '') {
+			$shared = $base . '/rechnungswerk-fonts';
+			if (!is_dir($shared)) {
+				@mkdir($shared, 0770, true);
+			}
+			if (is_dir($shared) && is_writable($shared)) {
+				return $shared;
+			}
+		}
+
+		// Der gemeinsame Ordner kann einem anderen Nutzer gehoeren: wer ihn
+		// zuerst anlegt, besitzt ihn, und mit umask 022 bleibt Modus 750. Ein
+		// CLI-Lauf als root sperrt damit den Webserver als www-data aus. Beim
+		// Nachstellen von #241 ist genau das passiert, keine zehn Minuten nach
+		// dem ersten Entwurf dieser Methode.
+		//
+		// Dann lieber ein frisches Verzeichnis je Aufruf als zurueck in die
+		// Auslieferung: der Cache wird nicht wiederverwendet, was einmaliges
+		// Parsen der Schriftmetriken kostet, aber vendor/ bleibt unberuehrt.
+		$perCall = $this->tempManager->getTemporaryFolder();
+		if (is_string($perCall) && $perCall !== '' && is_writable($perCall)) {
+			return rtrim($perCall, '/');
+		}
+
+		// Letzter Ausweg: dompdfs Vorgabe. Sie schreibt in vendor/ und loest die
+		// Integritaetswarnung aus, aber eine Rechnung nicht erzeugen zu koennen
+		// waere schlimmer.
+		$this->logger->warning('Rechnungswerk: kein beschreibbares Font-Cache-Verzeichnis, dompdf-Vorgabe bleibt');
+		return null;
 	}
 
 	/**
