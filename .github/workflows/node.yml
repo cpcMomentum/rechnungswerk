@@ -46,6 +46,13 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Faengt Strings ab, die in t()/->t() stehen, aber in keiner l10n-Datei.
+      # Solche Texte fallen in JEDER Sprache auf den deutschen Quelltext zurueck
+      # und bleiben beim Entwickeln unsichtbar, weil auf Deutsch getestet wird.
+      # Ergaenzt l10nCompleteness.spec.ts, siehe dortigen Kopf.
+      - name: l10n-Vollstaendigkeit
+        run: npm run l10n:check
+
       - name: Typecheck
         run: npm run typecheck
 
