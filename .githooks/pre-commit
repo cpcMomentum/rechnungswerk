@@ -3,7 +3,8 @@
 #
 # Check 1: Merge-Konfliktmarker in gestagten Dateien
 # Check 2: Zugangsschluessel (Secrets)
-# Check 3: OCP-only API usage in PHP-Dateien
+# Check 3: l10n-Katalog-Konsistenz (nc-app-tooling)
+# Check 4: OCP-only API usage in PHP-Dateien
 #
 # Override (strongly discouraged): git commit --no-verify
 
