@@ -177,8 +177,18 @@ function remove(index: number) {
 	text-align: center;
 	padding: 16px;
 }
-/* Optional free-text unit label (#153) below the standard-unit select. */
+/* Optional free-text unit label (#153) below the standard-unit select.
+ *
+ * display:block ist hier tragend, nicht kosmetisch (#238): die Zelle traegt
+ * white-space:nowrap, und beide Elemente sind inline-block mit width:100%.
+ * Als Inline-Boxen koennen sie deshalb NICHT umbrechen und stehen zu zweit auf
+ * einer Zeile, die nur eines von beiden fasst -- eines faellt auf einen Strich
+ * zusammen. Welches, entscheidet der Browser: der Melder sah das freie Feld
+ * verschwinden, hier war es die Auswahl. Eine Block-Box beginnt dagegen immer
+ * eine neue Zeile, unabhaengig von white-space.
+ */
 .rw-unit-label {
+	display: block;
 	margin-top: 4px;
 	font-size: 0.9em;
 }

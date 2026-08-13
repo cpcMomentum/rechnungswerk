@@ -4653,7 +4653,7 @@ var Ku = { class: "rw-table-wrap" }, qu = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["menuName"])) : T("", !0)]))]));
 	}
-}), [["__scopeId", "data-v-50cd1675"]]), xd = { class: "confirm-dialog" }, Sd = { class: "confirm-dialog__message" }, Cd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-42260acf"]]), xd = { class: "confirm-dialog" }, Sd = { class: "confirm-dialog__message" }, Cd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ConfirmDialog",
 	props: {
 		open: { type: Boolean },
