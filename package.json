@@ -19,6 +19,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
+    "l10n:check": "nc-l10n-check",
+    "l10n:fix": "nc-l10n-check --fix",
     "lint:fix": "eslint src --fix",
     "prepare": "git config core.hooksPath .githooks || true"
   },
@@ -40,6 +42,7 @@
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.8.1",
     "happy-dom": "^20.9.0",
+    "nc-app-tooling": "github:cpcMomentum/nc-app-tooling#v1.1.0",
     "sass": "^1.70.0",
     "typescript": "^5.7.2",
     "vite": "^8.2.1",

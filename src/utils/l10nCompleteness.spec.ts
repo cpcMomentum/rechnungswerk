@@ -13,9 +13,23 @@
  * Dazu fehlten acht Strings aus dem DATEV-Bereich ganz und fünfzehn Schlüssel
  * waren Altlasten ohne Fundstelle im Code.
  *
- * Dieser Test läuft über `npm test` und damit in der CI. Er ersetzt bewusst kein
- * separates Skript mit eigenem CI-Schritt: der Vertragstest aus #221 liest
- * genauso Dateien vom Datenträger, das Muster ist da.
+ * Dieser Test läuft über `npm test` und damit in der CI.
+ *
+ * ARBEITSTEILUNG mit `nc-l10n-check` (aus nc-app-tooling, seit contractmanager#340
+ * in allen Apps der Flotte, hier als eigener CI-Schritt und im Pre-Commit-Hook):
+ *
+ * - Der geteilte Wächter ist die flottenweite Grundsicherung. Er kennt keine App
+ *   und findet deshalb **fehlende** Schlüssel — die sind aus einem literalen
+ *   Aufruf beweisbar — im Frontend wie im Backend.
+ * - Bei **Waisen** kann er hier nichts beweisen: er sieht die 15 dynamischen
+ *   Aufrufe, kann aber nicht wissen, welchen Schlüssel sie meinen, und meldet
+ *   sie deshalb nur als Hinweis statt als Fehler. `--fix` löscht dann nichts.
+ * - Genau diese Lücke schließt dieser Test, weil er die Label-Konstanten
+ *   namentlich kennt und ihre Werte auflöst. Er ist damit für rechnungswerk
+ *   **schärfer** als der Wächter und wird von ihm nicht ersetzt.
+ *
+ * Wer die Sammlung unten erweitert, macht die Waisen-Prüfung wieder schärfer;
+ * wer sie vergisst, bekommt einen Fehlschlag statt einer stillen Lücke.
  *
  * WICHTIG bei einem Fehlschlag "Waise": das heißt nicht zwangsläufig, dass der
  * Schlüssel weg muss. Läuft ein String dynamisch durch `t()` — etwa aus einer

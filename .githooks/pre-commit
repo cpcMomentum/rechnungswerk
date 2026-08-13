@@ -92,7 +92,35 @@ ${M}
     fi
 fi
 
-# --- Check 3: OCP-only API usage in PHP files ---
+# --- Check 3: l10n-Katalog-Konsistenz (nc-app-tooling) ---
+# Quelle der Wahrheit sind die t()/->t()-Aufrufe im Code. Bei Aenderungen an
+# Code- oder Katalog-Dateien pruefen, dass die Kataloge nicht driften.
+# Beheben: npm run l10n:fix
+#
+# Der Ausloeser haengt am CODE, nicht an den l10n-Dateien. Genau daran scheiterte
+# die Prozessregel "bei jeder l10n-Aenderung Sprache umschalten": wer den
+# Katalogeintrag vergisst, fasst keine l10n-Datei an (contractmanager#340).
+#
+# Steht bewusst VOR Check 4: der steigt bei "keine PHP-Dateien gestaged" mit
+# exit 0 aus, eine reine .vue-Aenderung wuerde diesen Check sonst nie erreichen.
+L10N_RELEVANT=$(git diff --cached --name-only --diff-filter=ACM \
+    | grep -E '^(src/|lib/|templates/|appinfo/|l10n/).*\.(js|ts|vue|php|json)$' || true)
+if [ -n "$L10N_RELEVANT" ]; then
+    if ! command -v node >/dev/null 2>&1; then
+        printf '\033[0;33m[l10n Check] uebersprungen (node nicht gefunden)\033[0m\n'
+    elif [ ! -x node_modules/.bin/nc-l10n-check ]; then
+        printf '\033[0;33m[l10n Check] uebersprungen — nc-l10n-check fehlt.\033[0m\n'
+        printf 'Einmalig  npm install  ausfuehren; im CI laeuft die Pruefung ohnehin.\n'
+    elif ! node_modules/.bin/nc-l10n-check; then
+        printf '\033[0;31m[l10n Check] BLOCKED\033[0m\n\n'
+        printf 'Uebersetzungskataloge sind inkonsistent zum Code.\n'
+        printf 'Beheben:  npm run l10n:fix   (dann en uebersetzen und stagen)\n\n'
+        printf 'Override (NOT recommended): git commit --no-verify\n'
+        exit 1
+    fi
+fi
+
+# --- Check 4: OCP-only API usage in PHP files ---
 # Blocks commits that introduce usage of internal \OC_*, \OC::, \OC\ namespace
 # or "use OC\..." imports. Only OCP\ and OCA\ are public and stable.
 #
