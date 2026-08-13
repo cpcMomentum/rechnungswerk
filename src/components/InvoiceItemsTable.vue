@@ -44,9 +44,6 @@
 										{{ t('rechnungswerk', UNIT_CODE_LABELS[code]) }}
 									</option>
 								</select>
-								<input v-model="item.unitLabel" class="rw-input rw-unit-label" type="text" maxlength="64"
-									:readonly="readonly" :placeholder="t('rechnungswerk', 'eigene Einheit')"
-									:title="t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.')" />
 							</td>
 							<td class="num">
 								<!-- Textfeld, nicht type="number" (#223): ein Zahlenfeld liefert
@@ -70,10 +67,23 @@
 								</NcButton>
 							</td>
 						</tr>
-						<tr v-if="!readonly || item.description" class="rw-pos-desc">
+						<!-- Zweite Zeile je Position. Sie traegt seit #238 auch das freie
+						     Einheitenfeld: in der Einheitenspalte stand es neben der Auswahl,
+						     und weil beide width:100% hatten und die Zelle nicht umbrechen
+						     kann, fiel eines von beiden auf einen Strich zusammen. Hier ist
+						     der Platz schon da, die Zeile gibt es im Bearbeitungsmodus
+						     ohnehin unter jeder Position. -->
+						<tr v-if="!readonly || item.description || item.unitLabel" class="rw-pos-desc">
 							<td :colspan="readonly ? 6 : 7">
-								<input v-model="item.description" class="rw-input rw-input--sub" type="text"
-									:readonly="readonly" :placeholder="t('rechnungswerk', 'Beschreibung (optional)')" />
+								<div class="rw-sub-row">
+									<input v-if="!readonly || item.unitLabel" v-model="item.unitLabel"
+										class="rw-input rw-input--sub rw-unit-label" type="text" maxlength="64"
+										:readonly="readonly" :placeholder="t('rechnungswerk', 'eigene Einheit')"
+										:title="t('rechnungswerk', 'Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.')" />
+									<input v-if="!readonly || item.description" v-model="item.description"
+										class="rw-input rw-input--sub rw-desc" type="text"
+										:readonly="readonly" :placeholder="t('rechnungswerk', 'Beschreibung (optional)')" />
+								</div>
 							</td>
 						</tr>
 					</template>
@@ -177,19 +187,36 @@ function remove(index: number) {
 	text-align: center;
 	padding: 16px;
 }
-/* Optional free-text unit label (#153) below the standard-unit select.
+/* Freies Einheitenfeld (#153) und Beschreibung teilen sich die zweite Zeile.
  *
- * display:block ist hier tragend, nicht kosmetisch (#238): die Zelle traegt
- * white-space:nowrap, und beide Elemente sind inline-block mit width:100%.
- * Als Inline-Boxen koennen sie deshalb NICHT umbrechen und stehen zu zweit auf
- * einer Zeile, die nur eines von beiden fasst -- eines faellt auf einen Strich
- * zusammen. Welches, entscheidet der Browser: der Melder sah das freie Feld
- * verschwinden, hier war es die Auswahl. Eine Block-Box beginnt dagegen immer
- * eine neue Zeile, unabhaengig von white-space.
+ * Warum nicht mehr in der Einheitenspalte (#238): dort stand das Feld neben der
+ * Auswahl, beide mit width:100% aus .rw-input, und die Zelle kann nicht
+ * umbrechen. Zwei volle Zellenbreiten auf einer Zeile, die nur eine fasst --
+ * eines von beiden fiel auf einen Strich zusammen.
+ *
+ * Zwei naheliegende Auswege wurden gemessen und verworfen. Das Feld unter die
+ * Auswahl zu setzen haengt unter JEDE Position eine leere Box und macht die
+ * Zeile von 55 auf 96 px hoch. Die Spalte auf 250 px zu verbreitern nimmt
+ * "Bezeichnung" bei 1200 px Fensterbreite 138 px weg (191 -> 53) und loest bei
+ * 1100 px einen Querscroll aus -- derselbe Engpass, nur eine Spalte weiter.
+ * Hier ist der Platz dagegen schon vorhanden: die Zeile existiert im
+ * Bearbeitungsmodus ohnehin, Spaltenbreiten und Zeilenhoehe bleiben unberuehrt.
+ *
+ * `.rw-input` MUSS im Selektor stehen. Vue haengt den Scope nur an den letzten
+ * Selektorteil, `.rw-unit-label[data-v-x]` waere damit (0,2,0) und gleichauf
+ * mit der globalen `.app-rechnungswerk .rw-input` -- bei Gleichstand gewinnt
+ * die spaeter geladene, also die globale.
  */
-.rw-unit-label {
-	display: block;
-	margin-top: 4px;
-	font-size: 0.9em;
+.rw-sub-row {
+	display: flex;
+	gap: 6px;
+}
+.rw-input.rw-unit-label {
+	flex: 0 0 150px;
+	width: 150px;
+}
+.rw-input.rw-desc {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 </style>

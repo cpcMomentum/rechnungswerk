@@ -4488,29 +4488,29 @@ var Ku = { class: "rw-table-wrap" }, qu = { class: "rw-table rw-table--positions
 	"onUpdate:modelValue",
 	"readonly",
 	"onBlur"
-], id = ["onUpdate:modelValue", "disabled"], ad = ["value"], od = [
+], id = ["onUpdate:modelValue", "disabled"], ad = ["value"], od = { class: "num" }, sd = [
+	"onUpdate:modelValue",
+	"readonly",
+	"onBlur"
+], cd = { class: "num" }, ld = ["onUpdate:modelValue", "disabled"], ud = ["value"], dd = { class: "rw-sum" }, fd = {
+	key: 0,
+	class: "num"
+}, pd = {
+	key: 0,
+	class: "rw-pos-desc"
+}, md = ["colspan"], hd = { class: "rw-sub-row" }, gd = [
 	"onUpdate:modelValue",
 	"readonly",
 	"placeholder",
 	"title"
-], sd = { class: "num" }, cd = [
-	"onUpdate:modelValue",
-	"readonly",
-	"onBlur"
-], ld = { class: "num" }, ud = ["onUpdate:modelValue", "disabled"], dd = ["value"], fd = { class: "rw-sum" }, pd = {
-	key: 0,
-	class: "num"
-}, md = {
-	key: 0,
-	class: "rw-pos-desc"
-}, hd = ["colspan"], gd = [
+], _d = [
 	"onUpdate:modelValue",
 	"readonly",
 	"placeholder"
-], _d = { key: 0 }, vd = ["colspan"], yd = {
+], vd = { key: 0 }, yd = ["colspan"], bd = {
 	key: 0,
 	class: "rw-toolbar"
-}, bd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}, xd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "InvoiceItemsTable",
 	props: /*@__PURE__*/ le({
 		products: {},
@@ -4585,38 +4585,30 @@ var Ku = { class: "rw-table-wrap" }, qu = { class: "rw-table rw-table--positions
 				}, [(p(!0), K(G, null, S(J(xc), (e) => (p(), K("option", {
 					key: e,
 					value: e
-				}, n(J(f)("rechnungswerk", J(Sc)[e])), 9, ad))), 128))], 8, id), [[oe, t.unitCode]]), W(R("input", {
-					"onUpdate:modelValue": (e) => t.unitLabel = e,
-					class: "rw-input rw-unit-label",
-					type: "text",
-					maxlength: "64",
-					readonly: e.readonly,
-					placeholder: J(f)("rechnungswerk", "eigene Einheit"),
-					title: J(f)("rechnungswerk", "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.")
-				}, null, 8, od), [[D, t.unitLabel]])]),
-				R("td", sd, [W(R("input", {
+				}, n(J(f)("rechnungswerk", J(Sc)[e])), 9, ad))), 128))], 8, id), [[oe, t.unitCode]])]),
+				R("td", od, [W(R("input", {
 					"onUpdate:modelValue": (e) => t.priceInput = e,
 					class: "rw-input num",
 					type: "text",
 					inputmode: "decimal",
 					readonly: e.readonly,
 					onBlur: (e) => o(t)
-				}, null, 40, cd), [[D, t.priceInput]])]),
-				R("td", ld, [W(R("select", {
+				}, null, 40, sd), [[D, t.priceInput]])]),
+				R("td", cd, [W(R("select", {
 					"onUpdate:modelValue": (e) => t.taxRateBp = e,
 					class: "rw-input",
 					disabled: e.readonly || e.smallBusiness
 				}, [(p(!0), K(G, null, S(J(Cc), (e) => (p(), K("option", {
 					key: e,
 					value: e
-				}, n(J(Bc)(e)), 9, dd))), 128))], 8, ud), [[
+				}, n(J(Bc)(e)), 9, ud))), 128))], 8, ld), [[
 					oe,
 					t.taxRateBp,
 					void 0,
 					{ number: !0 }
 				]])]),
-				R("td", fd, n(J(zc)(i(t))), 1),
-				e.readonly ? T("", !0) : (p(), K("td", pd, [q(J(X), {
+				R("td", dd, n(J(zc)(i(t))), 1),
+				e.readonly ? T("", !0) : (p(), K("td", fd, [q(J(X), {
 					variant: "tertiary",
 					"aria-label": J(f)("rechnungswerk", "Position entfernen"),
 					onClick: (e) => l(r)
@@ -4624,17 +4616,27 @@ var Ku = { class: "rw-table-wrap" }, qu = { class: "rw-table rw-table--positions
 					icon: P(() => [q(Dl, { size: 20 })]),
 					_: 1
 				}, 8, ["aria-label", "onClick"])]))
-			]), !e.readonly || t.description ? (p(), K("tr", md, [R("td", { colspan: e.readonly ? 6 : 7 }, [W(R("input", {
+			]), !e.readonly || t.description || t.unitLabel ? (p(), K("tr", pd, [R("td", { colspan: e.readonly ? 6 : 7 }, [R("div", hd, [!e.readonly || t.unitLabel ? W((p(), K("input", {
+				key: 0,
+				"onUpdate:modelValue": (e) => t.unitLabel = e,
+				class: "rw-input rw-input--sub rw-unit-label",
+				type: "text",
+				maxlength: "64",
+				readonly: e.readonly,
+				placeholder: J(f)("rechnungswerk", "eigene Einheit"),
+				title: J(f)("rechnungswerk", "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.")
+			}, null, 8, gd)), [[D, t.unitLabel]]) : T("", !0), !e.readonly || t.description ? W((p(), K("input", {
+				key: 1,
 				"onUpdate:modelValue": (e) => t.description = e,
-				class: "rw-input rw-input--sub",
+				class: "rw-input rw-input--sub rw-desc",
 				type: "text",
 				readonly: e.readonly,
 				placeholder: J(f)("rechnungswerk", "Beschreibung (optional)")
-			}, null, 8, gd), [[D, t.description]])], 8, hd)])) : T("", !0)], 64))), 128)), t.value.length === 0 ? (p(), K("tr", _d, [R("td", {
+			}, null, 8, _d)), [[D, t.description]]) : T("", !0)])], 8, md)])) : T("", !0)], 64))), 128)), t.value.length === 0 ? (p(), K("tr", vd, [R("td", {
 				colspan: e.readonly ? 6 : 7,
 				class: "rw-muted empty-row"
-			}, n(J(f)("rechnungswerk", "Noch keine Positionen.")), 9, vd)])) : T("", !0)])
-		])]), e.readonly ? T("", !0) : (p(), K("div", yd, [q(J(X), { onClick: s }, {
+			}, n(J(f)("rechnungswerk", "Noch keine Positionen.")), 9, yd)])) : T("", !0)])
+		])]), e.readonly ? T("", !0) : (p(), K("div", bd, [q(J(X), { onClick: s }, {
 			icon: P(() => [q(Vo, { size: 20 })]),
 			default: P(() => [k(" " + n(J(f)("rechnungswerk", "Position hinzufügen")), 1)]),
 			_: 1
@@ -4653,7 +4655,7 @@ var Ku = { class: "rw-table-wrap" }, qu = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["menuName"])) : T("", !0)]))]));
 	}
-}), [["__scopeId", "data-v-42260acf"]]), xd = { class: "confirm-dialog" }, Sd = { class: "confirm-dialog__message" }, Cd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-04862899"]]), Sd = { class: "confirm-dialog" }, Cd = { class: "confirm-dialog__message" }, wd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ConfirmDialog",
 	props: {
 		open: { type: Boolean },
@@ -4687,19 +4689,19 @@ var Ku = { class: "rw-table-wrap" }, qu = { class: "rw-table rw-table--positions
 				default: P(() => [k(n(e.confirmLabel || J(f)("rechnungswerk", "Bestätigen")), 1)]),
 				_: 1
 			}, 8, ["variant"])]),
-			default: P(() => [R("div", xd, [R("p", Sd, n(e.message), 1)])]),
+			default: P(() => [R("div", Sd, [R("p", Cd, n(e.message), 1)])]),
 			_: 1
 		}, 8, ["open", "name"]));
 	}
 }), [["__scopeId", "data-v-54981555"]]);
 //#endregion
 //#region src/utils/modalEsc.ts
-function wd(e, t) {
+function Td(e, t) {
 	e.target?.closest?.(".v-select.vs--open") || t();
 }
 //#endregion
 //#region src/components/SendInvoiceDialog.vue?vue&type=script&setup=true&lang.ts
-var Td = { class: "send-modal" }, Ed = { class: "send-modal__hint" }, Dd = { class: "field" }, Od = { class: "field" }, kd = { class: "field" }, Ad = { class: "actions" }, jd = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+var Ed = { class: "send-modal" }, Dd = { class: "send-modal__hint" }, Od = { class: "field" }, kd = { class: "field" }, Ad = { class: "field" }, jd = { class: "actions" }, Md = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "SendInvoiceDialog",
 	props: {
 		open: { type: Boolean },
@@ -4730,30 +4732,30 @@ var Td = { class: "send-modal" }, Ed = { class: "send-modal__hint" }, Dd = { cla
 		return (t, r) => e.open ? (p(), I(J(ot), {
 			key: 0,
 			name: a.value,
-			onKeydown: r[4] ||= be((e) => J(wd)(e, () => t.$emit("close")), ["esc"]),
+			onKeydown: r[4] ||= be((e) => J(Td)(e, () => t.$emit("close")), ["esc"]),
 			onClose: r[5] ||= (e) => t.$emit("close")
 		}, {
-			default: P(() => [R("div", Td, [
+			default: P(() => [R("div", Ed, [
 				R("h2", null, n(a.value), 1),
-				R("p", Ed, n(o.value), 1),
-				R("label", Dd, [R("span", null, n(J(f)("rechnungswerk", "Empfänger-E-Mail")) + " *", 1), W(R("input", {
+				R("p", Dd, n(o.value), 1),
+				R("label", Od, [R("span", null, n(J(f)("rechnungswerk", "Empfänger-E-Mail")) + " *", 1), W(R("input", {
 					ref_key: "toInput",
 					ref: c,
 					"onUpdate:modelValue": r[0] ||= (e) => l.to = e,
 					class: "input",
 					type: "email"
 				}, null, 512), [[D, l.to]])]),
-				R("label", Od, [R("span", null, n(J(f)("rechnungswerk", "Betreff")) + " *", 1), W(R("input", {
+				R("label", kd, [R("span", null, n(J(f)("rechnungswerk", "Betreff")) + " *", 1), W(R("input", {
 					"onUpdate:modelValue": r[1] ||= (e) => l.subject = e,
 					class: "input",
 					type: "text"
 				}, null, 512), [[D, l.subject]])]),
-				R("label", kd, [R("span", null, n(J(f)("rechnungswerk", "Nachricht")), 1), W(R("textarea", {
+				R("label", Ad, [R("span", null, n(J(f)("rechnungswerk", "Nachricht")), 1), W(R("textarea", {
 					"onUpdate:modelValue": r[2] ||= (e) => l.body = e,
 					class: "input",
 					rows: "6"
 				}, null, 512), [[D, l.body]])]),
-				R("div", Ad, [q(J(X), { onClick: r[3] ||= (e) => t.$emit("close") }, {
+				R("div", jd, [q(J(X), { onClick: r[3] ||= (e) => t.$emit("close") }, {
 					default: P(() => [k(n(J(f)("rechnungswerk", "Abbrechen")), 1)]),
 					_: 1
 				}), q(J(X), {
@@ -4769,49 +4771,49 @@ var Td = { class: "send-modal" }, Ed = { class: "send-modal__hint" }, Dd = { cla
 			_: 1
 		}, 8, ["name"])) : T("", !0);
 	}
-}), [["__scopeId", "data-v-2f5a808a"]]), Md = () => ho("/quotes"), Nd = (e) => ho(`/quotes/${e}`), Pd = (e) => $("/quotes", { data: e }), Fd = (e, t) => go(`/quotes/${e}`, { data: t }), Id = (e) => vo(`/quotes/${e}`), Ld = (e) => $(`/quotes/${e}/commit`, {}), Rd = (e) => $(`/quotes/${e}/accept`, {}), zd = (e) => $(`/quotes/${e}/reject`, {}), Bd = (e) => $(`/quotes/${e}/convert`, {}), Vd = (e) => $(`/quotes/${e}/revise`, {}), Hd = (e) => po(`/quotes/${e}/pdf`), Ud = (e) => po(`/quotes/${e}/preview`) + "?t=" + Date.now(), Wd = (e) => {
+}), [["__scopeId", "data-v-2f5a808a"]]), Nd = () => ho("/quotes"), Pd = (e) => ho(`/quotes/${e}`), Fd = (e) => $("/quotes", { data: e }), Id = (e, t) => go(`/quotes/${e}`, { data: t }), Ld = (e) => vo(`/quotes/${e}`), Rd = (e) => $(`/quotes/${e}/commit`, {}), zd = (e) => $(`/quotes/${e}/accept`, {}), Bd = (e) => $(`/quotes/${e}/reject`, {}), Vd = (e) => $(`/quotes/${e}/convert`, {}), Hd = (e) => $(`/quotes/${e}/revise`, {}), Ud = (e) => po(`/quotes/${e}/pdf`), Wd = (e) => po(`/quotes/${e}/preview`) + "?t=" + Date.now(), Gd = (e) => {
 	let t = document.createElement("a");
-	t.href = Hd(e), t.download = "", t.rel = "noopener", t.style.display = "none", document.body.appendChild(t), t.click(), t.remove();
-}, Gd = (e, t) => $(`/quotes/${e}/send`, t), Kd = $t("quote", () => {
+	t.href = Ud(e), t.download = "", t.rel = "noopener", t.style.display = "none", document.body.appendChild(t), t.click(), t.remove();
+}, Kd = (e, t) => $(`/quotes/${e}/send`, t), qd = $t("quote", () => {
 	let e = M([]), t = M(!1);
 	async function n() {
 		t.value = !0;
 		try {
-			e.value = await Md();
+			e.value = await Nd();
 		} finally {
 			t.value = !1;
 		}
 	}
-	let r = (e) => Nd(e);
+	let r = (e) => Pd(e);
 	async function i(e) {
-		let t = await Pd(e);
+		let t = await Fd(e);
 		return await n(), t;
 	}
 	async function a(e, t) {
-		let r = await Fd(e, t);
+		let r = await Id(e, t);
 		return await n(), r;
 	}
 	async function o(t) {
-		await Id(t), e.value = e.value.filter((e) => e.id !== t);
+		await Ld(t), e.value = e.value.filter((e) => e.id !== t);
 	}
 	async function s(e) {
-		let t = await Ld(e);
-		return await n(), t;
-	}
-	async function c(e) {
 		let t = await Rd(e);
 		return await n(), t;
 	}
-	async function l(e) {
+	async function c(e) {
 		let t = await zd(e);
 		return await n(), t;
 	}
-	async function u(e) {
+	async function l(e) {
 		let t = await Bd(e);
 		return await n(), t;
 	}
-	async function d(e) {
+	async function u(e) {
 		let t = await Vd(e);
+		return await n(), t;
+	}
+	async function d(e) {
+		let t = await Hd(e);
 		return await n(), t;
 	}
 	return {
@@ -4828,29 +4830,29 @@ var Td = { class: "send-modal" }, Ed = { class: "send-modal__hint" }, Dd = { cla
 		convert: u,
 		revise: d
 	};
-}), qd = () => ho("/products"), Jd = (e) => $("/products", { data: e }), Yd = (e, t) => go(`/products/${e}`, { data: t }), Xd = (e) => vo(`/products/${e}`), Zd = $t("product", () => {
+}), Jd = () => ho("/products"), Yd = (e) => $("/products", { data: e }), Xd = (e, t) => go(`/products/${e}`, { data: t }), Zd = (e) => vo(`/products/${e}`), Qd = $t("product", () => {
 	let e = M([]), t = M(!1);
 	async function n() {
 		t.value = !0;
 		try {
-			e.value = await qd();
+			e.value = await Jd();
 		} finally {
 			t.value = !1;
 		}
 	}
 	async function r(t) {
-		let n = await Jd(t);
+		let n = await Yd(t);
 		return e.value.push(n), e.value.sort((e, t) => e.name.localeCompare(t.name)), n;
 	}
 	async function i(t, n) {
-		let r = await Yd(t, n), i = e.value.findIndex((e) => e.id === t);
+		let r = await Xd(t, n), i = e.value.findIndex((e) => e.id === t);
 		return i >= 0 && (e.value[i] = r), e.value.sort((e, t) => e.name.localeCompare(t.name)), r;
 	}
 	async function a(t) {
 		let n = e.value.findIndex((e) => e.id === t), r = n >= 0 ? e.value[n] : null;
 		n >= 0 && e.value.splice(n, 1);
 		try {
-			await Xd(t);
+			await Zd(t);
 		} catch (t) {
 			throw r && n >= 0 && e.value.splice(n, 0, r), t;
 		}
@@ -4863,18 +4865,18 @@ var Td = { class: "send-modal" }, Ed = { class: "send-modal__hint" }, Dd = { cla
 		update: i,
 		remove: a
 	};
-}), Qd = () => ho("/text-snippets"), $d = (e) => $("/text-snippets", { data: e }), ef = (e, t) => go(`/text-snippets/${e}`, { data: t }), tf = (e) => vo(`/text-snippets/${e}`);
+}), $d = () => ho("/text-snippets"), ef = (e) => $("/text-snippets", { data: e }), tf = (e, t) => go(`/text-snippets/${e}`, { data: t }), nf = (e) => vo(`/text-snippets/${e}`);
 //#endregion
 //#region src/stores/textSnippetStore.ts
-function nf(e) {
+function rf(e) {
 	e.sort((e, t) => e.docType.localeCompare(t.docType) || e.slot.localeCompare(t.slot) || e.sortOrder - t.sortOrder || e.label.localeCompare(t.label));
 }
-var rf = $t("textSnippet", () => {
+var af = $t("textSnippet", () => {
 	let e = M([]), t = M(!1), n = M(!1);
 	async function r() {
 		t.value = !0;
 		try {
-			e.value = await Qd(), n.value = !0;
+			e.value = await $d(), n.value = !0;
 		} finally {
 			t.value = !1;
 		}
@@ -4886,18 +4888,18 @@ var rf = $t("textSnippet", () => {
 		if (t.isDefault) for (let n of e.value) n.id !== t.id && n.docType === t.docType && n.slot === t.slot && (n.isDefault = !1);
 	}
 	async function o(t) {
-		let n = await $d(t);
-		return e.value.push(n), a(n), nf(e.value), n;
+		let n = await ef(t);
+		return e.value.push(n), a(n), rf(e.value), n;
 	}
 	async function s(t, n) {
-		let r = await ef(t, n), i = e.value.findIndex((e) => e.id === t);
-		return i >= 0 && (e.value[i] = r), a(r), nf(e.value), r;
+		let r = await tf(t, n), i = e.value.findIndex((e) => e.id === t);
+		return i >= 0 && (e.value[i] = r), a(r), rf(e.value), r;
 	}
 	async function c(t) {
 		let n = e.value.findIndex((e) => e.id === t), r = n >= 0 ? e.value[n] : null;
 		n >= 0 && e.value.splice(n, 1);
 		try {
-			await tf(t);
+			await nf(t);
 		} catch (t) {
 			throw r && n >= 0 && e.value.splice(n, 0, r), t;
 		}
@@ -4920,43 +4922,43 @@ var rf = $t("textSnippet", () => {
 		forSlot: l,
 		defaultContent: u
 	};
-}), af = () => ho("/me/contact"), of = (e) => _o("/me/contact", { data: e }), sf = { class: "rw-view" }, cf = { class: "rw-editor-head" }, lf = {
+}), of = () => ho("/me/contact"), sf = (e) => _o("/me/contact", { data: e }), cf = { class: "rw-view" }, lf = { class: "rw-editor-head" }, uf = {
 	key: 0,
 	class: "rw-status-group"
-}, uf = { class: "rw-status-tag" }, df = {
+}, df = { class: "rw-status-tag" }, ff = {
 	key: 0,
 	class: "rw-pill"
-}, ff = {
+}, pf = {
 	key: 1,
 	class: "rw-pill"
-}, pf = ["title"], mf = { class: "rw-section" }, hf = { class: "rw-form-row" }, gf = { class: "rw-field invoice-no" }, _f = ["value"], vf = { class: "rw-field" }, yf = ["readonly"], bf = { class: "rw-field" }, xf = ["readonly"], Sf = { class: "rw-hint" }, Cf = { class: "more" }, wf = { class: "rw-form-row" }, Tf = { class: "rw-field" }, Ef = ["readonly"], Df = { class: "rw-field" }, Of = ["readonly"], kf = {
+}, mf = ["title"], hf = { class: "rw-section" }, gf = { class: "rw-form-row" }, _f = { class: "rw-field invoice-no" }, vf = ["value"], yf = { class: "rw-field" }, bf = ["readonly"], xf = { class: "rw-field" }, Sf = ["readonly"], Cf = { class: "rw-hint" }, wf = { class: "more" }, Tf = { class: "rw-form-row" }, Ef = { class: "rw-field" }, Df = ["readonly"], Of = { class: "rw-field" }, kf = ["readonly"], Af = {
 	key: 0,
 	class: "rw-field"
-}, Af = ["readonly", "placeholder"], jf = {
+}, jf = ["readonly", "placeholder"], Mf = {
 	key: 1,
 	class: "rw-field",
 	"aria-hidden": "true"
-}, Mf = { class: "rw-form-row" }, Nf = { class: "rw-field" }, Pf = ["readonly"], Ff = { class: "rw-field" }, If = ["readonly"], Lf = { class: "rw-section" }, Rf = {
+}, Nf = { class: "rw-form-row" }, Pf = { class: "rw-field" }, Ff = ["readonly"], If = { class: "rw-field" }, Lf = ["readonly"], Rf = { class: "rw-section" }, zf = {
 	key: 0,
 	class: "rw-form-row"
-}, zf = { class: "rw-field" }, Bf = { class: "rw-hint" }, Vf = { class: "rw-form-row" }, Hf = { class: "rw-field" }, Uf = ["value"], Wf = { class: "rw-field" }, Gf = ["readonly"], Kf = { class: "rw-form-row" }, qf = { class: "rw-field" }, Jf = ["readonly"], Yf = { class: "rw-field rw-field--narrow" }, Xf = ["readonly"], Zf = { class: "rw-field" }, Qf = ["readonly"], $f = { class: "rw-field rw-field--country" }, ep = { class: "rw-form-row" }, tp = { class: "rw-field" }, np = ["readonly"], rp = { class: "rw-field" }, ip = ["readonly"], ap = { class: "rw-field" }, op = ["readonly"], sp = { class: "rw-section" }, cp = { class: "rw-form-row" }, lp = { class: "rw-field" }, up = ["readonly"], dp = { class: "rw-field" }, fp = ["readonly"], pp = { class: "rw-field" }, mp = ["readonly"], hp = { class: "rw-hint" }, gp = { class: "rw-section" }, _p = { class: "rw-section-head" }, vp = { class: "rw-field" }, yp = ["readonly", "placeholder"], bp = { class: "rw-section" }, xp = { class: "rw-section" }, Sp = { class: "rw-form-row" }, Cp = { class: "rw-field" }, wp = ["disabled"], Tp = { value: "" }, Ep = { value: "reverse_charge" }, Dp = { value: "intra_community" }, Op = { value: "export" }, kp = { class: "rw-totals" }, Ap = { class: "rw-kpi-card" }, jp = { class: "rw-kpi-row" }, Mp = { class: "rw-kpi-row rw-kpi-row--grand" }, Np = {
+}, Bf = { class: "rw-field" }, Vf = { class: "rw-hint" }, Hf = { class: "rw-form-row" }, Uf = { class: "rw-field" }, Wf = ["value"], Gf = { class: "rw-field" }, Kf = ["readonly"], qf = { class: "rw-form-row" }, Jf = { class: "rw-field" }, Yf = ["readonly"], Xf = { class: "rw-field rw-field--narrow" }, Zf = ["readonly"], Qf = { class: "rw-field" }, $f = ["readonly"], ep = { class: "rw-field rw-field--country" }, tp = { class: "rw-form-row" }, np = { class: "rw-field" }, rp = ["readonly"], ip = { class: "rw-field" }, ap = ["readonly"], op = { class: "rw-field" }, sp = ["readonly"], cp = { class: "rw-section" }, lp = { class: "rw-form-row" }, up = { class: "rw-field" }, dp = ["readonly"], fp = { class: "rw-field" }, pp = ["readonly"], mp = { class: "rw-field" }, hp = ["readonly"], gp = { class: "rw-hint" }, _p = { class: "rw-section" }, vp = { class: "rw-section-head" }, yp = { class: "rw-field" }, bp = ["readonly", "placeholder"], xp = { class: "rw-section" }, Sp = { class: "rw-section" }, Cp = { class: "rw-form-row" }, wp = { class: "rw-field" }, Tp = ["disabled"], Ep = { value: "" }, Dp = { value: "reverse_charge" }, Op = { value: "intra_community" }, kp = { value: "export" }, Ap = { class: "rw-totals" }, jp = { class: "rw-kpi-card" }, Mp = { class: "rw-kpi-row" }, Np = { class: "rw-kpi-row rw-kpi-row--grand" }, Pp = {
 	key: 4,
 	class: "rw-section"
-}, Pp = { class: "rw-form-row" }, Fp = { class: "rw-field payterm-days" }, Ip = ["readonly"], Lp = { class: "rw-field" }, Rp = ["value"], zp = { class: "rw-field" }, Bp = ["readonly", "placeholder"], Vp = {
+}, Fp = { class: "rw-form-row" }, Ip = { class: "rw-field payterm-days" }, Lp = ["readonly"], Rp = { class: "rw-field" }, zp = ["value"], Bp = { class: "rw-field" }, Vp = ["readonly", "placeholder"], Hp = {
 	key: 5,
 	class: "rw-section"
-}, Hp = { class: "rw-form-row" }, Up = { class: "rw-field payterm-days" }, Wp = ["readonly"], Gp = { class: "rw-field rw-checkbox-field" }, Kp = { class: "rw-checkbox-row" }, qp = ["disabled"], Jp = { class: "rw-hint" }, Yp = { class: "rw-section" }, Xp = { class: "rw-section-head" }, Zp = { class: "rw-field" }, Qp = ["readonly", "placeholder"], $p = {
+}, Up = { class: "rw-form-row" }, Wp = { class: "rw-field payterm-days" }, Gp = ["readonly"], Kp = { class: "rw-field rw-checkbox-field" }, qp = { class: "rw-checkbox-row" }, Jp = ["disabled"], Yp = { class: "rw-hint" }, Xp = { class: "rw-section" }, Zp = { class: "rw-section-head" }, Qp = { class: "rw-field" }, $p = ["readonly", "placeholder"], em = {
 	key: 6,
 	class: "rw-section"
-}, em = [
+}, tm = [
 	"onUpdate:modelValue",
 	"readonly",
 	"aria-label"
-], tm = { class: "rw-hint" }, nm = { class: "rw-action-bar" }, rm = ["src", "title"], im = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+], nm = { class: "rw-hint" }, rm = { class: "rw-action-bar" }, im = ["src", "title"], am = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "InvoiceEditorView",
 	props: { id: {} },
 	setup(e) {
-		let t = e, r = Le(), i = Je(), a = dc(), o = Kd(), l = Zd(), u = bc(), d = rf(), m = H(() => typeof r.name == "string" && r.name.startsWith("quote")), h = H(() => m.value ? o : a), g = H(() => m.value ? "quote" : "invoice"), v = H(() => d.forSlot(g.value, "opening")), y = H(() => d.forSlot(g.value, "closing"));
+		let t = e, r = Le(), i = Je(), a = dc(), o = qd(), l = Qd(), u = bc(), d = af(), m = H(() => typeof r.name == "string" && r.name.startsWith("quote")), h = H(() => m.value ? o : a), g = H(() => m.value ? "quote" : "invoice"), v = H(() => d.forSlot(g.value, "opening")), y = H(() => d.forSlot(g.value, "closing"));
 		function b(e) {
 			B.greeting = e.content ?? "";
 		}
@@ -5071,7 +5073,7 @@ var rf = $t("textSnippet", () => {
 				email: ""
 			};
 			try {
-				n = await af();
+				n = await of();
 			} catch {}
 			e === Ce && (B.sellerContactPerson = n.person || (t?.contactPerson ?? ""), B.sellerContactPhone = n.phone || (t?.contactPhone ?? ""), B.sellerContactEmail = n.email || (t?.contactEmail ?? ""));
 		}
@@ -5134,7 +5136,7 @@ var rf = $t("textSnippet", () => {
 		}
 		async function Me() {
 			let e = await je();
-			e && (ae.value = m.value ? Ud(e.id) : cc(e.id), ie.value = !0);
+			e && (ae.value = m.value ? Wd(e.id) : cc(e.id), ie.value = !0);
 		}
 		function Ne(e) {
 			e || (ie.value = !1, ae.value = "");
@@ -5160,7 +5162,7 @@ var rf = $t("textSnippet", () => {
 			"accepted"
 		].includes(w.value?.quoteStatus ?? "")), He = H(() => m.value && w.value?.status === "committed" && ["open", "expired"].includes(w.value?.quoteStatus ?? ""));
 		function Ue() {
-			w.value && (m.value ? Wd(w.value.id) : lc(w.value.id));
+			w.value && (m.value ? Gd(w.value.id) : lc(w.value.id));
 		}
 		async function We() {
 			L.value = null;
@@ -5241,7 +5243,7 @@ var rf = $t("textSnippet", () => {
 			if (w.value) {
 				re.value = !0, A.value = "";
 				try {
-					m.value ? (await Gd(w.value.id, e), F.value = !1, j.value = f("rechnungswerk", "Angebot an {to} gesendet.", { to: e.to })) : (await uc(w.value.id, e), F.value = !1, j.value = f("rechnungswerk", "Rechnung an {to} gesendet.", { to: e.to }));
+					m.value ? (await Kd(w.value.id, e), F.value = !1, j.value = f("rechnungswerk", "Angebot an {to} gesendet.", { to: e.to })) : (await uc(w.value.id, e), F.value = !1, j.value = f("rechnungswerk", "Rechnung an {to} gesendet.", { to: e.to }));
 				} catch (e) {
 					$e(e, f("rechnungswerk", "Versand fehlgeschlagen"));
 				} finally {
@@ -5284,20 +5286,20 @@ var rf = $t("textSnippet", () => {
 		}
 		return (e, t) => {
 			let r = C("tooltip");
-			return p(), K("div", sf, [
-				R("div", cf, [q(J(vt), null, {
+			return p(), K("div", cf, [
+				R("div", lf, [q(J(vt), null, {
 					default: P(() => [q(J(gt), {
 						name: m.value ? J(f)("rechnungswerk", "Angebote") : J(f)("rechnungswerk", "Rechnungen"),
 						to: { name: ee.value }
 					}, null, 8, ["name", "to"]), q(J(gt), { name: xe.value }, null, 8, ["name"])]),
 					_: 1
-				}), w.value ? (p(), K("span", lf, [
-					R("span", uf, [(p(), I(c(U(w.value.status)), {
+				}), w.value ? (p(), K("span", uf, [
+					R("span", df, [(p(), I(c(U(w.value.status)), {
 						size: 18,
 						class: O(["rw-sicon", `rw-sicon--${w.value.status}`])
 					}, null, 8, ["class"])), k(" " + n(me.value), 1)]),
-					!m.value && w.value.invoiceType !== "invoice" ? W((p(), K("span", df, [k(n(he.value), 1)])), [[r, ve.value]]) : T("", !0),
-					m.value && w.value.relatedQuoteNumber ? (p(), K("span", ff, n(J(f)("rechnungswerk", "Revision von {number}", { number: w.value.relatedQuoteNumber })), 1)) : T("", !0),
+					!m.value && w.value.invoiceType !== "invoice" ? W((p(), K("span", ff, [k(n(he.value), 1)])), [[r, ve.value]]) : T("", !0),
+					m.value && w.value.relatedQuoteNumber ? (p(), K("span", pf, n(J(f)("rechnungswerk", "Revision von {number}", { number: w.value.relatedQuoteNumber })), 1)) : T("", !0),
 					w.value.datevStatus && ge.value ? (p(), K("span", {
 						key: 2,
 						class: "rw-status-tag",
@@ -5305,7 +5307,7 @@ var rf = $t("textSnippet", () => {
 					}, [(p(), I(c(pe(w.value.datevStatus)), {
 						size: 18,
 						class: O(["rw-sicon", `rw-sicon--datev-${w.value.datevStatus}`])
-					}, null, 8, ["class"])), k(" " + n(ge.value), 1)], 8, pf)) : T("", !0)
+					}, null, 8, ["class"])), k(" " + n(ge.value), 1)], 8, mf)) : T("", !0)
 				])) : T("", !0)]),
 				A.value ? (p(), I(J(it), {
 					key: 0,
@@ -5327,65 +5329,65 @@ var rf = $t("textSnippet", () => {
 					type: "info",
 					text: J(f)("rechnungswerk", "Dieser Beleg wurde nicht beim Festschreiben abgelegt, sondern später aus dem Datensatz erzeugt. Beträge, Positionen und Steuerausweis stimmen; Firmendaten und Layout entsprechen dem heutigen Stand, nicht dem von damals.")
 				}, null, 8, ["text"])) : T("", !0),
-				R("section", mf, [
+				R("section", hf, [
 					R("h3", null, n(m.value ? J(f)("rechnungswerk", "Angebotsdaten") : J(f)("rechnungswerk", "Rechnungsdaten")), 1),
-					R("div", hf, [
-						R("label", gf, [R("span", null, n(m.value ? J(f)("rechnungswerk", "Angebotsnummer") : J(f)("rechnungswerk", "Rechnungsnummer")), 1), R("input", {
+					R("div", gf, [
+						R("label", _f, [R("span", null, n(m.value ? J(f)("rechnungswerk", "Angebotsnummer") : J(f)("rechnungswerk", "Rechnungsnummer")), 1), R("input", {
 							class: "rw-input",
 							type: "text",
 							readonly: "",
 							value: w.value?.number ?? J(f)("rechnungswerk", "(wird vergeben)")
-						}, null, 8, _f)]),
-						R("label", vf, [R("span", null, n(m.value ? J(f)("rechnungswerk", "Geplanter Leistungszeitraum (optional)") : J(f)("rechnungswerk", "Leistungsdatum /-zeitraum")), 1), W(R("input", {
+						}, null, 8, vf)]),
+						R("label", yf, [R("span", null, n(m.value ? J(f)("rechnungswerk", "Geplanter Leistungszeitraum (optional)") : J(f)("rechnungswerk", "Leistungsdatum /-zeitraum")), 1), W(R("input", {
 							"onUpdate:modelValue": t[0] ||= (e) => B.performancePeriodStart = e,
 							class: "rw-input",
 							type: "date",
 							readonly: V.value
-						}, null, 8, yf), [[D, B.performancePeriodStart]])]),
-						R("label", bf, [R("span", null, n(J(f)("rechnungswerk", "bis (optional)")), 1), W(R("input", {
+						}, null, 8, bf), [[D, B.performancePeriodStart]])]),
+						R("label", xf, [R("span", null, n(J(f)("rechnungswerk", "bis (optional)")), 1), W(R("input", {
 							"onUpdate:modelValue": t[1] ||= (e) => B.performancePeriodEnd = e,
 							class: "rw-input",
 							type: "date",
 							readonly: V.value
-						}, null, 8, xf), [[D, B.performancePeriodEnd]])])
+						}, null, 8, Sf), [[D, B.performancePeriodEnd]])])
 					]),
-					R("p", Sf, n(m.value ? J(f)("rechnungswerk", "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.") : J(f)("rechnungswerk", "Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.")), 1),
-					R("details", Cf, [
+					R("p", Cf, n(m.value ? J(f)("rechnungswerk", "Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.") : J(f)("rechnungswerk", "Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.")), 1),
+					R("details", wf, [
 						R("summary", null, n(m.value ? J(f)("rechnungswerk", "Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)") : J(f)("rechnungswerk", "Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)")), 1),
-						R("div", wf, [
-							R("label", Tf, [R("span", null, n(J(f)("rechnungswerk", "Referenznummer")), 1), W(R("input", {
+						R("div", Tf, [
+							R("label", Ef, [R("span", null, n(J(f)("rechnungswerk", "Referenznummer")), 1), W(R("input", {
 								"onUpdate:modelValue": t[2] ||= (e) => B.referenceNumber = e,
 								class: "rw-input",
 								type: "text",
 								readonly: V.value
-							}, null, 8, Ef), [[D, B.referenceNumber]])]),
-							R("label", Df, [R("span", null, n(J(f)("rechnungswerk", "Bestellnummer")), 1), W(R("input", {
+							}, null, 8, Df), [[D, B.referenceNumber]])]),
+							R("label", Of, [R("span", null, n(J(f)("rechnungswerk", "Bestellnummer")), 1), W(R("input", {
 								"onUpdate:modelValue": t[3] ||= (e) => B.orderNumber = e,
 								class: "rw-input",
 								type: "text",
 								readonly: V.value
-							}, null, 8, Of), [[D, B.orderNumber]])]),
-							m.value ? (p(), K("span", jf)) : (p(), K("label", kf, [R("span", null, n(J(f)("rechnungswerk", "Käuferreferenz / Leitweg-ID (BT-10)")), 1), W(R("input", {
+							}, null, 8, kf), [[D, B.orderNumber]])]),
+							m.value ? (p(), K("span", Mf)) : (p(), K("label", Af, [R("span", null, n(J(f)("rechnungswerk", "Käuferreferenz / Leitweg-ID (BT-10)")), 1), W(R("input", {
 								"onUpdate:modelValue": t[4] ||= (e) => B.buyerReference = e,
 								class: "rw-input",
 								type: "text",
 								readonly: V.value,
 								placeholder: J(f)("rechnungswerk", "nur für öffentliche Auftraggeber")
-							}, null, 8, Af), [[D, B.buyerReference]])]))
+							}, null, 8, jf), [[D, B.buyerReference]])]))
 						]),
-						R("div", Mf, [
-							R("label", Nf, [R("span", null, n(J(f)("rechnungswerk", "Vertragsnummer (BT-12)")), 1), W(R("input", {
+						R("div", Nf, [
+							R("label", Pf, [R("span", null, n(J(f)("rechnungswerk", "Vertragsnummer (BT-12)")), 1), W(R("input", {
 								"onUpdate:modelValue": t[5] ||= (e) => B.contractNumber = e,
 								class: "rw-input",
 								type: "text",
 								readonly: V.value
-							}, null, 8, Pf), [[D, B.contractNumber]])]),
-							R("label", Ff, [R("span", null, n(J(f)("rechnungswerk", "Objekt-/Projektkennung (BT-18)")), 1), W(R("input", {
+							}, null, 8, Ff), [[D, B.contractNumber]])]),
+							R("label", If, [R("span", null, n(J(f)("rechnungswerk", "Objekt-/Projektkennung (BT-18)")), 1), W(R("input", {
 								"onUpdate:modelValue": t[6] ||= (e) => B.projectReference = e,
 								class: "rw-input",
 								type: "text",
 								readonly: V.value
-							}, null, 8, If), [[D, B.projectReference]])]),
+							}, null, 8, Lf), [[D, B.projectReference]])]),
 							t[35] ||= R("span", {
 								class: "rw-field",
 								"aria-hidden": "true"
@@ -5393,101 +5395,101 @@ var rf = $t("textSnippet", () => {
 						])
 					])
 				]),
-				R("section", Lf, [
+				R("section", Rf, [
 					R("h3", null, n(J(f)("rechnungswerk", "Empfänger")), 1),
-					V.value ? T("", !0) : (p(), K("div", Rf, [R("label", zf, [
+					V.value ? T("", !0) : (p(), K("div", zf, [R("label", Bf, [
 						R("span", null, n(J(f)("rechnungswerk", "Kunde übernehmen")), 1),
 						q(Bu, { onSelect: Oe }),
-						R("span", Bf, n(J(f)("rechnungswerk", "Kunde auswählen, um die Empfängerdaten automatisch zu übernehmen.")), 1)
+						R("span", Vf, n(J(f)("rechnungswerk", "Kunde auswählen, um die Empfängerdaten automatisch zu übernehmen.")), 1)
 					])])),
-					R("div", Vf, [R("label", Hf, [R("span", null, n(J(f)("rechnungswerk", "Name")), 1), V.value ? (p(), K("input", {
+					R("div", Hf, [R("label", Uf, [R("span", null, n(J(f)("rechnungswerk", "Name")), 1), V.value ? (p(), K("input", {
 						key: 1,
 						class: "rw-input",
 						type: "text",
 						readonly: "",
 						value: B.recipientName
-					}, null, 8, Uf)) : (p(), I(Cu, {
+					}, null, 8, Wf)) : (p(), I(Cu, {
 						key: 0,
 						modelValue: B.recipientName,
 						"onUpdate:modelValue": t[7] ||= (e) => B.recipientName = e,
 						onSelect: ke
-					}, null, 8, ["modelValue"]))]), R("label", Wf, [R("span", null, n(J(f)("rechnungswerk", "E-Mail")), 1), W(R("input", {
+					}, null, 8, ["modelValue"]))]), R("label", Gf, [R("span", null, n(J(f)("rechnungswerk", "E-Mail")), 1), W(R("input", {
 						"onUpdate:modelValue": t[8] ||= (e) => B.recipientEmail = e,
 						class: "rw-input",
 						type: "email",
 						readonly: V.value
-					}, null, 8, Gf), [[D, B.recipientEmail]])])]),
-					R("div", Kf, [
-						R("label", qf, [R("span", null, n(J(f)("rechnungswerk", "Straße")), 1), W(R("input", {
+					}, null, 8, Kf), [[D, B.recipientEmail]])])]),
+					R("div", qf, [
+						R("label", Jf, [R("span", null, n(J(f)("rechnungswerk", "Straße")), 1), W(R("input", {
 							"onUpdate:modelValue": t[9] ||= (e) => B.recipientAddress = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, Jf), [[D, B.recipientAddress]])]),
-						R("label", Yf, [R("span", null, n(J(f)("rechnungswerk", "PLZ")), 1), W(R("input", {
+						}, null, 8, Yf), [[D, B.recipientAddress]])]),
+						R("label", Xf, [R("span", null, n(J(f)("rechnungswerk", "PLZ")), 1), W(R("input", {
 							"onUpdate:modelValue": t[10] ||= (e) => B.recipientPostalCode = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, Xf), [[D, B.recipientPostalCode]])]),
-						R("label", Zf, [R("span", null, n(J(f)("rechnungswerk", "Ort")), 1), W(R("input", {
+						}, null, 8, Zf), [[D, B.recipientPostalCode]])]),
+						R("label", Qf, [R("span", null, n(J(f)("rechnungswerk", "Ort")), 1), W(R("input", {
 							"onUpdate:modelValue": t[11] ||= (e) => B.recipientCity = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, Qf), [[D, B.recipientCity]])]),
-						R("label", $f, [R("span", null, n(J(f)("rechnungswerk", "Land")), 1), q(ku, {
+						}, null, 8, $f), [[D, B.recipientCity]])]),
+						R("label", ep, [R("span", null, n(J(f)("rechnungswerk", "Land")), 1), q(ku, {
 							modelValue: B.recipientCountry,
 							"onUpdate:modelValue": t[12] ||= (e) => B.recipientCountry = e,
 							disabled: V.value
 						}, null, 8, ["modelValue", "disabled"])])
 					]),
-					R("div", ep, [
-						R("label", tp, [R("span", null, n(J(f)("rechnungswerk", "USt-IdNr. (optional)")), 1), W(R("input", {
+					R("div", tp, [
+						R("label", np, [R("span", null, n(J(f)("rechnungswerk", "USt-IdNr. (optional)")), 1), W(R("input", {
 							"onUpdate:modelValue": t[13] ||= (e) => B.recipientVatId = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, np), [[D, B.recipientVatId]])]),
-						R("label", rp, [R("span", null, n(J(f)("rechnungswerk", "Ansprechpartner (optional)")), 1), W(R("input", {
+						}, null, 8, rp), [[D, B.recipientVatId]])]),
+						R("label", ip, [R("span", null, n(J(f)("rechnungswerk", "Ansprechpartner (optional)")), 1), W(R("input", {
 							"onUpdate:modelValue": t[14] ||= (e) => B.recipientContactPerson = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, ip), [[D, B.recipientContactPerson]])]),
-						R("label", ap, [R("span", null, n(J(f)("rechnungswerk", "Telefon (optional)")), 1), W(R("input", {
+						}, null, 8, ap), [[D, B.recipientContactPerson]])]),
+						R("label", op, [R("span", null, n(J(f)("rechnungswerk", "Telefon (optional)")), 1), W(R("input", {
 							"onUpdate:modelValue": t[15] ||= (e) => B.recipientPhone = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, op), [[D, B.recipientPhone]])])
+						}, null, 8, sp), [[D, B.recipientPhone]])])
 					])
 				]),
-				R("section", sp, [
+				R("section", cp, [
 					R("h3", null, n(m.value ? J(f)("rechnungswerk", "Ansprechpartner (für dieses Angebot)") : J(f)("rechnungswerk", "Ansprechpartner (für diese Rechnung)")), 1),
-					R("div", cp, [
-						R("label", lp, [R("span", null, n(J(f)("rechnungswerk", "Name")), 1), W(R("input", {
+					R("div", lp, [
+						R("label", up, [R("span", null, n(J(f)("rechnungswerk", "Name")), 1), W(R("input", {
 							"onUpdate:modelValue": t[16] ||= (e) => B.sellerContactPerson = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, up), [[D, B.sellerContactPerson]])]),
-						R("label", dp, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
+						}, null, 8, dp), [[D, B.sellerContactPerson]])]),
+						R("label", fp, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
 							"onUpdate:modelValue": t[17] ||= (e) => B.sellerContactPhone = e,
 							class: "rw-input",
 							type: "text",
 							readonly: V.value
-						}, null, 8, fp), [[D, B.sellerContactPhone]])]),
-						R("label", pp, [R("span", null, n(J(f)("rechnungswerk", "E-Mail")), 1), W(R("input", {
+						}, null, 8, pp), [[D, B.sellerContactPhone]])]),
+						R("label", mp, [R("span", null, n(J(f)("rechnungswerk", "E-Mail")), 1), W(R("input", {
 							"onUpdate:modelValue": t[18] ||= (e) => B.sellerContactEmail = e,
 							class: "rw-input",
 							type: "email",
 							readonly: V.value
-						}, null, 8, mp), [[D, B.sellerContactEmail]])])
+						}, null, 8, hp), [[D, B.sellerContactEmail]])])
 					]),
-					R("p", hp, n(m.value ? J(f)("rechnungswerk", "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.") : J(f)("rechnungswerk", "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.")), 1)
+					R("p", gp, n(m.value ? J(f)("rechnungswerk", "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.") : J(f)("rechnungswerk", "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.")), 1)
 				]),
-				R("section", gp, [R("div", _p, [R("h3", null, n(J(f)("rechnungswerk", "Anrede & Einleitung")), 1), !V.value && v.value.length > 0 ? (p(), I(J(nt), {
+				R("section", _p, [R("div", vp, [R("h3", null, n(J(f)("rechnungswerk", "Anrede & Einleitung")), 1), !V.value && v.value.length > 0 ? (p(), I(J(nt), {
 					key: 0,
 					menuName: J(f)("rechnungswerk", "Vorlage einfügen")
 				}, {
@@ -5500,14 +5502,14 @@ var rf = $t("textSnippet", () => {
 						_: 2
 					}, 1032, ["onClick"]))), 128))]),
 					_: 1
-				}, 8, ["menuName"])) : T("", !0)]), R("label", vp, [R("span", null, n(J(f)("rechnungswerk", "Anrede & Einleitung")), 1), W(R("textarea", {
+				}, 8, ["menuName"])) : T("", !0)]), R("label", yp, [R("span", null, n(J(f)("rechnungswerk", "Anrede & Einleitung")), 1), W(R("textarea", {
 					"onUpdate:modelValue": t[19] ||= (e) => B.greeting = e,
 					class: "rw-input",
 					rows: "3",
 					readonly: V.value,
 					placeholder: J(f)("rechnungswerk", "Anrede und Einleitung – Vorgabe aus den Textbausteinen")
-				}, null, 8, yp), [[D, B.greeting]])])]),
-				R("section", bp, [R("h3", null, n(J(f)("rechnungswerk", "Positionen")), 1), q(bd, {
+				}, null, 8, bp), [[D, B.greeting]])])]),
+				R("section", xp, [R("h3", null, n(J(f)("rechnungswerk", "Positionen")), 1), q(xd, {
 					items: ne.value,
 					"onUpdate:items": t[20] ||= (e) => ne.value = e,
 					products: J(l).products,
@@ -5521,18 +5523,18 @@ var rf = $t("textSnippet", () => {
 					"smallBusiness",
 					"defaultTaxRateBp"
 				])]),
-				R("section", xp, [
+				R("section", Sp, [
 					R("h3", null, n(J(f)("rechnungswerk", "Steuer & Summen")), 1),
-					R("div", Sp, [R("label", Cp, [R("span", null, n(J(f)("rechnungswerk", "Steuerfall")), 1), W(R("select", {
+					R("div", Cp, [R("label", wp, [R("span", null, n(J(f)("rechnungswerk", "Steuerfall")), 1), W(R("select", {
 						"onUpdate:modelValue": t[21] ||= (e) => B.specialTaxCase = e,
 						class: "rw-input",
 						disabled: V.value
 					}, [
-						R("option", Tp, n(J(f)("rechnungswerk", "Regelbesteuerung")), 1),
-						R("option", Ep, n(J(f)("rechnungswerk", "Reverse Charge (§ 13b – Steuerschuldnerschaft des Leistungsempfängers)")), 1),
-						R("option", Dp, n(J(f)("rechnungswerk", "Innergemeinschaftliche Lieferung (steuerfrei)")), 1),
-						R("option", Op, n(J(f)("rechnungswerk", "Ausfuhrlieferung Drittland (steuerfrei)")), 1)
-					], 8, wp), [[oe, B.specialTaxCase]])]), t[36] ||= R("span", {
+						R("option", Ep, n(J(f)("rechnungswerk", "Regelbesteuerung")), 1),
+						R("option", Dp, n(J(f)("rechnungswerk", "Reverse Charge (§ 13b – Steuerschuldnerschaft des Leistungsempfängers)")), 1),
+						R("option", Op, n(J(f)("rechnungswerk", "Innergemeinschaftliche Lieferung (steuerfrei)")), 1),
+						R("option", kp, n(J(f)("rechnungswerk", "Ausfuhrlieferung Drittland (steuerfrei)")), 1)
+					], 8, Tp), [[oe, B.specialTaxCase]])]), t[36] ||= R("span", {
 						class: "rw-field",
 						"aria-hidden": "true"
 					}, null, -1)]),
@@ -5541,52 +5543,52 @@ var rf = $t("textSnippet", () => {
 						type: "info",
 						text: J(f)("rechnungswerk", "Für diesen Steuerfall wird keine Umsatzsteuer berechnet (0 %). Ein entsprechender Hinweis erscheint auf der Rechnung.")
 					}, null, 8, ["text"])),
-					R("div", kp, [R("div", Ap, [
-						R("div", jp, [R("span", null, n(J(f)("rechnungswerk", "Zwischensumme (netto)")), 1), R("strong", null, n(J(zc)(Se.value.subtotalCents)), 1)]),
+					R("div", Ap, [R("div", jp, [
+						R("div", Mp, [R("span", null, n(J(f)("rechnungswerk", "Zwischensumme (netto)")), 1), R("strong", null, n(J(zc)(Se.value.subtotalCents)), 1)]),
 						(p(!0), K(G, null, S(Se.value.taxBreakdown, (e) => (p(), K("div", {
 							key: e.rateBp,
 							class: "rw-kpi-row rw-kpi-row--muted"
 						}, [R("span", null, n(J(f)("rechnungswerk", "USt {rate}", { rate: J(Bc)(e.rateBp) })) + " (" + n(J(zc)(e.netCents)) + ")", 1), R("span", null, n(J(zc)(e.taxCents)), 1)]))), 128)),
-						R("div", Mp, [R("span", null, n(J(f)("rechnungswerk", "Gesamt (brutto)")), 1), R("strong", null, n(J(zc)(Se.value.totalCents)), 1)])
+						R("div", Np, [R("span", null, n(J(f)("rechnungswerk", "Gesamt (brutto)")), 1), R("strong", null, n(J(zc)(Se.value.totalCents)), 1)])
 					])])
 				]),
-				m.value ? (p(), K("section", Vp, [
+				m.value ? (p(), K("section", Hp, [
 					R("h3", null, n(J(f)("rechnungswerk", "Gültigkeit")), 1),
-					R("div", Hp, [R("label", Up, [R("span", null, n(J(f)("rechnungswerk", "Gültig bis")), 1), W(R("input", {
+					R("div", Up, [R("label", Wp, [R("span", null, n(J(f)("rechnungswerk", "Gültig bis")), 1), W(R("input", {
 						"onUpdate:modelValue": t[24] ||= (e) => B.validUntil = e,
 						class: "rw-input",
 						type: "date",
 						readonly: V.value
-					}, null, 8, Wp), [[D, B.validUntil]])]), R("label", Gp, [R("span", Kp, [W(R("input", {
+					}, null, 8, Gp), [[D, B.validUntil]])]), R("label", Kp, [R("span", qp, [W(R("input", {
 						"onUpdate:modelValue": t[25] ||= (e) => B.offerFreeform = e,
 						type: "checkbox",
 						disabled: V.value
-					}, null, 8, qp), [[_e, B.offerFreeform]]), k(" " + n(J(f)("rechnungswerk", "Freibleibendes Angebot (unverbindlich)")), 1)])])]),
-					R("p", Jp, n(J(f)("rechnungswerk", "„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.")), 1)
-				])) : (p(), K("section", Np, [R("h3", null, n(J(f)("rechnungswerk", "Zahlungsbedingungen")), 1), R("div", Pp, [
-					R("label", Fp, [R("span", null, n(J(f)("rechnungswerk", "Zahlungsziel (Tage)")), 1), W(R("input", {
+					}, null, 8, Jp), [[_e, B.offerFreeform]]), k(" " + n(J(f)("rechnungswerk", "Freibleibendes Angebot (unverbindlich)")), 1)])])]),
+					R("p", Yp, n(J(f)("rechnungswerk", "„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.")), 1)
+				])) : (p(), K("section", Pp, [R("h3", null, n(J(f)("rechnungswerk", "Zahlungsbedingungen")), 1), R("div", Fp, [
+					R("label", Ip, [R("span", null, n(J(f)("rechnungswerk", "Zahlungsziel (Tage)")), 1), W(R("input", {
 						"onUpdate:modelValue": t[22] ||= (e) => B.paymentTermDays = e,
 						class: "rw-input",
 						type: "number",
 						min: "0",
 						step: "1",
 						readonly: V.value
-					}, null, 8, Ip), [[D, B.paymentTermDays]])]),
-					R("label", Lp, [R("span", null, n(J(f)("rechnungswerk", "Fällig am")), 1), R("input", {
+					}, null, 8, Lp), [[D, B.paymentTermDays]])]),
+					R("label", Rp, [R("span", null, n(J(f)("rechnungswerk", "Fällig am")), 1), R("input", {
 						class: "rw-input",
 						type: "text",
 						readonly: "",
 						value: le.value || "—"
-					}, null, 8, Rp)]),
-					R("label", zp, [R("span", null, n(J(f)("rechnungswerk", "Skonto")), 1), W(R("input", {
+					}, null, 8, zp)]),
+					R("label", Bp, [R("span", null, n(J(f)("rechnungswerk", "Skonto")), 1), W(R("input", {
 						"onUpdate:modelValue": t[23] ||= (e) => B.discountTerms = e,
 						class: "rw-input",
 						type: "text",
 						readonly: V.value,
 						placeholder: J(f)("rechnungswerk", "z. B. 2 % bei Zahlung bis\xA0…")
-					}, null, 8, Bp), [[D, B.discountTerms]])])
+					}, null, 8, Vp), [[D, B.discountTerms]])])
 				])])),
-				R("section", Yp, [R("div", Xp, [R("h3", null, n(J(f)("rechnungswerk", "Schlusstext")), 1), !V.value && y.value.length > 0 ? (p(), I(J(nt), {
+				R("section", Xp, [R("div", Zp, [R("h3", null, n(J(f)("rechnungswerk", "Schlusstext")), 1), !V.value && y.value.length > 0 ? (p(), I(J(nt), {
 					key: 0,
 					menuName: J(f)("rechnungswerk", "Vorlage einfügen")
 				}, {
@@ -5599,14 +5601,14 @@ var rf = $t("textSnippet", () => {
 						_: 2
 					}, 1032, ["onClick"]))), 128))]),
 					_: 1
-				}, 8, ["menuName"])) : T("", !0)]), R("label", Zp, [R("span", null, n(J(f)("rechnungswerk", "Schlusstext / Anmerkungen")), 1), W(R("textarea", {
+				}, 8, ["menuName"])) : T("", !0)]), R("label", Qp, [R("span", null, n(J(f)("rechnungswerk", "Schlusstext / Anmerkungen")), 1), W(R("textarea", {
 					"onUpdate:modelValue": t[26] ||= (e) => B.extraText = e,
 					class: "rw-input",
 					rows: "3",
 					readonly: V.value,
 					placeholder: J(f)("rechnungswerk", "Schlusstext – Vorgabe aus den Textbausteinen")
-				}, null, 8, Qp), [[D, B.extraText]])])]),
-				!V.value || E.value.length > 0 ? (p(), K("section", $p, [
+				}, null, 8, $p), [[D, B.extraText]])])]),
+				!V.value || E.value.length > 0 ? (p(), K("section", em, [
 					R("h3", null, n(m.value ? J(f)("rechnungswerk", "Notizen / Hinweise auf dem Angebot") : J(f)("rechnungswerk", "Notizen / Hinweise auf der Rechnung")), 1),
 					(p(!0), K(G, null, S(E.value, (e, t) => (p(), K("div", {
 						key: t,
@@ -5617,7 +5619,7 @@ var rf = $t("textSnippet", () => {
 						type: "text",
 						readonly: V.value,
 						"aria-label": J(f)("rechnungswerk", "Notiz {index}", { index: t + 1 })
-					}, null, 8, em), [[D, E.value[t]]]), V.value ? T("", !0) : (p(), I(J(X), {
+					}, null, 8, tm), [[D, E.value[t]]]), V.value ? T("", !0) : (p(), I(J(X), {
 						key: 0,
 						variant: "tertiary",
 						"aria-label": J(f)("rechnungswerk", "Notiz entfernen"),
@@ -5635,9 +5637,9 @@ var rf = $t("textSnippet", () => {
 						default: P(() => [k(" " + n(J(f)("rechnungswerk", "Notiz hinzufügen")), 1)]),
 						_: 1
 					})),
-					R("p", tm, n(m.value ? J(f)("rechnungswerk", "Erscheint als Freitext auf dem Angebot – kein strukturiertes Datenfeld.") : J(f)("rechnungswerk", "Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.")), 1)
+					R("p", nm, n(m.value ? J(f)("rechnungswerk", "Erscheint als Freitext auf dem Angebot – kein strukturiertes Datenfeld.") : J(f)("rechnungswerk", "Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.")), 1)
 				])) : T("", !0),
-				R("div", nm, [V.value ? w.value ? (p(), K(G, { key: 1 }, [
+				R("div", rm, [V.value ? w.value ? (p(), K(G, { key: 1 }, [
 					q(J(X), { onClick: Ue }, {
 						icon: P(() => [q(Jo, { size: 20 })]),
 						default: P(() => [k(" " + n(J(f)("rechnungswerk", "PDF herunterladen")), 1)]),
@@ -5735,7 +5737,7 @@ var rf = $t("textSnippet", () => {
 						_: 1
 					}, 8, ["disabled"])) : T("", !0)
 				], 64))]),
-				q(Cd, {
+				q(wd, {
 					open: L.value === "finalize",
 					name: m.value ? J(f)("rechnungswerk", "Angebot festschreiben") : J(f)("rechnungswerk", "Rechnung festschreiben"),
 					message: ye.value,
@@ -5748,7 +5750,7 @@ var rf = $t("textSnippet", () => {
 					"message",
 					"confirmLabel"
 				]),
-				q(Cd, {
+				q(wd, {
 					open: L.value === "delete",
 					name: m.value ? J(f)("rechnungswerk", "Angebot löschen") : J(f)("rechnungswerk", "Entwurf löschen"),
 					message: m.value ? J(f)("rechnungswerk", "Diesen Angebots-Entwurf wirklich löschen?") : J(f)("rechnungswerk", "Diesen Entwurf wirklich löschen?"),
@@ -5762,7 +5764,7 @@ var rf = $t("textSnippet", () => {
 					"message",
 					"confirmLabel"
 				]),
-				q(Cd, {
+				q(wd, {
 					open: L.value === "cancel",
 					name: J(f)("rechnungswerk", "Rechnung stornieren"),
 					message: J(f)("rechnungswerk", "Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?"),
@@ -5776,7 +5778,7 @@ var rf = $t("textSnippet", () => {
 					"message",
 					"confirmLabel"
 				]),
-				q(Cd, {
+				q(wd, {
 					open: L.value === "convert",
 					name: J(f)("rechnungswerk", "In Rechnung übernehmen"),
 					message: J(f)("rechnungswerk", "Aus diesem Angebot wird ein neuer Rechnungs-Entwurf mit denselben Positionen erstellt. Das Angebot wird als „übernommen“ markiert. Fortfahren?"),
@@ -5789,7 +5791,7 @@ var rf = $t("textSnippet", () => {
 					"message",
 					"confirmLabel"
 				]),
-				q(Cd, {
+				q(wd, {
 					open: L.value === "revise",
 					name: J(f)("rechnungswerk", "Angebot revidieren"),
 					message: J(f)("rechnungswerk", "Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?"),
@@ -5802,7 +5804,7 @@ var rf = $t("textSnippet", () => {
 					"message",
 					"confirmLabel"
 				]),
-				q(jd, {
+				q(Md, {
 					open: F.value,
 					invoice: w.value,
 					defaultBody: be.value,
@@ -5828,13 +5830,13 @@ var rf = $t("textSnippet", () => {
 						src: ae.value,
 						class: "preview-frame",
 						title: J(f)("rechnungswerk", "Vorschau (Entwurf)")
-					}, null, 8, rm)) : T("", !0)]),
+					}, null, 8, im)) : T("", !0)]),
 					_: 1
 				}, 8, ["open", "name"])
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-7576b8a3"]]), am = {
+}), [["__scopeId", "data-v-7576b8a3"]]), om = {
 	name: "AlertCircleOutlineIcon",
 	emits: ["click"],
 	props: {
@@ -5848,12 +5850,12 @@ var rf = $t("textSnippet", () => {
 			default: 24
 		}
 	}
-}, om = ["aria-hidden", "aria-label"], sm = [
+}, sm = ["aria-hidden", "aria-label"], cm = [
 	"fill",
 	"width",
 	"height"
-], cm = { d: "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" }, lm = { key: 0 };
-function um(e, r, i, a, o, s) {
+], lm = { d: "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" }, um = { key: 0 };
+function dm(e, r, i, a, o, s) {
 	return p(), K("span", t(e.$attrs, {
 		"aria-hidden": i.title ? null : "true",
 		"aria-label": i.title,
@@ -5866,12 +5868,12 @@ function um(e, r, i, a, o, s) {
 		width: i.size,
 		height: i.size,
 		viewBox: "0 0 24 24"
-	}, [R("path", cm, [i.title ? (p(), K("title", lm, n(i.title), 1)) : T("", !0)])], 8, sm))], 16, om);
+	}, [R("path", lm, [i.title ? (p(), K("title", um, n(i.title), 1)) : T("", !0)])], 8, cm))], 16, sm);
 }
-var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = { class: "rw-view__head" }, mm = { key: 2 }, hm = { class: "rw-filterbar" }, gm = ["onClick"], _m = { class: "rw-chip__n" }, vm = { class: "rw-table-wrap" }, ym = { class: "rw-table" }, bm = { class: "num" }, xm = ["onClick"], Sm = { class: "rw-status-cell" }, Cm = { class: "rw-qstatus-text" }, wm = { class: "num" }, Tm = { class: "rw-col-actions" }, Em = { class: "rw-actions" }, Dm = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+var fm = /*#__PURE__*/ Q(om, [["render", dm]]), pm = { class: "rw-view" }, mm = { class: "rw-view__head" }, hm = { key: 2 }, gm = { class: "rw-filterbar" }, _m = ["onClick"], vm = { class: "rw-chip__n" }, ym = { class: "rw-table-wrap" }, bm = { class: "rw-table" }, xm = { class: "num" }, Sm = ["onClick"], Cm = { class: "rw-status-cell" }, wm = { class: "rw-qstatus-text" }, Tm = { class: "num" }, Em = { class: "rw-col-actions" }, Dm = { class: "rw-actions" }, Om = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "QuotesView",
 	setup(e) {
-		let t = Je(), r = Kd(), i = M(""), a = [
+		let t = Je(), r = qd(), i = M(""), a = [
 			{
 				key: "all",
 				label: "Alle"
@@ -5913,7 +5915,7 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 		}), m = (e) => e.status === "committed" && (e.quoteStatus === "open" || e.quoteStatus === "expired" || e.quoteStatus === "accepted"), h = {
 			draft: cs,
 			open: ks,
-			expired: dm,
+			expired: fm,
 			accepted: Ss,
 			rejected: hs,
 			converted: cu,
@@ -5937,7 +5939,7 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 			});
 		}
 		function x(e) {
-			Wd(e);
+			Gd(e);
 		}
 		async function C(e) {
 			i.value = "";
@@ -5951,8 +5953,8 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 				i.value = e.message ?? f("rechnungswerk", "Übernahme fehlgeschlagen");
 			}
 		}
-		return (e, t) => (p(), K("div", fm, [
-			R("div", pm, [R("h2", null, n(J(f)("rechnungswerk", "Angebote")), 1), q(J(X), {
+		return (e, t) => (p(), K("div", pm, [
+			R("div", mm, [R("h2", null, n(J(f)("rechnungswerk", "Angebote")), 1), q(J(X), {
 				variant: "primary",
 				onClick: y
 			}, {
@@ -5972,34 +5974,34 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 			}, {
 				icon: P(() => [q(Ca, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : J(r).quotes.length > 0 ? (p(), K("div", mm, [R("div", hm, [(p(), K(G, null, S(a, (e) => R("button", {
+			}, 8, ["name", "description"])) : J(r).quotes.length > 0 ? (p(), K("div", hm, [R("div", gm, [(p(), K(G, null, S(a, (e) => R("button", {
 				key: e.key,
 				class: O(["rw-chip", { "rw-chip--active": o.value === e.key }]),
 				onClick: (t) => o.value = e.key
-			}, [k(n(J(f)("rechnungswerk", e.label)) + " ", 1), R("span", _m, n(u.value[e.key]), 1)], 10, gm)), 64))]), R("div", vm, [R("table", ym, [R("thead", null, [R("tr", null, [
+			}, [k(n(J(f)("rechnungswerk", e.label)) + " ", 1), R("span", vm, n(u.value[e.key]), 1)], 10, _m)), 64))]), R("div", ym, [R("table", bm, [R("thead", null, [R("tr", null, [
 				R("th", null, n(J(f)("rechnungswerk", "Status")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Nummer")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Empfänger")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Datum")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Gültig bis")), 1),
-				R("th", bm, n(J(f)("rechnungswerk", "Brutto")), 1),
+				R("th", xm, n(J(f)("rechnungswerk", "Brutto")), 1),
 				t[0] ||= R("th", { class: "rw-col-actions" }, null, -1)
 			])]), R("tbody", null, [(p(!0), K(G, null, S(d.value, (e) => (p(), K("tr", {
 				key: e.id,
 				class: O(["rw-row-clickable", { "rw-row--overdue": e.quoteStatus === "expired" }]),
 				onClick: (t) => b(e.id)
 			}, [
-				R("td", null, [R("span", Sm, [(p(), I(c(g(e.quoteStatus)), {
+				R("td", null, [R("span", Cm, [(p(), I(c(g(e.quoteStatus)), {
 					size: 20,
 					class: O(["rw-sicon", `rw-qsicon--${e.quoteStatus}`]),
 					title: _(e.quoteStatus)
-				}, null, 8, ["class", "title"])), R("span", Cm, n(_(e.quoteStatus)), 1)])]),
+				}, null, 8, ["class", "title"])), R("span", wm, n(_(e.quoteStatus)), 1)])]),
 				R("td", null, n(e.number ?? J(f)("rechnungswerk", "(Entwurf)")), 1),
 				R("td", null, n(e.recipientName ?? "—"), 1),
 				R("td", null, n(v(e.issueDate ?? e.createdAt)), 1),
 				R("td", null, [R("span", { class: O({ "rw-amt-overdue": e.quoteStatus === "expired" }) }, n(v(e.validUntil)), 3)]),
-				R("td", wm, n(J(zc)(e.totalCents)), 1),
-				R("td", Tm, [R("div", Em, [m(e) ? (p(), I(J(X), {
+				R("td", Tm, n(J(zc)(e.totalCents)), 1),
+				R("td", Em, [R("div", Dm, [m(e) ? (p(), I(J(X), {
 					key: 0,
 					variant: "tertiary",
 					"aria-label": J(f)("rechnungswerk", "In Rechnung übernehmen"),
@@ -6026,10 +6028,10 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 					"title",
 					"onClick"
 				]))])])
-			], 10, xm))), 128))])])])])) : T("", !0)
+			], 10, Sm))), 128))])])])])) : T("", !0)
 		]));
 	}
-}), [["__scopeId", "data-v-62bdd46f"]]), Om = { class: "product-modal" }, km = { class: "field" }, Am = { class: "field" }, jm = { class: "field-row" }, Mm = { class: "field" }, Nm = ["value"], Pm = { class: "field" }, Fm = { class: "field" }, Im = ["value"], Lm = { class: "field" }, Rm = ["placeholder"], zm = { class: "hint" }, Bm = { class: "actions" }, Vm = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-62bdd46f"]]), km = { class: "product-modal" }, Am = { class: "field" }, jm = { class: "field" }, Mm = { class: "field-row" }, Nm = { class: "field" }, Pm = ["value"], Fm = { class: "field" }, Im = { class: "field" }, Lm = ["value"], Rm = { class: "field" }, zm = ["placeholder"], Bm = { class: "hint" }, Vm = { class: "actions" }, Hm = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ProductEditModal",
 	props: {
 		open: { type: Boolean },
@@ -6067,52 +6069,52 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 		return (t, r) => e.open ? (p(), I(J(ot), {
 			key: 0,
 			name: l.value,
-			onKeydown: r[7] ||= be((e) => J(wd)(e, () => t.$emit("close")), ["esc"]),
+			onKeydown: r[7] ||= be((e) => J(Td)(e, () => t.$emit("close")), ["esc"]),
 			onClose: r[8] ||= (e) => t.$emit("close")
 		}, {
-			default: P(() => [R("div", Om, [
+			default: P(() => [R("div", km, [
 				R("h2", null, n(l.value), 1),
-				R("label", km, [R("span", null, n(J(f)("rechnungswerk", "Name")) + " *", 1), W(R("input", {
+				R("label", Am, [R("span", null, n(J(f)("rechnungswerk", "Name")) + " *", 1), W(R("input", {
 					ref_key: "nameInput",
 					ref: a,
 					"onUpdate:modelValue": r[0] ||= (e) => o.name = e,
 					class: "input",
 					type: "text"
 				}, null, 512), [[D, o.name]])]),
-				R("label", Am, [R("span", null, n(J(f)("rechnungswerk", "Beschreibung")), 1), W(R("textarea", {
+				R("label", jm, [R("span", null, n(J(f)("rechnungswerk", "Beschreibung")), 1), W(R("textarea", {
 					"onUpdate:modelValue": r[1] ||= (e) => o.description = e,
 					class: "input",
 					rows: "2"
 				}, null, 512), [[D, o.description]])]),
-				R("div", jm, [
-					R("label", Mm, [R("span", null, n(J(f)("rechnungswerk", "Einheit")), 1), W(R("select", {
+				R("div", Mm, [
+					R("label", Nm, [R("span", null, n(J(f)("rechnungswerk", "Einheit")), 1), W(R("select", {
 						"onUpdate:modelValue": r[2] ||= (e) => o.defaultUnitCode = e,
 						class: "input"
 					}, [(p(!0), K(G, null, S(J(xc), (e) => (p(), K("option", {
 						key: e,
 						value: e
-					}, n(J(f)("rechnungswerk", J(Sc)[e])), 9, Nm))), 128))], 512), [[oe, o.defaultUnitCode]])]),
-					R("label", Pm, [R("span", null, n(J(f)("rechnungswerk", "Standard-Preis (€)")), 1), W(R("input", {
+					}, n(J(f)("rechnungswerk", J(Sc)[e])), 9, Pm))), 128))], 512), [[oe, o.defaultUnitCode]])]),
+					R("label", Fm, [R("span", null, n(J(f)("rechnungswerk", "Standard-Preis (€)")), 1), W(R("input", {
 						"onUpdate:modelValue": r[3] ||= (e) => s.value = e,
 						class: "input",
 						type: "text",
 						inputmode: "decimal",
 						onBlur: c
 					}, null, 544), [[D, s.value]])]),
-					R("label", Fm, [R("span", null, n(J(f)("rechnungswerk", "USt-Satz")), 1), W(R("select", {
+					R("label", Im, [R("span", null, n(J(f)("rechnungswerk", "USt-Satz")), 1), W(R("select", {
 						"onUpdate:modelValue": r[4] ||= (e) => o.defaultTaxRateBp = e,
 						class: "input"
 					}, [(p(!0), K(G, null, S(J(Cc), (e) => (p(), K("option", {
 						key: e,
 						value: e
-					}, n(J(Bc)(e)), 9, Im))), 128))], 512), [[
+					}, n(J(Bc)(e)), 9, Lm))), 128))], 512), [[
 						oe,
 						o.defaultTaxRateBp,
 						void 0,
 						{ number: !0 }
 					]])])
 				]),
-				R("label", Lm, [
+				R("label", Rm, [
 					R("span", null, n(J(f)("rechnungswerk", "Eigene Einheit (optional)")), 1),
 					W(R("input", {
 						"onUpdate:modelValue": r[5] ||= (e) => o.defaultUnitLabel = e,
@@ -6120,10 +6122,10 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 						type: "text",
 						maxlength: "64",
 						placeholder: J(f)("rechnungswerk", "z. B. Personen, Sitzung")
-					}, null, 8, Rm), [[D, o.defaultUnitLabel]]),
-					R("span", zm, n(J(f)("rechnungswerk", "Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.")), 1)
+					}, null, 8, zm), [[D, o.defaultUnitLabel]]),
+					R("span", Bm, n(J(f)("rechnungswerk", "Freie Bezeichnung – erscheint auf dem PDF. In der E-Rechnung wird die Einheit generisch (Stück) abgebildet, damit sie gültig bleibt.")), 1)
 				]),
-				R("div", Bm, [q(J(X), { onClick: r[6] ||= (e) => t.$emit("close") }, {
+				R("div", Vm, [q(J(X), { onClick: r[6] ||= (e) => t.$emit("close") }, {
 					default: P(() => [k(n(J(f)("rechnungswerk", "Abbrechen")), 1)]),
 					_: 1
 				}), q(J(X), {
@@ -6138,16 +6140,16 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 			_: 1
 		}, 8, ["name"])) : T("", !0);
 	}
-}), [["__scopeId", "data-v-e77e93c0"]]), Hm = { class: "rw-view" }, Um = { class: "rw-view__head" }, Wm = {
+}), [["__scopeId", "data-v-e77e93c0"]]), Um = { class: "rw-view" }, Wm = { class: "rw-view__head" }, Gm = {
 	key: 2,
 	class: "rw-table-wrap"
-}, Gm = { class: "rw-table" }, Km = { class: "num" }, qm = { class: "num" }, Jm = ["onClick"], Ym = {
+}, Km = { class: "rw-table" }, qm = { class: "num" }, Jm = { class: "num" }, Ym = ["onClick"], Xm = {
 	key: 0,
 	class: "rw-muted"
-}, Xm = { class: "num" }, Zm = { class: "num" }, Qm = { class: "rw-col-actions" }, $m = { class: "rw-actions" }, eh = /* @__PURE__ */ r({
+}, Zm = { class: "num" }, Qm = { class: "num" }, $m = { class: "rw-col-actions" }, eh = { class: "rw-actions" }, th = /* @__PURE__ */ r({
 	__name: "ProductsView",
 	setup(e) {
-		let t = Zd(), r = M(!1), i = M(null), a = M(null), o = M(""), c = (e) => Sc[e] ?? e;
+		let t = Qd(), r = M(!1), i = M(null), a = M(null), o = M(""), c = (e) => Sc[e] ?? e;
 		function l(e, t) {
 			let n = e.message ?? t;
 			o.value = n, console.error("[rechnungswerk] products:", e);
@@ -6183,8 +6185,8 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 				}
 			}
 		}
-		return (e, s) => (p(), K("div", Hm, [
-			R("div", Um, [R("h2", null, n(J(f)("rechnungswerk", "Produkte")), 1), q(J(X), {
+		return (e, s) => (p(), K("div", Um, [
+			R("div", Wm, [R("h2", null, n(J(f)("rechnungswerk", "Produkte")), 1), q(J(X), {
 				variant: "primary",
 				onClick: u
 			}, {
@@ -6204,22 +6206,22 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 			}, {
 				icon: P(() => [q(Wa, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : J(t).products.length > 0 ? (p(), K("div", Wm, [R("table", Gm, [R("thead", null, [R("tr", null, [
+			}, 8, ["name", "description"])) : J(t).products.length > 0 ? (p(), K("div", Gm, [R("table", Km, [R("thead", null, [R("tr", null, [
 				R("th", null, n(J(f)("rechnungswerk", "Name")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Einheit")), 1),
-				R("th", Km, n(J(f)("rechnungswerk", "Preis")), 1),
-				R("th", qm, n(J(f)("rechnungswerk", "USt")), 1),
+				R("th", qm, n(J(f)("rechnungswerk", "Preis")), 1),
+				R("th", Jm, n(J(f)("rechnungswerk", "USt")), 1),
 				s[2] ||= R("th", { class: "num" }, null, -1)
 			])]), R("tbody", null, [(p(!0), K(G, null, S(J(t).products, (e) => (p(), K("tr", {
 				key: e.id,
 				class: "rw-row-clickable",
 				onClick: (t) => d(e)
 			}, [
-				R("td", null, [k(n(e.name) + " ", 1), e.description ? (p(), K("div", Ym, n(e.description), 1)) : T("", !0)]),
+				R("td", null, [k(n(e.name) + " ", 1), e.description ? (p(), K("div", Xm, n(e.description), 1)) : T("", !0)]),
 				R("td", null, n(e.defaultUnitLabel || J(f)("rechnungswerk", c(e.defaultUnitCode))), 1),
-				R("td", Xm, n(J(Rc)(e.defaultPriceE4)), 1),
-				R("td", Zm, n(J(Bc)(e.defaultTaxRateBp)), 1),
-				R("td", Qm, [R("div", $m, [q(J(X), {
+				R("td", Zm, n(J(Rc)(e.defaultPriceE4)), 1),
+				R("td", Qm, n(J(Bc)(e.defaultTaxRateBp)), 1),
+				R("td", $m, [R("div", eh, [q(J(X), {
 					variant: "tertiary",
 					"aria-label": J(f)("rechnungswerk", "Löschen"),
 					title: J(f)("rechnungswerk", "Löschen"),
@@ -6232,8 +6234,8 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 					"title",
 					"onClick"
 				])])])
-			], 8, Jm))), 128))])])])) : T("", !0),
-			q(Vm, {
+			], 8, Ym))), 128))])])])) : T("", !0),
+			q(Hm, {
 				open: r.value,
 				product: i.value,
 				saving: J(t).loading,
@@ -6244,7 +6246,7 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 				"product",
 				"saving"
 			]),
-			q(Cd, {
+			q(wd, {
 				open: a.value !== null,
 				name: J(f)("rechnungswerk", "Produkt löschen"),
 				message: a.value ? J(f)("rechnungswerk", "„{name}“ wirklich löschen?", { name: a.value.name }) : "",
@@ -6260,7 +6262,7 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 			])
 		]));
 	}
-}), th = {
+}), nh = {
 	name: "StarIcon",
 	emits: ["click"],
 	props: {
@@ -6274,12 +6276,12 @@ var dm = /*#__PURE__*/ Q(am, [["render", um]]), fm = { class: "rw-view" }, pm = 
 			default: 24
 		}
 	}
-}, nh = ["aria-hidden", "aria-label"], rh = [
+}, rh = ["aria-hidden", "aria-label"], ih = [
 	"fill",
 	"width",
 	"height"
-], ih = { d: "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" }, ah = { key: 0 };
-function oh(e, r, i, a, o, s) {
+], ah = { d: "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" }, oh = { key: 0 };
+function sh(e, r, i, a, o, s) {
 	return p(), K("span", t(e.$attrs, {
 		"aria-hidden": i.title ? null : "true",
 		"aria-label": i.title,
@@ -6292,9 +6294,9 @@ function oh(e, r, i, a, o, s) {
 		width: i.size,
 		height: i.size,
 		viewBox: "0 0 24 24"
-	}, [R("path", ih, [i.title ? (p(), K("title", ah, n(i.title), 1)) : T("", !0)])], 8, rh))], 16, nh);
+	}, [R("path", ah, [i.title ? (p(), K("title", oh, n(i.title), 1)) : T("", !0)])], 8, ih))], 16, rh);
 }
-var sh = /*#__PURE__*/ Q(th, [["render", oh]]), ch = {
+var ch = /*#__PURE__*/ Q(nh, [["render", sh]]), lh = {
 	name: "StarOutlineIcon",
 	emits: ["click"],
 	props: {
@@ -6308,12 +6310,12 @@ var sh = /*#__PURE__*/ Q(th, [["render", oh]]), ch = {
 			default: 24
 		}
 	}
-}, lh = ["aria-hidden", "aria-label"], uh = [
+}, uh = ["aria-hidden", "aria-label"], dh = [
 	"fill",
 	"width",
 	"height"
-], dh = { d: "M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" }, fh = { key: 0 };
-function ph(e, r, i, a, o, s) {
+], fh = { d: "M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" }, ph = { key: 0 };
+function mh(e, r, i, a, o, s) {
 	return p(), K("span", t(e.$attrs, {
 		"aria-hidden": i.title ? null : "true",
 		"aria-label": i.title,
@@ -6326,9 +6328,9 @@ function ph(e, r, i, a, o, s) {
 		width: i.size,
 		height: i.size,
 		viewBox: "0 0 24 24"
-	}, [R("path", dh, [i.title ? (p(), K("title", fh, n(i.title), 1)) : T("", !0)])], 8, uh))], 16, lh);
+	}, [R("path", fh, [i.title ? (p(), K("title", ph, n(i.title), 1)) : T("", !0)])], 8, dh))], 16, uh);
 }
-var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" }, gh = { class: "field" }, _h = ["placeholder"], vh = { class: "field-row" }, yh = { class: "field" }, bh = ["value"], xh = { class: "field" }, Sh = ["value"], Ch = { class: "field" }, wh = { class: "hint" }, Th = { class: "actions" }, Eh = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+var hh = /*#__PURE__*/ Q(lh, [["render", mh]]), gh = { class: "snippet-modal" }, _h = { class: "field" }, vh = ["placeholder"], yh = { class: "field-row" }, bh = { class: "field" }, xh = ["value"], Sh = { class: "field" }, Ch = ["value"], wh = { class: "field" }, Th = { class: "hint" }, Eh = { class: "actions" }, Dh = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "TextSnippetEditModal",
 	props: {
 		open: { type: Boolean },
@@ -6361,33 +6363,33 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 		return (t, a) => e.open ? (p(), I(J(ot), {
 			key: 0,
 			name: l.value,
-			onKeydown: a[6] ||= be((e) => J(wd)(e, () => t.$emit("close")), ["esc"]),
+			onKeydown: a[6] ||= be((e) => J(Td)(e, () => t.$emit("close")), ["esc"]),
 			onClose: a[7] ||= (e) => t.$emit("close")
 		}, {
-			default: P(() => [R("div", hh, [
+			default: P(() => [R("div", gh, [
 				R("h2", null, n(l.value), 1),
-				R("label", gh, [R("span", null, n(J(f)("rechnungswerk", "Name")) + " *", 1), W(R("input", {
+				R("label", _h, [R("span", null, n(J(f)("rechnungswerk", "Name")) + " *", 1), W(R("input", {
 					ref_key: "nameInput",
 					ref: s,
 					"onUpdate:modelValue": a[0] ||= (e) => c.label = e,
 					class: "input",
 					type: "text",
 					placeholder: J(f)("rechnungswerk", "z. B. Neukunde, Mahnfreundlich")
-				}, null, 8, _h), [[D, c.label]])]),
-				R("div", vh, [R("label", yh, [R("span", null, n(J(f)("rechnungswerk", "Dokument")), 1), W(R("select", {
+				}, null, 8, vh), [[D, c.label]])]),
+				R("div", yh, [R("label", bh, [R("span", null, n(J(f)("rechnungswerk", "Dokument")), 1), W(R("select", {
 					"onUpdate:modelValue": a[1] ||= (e) => c.docType = e,
 					class: "input"
 				}, [(p(), K(G, null, S(r, (e) => R("option", {
 					key: e,
 					value: e
-				}, n(J(f)("rechnungswerk", J(Tc)[e])), 9, bh)), 64))], 512), [[oe, c.docType]])]), R("label", xh, [R("span", null, n(J(f)("rechnungswerk", "Textbereich")), 1), W(R("select", {
+				}, n(J(f)("rechnungswerk", J(Tc)[e])), 9, xh)), 64))], 512), [[oe, c.docType]])]), R("label", Sh, [R("span", null, n(J(f)("rechnungswerk", "Textbereich")), 1), W(R("select", {
 					"onUpdate:modelValue": a[2] ||= (e) => c.slot = e,
 					class: "input"
 				}, [(p(), K(G, null, S(i, (e) => R("option", {
 					key: e,
 					value: e
-				}, n(J(f)("rechnungswerk", J(Ec)[e])), 9, Sh)), 64))], 512), [[oe, c.slot]])])]),
-				R("label", Ch, [R("span", null, n(J(f)("rechnungswerk", "Text")), 1), W(R("textarea", {
+				}, n(J(f)("rechnungswerk", J(Ec)[e])), 9, Ch)), 64))], 512), [[oe, c.slot]])])]),
+				R("label", wh, [R("span", null, n(J(f)("rechnungswerk", "Text")), 1), W(R("textarea", {
 					"onUpdate:modelValue": a[3] ||= (e) => c.content = e,
 					class: "input",
 					rows: "6"
@@ -6399,8 +6401,8 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 					default: P(() => [k(n(J(f)("rechnungswerk", "Als Standard für neue Dokumente verwenden")), 1)]),
 					_: 1
 				}, 8, ["modelValue"]),
-				R("p", wh, n(J(f)("rechnungswerk", "Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.")), 1),
-				R("div", Th, [q(J(X), { onClick: a[5] ||= (e) => t.$emit("close") }, {
+				R("p", Th, n(J(f)("rechnungswerk", "Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.")), 1),
+				R("div", Eh, [q(J(X), { onClick: a[5] ||= (e) => t.$emit("close") }, {
 					default: P(() => [k(n(J(f)("rechnungswerk", "Abbrechen")), 1)]),
 					_: 1
 				}), q(J(X), {
@@ -6415,16 +6417,16 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 			_: 1
 		}, 8, ["name"])) : T("", !0);
 	}
-}), [["__scopeId", "data-v-b60fbea6"]]), Dh = { class: "rw-view" }, Oh = { class: "rw-view__head" }, kh = { class: "rw-muted rw-intro" }, Ah = {
+}), [["__scopeId", "data-v-b60fbea6"]]), Oh = { class: "rw-view" }, kh = { class: "rw-view__head" }, Ah = { class: "rw-muted rw-intro" }, jh = {
 	key: 2,
 	class: "rw-snippet-groups"
-}, jh = { class: "rw-snippet-group__head" }, Mh = { class: "rw-table-wrap" }, Nh = { class: "rw-table" }, Ph = ["onClick"], Fh = {
+}, Mh = { class: "rw-snippet-group__head" }, Nh = { class: "rw-table-wrap" }, Ph = { class: "rw-table" }, Fh = ["onClick"], Ih = {
 	key: 0,
 	class: "rw-muted rw-snippet-content"
-}, Ih = { class: "rw-snippet-actions" }, Lh = { class: "rw-actions" }, Rh = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}, Lh = { class: "rw-snippet-actions" }, Rh = { class: "rw-actions" }, zh = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "TextSnippetsView",
 	setup(e) {
-		let t = rf(), r = ["invoice", "quote"], i = ["opening", "closing"], a = H(() => {
+		let t = af(), r = ["invoice", "quote"], i = ["opening", "closing"], a = H(() => {
 			let e = [];
 			for (let n of r) for (let r of i) {
 				let i = t.snippets.filter((e) => e.docType === n && e.slot === r).sort((e, t) => Number(t.isDefault) - Number(e.isDefault) || e.sortOrder - t.sortOrder || e.label.localeCompare(t.label));
@@ -6482,8 +6484,8 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 				}
 			}
 		}
-		return (e, r) => (p(), K("div", Dh, [
-			R("div", Oh, [R("h2", null, n(J(f)("rechnungswerk", "Textbausteine")), 1), q(J(X), {
+		return (e, r) => (p(), K("div", Oh, [
+			R("div", kh, [R("h2", null, n(J(f)("rechnungswerk", "Textbausteine")), 1), q(J(X), {
 				variant: "primary",
 				onClick: m
 			}, {
@@ -6491,7 +6493,7 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 				default: P(() => [k(" " + n(J(f)("rechnungswerk", "Textbaustein anlegen")), 1)]),
 				_: 1
 			})]),
-			R("p", kh, n(J(f)("rechnungswerk", "Pflege wiederverwendbare Anrede-/Einleitungs- und Schlusstexte – getrennt für Rechnungen und Angebote. Beim Anlegen eines Dokuments füllt der jeweilige Standard-Baustein die Texte vor; weitere Bausteine lassen sich im Editor per Klick einfügen.")), 1),
+			R("p", Ah, n(J(f)("rechnungswerk", "Pflege wiederverwendbare Anrede-/Einleitungs- und Schlusstexte – getrennt für Rechnungen und Angebote. Beim Anlegen eines Dokuments füllt der jeweilige Standard-Baustein die Texte vor; weitere Bausteine lassen sich im Editor per Klick einfügen.")), 1),
 			u.value ? (p(), I(J(it), {
 				key: 0,
 				type: "error",
@@ -6504,28 +6506,28 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 			}, {
 				icon: P(() => [q(Za, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : J(t).snippets.length > 0 ? (p(), K("div", Ah, [(p(!0), K(G, null, S(a.value, (e) => (p(), K("section", {
+			}, 8, ["name", "description"])) : J(t).snippets.length > 0 ? (p(), K("div", jh, [(p(!0), K(G, null, S(a.value, (e) => (p(), K("section", {
 				key: e.key,
 				class: "rw-snippet-group"
-			}, [R("h3", jh, [
+			}, [R("h3", Mh, [
 				k(n(J(f)("rechnungswerk", J(Tc)[e.docType])) + " ", 1),
 				r[2] ||= R("span", { class: "rw-snippet-group__sep" }, "–", -1),
 				k(" " + n(J(f)("rechnungswerk", J(Ec)[e.slot])), 1)
-			]), R("div", Mh, [R("table", Nh, [R("tbody", null, [(p(!0), K(G, null, S(e.items, (e) => (p(), K("tr", {
+			]), R("div", Nh, [R("table", Ph, [R("tbody", null, [(p(!0), K(G, null, S(e.items, (e) => (p(), K("tr", {
 				key: e.id,
 				class: "rw-row-clickable rw-snippet-row",
 				onClick: (t) => h(e)
-			}, [R("td", null, [R("strong", null, n(e.label), 1), e.content ? (p(), K("div", Fh, n(e.content), 1)) : T("", !0)]), R("td", Ih, [R("div", Lh, [q(J(X), {
+			}, [R("td", null, [R("strong", null, n(e.label), 1), e.content ? (p(), K("div", Ih, n(e.content), 1)) : T("", !0)]), R("td", Lh, [R("div", Rh, [q(J(X), {
 				variant: "tertiary",
 				"aria-label": e.isDefault ? J(f)("rechnungswerk", "Standard-Vorlage") : J(f)("rechnungswerk", "Als Standard festlegen"),
 				title: e.isDefault ? J(f)("rechnungswerk", "Standard-Vorlage") : J(f)("rechnungswerk", "Als Standard festlegen"),
 				onClick: j((t) => g(e), ["stop"])
 			}, {
-				icon: P(() => [e.isDefault ? (p(), I(sh, {
+				icon: P(() => [e.isDefault ? (p(), I(ch, {
 					key: 0,
 					size: 20,
 					class: "rw-star rw-star--active"
-				})) : (p(), I(mh, {
+				})) : (p(), I(hh, {
 					key: 1,
 					size: 20,
 					class: "rw-star"
@@ -6547,8 +6549,8 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 				"aria-label",
 				"title",
 				"onClick"
-			])])])], 8, Ph))), 128))])])])]))), 128))])) : T("", !0),
-			q(Eh, {
+			])])])], 8, Fh))), 128))])])])]))), 128))])) : T("", !0),
+			q(Dh, {
 				open: o.value,
 				snippet: c.value,
 				saving: J(t).loading,
@@ -6559,7 +6561,7 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 				"snippet",
 				"saving"
 			]),
-			q(Cd, {
+			q(wd, {
 				open: l.value !== null,
 				name: J(f)("rechnungswerk", "Textbaustein löschen"),
 				message: l.value ? J(f)("rechnungswerk", "„{name}“ wirklich löschen?", { name: l.value.label }) : "",
@@ -6575,7 +6577,7 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-c438c8e2"]]), zh = {
+}), [["__scopeId", "data-v-c438c8e2"]]), Bh = {
 	name: "AccountArrowRightIcon",
 	emits: ["click"],
 	props: {
@@ -6589,12 +6591,12 @@ var mh = /*#__PURE__*/ Q(ch, [["render", ph]]), hh = { class: "snippet-modal" },
 			default: 24
 		}
 	}
-}, Bh = ["aria-hidden", "aria-label"], Vh = [
+}, Vh = ["aria-hidden", "aria-label"], Hh = [
 	"fill",
 	"width",
 	"height"
-], Hh = { d: "M18 16H14V18H18V20L21 17L18 14V16M11 4C8.8 4 7 5.8 7 8S8.8 12 11 12 15 10.2 15 8 13.2 4 11 4M11 14C6.6 14 3 15.8 3 18V20H12.5C12.2 19.2 12 18.4 12 17.5C12 16.3 12.3 15.2 12.9 14.1C12.3 14.1 11.7 14 11 14" }, Uh = { key: 0 };
-function Wh(e, r, i, a, o, s) {
+], Uh = { d: "M18 16H14V18H18V20L21 17L18 14V16M11 4C8.8 4 7 5.8 7 8S8.8 12 11 12 15 10.2 15 8 13.2 4 11 4M11 14C6.6 14 3 15.8 3 18V20H12.5C12.2 19.2 12 18.4 12 17.5C12 16.3 12.3 15.2 12.9 14.1C12.3 14.1 11.7 14 11 14" }, Wh = { key: 0 };
+function Gh(e, r, i, a, o, s) {
 	return p(), K("span", t(e.$attrs, {
 		"aria-hidden": i.title ? null : "true",
 		"aria-label": i.title,
@@ -6607,9 +6609,9 @@ function Wh(e, r, i, a, o, s) {
 		width: i.size,
 		height: i.size,
 		viewBox: "0 0 24 24"
-	}, [R("path", Hh, [i.title ? (p(), K("title", Uh, n(i.title), 1)) : T("", !0)])], 8, Vh))], 16, Bh);
+	}, [R("path", Uh, [i.title ? (p(), K("title", Wh, n(i.title), 1)) : T("", !0)])], 8, Hh))], 16, Vh);
 }
-var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }, qh = { class: "form-section" }, Jh = { class: "row" }, Yh = { class: "field" }, Xh = { class: "field" }, Zh = { class: "row" }, Qh = { class: "field" }, $h = { class: "form-section" }, eg = { class: "field" }, tg = { class: "row" }, ng = { class: "field" }, rg = { class: "field" }, ig = { class: "row" }, ag = { class: "field" }, og = { class: "form-section" }, sg = { class: "row" }, cg = { class: "field" }, lg = { class: "field" }, ug = { class: "field" }, dg = { class: "form-section" }, fg = { class: "field" }, pg = { class: "row" }, mg = { class: "field" }, hg = { class: "field" }, gg = { class: "field" }, _g = { class: "form-section" }, vg = { class: "row" }, yg = { class: "field" }, bg = { class: "field" }, xg = { value: "" }, Sg = ["value"], Cg = { class: "field" }, wg = { class: "actions" }, Tg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+var Kh = /*#__PURE__*/ Q(Bh, [["render", Gh]]), qh = { class: "customer-modal" }, Jh = { class: "form-section" }, Yh = { class: "row" }, Xh = { class: "field" }, Zh = { class: "field" }, Qh = { class: "row" }, $h = { class: "field" }, eg = { class: "form-section" }, tg = { class: "field" }, ng = { class: "row" }, rg = { class: "field" }, ig = { class: "field" }, ag = { class: "row" }, og = { class: "field" }, sg = { class: "form-section" }, cg = { class: "row" }, lg = { class: "field" }, ug = { class: "field" }, dg = { class: "field" }, fg = { class: "form-section" }, pg = { class: "field" }, mg = { class: "row" }, hg = { class: "field" }, gg = { class: "field" }, _g = { class: "field" }, vg = { class: "form-section" }, yg = { class: "row" }, bg = { class: "field" }, xg = { class: "field" }, Sg = { value: "" }, Cg = ["value"], wg = { class: "field" }, Tg = { class: "actions" }, Eg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "CustomerEditModal",
 	props: {
 		open: { type: Boolean },
@@ -6681,20 +6683,20 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 		return (t, r) => e.open ? (p(), I(J(ot), {
 			key: 0,
 			name: u.value,
-			onKeydown: r[18] ||= be((e) => J(wd)(e, () => t.$emit("close")), ["esc"]),
+			onKeydown: r[18] ||= be((e) => J(Td)(e, () => t.$emit("close")), ["esc"]),
 			onClose: r[19] ||= (e) => t.$emit("close")
 		}, {
-			default: P(() => [R("div", Kh, [
+			default: P(() => [R("div", qh, [
 				R("h2", null, n(u.value), 1),
-				R("div", qh, [
+				R("div", Jh, [
 					R("h3", null, n(J(f)("rechnungswerk", "Stammdaten")), 1),
-					R("div", Jh, [R("label", Yh, [R("span", null, n(J(f)("rechnungswerk", "Kundennr.")) + " *", 1), W(R("input", {
+					R("div", Yh, [R("label", Xh, [R("span", null, n(J(f)("rechnungswerk", "Kundennr.")) + " *", 1), W(R("input", {
 						ref_key: "numberInput",
 						ref: a,
 						"onUpdate:modelValue": r[0] ||= (e) => s.customerNumber = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[D, s.customerNumber]])]), R("label", Xh, [R("span", null, n(J(f)("rechnungswerk", "Name / Firma")) + " *", 1), W(R("input", {
+					}, null, 512), [[D, s.customerNumber]])]), R("label", Zh, [R("span", null, n(J(f)("rechnungswerk", "Name / Firma")) + " *", 1), W(R("input", {
 						"onUpdate:modelValue": r[1] ||= (e) => s.name = e,
 						class: "input",
 						type: "text"
@@ -6704,95 +6706,95 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 						type: "error",
 						text: J(f)("rechnungswerk", "Die Kundennummer {number} ist bereits vergeben. Bitte eine andere wählen.", { number: s.customerNumber.trim() })
 					}, null, 8, ["text"])) : T("", !0),
-					R("div", Zh, [R("label", Qh, [R("span", null, n(J(f)("rechnungswerk", "USt-IdNr.")), 1), W(R("input", {
+					R("div", Qh, [R("label", $h, [R("span", null, n(J(f)("rechnungswerk", "USt-IdNr.")), 1), W(R("input", {
 						"onUpdate:modelValue": r[2] ||= (e) => s.vatId = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.vatId]])])])
 				]),
-				R("div", $h, [
+				R("div", eg, [
 					R("h3", null, n(J(f)("rechnungswerk", "Anschrift")), 1),
-					R("label", eg, [R("span", null, n(J(f)("rechnungswerk", "Straße & Hausnummer")), 1), W(R("input", {
+					R("label", tg, [R("span", null, n(J(f)("rechnungswerk", "Straße & Hausnummer")), 1), W(R("input", {
 						"onUpdate:modelValue": r[3] ||= (e) => s.address = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.address]])]),
-					R("div", tg, [R("label", ng, [R("span", null, n(J(f)("rechnungswerk", "PLZ")), 1), W(R("input", {
+					R("div", ng, [R("label", rg, [R("span", null, n(J(f)("rechnungswerk", "PLZ")), 1), W(R("input", {
 						"onUpdate:modelValue": r[4] ||= (e) => s.postalCode = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[D, s.postalCode]])]), R("label", rg, [R("span", null, n(J(f)("rechnungswerk", "Ort")), 1), W(R("input", {
+					}, null, 512), [[D, s.postalCode]])]), R("label", ig, [R("span", null, n(J(f)("rechnungswerk", "Ort")), 1), W(R("input", {
 						"onUpdate:modelValue": r[5] ||= (e) => s.city = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.city]])])]),
-					R("div", ig, [R("label", ag, [R("span", null, n(J(f)("rechnungswerk", "Land")), 1), q(ku, {
+					R("div", ag, [R("label", og, [R("span", null, n(J(f)("rechnungswerk", "Land")), 1), q(ku, {
 						modelValue: s.country,
 						"onUpdate:modelValue": r[6] ||= (e) => s.country = e,
 						selectClass: "input"
 					}, null, 8, ["modelValue"])])])
 				]),
-				R("div", og, [
+				R("div", sg, [
 					R("h3", null, n(J(f)("rechnungswerk", "Ansprechpartner & Kontakt")), 1),
-					R("div", sg, [R("label", cg, [R("span", null, n(J(f)("rechnungswerk", "Ansprechpartner")), 1), W(R("input", {
+					R("div", cg, [R("label", lg, [R("span", null, n(J(f)("rechnungswerk", "Ansprechpartner")), 1), W(R("input", {
 						"onUpdate:modelValue": r[7] ||= (e) => s.contactPerson = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[D, s.contactPerson]])]), R("label", lg, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
+					}, null, 512), [[D, s.contactPerson]])]), R("label", ug, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
 						"onUpdate:modelValue": r[8] ||= (e) => s.phone = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.phone]])])]),
-					R("label", ug, [R("span", null, n(J(f)("rechnungswerk", "E-Mail (für Rechnungsversand)")), 1), W(R("input", {
+					R("label", dg, [R("span", null, n(J(f)("rechnungswerk", "E-Mail (für Rechnungsversand)")), 1), W(R("input", {
 						"onUpdate:modelValue": r[9] ||= (e) => s.email = e,
 						class: "input",
 						type: "email"
 					}, null, 512), [[D, s.email]])])
 				]),
-				R("div", dg, [
+				R("div", fg, [
 					R("h3", null, n(J(f)("rechnungswerk", "Bankverbindung")), 1),
-					R("label", fg, [R("span", null, n(J(f)("rechnungswerk", "Kontoinhaber")), 1), W(R("input", {
+					R("label", pg, [R("span", null, n(J(f)("rechnungswerk", "Kontoinhaber")), 1), W(R("input", {
 						"onUpdate:modelValue": r[10] ||= (e) => s.bankAccountHolder = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.bankAccountHolder]])]),
-					R("div", pg, [R("label", mg, [R("span", null, n(J(f)("rechnungswerk", "IBAN")), 1), W(R("input", {
+					R("div", mg, [R("label", hg, [R("span", null, n(J(f)("rechnungswerk", "IBAN")), 1), W(R("input", {
 						"onUpdate:modelValue": r[11] ||= (e) => s.iban = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[D, s.iban]])]), R("label", hg, [R("span", null, n(J(f)("rechnungswerk", "BIC")), 1), W(R("input", {
+					}, null, 512), [[D, s.iban]])]), R("label", gg, [R("span", null, n(J(f)("rechnungswerk", "BIC")), 1), W(R("input", {
 						"onUpdate:modelValue": r[12] ||= (e) => s.bic = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.bic]])])]),
-					R("label", gg, [R("span", null, n(J(f)("rechnungswerk", "Bank")), 1), W(R("input", {
+					R("label", _g, [R("span", null, n(J(f)("rechnungswerk", "Bank")), 1), W(R("input", {
 						"onUpdate:modelValue": r[13] ||= (e) => s.bankName = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[D, s.bankName]])])
 				]),
-				R("div", _g, [
+				R("div", vg, [
 					R("h3", null, n(J(f)("rechnungswerk", "Vorgaben für neue Rechnungen")), 1),
-					R("div", vg, [R("label", yg, [R("span", null, n(J(f)("rechnungswerk", "Zahlungsziel (Tage)")), 1), W(R("input", {
+					R("div", yg, [R("label", bg, [R("span", null, n(J(f)("rechnungswerk", "Zahlungsziel (Tage)")), 1), W(R("input", {
 						"onUpdate:modelValue": r[14] ||= (e) => c.value = e,
 						class: "input",
 						type: "number",
 						min: "0",
 						inputmode: "numeric"
-					}, null, 512), [[D, c.value]])]), R("label", bg, [R("span", null, n(J(f)("rechnungswerk", "Standard-Steuersatz")), 1), W(R("select", {
+					}, null, 512), [[D, c.value]])]), R("label", xg, [R("span", null, n(J(f)("rechnungswerk", "Standard-Steuersatz")), 1), W(R("select", {
 						"onUpdate:modelValue": r[15] ||= (e) => l.value = e,
 						class: "input"
-					}, [R("option", xg, n(J(f)("rechnungswerk", "— keine Vorgabe —")), 1), (p(!0), K(G, null, S(J(Cc), (e) => (p(), K("option", {
+					}, [R("option", Sg, n(J(f)("rechnungswerk", "— keine Vorgabe —")), 1), (p(!0), K(G, null, S(J(Cc), (e) => (p(), K("option", {
 						key: e,
 						value: String(e)
-					}, n(J(Bc)(e)), 9, Sg))), 128))], 512), [[oe, l.value]])])]),
-					R("label", Cg, [R("span", null, n(J(f)("rechnungswerk", "Notiz (intern, nicht auf der Rechnung)")), 1), W(R("textarea", {
+					}, n(J(Bc)(e)), 9, Cg))), 128))], 512), [[oe, l.value]])])]),
+					R("label", wg, [R("span", null, n(J(f)("rechnungswerk", "Notiz (intern, nicht auf der Rechnung)")), 1), W(R("textarea", {
 						"onUpdate:modelValue": r[16] ||= (e) => s.note = e,
 						class: "input",
 						rows: "2"
 					}, null, 512), [[D, s.note]])])
 				]),
-				R("div", wg, [q(J(X), { onClick: r[17] ||= (e) => t.$emit("close") }, {
+				R("div", Tg, [q(J(X), { onClick: r[17] ||= (e) => t.$emit("close") }, {
 					default: P(() => [k(n(J(f)("rechnungswerk", "Abbrechen")), 1)]),
 					_: 1
 				}), q(J(X), {
@@ -6807,13 +6809,13 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 			_: 1
 		}, 8, ["name"])) : T("", !0);
 	}
-}), [["__scopeId", "data-v-2d237eab"]]), Eg = { class: "rw-view" }, Dg = { class: "rw-view__head" }, Og = { class: "rw-view__actions" }, kg = {
+}), [["__scopeId", "data-v-2d237eab"]]), Dg = { class: "rw-view" }, Og = { class: "rw-view__head" }, kg = { class: "rw-view__actions" }, Ag = {
 	key: 2,
 	class: "rw-table-wrap"
-}, Ag = { class: "rw-table" }, jg = ["onClick"], Mg = { class: "rw-muted" }, Ng = {
+}, jg = { class: "rw-table" }, Mg = ["onClick"], Ng = { class: "rw-muted" }, Pg = {
 	key: 0,
 	class: "rw-muted"
-}, Pg = { class: "rw-col-actions" }, Fg = { class: "rw-actions" }, Ig = { class: "rw-import" }, Lg = { class: "rw-muted" }, Rg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}, Fg = { class: "rw-col-actions" }, Ig = { class: "rw-actions" }, Lg = { class: "rw-import" }, Rg = { class: "rw-muted" }, zg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "CustomersView",
 	setup(e) {
 		let t = Pu(), r = M(!1), i = M(null), a = M(null), o = M(null), c = M(!1), l = M(""), u = M(""), d = M(!1), m = H(() => t.customers.filter((e) => e.id !== i.value?.id).map((e) => e.customerNumber.trim().toLowerCase()));
@@ -6867,9 +6869,9 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 				}
 			}
 		}
-		return (e, s) => (p(), K("div", Eg, [
-			R("div", Dg, [R("h2", null, n(J(f)("rechnungswerk", "Kunden")), 1), R("div", Og, [q(J(X), { onClick: v }, {
-				icon: P(() => [q(Gh, { size: 20 })]),
+		return (e, s) => (p(), K("div", Dg, [
+			R("div", Og, [R("h2", null, n(J(f)("rechnungswerk", "Kunden")), 1), R("div", kg, [q(J(X), { onClick: v }, {
+				icon: P(() => [q(Kh, { size: 20 })]),
 				default: P(() => [k(" " + n(J(f)("rechnungswerk", "Aus Kontakten importieren")), 1)]),
 				_: 1
 			}), q(J(X), {
@@ -6892,7 +6894,7 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 			}, {
 				icon: P(() => [q(Aa, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : J(t).customers.length > 0 ? (p(), K("div", kg, [R("table", Ag, [R("thead", null, [R("tr", null, [
+			}, 8, ["name", "description"])) : J(t).customers.length > 0 ? (p(), K("div", Ag, [R("table", jg, [R("thead", null, [R("tr", null, [
 				R("th", null, n(J(f)("rechnungswerk", "Kundennr.")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Kunde")), 1),
 				R("th", null, n(J(f)("rechnungswerk", "Ort")), 1),
@@ -6902,10 +6904,10 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 				class: "rw-row-clickable",
 				onClick: (t) => _(e)
 			}, [
-				R("td", Mg, n(e.customerNumber), 1),
-				R("td", null, [k(n(e.name) + " ", 1), e.contactPerson || e.vatId ? (p(), K("div", Ng, n([e.contactPerson, e.vatId].filter(Boolean).join(" · ")), 1)) : T("", !0)]),
+				R("td", Ng, n(e.customerNumber), 1),
+				R("td", null, [k(n(e.name) + " ", 1), e.contactPerson || e.vatId ? (p(), K("div", Pg, n([e.contactPerson, e.vatId].filter(Boolean).join(" · ")), 1)) : T("", !0)]),
 				R("td", null, n([e.postalCode, e.city].filter(Boolean).join(" ")), 1),
-				R("td", Pg, [R("div", Fg, [q(J(X), {
+				R("td", Fg, [R("div", Ig, [q(J(X), {
 					variant: "tertiary",
 					"aria-label": J(f)("rechnungswerk", "Löschen"),
 					title: J(f)("rechnungswerk", "Löschen"),
@@ -6918,8 +6920,8 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 					"title",
 					"onClick"
 				])])])
-			], 8, jg))), 128))])])])) : T("", !0),
-			q(Tg, {
+			], 8, Mg))), 128))])])])) : T("", !0),
+			q(Eg, {
 				open: r.value,
 				customer: i.value,
 				saving: d.value,
@@ -6937,17 +6939,17 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 			c.value ? (p(), I(J(ot), {
 				key: 3,
 				name: J(f)("rechnungswerk", "Aus Nextcloud-Kontakten übernehmen"),
-				onKeydown: s[2] ||= be((e) => J(wd)(e, () => c.value = !1), ["esc"]),
+				onKeydown: s[2] ||= be((e) => J(Td)(e, () => c.value = !1), ["esc"]),
 				onClose: s[3] ||= (e) => c.value = !1
 			}, {
-				default: P(() => [R("div", Ig, [R("p", Lg, n(J(f)("rechnungswerk", "Einmaliger Import als Kopie – danach ist der Kunde unabhängig in RechnungsWerk. Kein automatischer Abgleich.")), 1), q(Cu, {
+				default: P(() => [R("div", Lg, [R("p", Rg, n(J(f)("rechnungswerk", "Einmaliger Import als Kopie – danach ist der Kunde unabhängig in RechnungsWerk. Kein automatischer Abgleich.")), 1), q(Cu, {
 					modelValue: l.value,
 					"onUpdate:modelValue": s[1] ||= (e) => l.value = e,
 					onSelect: y
 				}, null, 8, ["modelValue"])])]),
 				_: 1
 			}, 8, ["name"])) : T("", !0),
-			q(Cd, {
+			q(wd, {
 				open: o.value !== null,
 				name: J(f)("rechnungswerk", "Kunde löschen"),
 				message: o.value ? J(f)("rechnungswerk", "„{name}“ wirklich löschen?", { name: o.value.name }) : "",
@@ -6963,7 +6965,7 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-1eff74a5"]]), zg = {
+}), [["__scopeId", "data-v-1eff74a5"]]), Bg = {
 	name: "ContentSaveIcon",
 	emits: ["click"],
 	props: {
@@ -6977,12 +6979,12 @@ var Gh = /*#__PURE__*/ Q(zh, [["render", Wh]]), Kh = { class: "customer-modal" }
 			default: 24
 		}
 	}
-}, Bg = ["aria-hidden", "aria-label"], Vg = [
+}, Vg = ["aria-hidden", "aria-label"], Hg = [
 	"fill",
 	"width",
 	"height"
-], Hg = { d: "M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" }, Ug = { key: 0 };
-function Wg(e, r, i, a, o, s) {
+], Ug = { d: "M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" }, Wg = { key: 0 };
+function Gg(e, r, i, a, o, s) {
 	return p(), K("span", t(e.$attrs, {
 		"aria-hidden": i.title ? null : "true",
 		"aria-label": i.title,
@@ -6995,21 +6997,21 @@ function Wg(e, r, i, a, o, s) {
 		width: i.size,
 		height: i.size,
 		viewBox: "0 0 24 24"
-	}, [R("path", Hg, [i.title ? (p(), K("title", Ug, n(i.title), 1)) : T("", !0)])], 8, Vg))], 16, Bg);
+	}, [R("path", Ug, [i.title ? (p(), K("title", Wg, n(i.title), 1)) : T("", !0)])], 8, Hg))], 16, Vg);
 }
-var Gg = /*#__PURE__*/ Q(zg, [["render", Wg]]), Kg = { class: "rw-view" }, qg = {
+var Kg = /*#__PURE__*/ Q(Bg, [["render", Gg]]), qg = { class: "rw-view" }, Jg = {
 	key: 2,
 	class: "rw-section"
-}, Jg = { class: "rw-hint" }, Yg = { class: "rw-form-row" }, Xg = { class: "rw-field" }, Zg = { class: "rw-field" }, Qg = { class: "rw-field" }, $g = {
+}, Yg = { class: "rw-hint" }, Xg = { class: "rw-form-row" }, Zg = { class: "rw-field" }, Qg = { class: "rw-field" }, $g = { class: "rw-field" }, e_ = {
 	key: 3,
 	class: "rw-action-bar"
-}, e_ = /* @__PURE__ */ r({
+}, t_ = /* @__PURE__ */ r({
 	__name: "MyContactView",
 	setup(e) {
 		let t = M(null), r = M(""), i = M(""), a = M(!1);
 		s(async () => {
 			try {
-				t.value = await af();
+				t.value = await of();
 			} catch (e) {
 				r.value = e.message ?? f("rechnungswerk", "Laden fehlgeschlagen");
 			}
@@ -7031,7 +7033,7 @@ var Gg = /*#__PURE__*/ Q(zg, [["render", Wg]]), Kg = { class: "rw-view" }, qg = 
 			if (t.value) {
 				r.value = "", i.value = "", a.value = !0;
 				try {
-					t.value = await of(t.value), i.value = f("rechnungswerk", "Gespeichert.");
+					t.value = await sf(t.value), i.value = f("rechnungswerk", "Gespeichert.");
 				} catch (e) {
 					r.value = e.message ?? f("rechnungswerk", "Speichern fehlgeschlagen");
 				} finally {
@@ -7039,7 +7041,7 @@ var Gg = /*#__PURE__*/ Q(zg, [["render", Wg]]), Kg = { class: "rw-view" }, qg = 
 				}
 			}
 		}
-		return (e, s) => (p(), K("div", Kg, [
+		return (e, s) => (p(), K("div", qg, [
 			R("h2", null, n(J(f)("rechnungswerk", "Mein Kontakt")), 1),
 			r.value ? (p(), I(J(it), {
 				key: 0,
@@ -7051,21 +7053,21 @@ var Gg = /*#__PURE__*/ Q(zg, [["render", Wg]]), Kg = { class: "rw-view" }, qg = 
 				type: "success",
 				text: i.value
 			}, null, 8, ["text"])) : T("", !0),
-			t.value ? (p(), K("section", qg, [
+			t.value ? (p(), K("section", Jg, [
 				R("h3", null, n(J(f)("rechnungswerk", "Mein Verkäufer-Ansprechpartner")), 1),
-				R("p", Jg, n(J(f)("rechnungswerk", "Diese Kontaktdaten füllen deine neuen Rechnungen automatisch vor (nur für dich). Ohne Angabe greift der zentrale Firmenkontakt. Pro Rechnung bleibt eine Änderung möglich.")), 1),
-				R("div", Yg, [
-					R("label", Xg, [R("span", null, n(J(f)("rechnungswerk", "Name")), 1), W(R("input", {
+				R("p", Yg, n(J(f)("rechnungswerk", "Diese Kontaktdaten füllen deine neuen Rechnungen automatisch vor (nur für dich). Ohne Angabe greift der zentrale Firmenkontakt. Pro Rechnung bleibt eine Änderung möglich.")), 1),
+				R("div", Xg, [
+					R("label", Zg, [R("span", null, n(J(f)("rechnungswerk", "Name")), 1), W(R("input", {
 						"onUpdate:modelValue": s[0] ||= (e) => t.value.person = e,
 						class: "rw-input",
 						type: "text"
 					}, null, 512), [[D, t.value.person]])]),
-					R("label", Zg, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
+					R("label", Qg, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
 						"onUpdate:modelValue": s[1] ||= (e) => t.value.phone = e,
 						class: "rw-input",
 						type: "text"
 					}, null, 512), [[D, t.value.phone]])]),
-					R("label", Qg, [R("span", null, n(J(f)("rechnungswerk", "E-Mail")), 1), W(R("input", {
+					R("label", $g, [R("span", null, n(J(f)("rechnungswerk", "E-Mail")), 1), W(R("input", {
 						"onUpdate:modelValue": s[2] ||= (e) => t.value.email = e,
 						class: "rw-input",
 						type: "email"
@@ -7080,19 +7082,19 @@ var Gg = /*#__PURE__*/ Q(zg, [["render", Wg]]), Kg = { class: "rw-view" }, qg = 
 					_: 1
 				})
 			])) : T("", !0),
-			t.value ? (p(), K("div", $g, [q(J(X), {
+			t.value ? (p(), K("div", e_, [q(J(X), {
 				variant: "primary",
 				disabled: a.value,
 				onClick: c
 			}, {
-				icon: P(() => [q(Gg, { size: 20 })]),
+				icon: P(() => [q(Kg, { size: 20 })]),
 				default: P(() => [k(" " + n(J(f)("rechnungswerk", "Speichern")), 1)]),
 				_: 1
 			}, 8, ["disabled"])])) : T("", !0)
 		]));
 	}
 });
-function t_(e) {
+function n_(e) {
 	if (typeof e != "string") return null;
 	let t = e.trim().replace(/^#/, "");
 	if (t.length === 3 && (t = t.split("").map((e) => e + e).join("")), !/^[0-9a-fA-F]{6}$/.test(t)) return null;
@@ -7102,26 +7104,26 @@ function t_(e) {
 	}, r = parseInt(t, 16);
 	return .2126 * n(r >> 16 & 255) + .7152 * n(r >> 8 & 255) + .0722 * n(r & 255);
 }
-function n_(e, t) {
+function r_(e, t) {
 	let [n, r] = e > t ? [e, t] : [t, e];
 	return (n + .05) / (r + .05);
 }
-function r_(e) {
-	let t = t_(e);
-	return t === null ? "#000000" : n_(t, 1) >= n_(t, 0) ? "#ffffff" : "#000000";
-}
 function i_(e) {
-	let t = t_(e);
-	return t !== null && n_(t, 1) < 4.5;
+	let t = n_(e);
+	return t === null ? "#000000" : r_(t, 1) >= r_(t, 0) ? "#ffffff" : "#000000";
+}
+function a_(e) {
+	let t = n_(e);
+	return t !== null && r_(t, 1) < 4.5;
 }
 //#endregion
 //#region src/utils/invoiceNumber.ts
-function a_(e, t, n, r, i) {
+function o_(e, t, n, r, i) {
 	return e.replace(/\{YYYY\}/g, String(n).padStart(4, "0")).replace(/\{YY\}/g, String(n % 100).padStart(2, "0")).replace(/\{MM\}/g, String(r).padStart(2, "0")).replace(/\{DD\}/g, String(i).padStart(2, "0")).replace(/\{(#+)\}/g, (e, n) => String(t).padStart(n.length, "0"));
 }
 //#endregion
 //#region src/utils/fileName.ts
-var o_ = {
+var s_ = {
 	ä: "ae",
 	ö: "oe",
 	ü: "ue",
@@ -7130,41 +7132,41 @@ var o_ = {
 	Ö: "Oe",
 	Ü: "Ue"
 };
-function s_(e, t) {
+function c_(e, t) {
 	let n = (e) => String(e).padStart(2, "0"), r = {
 		"{nummer}": t.nummer,
 		"{YYYY}": String(t.date.getFullYear()),
 		"{MM}": n(t.date.getMonth() + 1),
 		"{DD}": n(t.date.getDate()),
-		"{kunde}": t.kunde.replace(/[äöüßÄÖÜ]/g, (e) => o_[e] ?? e),
+		"{kunde}": t.kunde.replace(/[äöüßÄÖÜ]/g, (e) => s_[e] ?? e),
 		"{typ}": t.typ
 	}, i = e.replace(/\{nummer\}|\{YYYY\}|\{MM\}|\{DD\}|\{kunde\}|\{typ\}/g, (e) => r[e]);
 	return i = i.replace(/[/\\:*?"<>|]/g, "-").replace(/\s+/g, " ").replace(/^[\s.]+|[\s.]+$/g, "").slice(0, 120), (i || "rechnung-1") + ".pdf";
 }
 //#endregion
 //#region src/views/SettingsView.vue?vue&type=script&setup=true&lang.ts
-var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
+var l_ = { class: "rw-view" }, u_ = { class: "rw-settings-title" }, d_ = {
 	key: 1,
 	class: "settings-form"
-}, d_ = { class: "rw-section" }, f_ = { class: "rw-field" }, p_ = { class: "rw-field" }, m_ = { class: "rw-form-row" }, h_ = { class: "rw-field" }, g_ = { class: "rw-field" }, __ = { class: "rw-form-row" }, v_ = { class: "rw-field" }, y_ = { class: "rw-field" }, b_ = { class: "rw-field" }, x_ = { class: "rw-hint" }, S_ = { class: "rw-section" }, C_ = { class: "rw-form-row" }, w_ = { class: "rw-field" }, T_ = { class: "rw-field" }, E_ = { class: "rw-field" }, D_ = { class: "rw-hint" }, O_ = { class: "rw-section" }, k_ = { class: "rw-field rw-field--inline" }, A_ = { class: "rw-accent" }, j_ = ["aria-label"], M_ = { class: "rw-field" }, N_ = { class: "rw-accent-preview" }, P_ = { class: "rw-hint" }, F_ = {
+}, f_ = { class: "rw-section" }, p_ = { class: "rw-field" }, m_ = { class: "rw-field" }, h_ = { class: "rw-form-row" }, g_ = { class: "rw-field" }, __ = { class: "rw-field" }, v_ = { class: "rw-form-row" }, y_ = { class: "rw-field" }, b_ = { class: "rw-field" }, x_ = { class: "rw-field" }, S_ = { class: "rw-hint" }, C_ = { class: "rw-section" }, w_ = { class: "rw-form-row" }, T_ = { class: "rw-field" }, E_ = { class: "rw-field" }, D_ = { class: "rw-field" }, O_ = { class: "rw-hint" }, k_ = { class: "rw-section" }, A_ = { class: "rw-field rw-field--inline" }, j_ = { class: "rw-accent" }, M_ = ["aria-label"], N_ = { class: "rw-field" }, P_ = { class: "rw-accent-preview" }, F_ = { class: "rw-hint" }, I_ = {
 	key: 0,
 	class: "rw-hint"
-}, I_ = { class: "rw-field" }, L_ = { class: "rw-logo" }, R_ = ["src", "alt"], z_ = {
+}, L_ = { class: "rw-field" }, R_ = { class: "rw-logo" }, z_ = ["src", "alt"], B_ = {
 	key: 1,
 	class: "rw-logo__empty"
-}, B_ = { class: "rw-logo__actions" }, V_ = { class: "rw-hint" }, H_ = { class: "rw-section" }, U_ = { class: "rw-field" }, W_ = { class: "rw-hint" }, G_ = { class: "rw-field rw-reset-mode" }, K_ = { class: "rw-hint" }, q_ = { class: "rw-section" }, J_ = { class: "rw-field" }, Y_ = { class: "rw-hint" }, X_ = { class: "rw-field rw-reset-mode" }, Z_ = { class: "rw-hint" }, Q_ = { class: "rw-section" }, $_ = { class: "rw-field" }, ev = { class: "rw-hint" }, tv = { class: "rw-section" }, nv = {
+}, V_ = { class: "rw-logo__actions" }, H_ = { class: "rw-hint" }, U_ = { class: "rw-section" }, W_ = { class: "rw-field" }, G_ = { class: "rw-hint" }, K_ = { class: "rw-field rw-reset-mode" }, q_ = { class: "rw-hint" }, J_ = { class: "rw-section" }, Y_ = { class: "rw-field" }, X_ = { class: "rw-hint" }, Z_ = { class: "rw-field rw-reset-mode" }, Q_ = { class: "rw-hint" }, $_ = { class: "rw-section" }, ev = { class: "rw-field" }, tv = { class: "rw-hint" }, nv = { class: "rw-section" }, rv = {
 	key: 0,
 	class: "rw-field"
-}, rv = ["placeholder"], iv = { class: "rw-hint" }, av = {
+}, iv = ["placeholder"], av = { class: "rw-hint" }, ov = {
 	key: 1,
 	class: "rw-field tax-rate-field"
-}, ov = ["value"], sv = { class: "rw-section" }, cv = { class: "rw-field rw-field--narrow" }, lv = { class: "rw-hint" }, uv = { class: "rw-section" }, dv = { class: "rw-field" }, fv = { class: "rw-hint" }, pv = { class: "rw-form-row" }, mv = { class: "rw-field" }, hv = { class: "rw-field" }, gv = { class: "rw-section" }, _v = { class: "rw-field" }, vv = { class: "rw-archive-folder" }, yv = {
+}, sv = ["value"], cv = { class: "rw-section" }, lv = { class: "rw-field rw-field--narrow" }, uv = { class: "rw-hint" }, dv = { class: "rw-section" }, fv = { class: "rw-field" }, pv = { class: "rw-hint" }, mv = { class: "rw-form-row" }, hv = { class: "rw-field" }, gv = { class: "rw-field" }, _v = { class: "rw-section" }, vv = { class: "rw-field" }, yv = { class: "rw-archive-folder" }, bv = {
 	key: 0,
 	class: "rw-archive-folder__path"
-}, bv = {
+}, xv = {
 	key: 1,
 	class: "rw-archive-folder__empty"
-}, xv = { class: "rw-field" }, Sv = ["placeholder"], Cv = { class: "rw-hint" }, wv = { class: "rw-section" }, Tv = { class: "rw-hint" }, Ev = { class: "rw-form-row" }, Dv = { class: "rw-field" }, Ov = { class: "rw-field rw-field--narrow" }, kv = { class: "rw-field rw-field--narrow" }, Av = { value: "none" }, jv = { class: "rw-form-row" }, Mv = { class: "rw-field" }, Nv = { class: "rw-field" }, Pv = ["placeholder"], Fv = { class: "smtp-test" }, Iv = { class: "rw-section" }, Lv = { class: "rw-hint" }, Rv = { class: "rw-form-row" }, zv = { class: "rw-field" }, Bv = { class: "rw-field rw-field--narrow" }, Vv = { class: "rw-field rw-field--narrow" }, Hv = { class: "rw-form-row" }, Uv = { class: "rw-field" }, Wv = { class: "rw-field" }, Gv = ["placeholder"], Kv = { class: "rw-section" }, qv = { class: "rw-hint" }, Jv = { class: "rw-section" }, Yv = { class: "rw-hint rw-access-intro" }, Xv = { class: "rw-access-group" }, Zv = { class: "rw-access-label" }, Qv = { class: "rw-hint rw-access-desc" }, $v = { class: "rw-access-group" }, ey = { class: "rw-access-label" }, ty = { class: "rw-hint rw-access-desc" }, ny = { class: "rw-action-bar" }, ry = [
+}, Sv = { class: "rw-field" }, Cv = ["placeholder"], wv = { class: "rw-hint" }, Tv = { class: "rw-section" }, Ev = { class: "rw-hint" }, Dv = { class: "rw-form-row" }, Ov = { class: "rw-field" }, kv = { class: "rw-field rw-field--narrow" }, Av = { class: "rw-field rw-field--narrow" }, jv = { value: "none" }, Mv = { class: "rw-form-row" }, Nv = { class: "rw-field" }, Pv = { class: "rw-field" }, Fv = ["placeholder"], Iv = { class: "smtp-test" }, Lv = { class: "rw-section" }, Rv = { class: "rw-hint" }, zv = { class: "rw-form-row" }, Bv = { class: "rw-field" }, Vv = { class: "rw-field rw-field--narrow" }, Hv = { class: "rw-field rw-field--narrow" }, Uv = { class: "rw-form-row" }, Wv = { class: "rw-field" }, Gv = { class: "rw-field" }, Kv = ["placeholder"], qv = { class: "rw-section" }, Jv = { class: "rw-hint" }, Yv = { class: "rw-section" }, Xv = { class: "rw-hint rw-access-intro" }, Zv = { class: "rw-access-group" }, Qv = { class: "rw-access-label" }, $v = { class: "rw-hint rw-access-desc" }, ey = { class: "rw-access-group" }, ty = { class: "rw-access-label" }, ny = { class: "rw-hint rw-access-desc" }, ry = { class: "rw-action-bar" }, iy = [
 	{
 		path: "/",
 		redirect: { name: "invoices" }
@@ -7177,49 +7179,49 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 	{
 		path: "/invoices/new",
 		name: "invoice-new",
-		component: im
+		component: am
 	},
 	{
 		path: "/invoices/:id",
 		name: "invoice-detail",
-		component: im,
+		component: am,
 		props: !0
 	},
 	{
 		path: "/quotes",
 		name: "quotes",
-		component: Dm
+		component: Om
 	},
 	{
 		path: "/quotes/new",
 		name: "quote-new",
-		component: im
+		component: am
 	},
 	{
 		path: "/quotes/:id",
 		name: "quote-detail",
-		component: im,
+		component: am,
 		props: !0
 	},
 	{
 		path: "/customers",
 		name: "customers",
-		component: Rg
+		component: zg
 	},
 	{
 		path: "/products",
 		name: "products",
-		component: eh
+		component: th
 	},
 	{
 		path: "/text-snippets",
 		name: "text-snippets",
-		component: Rh
+		component: zh
 	},
 	{
 		path: "/me",
 		name: "my-contact",
-		component: e_
+		component: t_
 	},
 	{
 		path: "/settings",
@@ -7233,20 +7235,20 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 				}
 				let o = M(null), c = M(!1), l = M(""), u = M(!1), d = M(!1), m = M(!1), h = M(!1), g = M(!1), _ = M(0), y = M((/* @__PURE__ */ new Date()).getFullYear()), b = M((/* @__PURE__ */ new Date()).getMonth() + 1), x = M((/* @__PURE__ */ new Date()).getDate()), C = M(null), ee = M(0), te = M(null), w = H(() => i.value?.accentColor || "#2c3e50"), ne = H(() => ({
 					background: w.value,
-					color: r_(w.value)
-				})), E = H(() => i_(w.value));
+					color: i_(w.value)
+				})), E = H(() => a_(w.value));
 				function A(e) {
 					i.value && (i.value.accentColor = e ?? null);
 				}
 				let j = M([]), N = M([]), re = M([]), F = M(!1), ie = M(!1), ae = M(""), L = null, z = M(""), B = M(""), se = M(!1), ce = M(""), le = M(!1), ue = M(!1), V = H(() => i.value?.logoFileId ? _c(i.value.logoFileId) : ""), de = H(() => F.value ? f("rechnungswerk", "Suche läuft\xA0…") : ae.value.trim().length < 2 ? f("rechnungswerk", "Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.") : f("rechnungswerk", "Keine Treffer.")), fe = H(() => {
 					if (!i.value) return "";
 					let e = i.value.numberResetMode === "continuous" || y.value === C.value ? _.value : 0;
-					return a_(i.value.numberFormat || "RE-{YYYY}-{####}", e + 1, y.value, b.value, x.value);
+					return o_(i.value.numberFormat || "RE-{YYYY}-{####}", e + 1, y.value, b.value, x.value);
 				}), U = H(() => {
 					if (!i.value) return "";
 					let e = i.value.quoteNumberResetMode === "continuous" || y.value === te.value ? ee.value : 0;
-					return a_(i.value.quoteNumberFormat || "AN-{YYYY}-{####}", e + 1, y.value, b.value, x.value);
-				}), pe = H(() => i.value ? s_(i.value.fileNameFormat || "{nummer}", {
+					return o_(i.value.quoteNumberFormat || "AN-{YYYY}-{####}", e + 1, y.value, b.value, x.value);
+				}), pe = H(() => i.value ? c_(i.value.fileNameFormat || "{nummer}", {
 					nummer: fe.value,
 					date: /* @__PURE__ */ new Date(),
 					kunde: "Muster GmbH",
@@ -7498,66 +7500,66 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 				function Me(e, t) {
 					l.value = e.message ?? t, console.error("[rechnungswerk] settings:", e);
 				}
-				return (e, t) => (p(), K("div", c_, [
-					R("h2", l_, n(J(f)("rechnungswerk", "Einstellungen")), 1),
+				return (e, t) => (p(), K("div", l_, [
+					R("h2", u_, n(J(f)("rechnungswerk", "Einstellungen")), 1),
 					l.value ? (p(), I(J(it), {
 						key: 0,
 						type: "error",
 						text: l.value
 					}, null, 8, ["text"])) : T("", !0),
-					i.value ? (p(), K("div", u_, [
-						R("section", d_, [
+					i.value ? (p(), K("div", d_, [
+						R("section", f_, [
 							R("h3", null, n(J(f)("rechnungswerk", "Firma")), 1),
-							R("label", f_, [R("span", null, n(J(f)("rechnungswerk", "Firmenname")), 1), W(R("input", {
+							R("label", p_, [R("span", null, n(J(f)("rechnungswerk", "Firmenname")), 1), W(R("input", {
 								"onUpdate:modelValue": t[0] ||= (e) => i.value.companyName = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[D, i.value.companyName]])]),
-							R("label", p_, [R("span", null, n(J(f)("rechnungswerk", "Adresse")), 1), W(R("textarea", {
+							R("label", m_, [R("span", null, n(J(f)("rechnungswerk", "Adresse")), 1), W(R("textarea", {
 								"onUpdate:modelValue": t[1] ||= (e) => i.value.companyAddress = e,
 								class: "rw-input",
 								rows: "3"
 							}, null, 512), [[D, i.value.companyAddress]])]),
-							R("div", m_, [R("label", h_, [R("span", null, n(J(f)("rechnungswerk", "USt-IdNr.")), 1), W(R("input", {
+							R("div", h_, [R("label", g_, [R("span", null, n(J(f)("rechnungswerk", "USt-IdNr.")), 1), W(R("input", {
 								"onUpdate:modelValue": t[2] ||= (e) => i.value.vatId = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[D, i.value.vatId]])]), R("label", g_, [R("span", null, n(J(f)("rechnungswerk", "Steuernummer")), 1), W(R("input", {
+							}, null, 512), [[D, i.value.vatId]])]), R("label", __, [R("span", null, n(J(f)("rechnungswerk", "Steuernummer")), 1), W(R("input", {
 								"onUpdate:modelValue": t[3] ||= (e) => i.value.taxNumber = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[D, i.value.taxNumber]])])]),
-							R("div", __, [
-								R("label", v_, [R("span", null, n(J(f)("rechnungswerk", "Ansprechpartner")), 1), W(R("input", {
+							R("div", v_, [
+								R("label", y_, [R("span", null, n(J(f)("rechnungswerk", "Ansprechpartner")), 1), W(R("input", {
 									"onUpdate:modelValue": t[4] ||= (e) => i.value.contactPerson = e,
 									class: "rw-input",
 									type: "text"
 								}, null, 512), [[D, i.value.contactPerson]])]),
-								R("label", y_, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
+								R("label", b_, [R("span", null, n(J(f)("rechnungswerk", "Telefon")), 1), W(R("input", {
 									"onUpdate:modelValue": t[5] ||= (e) => i.value.contactPhone = e,
 									class: "rw-input",
 									type: "text"
 								}, null, 512), [[D, i.value.contactPhone]])]),
-								R("label", b_, [R("span", null, n(J(f)("rechnungswerk", "Kontakt-E-Mail")), 1), W(R("input", {
+								R("label", x_, [R("span", null, n(J(f)("rechnungswerk", "Kontakt-E-Mail")), 1), W(R("input", {
 									"onUpdate:modelValue": t[6] ||= (e) => i.value.contactEmail = e,
 									class: "rw-input",
 									type: "email"
 								}, null, 512), [[D, i.value.contactEmail]])])
 							]),
-							R("p", x_, n(J(f)("rechnungswerk", "Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).")), 1)
+							R("p", S_, n(J(f)("rechnungswerk", "Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).")), 1)
 						]),
-						R("section", S_, [
+						R("section", C_, [
 							R("h3", null, n(J(f)("rechnungswerk", "Bankverbindung")), 1),
-							R("div", C_, [R("label", w_, [R("span", null, n(J(f)("rechnungswerk", "IBAN")), 1), W(R("input", {
+							R("div", w_, [R("label", T_, [R("span", null, n(J(f)("rechnungswerk", "IBAN")), 1), W(R("input", {
 								"onUpdate:modelValue": t[7] ||= (e) => i.value.iban = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[D, i.value.iban]])]), R("label", T_, [R("span", null, n(J(f)("rechnungswerk", "BIC")), 1), W(R("input", {
+							}, null, 512), [[D, i.value.iban]])]), R("label", E_, [R("span", null, n(J(f)("rechnungswerk", "BIC")), 1), W(R("input", {
 								"onUpdate:modelValue": t[8] ||= (e) => i.value.bic = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[D, i.value.bic]])])]),
-							R("label", E_, [R("span", null, n(J(f)("rechnungswerk", "Bankname")), 1), W(R("input", {
+							R("label", D_, [R("span", null, n(J(f)("rechnungswerk", "Bankname")), 1), W(R("input", {
 								"onUpdate:modelValue": t[9] ||= (e) => i.value.bankName = e,
 								class: "rw-input",
 								type: "text"
@@ -7573,11 +7575,11 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								default: P(() => [k(n(J(f)("rechnungswerk", "Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"]),
-							R("p", D_, n(J(f)("rechnungswerk", "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.")), 1)
+							R("p", O_, n(J(f)("rechnungswerk", "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.")), 1)
 						]),
-						R("section", O_, [
+						R("section", k_, [
 							R("h3", null, n(J(f)("rechnungswerk", "Branding")), 1),
-							R("div", k_, [R("span", null, n(J(f)("rechnungswerk", "Akzentfarbe")), 1), R("div", A_, [q(J(xt), {
+							R("div", A_, [R("span", null, n(J(f)("rechnungswerk", "Akzentfarbe")), 1), R("div", j_, [q(J(xt), {
 								modelValue: w.value,
 								advancedFields: "",
 								"onUpdate:modelValue": A
@@ -7587,7 +7589,7 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									class: "rw-accent__trigger",
 									"aria-label": J(f)("rechnungswerk", "Akzentfarbe") + ": " + w.value.toUpperCase(),
 									style: v(ne.value)
-								}, n(w.value.toUpperCase()), 13, j_)]),
+								}, n(w.value.toUpperCase()), 13, M_)]),
 								_: 1
 							}, 8, ["modelValue"]), i.value.accentColor ? (p(), I(J(X), {
 								key: 0,
@@ -7597,8 +7599,8 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								default: P(() => [k(n(J(f)("rechnungswerk", "Zurücksetzen")), 1)]),
 								_: 1
 							})) : T("", !0)])]),
-							R("div", M_, [
-								R("table", N_, [R("thead", null, [R("tr", { style: v(ne.value) }, [...t[40] ||= [
+							R("div", N_, [
+								R("table", P_, [R("thead", null, [R("tr", { style: v(ne.value) }, [...t[40] ||= [
 									R("th", null, "Beschreibung", -1),
 									R("th", { class: "num" }, "Menge", -1),
 									R("th", { class: "num" }, "Einzelpreis", -1),
@@ -7609,17 +7611,17 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									R("td", { class: "num" }, "95,00 €"),
 									R("td", { class: "num" }, "190,00 €")
 								])], -1)]),
-								R("p", P_, n(J(f)("rechnungswerk", "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.")), 1),
-								E.value ? (p(), K("p", F_, n(J(f)("rechnungswerk", "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.")), 1)) : T("", !0)
+								R("p", F_, n(J(f)("rechnungswerk", "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.")), 1),
+								E.value ? (p(), K("p", I_, n(J(f)("rechnungswerk", "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.")), 1)) : T("", !0)
 							]),
-							R("div", I_, [
+							R("div", L_, [
 								R("span", null, n(J(f)("rechnungswerk", "Firmenlogo")), 1),
-								R("div", L_, [i.value.logoFileId ? (p(), K("img", {
+								R("div", R_, [i.value.logoFileId ? (p(), K("img", {
 									key: 0,
 									src: V.value,
 									alt: J(f)("rechnungswerk", "Firmenlogo"),
 									class: "rw-logo__preview"
-								}, null, 8, R_)) : (p(), K("span", z_, n(J(f)("rechnungswerk", "Kein Logo gewählt")), 1)), R("div", B_, [q(J(X), {
+								}, null, 8, z_)) : (p(), K("span", B_, n(J(f)("rechnungswerk", "Kein Logo gewählt")), 1)), R("div", V_, [q(J(X), {
 									disabled: ue.value,
 									onClick: Oe
 								}, {
@@ -7634,22 +7636,22 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									default: P(() => [k(n(J(f)("rechnungswerk", "Entfernen")), 1)]),
 									_: 1
 								}, 8, ["disabled"])) : T("", !0)])]),
-								R("p", V_, n(J(f)("rechnungswerk", "Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.")), 1)
+								R("p", H_, n(J(f)("rechnungswerk", "Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.")), 1)
 							])
 						]),
-						R("section", H_, [
+						R("section", U_, [
 							R("h3", null, n(J(f)("rechnungswerk", "Rechnungsnummer")), 1),
-							R("label", U_, [R("span", null, n(J(f)("rechnungswerk", "Format")), 1), W(R("input", {
+							R("label", W_, [R("span", null, n(J(f)("rechnungswerk", "Format")), 1), W(R("input", {
 								"onUpdate:modelValue": t[12] ||= (e) => i.value.numberFormat = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[D, i.value.numberFormat]])]),
-							R("p", W_, [
+							R("p", G_, [
 								k(n(J(f)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
 								t[42] ||= R("br", null, null, -1),
 								k(" " + n(J(f)("rechnungswerk", "Vorschau: {preview}", { preview: fe.value })), 1)
 							]),
-							R("div", G_, [
+							R("div", K_, [
 								R("span", null, n(J(f)("rechnungswerk", "Nummernkreis")), 1),
 								q(J(bt), {
 									type: "radio",
@@ -7672,22 +7674,22 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									_: 1
 								}, 8, ["modelValue"])
 							]),
-							R("p", K_, n(J(f)("rechnungswerk", "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.")), 1)
+							R("p", q_, n(J(f)("rechnungswerk", "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.")), 1)
 						]),
-						R("section", q_, [
+						R("section", J_, [
 							R("h3", null, n(J(f)("rechnungswerk", "Angebotsnummer")), 1),
-							R("label", J_, [R("span", null, n(J(f)("rechnungswerk", "Format")), 1), W(R("input", {
+							R("label", Y_, [R("span", null, n(J(f)("rechnungswerk", "Format")), 1), W(R("input", {
 								"onUpdate:modelValue": t[13] ||= (e) => i.value.quoteNumberFormat = e,
 								class: "rw-input",
 								type: "text",
 								placeholder: "AN-{YYYY}-{####}"
 							}, null, 512), [[D, i.value.quoteNumberFormat]])]),
-							R("p", Y_, [
+							R("p", X_, [
 								k(n(J(f)("rechnungswerk", "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
 								t[43] ||= R("br", null, null, -1),
 								k(" " + n(J(f)("rechnungswerk", "Vorschau: {preview}", { preview: U.value })), 1)
 							]),
-							R("div", X_, [
+							R("div", Z_, [
 								R("span", null, n(J(f)("rechnungswerk", "Nummernkreis")), 1),
 								q(J(bt), {
 									type: "radio",
@@ -7710,22 +7712,22 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									_: 1
 								}, 8, ["modelValue"])
 							]),
-							R("p", Z_, n(J(f)("rechnungswerk", "Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.")), 1)
+							R("p", Q_, n(J(f)("rechnungswerk", "Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.")), 1)
 						]),
-						R("section", Q_, [
+						R("section", $_, [
 							R("h3", null, n(J(f)("rechnungswerk", "PDF-Dateiname")), 1),
-							R("label", $_, [R("span", null, n(J(f)("rechnungswerk", "Schema")), 1), W(R("input", {
+							R("label", ev, [R("span", null, n(J(f)("rechnungswerk", "Schema")), 1), W(R("input", {
 								"onUpdate:modelValue": t[14] ||= (e) => i.value.fileNameFormat = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[D, i.value.fileNameFormat]])]),
-							R("p", ev, [
+							R("p", tv, [
 								k(n(J(f)("rechnungswerk", "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.")) + " ", 1),
 								t[44] ||= R("br", null, null, -1),
 								k(" " + n(J(f)("rechnungswerk", "Vorschau: {preview}", { preview: pe.value })), 1)
 							])
 						]),
-						R("section", tv, [
+						R("section", nv, [
 							R("h3", null, n(J(f)("rechnungswerk", "Steuer")), 1),
 							q(J(bt), {
 								type: "switch",
@@ -7735,32 +7737,32 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								default: P(() => [k(n(J(f)("rechnungswerk", "Kleinunternehmer nach §19 UStG (kein USt-Ausweis)")), 1)]),
 								_: 1
 							}, 8, ["modelValue"]),
-							i.value.smallBusiness ? (p(), K("label", nv, [
+							i.value.smallBusiness ? (p(), K("label", rv, [
 								R("span", null, n(J(f)("rechnungswerk", "Hinweistext auf der Rechnung (§ 19 UStG)")), 1),
 								W(R("textarea", {
 									"onUpdate:modelValue": t[15] ||= (e) => i.value.smallBusinessNote = e,
 									class: "rw-input",
 									rows: "2",
 									placeholder: J(wc)
-								}, null, 8, rv), [[D, i.value.smallBusinessNote]]),
-								R("span", iv, n(J(f)("rechnungswerk", "Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.")), 1)
+								}, null, 8, iv), [[D, i.value.smallBusinessNote]]),
+								R("span", av, n(J(f)("rechnungswerk", "Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.")), 1)
 							])) : T("", !0),
-							i.value.smallBusiness ? T("", !0) : (p(), K("label", av, [R("span", null, n(J(f)("rechnungswerk", "Standard-USt-Satz")), 1), W(R("select", {
+							i.value.smallBusiness ? T("", !0) : (p(), K("label", ov, [R("span", null, n(J(f)("rechnungswerk", "Standard-USt-Satz")), 1), W(R("select", {
 								"onUpdate:modelValue": t[16] ||= (e) => i.value.defaultTaxRateBp = e,
 								class: "rw-input"
 							}, [(p(!0), K(G, null, S(J(Cc), (e) => (p(), K("option", {
 								key: e,
 								value: e
-							}, n(J(Bc)(e)), 9, ov))), 128))], 512), [[
+							}, n(J(Bc)(e)), 9, sv))), 128))], 512), [[
 								oe,
 								i.value.defaultTaxRateBp,
 								void 0,
 								{ number: !0 }
 							]])]))
 						]),
-						R("section", sv, [
+						R("section", cv, [
 							R("h3", null, n(J(f)("rechnungswerk", "Zahlung")), 1),
-							R("label", cv, [R("span", null, n(J(f)("rechnungswerk", "Standard-Zahlungsziel (Tage)")), 1), W(R("input", {
+							R("label", lv, [R("span", null, n(J(f)("rechnungswerk", "Standard-Zahlungsziel (Tage)")), 1), W(R("input", {
 								"onUpdate:modelValue": t[17] ||= (e) => i.value.defaultPaymentTermDays = e,
 								class: "rw-input",
 								type: "number",
@@ -7773,11 +7775,11 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								void 0,
 								{ number: !0 }
 							]])]),
-							R("p", lv, n(J(f)("rechnungswerk", "Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.")), 1)
+							R("p", uv, n(J(f)("rechnungswerk", "Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.")), 1)
 						]),
-						R("section", uv, [
+						R("section", dv, [
 							R("h3", null, n(J(f)("rechnungswerk", "Versand")), 1),
-							R("label", dv, [R("span", null, n(J(f)("rechnungswerk", "DATEV-Upload-Mail")), 1), W(R("input", {
+							R("label", fv, [R("span", null, n(J(f)("rechnungswerk", "DATEV-Upload-Mail")), 1), W(R("input", {
 								"onUpdate:modelValue": t[18] ||= (e) => i.value.datevUploadMail = e,
 								class: "rw-input",
 								type: "email"
@@ -7791,21 +7793,21 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								default: P(() => [k(n(J(f)("rechnungswerk", "E-Rechnung beim Festschreiben automatisch an DATEV senden")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"]),
-							R("p", fv, n(J(f)("rechnungswerk", "Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.")), 1),
-							R("div", pv, [R("label", mv, [R("span", null, n(J(f)("rechnungswerk", "Absender-Name")), 1), W(R("input", {
+							R("p", pv, n(J(f)("rechnungswerk", "Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.")), 1),
+							R("div", mv, [R("label", hv, [R("span", null, n(J(f)("rechnungswerk", "Absender-Name")), 1), W(R("input", {
 								"onUpdate:modelValue": t[19] ||= (e) => i.value.smtpFromName = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[D, i.value.smtpFromName]])]), R("label", hv, [R("span", null, n(J(f)("rechnungswerk", "Absender-E-Mail")), 1), W(R("input", {
+							}, null, 512), [[D, i.value.smtpFromName]])]), R("label", gv, [R("span", null, n(J(f)("rechnungswerk", "Absender-E-Mail")), 1), W(R("input", {
 								"onUpdate:modelValue": t[20] ||= (e) => i.value.smtpFromEmail = e,
 								class: "rw-input",
 								type: "email"
 							}, null, 512), [[D, i.value.smtpFromEmail]])])])
 						]),
-						R("section", gv, [
+						R("section", _v, [
 							R("h3", null, n(J(f)("rechnungswerk", "Ablage in Nextcloud")), 1),
-							R("div", _v, [R("span", null, n(J(f)("rechnungswerk", "Zielordner")), 1), R("div", vv, [
-								o.value ? (p(), K("span", yv, n(o.value), 1)) : (p(), K("span", bv, n(J(f)("rechnungswerk", "Kein Ordner gewählt")), 1)),
+							R("div", vv, [R("span", null, n(J(f)("rechnungswerk", "Zielordner")), 1), R("div", yv, [
+								o.value ? (p(), K("span", bv, n(o.value), 1)) : (p(), K("span", xv, n(J(f)("rechnungswerk", "Kein Ordner gewählt")), 1)),
 								q(J(X), {
 									disabled: c.value,
 									onClick: Ee
@@ -7832,29 +7834,29 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								default: P(() => [k(n(J(f)("rechnungswerk", "ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"]),
-							R("label", xv, [R("span", null, n(J(f)("rechnungswerk", "Unterordner (optional)")), 1), W(R("input", {
+							R("label", Sv, [R("span", null, n(J(f)("rechnungswerk", "Unterordner (optional)")), 1), W(R("input", {
 								"onUpdate:modelValue": t[21] ||= (e) => i.value.archiveSubfolder = e,
 								class: "rw-input",
 								type: "text",
 								placeholder: J(f)("rechnungswerk", "z. B. {YYYY}")
-							}, null, 8, Sv), [[D, i.value.archiveSubfolder]])]),
-							R("p", Cv, [
+							}, null, 8, Cv), [[D, i.value.archiveSubfolder]])]),
+							R("p", wv, [
 								k(n(J(f)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {MM} Monat, {DD} Tag (Rechnungsdatum). Unterordner werden bei Bedarf angelegt. Vorhandene Dateien werden nie überschrieben.")) + " ", 1),
 								t[45] ||= R("br", null, null, -1),
 								k(" " + n(J(f)("rechnungswerk", "Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.")), 1)
 							])
 						]),
-						R("section", wv, [
+						R("section", Tv, [
 							R("h3", null, n(J(f)("rechnungswerk", "Eigenes SMTP-Konto (optional)")), 1),
-							R("p", Tv, n(J(f)("rechnungswerk", "Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).")), 1),
-							R("div", Ev, [
-								R("label", Dv, [R("span", null, n(J(f)("rechnungswerk", "Server (Host)")), 1), W(R("input", {
+							R("p", Ev, n(J(f)("rechnungswerk", "Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).")), 1),
+							R("div", Dv, [
+								R("label", Ov, [R("span", null, n(J(f)("rechnungswerk", "Server (Host)")), 1), W(R("input", {
 									"onUpdate:modelValue": t[22] ||= (e) => i.value.smtpHost = e,
 									class: "rw-input",
 									type: "text",
 									placeholder: "smtp.example.com"
 								}, null, 512), [[D, i.value.smtpHost]])]),
-								R("label", Ov, [R("span", null, n(J(f)("rechnungswerk", "Port")), 1), W(R("input", {
+								R("label", kv, [R("span", null, n(J(f)("rechnungswerk", "Port")), 1), W(R("input", {
 									"onUpdate:modelValue": t[23] ||= (e) => i.value.smtpPort = e,
 									class: "rw-input",
 									type: "number",
@@ -7865,26 +7867,26 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									void 0,
 									{ number: !0 }
 								]])]),
-								R("label", kv, [R("span", null, n(J(f)("rechnungswerk", "Verschlüsselung")), 1), W(R("select", {
+								R("label", Av, [R("span", null, n(J(f)("rechnungswerk", "Verschlüsselung")), 1), W(R("select", {
 									"onUpdate:modelValue": t[24] ||= (e) => i.value.smtpSecurity = e,
 									class: "rw-input"
 								}, [
 									t[46] ||= R("option", { value: "starttls" }, "STARTTLS", -1),
 									t[47] ||= R("option", { value: "ssl" }, "SSL/TLS", -1),
-									R("option", Av, n(J(f)("rechnungswerk", "Keine")), 1)
+									R("option", jv, n(J(f)("rechnungswerk", "Keine")), 1)
 								], 512), [[oe, i.value.smtpSecurity]])])
 							]),
-							R("div", jv, [R("label", Mv, [R("span", null, n(J(f)("rechnungswerk", "Benutzer")), 1), W(R("input", {
+							R("div", Mv, [R("label", Nv, [R("span", null, n(J(f)("rechnungswerk", "Benutzer")), 1), W(R("input", {
 								"onUpdate:modelValue": t[25] ||= (e) => i.value.smtpUser = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[D, i.value.smtpUser]])]), R("label", Nv, [R("span", null, n(J(f)("rechnungswerk", "Passwort")), 1), W(R("input", {
+							}, null, 512), [[D, i.value.smtpUser]])]), R("label", Pv, [R("span", null, n(J(f)("rechnungswerk", "Passwort")), 1), W(R("input", {
 								"onUpdate:modelValue": t[26] ||= (e) => z.value = e,
 								class: "rw-input",
 								type: "password",
 								placeholder: i.value.smtpPasswordSet ? J(f)("rechnungswerk", "•••••••• (gespeichert, leer lassen)") : ""
-							}, null, 8, Pv), [[D, z.value]])])]),
-							R("div", Fv, [q(J(X), {
+							}, null, 8, Fv), [[D, z.value]])])]),
+							R("div", Iv, [q(J(X), {
 								disabled: !i.value.smtpHost || se.value,
 								onClick: je
 							}, {
@@ -7895,17 +7897,17 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								class: O(["smtp-test__result", le.value ? "rw-ok" : "rw-err"])
 							}, n(ce.value), 3)) : T("", !0)])
 						]),
-						R("section", Iv, [
+						R("section", Lv, [
 							R("h3", null, n(J(f)("rechnungswerk", "DATEV-Rückmeldung (IMAP, optional)")), 1),
-							R("p", Lv, n(J(f)("rechnungswerk", "DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.")), 1),
-							R("div", Rv, [
-								R("label", zv, [R("span", null, n(J(f)("rechnungswerk", "Server (Host)")), 1), W(R("input", {
+							R("p", Rv, n(J(f)("rechnungswerk", "DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.")), 1),
+							R("div", zv, [
+								R("label", Bv, [R("span", null, n(J(f)("rechnungswerk", "Server (Host)")), 1), W(R("input", {
 									"onUpdate:modelValue": t[27] ||= (e) => i.value.imapHost = e,
 									class: "rw-input",
 									type: "text",
 									placeholder: "imap.example.com"
 								}, null, 512), [[D, i.value.imapHost]])]),
-								R("label", Bv, [R("span", null, n(J(f)("rechnungswerk", "Port")), 1), W(R("input", {
+								R("label", Vv, [R("span", null, n(J(f)("rechnungswerk", "Port")), 1), W(R("input", {
 									"onUpdate:modelValue": t[28] ||= (e) => i.value.imapPort = e,
 									class: "rw-input",
 									type: "number",
@@ -7916,7 +7918,7 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									void 0,
 									{ number: !0 }
 								]])]),
-								R("label", Vv, [R("span", null, n(J(f)("rechnungswerk", "Verschlüsselung")), 1), W(R("select", {
+								R("label", Hv, [R("span", null, n(J(f)("rechnungswerk", "Verschlüsselung")), 1), W(R("select", {
 									"onUpdate:modelValue": t[29] ||= (e) => i.value.imapSecurity = e,
 									class: "rw-input"
 								}, [...t[48] ||= [
@@ -7925,16 +7927,16 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									R("option", { value: "tls" }, "TLS", -1)
 								]], 512), [[oe, i.value.imapSecurity]])])
 							]),
-							R("div", Hv, [R("label", Uv, [R("span", null, n(J(f)("rechnungswerk", "Benutzer")), 1), W(R("input", {
+							R("div", Uv, [R("label", Wv, [R("span", null, n(J(f)("rechnungswerk", "Benutzer")), 1), W(R("input", {
 								"onUpdate:modelValue": t[30] ||= (e) => i.value.imapUser = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[D, i.value.imapUser]])]), R("label", Wv, [R("span", null, n(J(f)("rechnungswerk", "Passwort")), 1), W(R("input", {
+							}, null, 512), [[D, i.value.imapUser]])]), R("label", Gv, [R("span", null, n(J(f)("rechnungswerk", "Passwort")), 1), W(R("input", {
 								"onUpdate:modelValue": t[31] ||= (e) => B.value = e,
 								class: "rw-input",
 								type: "password",
 								placeholder: i.value.imapPasswordSet ? J(f)("rechnungswerk", "•••••••• (gespeichert, leer lassen)") : ""
-							}, null, 8, Gv), [[D, B.value]])])]),
+							}, null, 8, Kv), [[D, B.value]])])]),
 							q(J(bt), {
 								modelValue: i.value.imapCleanup,
 								disabled: !i.value.imapHost,
@@ -7944,21 +7946,21 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								_: 1
 							}, 8, ["modelValue", "disabled"])
 						]),
-						R("section", Kv, [
+						R("section", qv, [
 							R("h3", null, n(J(f)("rechnungswerk", "Standardtexte")), 1),
-							R("p", qv, n(J(f)("rechnungswerk", "Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.")), 1),
+							R("p", Jv, n(J(f)("rechnungswerk", "Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.")), 1),
 							q(J(X), { onClick: a }, {
 								icon: P(() => [q(Za, { size: 20 })]),
 								default: P(() => [k(" " + n(J(f)("rechnungswerk", "Textbausteine verwalten")), 1)]),
 								_: 1
 							})
 						]),
-						R("section", Jv, [
+						R("section", Yv, [
 							R("h3", null, n(J(f)("rechnungswerk", "Zugriff & Administration")), 1),
-							R("p", Yv, n(J(f)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
-							R("div", Xv, [
-								R("span", Zv, n(J(f)("rechnungswerk", "App-Administratoren")), 1),
-								R("p", Qv, n(J(f)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
+							R("p", Xv, n(J(f)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
+							R("div", Zv, [
+								R("span", Qv, n(J(f)("rechnungswerk", "App-Administratoren")), 1),
+								R("p", $v, n(J(f)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
 								q(J(pt), {
 									modelValue: j.value,
 									"onUpdate:modelValue": t[33] ||= (e) => j.value = e,
@@ -7979,9 +7981,9 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 									"placeholder"
 								])
 							]),
-							R("div", $v, [
-								R("span", ey, n(J(f)("rechnungswerk", "Berechtigte Nutzer")), 1),
-								R("p", ty, n(J(f)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
+							R("div", ey, [
+								R("span", ty, n(J(f)("rechnungswerk", "Berechtigte Nutzer")), 1),
+								R("p", ny, n(J(f)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
 								q(J(pt), {
 									modelValue: N.value,
 									"onUpdate:modelValue": t[34] ||= (e) => N.value = e,
@@ -8003,17 +8005,17 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 								])
 							])
 						]),
-						R("div", ny, [q(J(X), {
+						R("div", ry, [q(J(X), {
 							variant: "primary",
 							disabled: J(r).saving || ie.value,
 							onClick: Ae
 						}, {
-							icon: P(() => [q(Gg, { size: 20 })]),
+							icon: P(() => [q(Kg, { size: 20 })]),
 							default: P(() => [k(" " + n(J(f)("rechnungswerk", "Speichern")), 1)]),
 							_: 1
 						}, 8, ["disabled"])])
 					])) : T("", !0),
-					q(Cd, {
+					q(wd, {
 						open: u.value,
 						name: J(f)("rechnungswerk", "Kleinunternehmer §19 aktivieren"),
 						message: J(f)("rechnungswerk", "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?"),
@@ -8026,7 +8028,7 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 						"message",
 						"confirmLabel"
 					]),
-					q(Cd, {
+					q(wd, {
 						open: d.value,
 						name: J(f)("rechnungswerk", "Automatischen DATEV-Versand aktivieren"),
 						message: J(f)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?"),
@@ -8039,7 +8041,7 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 						"message",
 						"confirmLabel"
 					]),
-					q(Cd, {
+					q(wd, {
 						open: m.value,
 						name: J(f)("rechnungswerk", "Automatische Ablage aktivieren"),
 						message: J(f)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?"),
@@ -8052,7 +8054,7 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 						"message",
 						"confirmLabel"
 					]),
-					q(Cd, {
+					q(wd, {
 						open: h.value,
 						name: J(f)("rechnungswerk", "Nummernkreis auf „Fortlaufend“ stellen"),
 						message: J(f)("rechnungswerk", "Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?"),
@@ -8065,7 +8067,7 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 						"message",
 						"confirmLabel"
 					]),
-					q(Cd, {
+					q(wd, {
 						open: g.value,
 						name: J(f)("rechnungswerk", "Angebots-Nummernkreis auf „Fortlaufend“ stellen"),
 						message: J(f)("rechnungswerk", "Der Angebots-Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Fortfahren?"),
@@ -8082,15 +8084,15 @@ var c_ = { class: "rw-view" }, l_ = { class: "rw-settings-title" }, u_ = {
 			}
 		}), [["__scopeId", "data-v-81f38fd1"]])
 	}
-], iy = Rr({
+], ay = Rr({
 	history: or(),
-	routes: ry
+	routes: iy
 });
 //#endregion
 //#region src/main.js
 document.addEventListener("DOMContentLoaded", () => {
 	let e = re(wo);
-	e.use(zt()), e.use(iy), e.use(Te, { themes: { tooltip: { delay: {
+	e.use(zt()), e.use(ay), e.use(Te, { themes: { tooltip: { delay: {
 		show: 100,
 		hide: 0
 	} } } }), e.mount(".app-rechnungswerk");
