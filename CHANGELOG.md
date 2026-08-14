@@ -7,6 +7,51 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-14
+
+Ein Release für alle, die die App auf Englisch bedienen: Fehlermeldungen kamen
+bisher auf Deutsch zurück, und fünf Texte blieben trotz vorhandener Übersetzung
+deutsch. Dazu zwei Anzeigefehler, die von außen gemeldet wurden, und eine
+Integritätsmeldung, die seit der ersten PDF-Erzeugung auftrat.
+
+### Added
+- **Fehlermeldungen aus dem Backend sind übersetzbar.** `IL10N` wurde bisher an
+  genau einer Stelle benutzt, die übrigen 48 benutzersichtbaren Meldungen waren
+  hart deutsch. Die Zahlenprüfung (`NumberInput`) wirft dafür jetzt prosafrei:
+  die Ausnahme trägt nur den Sachverhalt, den Satz formuliert eine eigene
+  Klasse mit `IL10N`. Damit bleibt die Klasse statisch und deckungsgleich mit
+  ihrem Frontend-Zwilling (#235)
+
+### Fixed
+- **Das freie Einheitenfeld war neben der Einheitenauswahl nur noch als Strich
+  zu sehen.** Beide Elemente stehen mit voller Zellenbreite in einer Zelle, die
+  nicht umbrechen kann — welches von beiden zusammenfällt, entschied der
+  Browser. Das freie Feld sitzt jetzt in der zweiten Zeile neben der
+  Beschreibung, wo der Platz ohnehin vorhanden ist; Spaltenbreiten und
+  Zeilenhöhe bleiben unverändert. In der schreibgeschützten Ansicht erscheinen
+  beide Felder nur noch, wenn sie einen Wert tragen. Gemeldet von @myssv (#238)
+- **Die Integritätsprüfung meldete nach jeder PDF-Erzeugung zwei zusätzliche
+  Dateien.** dompdf legte seinen Font-Cache innerhalb des eigenen Pakets ab,
+  also in einem signierten Verzeichnis. Der Cache liegt jetzt unter dem
+  Nextcloud-Temp-Pfad; ist der gemeinsame Ordner nicht benutzbar, wird auf
+  einen Ordner je Aufruf ausgewichen statt zurück in die Auslieferung (#241)
+- **Fünf Texte erschienen in der englischen Oberfläche auf Deutsch**, obwohl die
+  Übersetzung vorhanden war: vor den Auslassungspunkten steht im Quellcode ein
+  geschütztes Leerzeichen, in den Übersetzungsdateien ein normales. Beim
+  Draufschauen sind beide Zeichenketten identisch, deshalb prüft das jetzt eine
+  Maschine. Acht fehlende DATEV-Texte ergänzt, fünfzehn Altlasten entfernt
+  (#234)
+- **Ordner- und Logoauswahl in den Einstellungen** liefen über `OC.dialogs`,
+  das seit Nextcloud 30 veraltet ist und beim Klicken gebrochen wäre, nicht beim
+  Bauen. Ersetzt durch den FilePicker aus `@nextcloud/dialogs`; ein Abbruch
+  erzeugt keine Fehlermeldung mehr (#221)
+
+### Changed
+- **Das JavaScript-Bundle wird als ES-Modul ausgeliefert** statt als iife. Der
+  FilePicker lädt seine Komponente per dynamischem Import, was Code-Splitting
+  erzwingt — das iife-Format kann das nicht. Das alte Bundle wird beim Update
+  entfernt (#221)
+
 ## [0.4.1] - 2026-08-11
 
 Mengen und Preise blieben beim Speichern nicht zuverlässig stehen. Gemeldet von
@@ -371,7 +416,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.0...v0.3.1
