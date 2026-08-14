@@ -15,12 +15,14 @@ use OCA\Rechnungswerk\Db\CustomerMapper;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\IL10N;
 
 class CustomerService {
 
 	public function __construct(
 		private readonly CustomerMapper $mapper,
 		private readonly CountryService $countryService,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -84,7 +86,7 @@ class CustomerService {
 		try {
 			return $this->mapper->findOne($id);
 		} catch (DoesNotExistException) {
-			throw new NotFoundException('Kunde nicht gefunden.');
+			throw new NotFoundException($this->l10n->t('Kunde nicht gefunden.'));
 		}
 	}
 
@@ -104,7 +106,7 @@ class CustomerService {
 			return;
 		}
 		if ($existing->getId() !== $excludeId) {
-			throw new ValidationException('Die Kundennummer ' . $customerNumber . ' ist bereits vergeben.');
+			throw new ValidationException($this->l10n->t('Die Kundennummer %s ist bereits vergeben.', [$customerNumber]));
 		}
 	}
 
@@ -116,29 +118,29 @@ class CustomerService {
 		if (!$partial || array_key_exists('name', $data)) {
 			$name = trim((string)($data['name'] ?? ''));
 			if ($name === '') {
-				throw new ValidationException('Ein Name ist erforderlich.');
+				throw new ValidationException($this->l10n->t('Ein Name ist erforderlich.'));
 			}
 			if (mb_strlen($name) > 255) {
-				throw new ValidationException('Der Name darf höchstens 255 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Der Name darf höchstens 255 Zeichen lang sein.'));
 			}
 		}
 		if (!$partial || array_key_exists('customerNumber', $data)) {
 			$number = trim((string)($data['customerNumber'] ?? ''));
 			if ($number === '') {
-				throw new ValidationException('Eine Kundennummer ist erforderlich.');
+				throw new ValidationException($this->l10n->t('Eine Kundennummer ist erforderlich.'));
 			}
 			if (mb_strlen($number) > 64) {
-				throw new ValidationException('Die Kundennummer darf höchstens 64 Zeichen lang sein.');
+				throw new ValidationException($this->l10n->t('Die Kundennummer darf höchstens 64 Zeichen lang sein.'));
 			}
 		}
 		if (array_key_exists('iban', $data) && trim((string)$data['iban']) !== '' && !$this->isValidIban((string)$data['iban'])) {
-			throw new ValidationException('Die IBAN ist ungültig (Format oder Prüfziffer).');
+			throw new ValidationException($this->l10n->t('Die IBAN ist ungültig (Format oder Prüfziffer).'));
 		}
 		if (array_key_exists('defaultTaxRateBp', $data) && $data['defaultTaxRateBp'] !== null && (int)$data['defaultTaxRateBp'] < 0) {
-			throw new ValidationException('Der Steuersatz darf nicht negativ sein.');
+			throw new ValidationException($this->l10n->t('Der Steuersatz darf nicht negativ sein.'));
 		}
 		if (array_key_exists('defaultPaymentTermDays', $data) && $data['defaultPaymentTermDays'] !== null && (int)$data['defaultPaymentTermDays'] < 0) {
-			throw new ValidationException('Das Zahlungsziel darf nicht negativ sein.');
+			throw new ValidationException($this->l10n->t('Das Zahlungsziel darf nicht negativ sein.'));
 		}
 	}
 

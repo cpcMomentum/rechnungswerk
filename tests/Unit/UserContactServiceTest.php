@@ -16,13 +16,15 @@ use PHPUnit\Framework\TestCase;
 
 class UserContactServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private IConfig $config;
 	private UserContactService $service;
 
 	protected function setUp(): void {
 		parent::setUp();
 		$this->config = $this->createMock(IConfig::class);
-		$this->service = new UserContactService($this->config);
+		$this->service = new UserContactService($this->config, $this->l10nStub());
 	}
 
 	public function testGetReturnsStoredUserValues(): void {

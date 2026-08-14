@@ -13,11 +13,14 @@ use OCA\Rechnungswerk\Db\Product;
 use OCA\Rechnungswerk\Db\ProductMapper;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\NumberFormatMessage;
 use OCA\Rechnungswerk\Service\ProductService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use PHPUnit\Framework\TestCase;
 
 class ProductServiceTest extends TestCase {
+
+	use TranslatorStub;
 
 	private ProductMapper $mapper;
 	private ProductService $service;
@@ -25,7 +28,7 @@ class ProductServiceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(ProductMapper::class);
-		$this->service = new ProductService($this->mapper);
+		$this->service = new ProductService($this->mapper, new NumberFormatMessage($this->l10nStub()), $this->l10nStub());
 	}
 
 	public function testCreateAppliesDefaults(): void {

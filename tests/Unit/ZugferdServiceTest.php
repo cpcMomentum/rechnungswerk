@@ -16,6 +16,7 @@ use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Service\GirocodeService;
 use OCA\Rechnungswerk\Service\ZugferdService;
 use OCP\Files\IRootFolder;
+use OCP\ITempManager;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -30,10 +31,13 @@ class ZugferdServiceTest extends TestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
+		$tempManager = $this->createMock(ITempManager::class);
+		$tempManager->method('getTempBaseDir')->willReturn(sys_get_temp_dir());
 		$this->service = new ZugferdService(
 			$this->createMock(IRootFolder::class),
 			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
+			$tempManager,
 		);
 	}
 
@@ -350,6 +354,108 @@ class ZugferdServiceTest extends TestCase {
 	private function renderHtml(Invoice $invoice, array $items, Settings $settings, bool $preview): string {
 		$m = new \ReflectionMethod(ZugferdService::class, 'renderHtml');
 		return (string)$m->invoke($this->service, $invoice, $items, $settings, null, null, $preview);
+	}
+
+	private function renderPdf(Invoice $invoice, array $items, Settings $settings, bool $preview = false): string {
+		$m = new \ReflectionMethod(ZugferdService::class, 'renderVisiblePdf');
+		return (string)$m->invoke($this->service, $invoice, $items, $settings, null, null, $preview);
+	}
+
+	/** @return string[] Dateinamen in $dir, sortiert. */
+	private function fileList(string $dir): array {
+		$names = array_values(array_diff(scandir($dir) ?: [], ['.', '..']));
+		sort($names);
+		return $names;
+	}
+
+	/**
+	 * Der Font-Cache von dompdf darf nicht in der Auslieferung landen (#241).
+	 *
+	 * Geprueft wird das Ergebnis, nicht die gesetzte Option: nach dem Rendern
+	 * darf im dompdf-Paket keine Datei dazugekommen sein. Ohne den Fix legt
+	 * dompdf dort DejaVuSans.ufm.json und DejaVuSans-Bold.ufm.json an, und die
+	 * Integritaetspruefung meldet sie danach als EXTRA_FILE.
+	 */
+	public function testRenderingWritesNoFileIntoTheShippedPackage(): void {
+		$fontDir = dirname(__DIR__, 2) . '/vendor/dompdf/dompdf/lib/fonts';
+		if (!is_dir($fontDir)) {
+			$this->markTestSkipped('vendor/dompdf nicht installiert');
+		}
+		// Vorhandene Cache-Dateien entfernen: liegen sie schon da, schreibt
+		// dompdf nicht erneut und der Test bestuende auch ohne den Fix.
+		foreach (glob($fontDir . '/*.ufm.json') ?: [] as $stale) {
+			@unlink($stale);
+		}
+		$before = $this->fileList($fontDir);
+
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$pdf = $this->renderPdf($invoice, [$this->item(1000000, 1900, 20000)], $this->settings());
+
+		$this->assertStringStartsWith('%PDF', $pdf, 'Es sollte ueberhaupt ein PDF entstanden sein');
+		$this->assertSame(
+			[],
+			array_values(array_diff($this->fileList($fontDir), $before)),
+			'dompdf hat in vendor/ geschrieben — der Font-Cache gehoert ausserhalb der Auslieferung',
+		);
+	}
+
+	/**
+	 * Ist der gemeinsame Cache-Ordner nicht nutzbar, darf NICHT nach vendor/
+	 * ausgewichen werden (#241).
+	 *
+	 * Der Fall ist real: wer den Ordner zuerst anlegt, besitzt ihn, und ein
+	 * CLI-Lauf als root sperrt den Webserver als www-data aus. Hier wird er
+	 * ueber ein unanlegbares Basisverzeichnis erzwungen, damit der Test nicht
+	 * davon abhaengt, als welcher Nutzer er laeuft — als root waere jede
+	 * Rechtepruefung wirkungslos.
+	 */
+	public function testUnusableSharedCacheFallsBackToTempFolderNotVendor(): void {
+		$fontDir = dirname(__DIR__, 2) . '/vendor/dompdf/dompdf/lib/fonts';
+		if (!is_dir($fontDir)) {
+			$this->markTestSkipped('vendor/dompdf nicht installiert');
+		}
+		foreach (glob($fontDir . '/*.ufm.json') ?: [] as $stale) {
+			@unlink($stale);
+		}
+		$before = $this->fileList($fontDir);
+
+		$perCall = sys_get_temp_dir() . '/rw-fonts-percall-' . getmypid();
+		@mkdir($perCall, 0700, true);
+		$tempManager = $this->createMock(ITempManager::class);
+		$tempManager->method('getTempBaseDir')->willReturn('/proc/self/nichtanlegbar');
+		$tempManager->method('getTemporaryFolder')->willReturn($perCall);
+		$service = new ZugferdService(
+			$this->createMock(IRootFolder::class),
+			new GirocodeService($this->createMock(LoggerInterface::class)),
+			$this->createMock(LoggerInterface::class),
+			$tempManager,
+		);
+
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$m = new \ReflectionMethod(ZugferdService::class, 'renderVisiblePdf');
+		$pdf = (string)$m->invoke($service, $invoice, [$this->item(1000000, 1900, 20000)], $this->settings(), null, null, false);
+
+		$this->assertStringStartsWith('%PDF', $pdf);
+		$this->assertSame(
+			[],
+			array_values(array_diff($this->fileList($fontDir), $before)),
+			'Ausweichpfad hat in vendor/ geschrieben statt in den Ersatzordner',
+		);
+		$this->assertNotEmpty(
+			glob($perCall . '/*.ufm.json') ?: [],
+			'Der Ersatzordner wurde nicht benutzt',
+		);
+
+		foreach (glob($perCall . '/*') ?: [] as $f) {
+			@unlink($f);
+		}
+		@rmdir($perCall);
 	}
 
 	public function testPreviewHtmlCarriesDraftMarkingAndNumberPlaceholder(): void {

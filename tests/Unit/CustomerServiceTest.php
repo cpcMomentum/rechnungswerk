@@ -20,13 +20,15 @@ use PHPUnit\Framework\TestCase;
 
 class CustomerServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private CustomerMapper $mapper;
 	private CustomerService $service;
 
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = $this->createMock(CustomerMapper::class);
-		$this->service = new CustomerService($this->mapper, new CountryService());
+		$this->service = new CustomerService($this->mapper, new CountryService($this->l10nStub()), $this->l10nStub());
 	}
 
 	private function freeNumber(): void {

@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\Service;
 
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCP\IL10N;
 use OCP\Mail\IMailer;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -27,6 +28,7 @@ class MailService {
 
 	public function __construct(
 		private readonly IMailer $mailer,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -47,7 +49,7 @@ class MailService {
 		?array $smtpConfig = null,
 	): ?string {
 		if (!$this->mailer->validateMailAddress($to)) {
-			throw new ValidationException('Die Empfängeradresse ist ungültig.');
+			throw new ValidationException($this->l10n->t('Die Empfängeradresse ist ungültig.'));
 		}
 
 		if ($smtpConfig !== null) {

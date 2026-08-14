@@ -14,6 +14,7 @@ use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCP\Files\IAppData;
 use OCP\Files\NotFoundException as FilesNotFoundException;
 use OCP\Files\SimpleFS\ISimpleFolder;
+use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -40,6 +41,7 @@ class DocumentStore {
 	public function __construct(
 		private readonly IAppData $appData,
 		private readonly LoggerInterface $logger,
+		private readonly IL10N $l10n,
 	) {
 	}
 
@@ -56,10 +58,10 @@ class DocumentStore {
 		$folder = $this->folder($invoice);
 
 		if ($folder->fileExists($name)) {
-			throw new IllegalStateException(
-				'Für Rechnung ' . (string)$invoice->getNumber() . ' existiert bereits ein Beleg. '
-				. 'Ein festgeschriebener Beleg wird nie überschrieben.'
-			);
+			throw new IllegalStateException($this->l10n->t(
+				'Für Rechnung %s existiert bereits ein Beleg. Ein festgeschriebener Beleg wird nie überschrieben.',
+				[(string)$invoice->getNumber()],
+			));
 		}
 		$folder->newFile($name, $pdf);
 

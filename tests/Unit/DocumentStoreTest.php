@@ -29,6 +29,8 @@ use Psr\Log\LoggerInterface;
  */
 class DocumentStoreTest extends TestCase {
 
+	use TranslatorStub;
+
 	private IAppData $appData;
 	private ISimpleFolder $folder;
 	private LoggerInterface $logger;
@@ -40,7 +42,7 @@ class DocumentStoreTest extends TestCase {
 		$this->appData = $this->createMock(IAppData::class);
 		$this->appData->method('getFolder')->willReturn($this->folder);
 		$this->logger = $this->createMock(LoggerInterface::class);
-		$this->store = new DocumentStore($this->appData, $this->logger);
+		$this->store = new DocumentStore($this->appData, $this->logger, $this->l10nStub());
 	}
 
 	private function invoice(int $id = 7, ?string $sha = null): Invoice {
@@ -115,7 +117,7 @@ class DocumentStoreTest extends TestCase {
 		$appData->method('getFolder')->willReturn($folder);
 		$this->logger->expects($this->once())->method('warning');
 
-		$store = new DocumentStore($appData, $this->logger);
+		$store = new DocumentStore($appData, $this->logger, $this->l10nStub());
 
 		$this->assertNull($store->read($this->invoice()), 'Rückfall auf Neuerzeugung statt Absturz');
 	}
@@ -125,7 +127,7 @@ class DocumentStoreTest extends TestCase {
 		$appData->method('getFolder')->willThrowException(new FilesNotFoundException('weg'));
 		$appData->method('newFolder')->willThrowException(new FilesNotFoundException('weg'));
 
-		$store = new DocumentStore($appData, $this->createMock(LoggerInterface::class));
+		$store = new DocumentStore($appData, $this->createMock(LoggerInterface::class), $this->l10nStub());
 
 		$this->assertFalse($store->has($this->invoice()));
 	}

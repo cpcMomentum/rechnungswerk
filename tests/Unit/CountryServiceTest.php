@@ -16,11 +16,13 @@ use PHPUnit\Framework\TestCase;
 
 class CountryServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private CountryService $service;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->service = new CountryService();
+		$this->service = new CountryService($this->l10nStub());
 	}
 
 	/**
