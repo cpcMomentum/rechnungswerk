@@ -22,10 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          # Volle Historie: der Bundle-Check diffst gegen den Ziel-Branch
-          # und braucht die Merge-Base.
-          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -36,12 +32,17 @@ jobs:
           node-version: '24'
 
       - name: Abhaengigkeiten installieren
-        # npm/cli#4828: ein auf anderem OS erzeugter Lock laesst das plattform-
-        # spezifische rollup-Binary fehlen. Lock entfernen erzwingt frische,
-        # plattform-korrekte Aufloesung auf dem Linux-Runner.
-        run: |
-          rm -f package-lock.json
-          npm install --no-audit --no-fund
+        # `npm ci` statt `npm install`, und das Lockfile bleibt liegen. Bis zum
+        # 15.08.2026 stand hier `rm -f package-lock.json` mit Verweis auf
+        # npm/cli#4828 (fehlendes rollup-Binary). Der Fehler, der tatsaechlich
+        # auftrat, war ein anderer: npm 10 meldet auf einem synchronen Lock
+        # faelschlich "Missing: pinia@3.0.4". Mit npm 11 -- das mit Node 24
+        # kommt -- laeuft `npm ci` durch.
+        #
+        # Das ist die Voraussetzung fuer den Frische-Schritt weiter unten:
+        # ohne gepinnte Installation weicht der CI-Build vom lokalen ab und der
+        # Vergleich meldet immer (nc-app-tooling#1).
+        run: npm ci
 
       # Bis 08.08.2026 hiess dieser Job "lint-and-build", ohne je zu linten
       # (#210): das Paket war deklariert, aber es gab keine Konfiguration, kein
@@ -54,26 +55,6 @@ jobs:
       # Solche Texte fallen in JEDER Sprache auf den deutschen Quelltext zurueck
       # und bleiben beim Entwickeln unsichtbar, weil auf Deutsch getestet wird.
       # Ergaenzt l10nCompleteness.spec.ts, siehe dortigen Kopf.
-      # Faengt vergessene Frontend-Builds. Kein Byte-Diff — der Build ist in der
-      # CI nicht reproduzierbar (contractmanager#251): der Lock wird verworfen
-      # und die Node-Version weicht ab, ein Rebuild ohne Quelltextaenderung
-      # erzeugt schon andere Minifier-Kuerzel. Stattdessen: wurden Eingaben
-      # geaendert, ohne dass sich js/ und css/ geaendert haben? Genau so blieb
-      # bei contractmanager#327 eine verwundbare Abhaengigkeit im
-      # ausgelieferten Bundle stehen.
-      # Nicht blockierend, bis nc-app-tooling#1 steht: der Check raet, statt zu
-      # messen — „Quelle geaendert, Bundle unveraendert" ist bei reinen Typ- und
-      # Kommentaraenderungen ein korrekter Zustand. Das Signal bleibt sichtbar,
-      # haelt aber niemanden auf.
-      - name: Bundle aktuell (Hinweis, siehe nc-app-tooling#1)
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        env:
-          # Nicht direkt in run: interpolieren — ein Branch-Name kann
-          # Shell-Metazeichen enthalten (Script-Injection).
-          BASE_REF: ${{ github.base_ref }}
-        run: npx --no-install nc-bundle-check "origin/$BASE_REF"
-
       - name: l10n-Vollstaendigkeit
         run: npm run l10n:check
 
@@ -85,3 +66,24 @@ jobs:
 
       - name: Produktions-Build
         run: npm run build
+
+      # Der eigentliche Frische-Test: passt das eingecheckte Bundle zu den
+      # Quellen? Der Schritt darueber hat gerade neu gebaut -- weicht js/ oder
+      # css/ jetzt vom Commit ab, wurde beim Aendern der Quellen der Build
+      # vergessen. Genau so blieb bei contractmanager#327 eine verwundbare
+      # dompurify-Version im ausgelieferten Bundle stehen.
+      #
+      # Gemessen statt geraten. Der Vorgaenger (nc-bundle-check) schloss aus
+      # "src/ geaendert, js/ nicht" auf eine Absicht und lag bei reinen Typ- und
+      # Kommentaraenderungen falsch; sein Ausweg [skip bundle-check] hebelte ihn
+      # ganz aus. Beides faellt hiermit weg (nc-app-tooling#1).
+      #
+      # Traegt, weil der Build byte-reproduzierbar ist: alle fuenf Apps bauen
+      # unter Linux mit npm 11 aus dem auf macOS erzeugten Lockfile
+      # byte-identisch (nachgemessen 15.08.2026, Node 20/22/24 einzeln).
+      - name: Bundle passt zum Quellstand
+        run: |
+          if ! git diff --exit-code -- js/ css/; then
+            echo "::error::Das eingecheckte Bundle passt nicht zu den Quellen. Bitte 'npm run build' laufen lassen und das Ergebnis mitcommitten."
+            exit 1
+          fi
