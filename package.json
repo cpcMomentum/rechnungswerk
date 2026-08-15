@@ -44,7 +44,7 @@
     "happy-dom": "^20.9.0",
     "nc-app-tooling": "github:cpcMomentum/nc-app-tooling#v1.11.0",
     "sass": "^1.70.0",
-    "typescript": "^5.7.2",
+    "typescript": "^7.0.2",
     "vite": "^8.2.1",
     "vitest": "^4.1.4"
   },
