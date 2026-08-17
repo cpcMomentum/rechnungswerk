@@ -80,7 +80,22 @@
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">
 							<span :class="amountClass(inv)">{{ formatCents(inv.totalCents) }}</span>
-							<div v-if="paymentSubline(inv)" :class="['rw-subline', { 'rw-subline--overdue': inv.paymentStatus === 'overdue' }]">{{ paymentSubline(inv) }}</div>
+							<div v-if="editingPaidId === inv.id" class="rw-paid-edit" @click.stop>
+								<input v-model="paidDraft" type="date" class="rw-input rw-paid-input"
+									:aria-label="t('rechnungswerk', 'Zahldatum')"
+									@keyup.enter="savePaidDate(inv)" @keyup.esc="cancelPaidEdit">
+								<NcButton variant="primary" :aria-label="t('rechnungswerk', 'Zahldatum speichern')"
+									:title="t('rechnungswerk', 'Zahldatum speichern')" @click.stop="savePaidDate(inv)">
+									<template #icon><CheckIcon :size="18" /></template>
+								</NcButton>
+								<NcButton variant="tertiary" :aria-label="t('rechnungswerk', 'Abbrechen')"
+									:title="t('rechnungswerk', 'Abbrechen')" @click.stop="cancelPaidEdit">
+									<template #icon><CloseIcon :size="18" /></template>
+								</NcButton>
+							</div>
+							<button v-else-if="inv.paymentStatus === 'paid'" type="button" class="rw-subline rw-subline--editable"
+								:title="t('rechnungswerk', 'Zahldatum ändern')" @click.stop="startPaidEdit(inv)">{{ paymentSubline(inv) }}</button>
+							<div v-else-if="paymentSubline(inv)" :class="['rw-subline', { 'rw-subline--overdue': inv.paymentStatus === 'overdue' }]">{{ paymentSubline(inv) }}</div>
 						</td>
 						<td class="rw-col-paid">
 							<button v-if="inv.paymentStatus"
@@ -137,6 +152,8 @@ import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import CheckboxBlankOutlineIcon from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import CheckboxMarkedIcon from 'vue-material-design-icons/CheckboxMarked.vue'
+import CheckIcon from 'vue-material-design-icons/Check.vue'
+import CloseIcon from 'vue-material-design-icons/Close.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { downloadInvoicePdf } from '@/api/invoices'
@@ -267,6 +284,44 @@ async function togglePaid(inv: Invoice) {
 		}
 	} catch (e) {
 		error.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Zahlungsstatus konnte nicht geändert werden')
+	}
+}
+
+// Inline correction of the payment date (#257). The checkbox keeps setting today
+// on one click; clicking the "bezahlt am {date}" line opens a date field prefilled
+// with the current payment date. Format is Y-m-d — exactly what the backend's
+// parseDate() expects and what a native date input yields.
+const editingPaidId = ref<number | null>(null)
+const paidDraft = ref('')
+
+function toDateInput(iso: string | null): string {
+	const d = iso ? parseLocalDate(iso) : new Date()
+	const month = String(d.getMonth() + 1).padStart(2, '0')
+	const day = String(d.getDate()).padStart(2, '0')
+	return `${d.getFullYear()}-${month}-${day}`
+}
+
+function startPaidEdit(inv: Invoice) {
+	error.value = ''
+	paidDraft.value = toDateInput(inv.paidAt)
+	editingPaidId.value = inv.id
+}
+
+function cancelPaidEdit() {
+	editingPaidId.value = null
+}
+
+async function savePaidDate(inv: Invoice) {
+	if (!paidDraft.value) {
+		cancelPaidEdit()
+		return
+	}
+	error.value = ''
+	try {
+		await store.markPaid(inv.id, paidDraft.value)
+		editingPaidId.value = null
+	} catch (e) {
+		error.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Zahldatum konnte nicht geändert werden')
 	}
 }
 
