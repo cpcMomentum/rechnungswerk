@@ -29,6 +29,18 @@ updates:
         update-types:
           - minor
           - patch
+    # nc-app-tooling haengt als Git-Tag drin, nicht als npm-Version. Dependabot
+    # ordnet solche Tags als Zeichenketten: "v1.9.0" steht dann hinter
+    # "v1.11.0", weil die 9 groesser ist als die 1. Ergebnis war PR #261 am
+    # 17.08.2026 — ein Downgrade von v1.11.0 auf v1.9.0, als waere das ein
+    # Update. Das wiederholt sich mit jedem Tag ab v1.10.0.
+    #
+    # Ein Update braucht es hier ohnehin nicht: das Werkzeug wird bewusst
+    # flottenweit im Gleichschritt gehoben (Tag und version im selben Commit,
+    # dann alle fuenf Apps nachziehen). Wer es hier allein hochzoege, braechte
+    # die Flotte auseinander — genau das, wogegen das Repo gebaut ist.
+    ignore:
+      - dependency-name: nc-app-tooling
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
