@@ -44,7 +44,7 @@
 											<span class="rw-legend__item"><PencilOutlineIcon :size="16" class="rw-sicon rw-sicon--draft" /> {{ t('rechnungswerk', 'Entwurf') }}</span>
 											<span class="rw-legend__item"><CloseCircleIcon :size="16" class="rw-sicon rw-sicon--cancelled" /> {{ t('rechnungswerk', 'Storniert') }}</span>
 										</div>
-										<div v-if="datevFeatureActive" class="rw-info-popup__group">
+										<div v-if="datevColumnActive" class="rw-info-popup__group">
 											<span class="rw-legend__label">{{ t('rechnungswerk', 'DATEV-Übergabe') }}</span>
 											<span class="rw-legend__item"><CheckCircleIcon :size="16" class="rw-sicon rw-sicon--datev-confirmed" /> {{ t('rechnungswerk', 'bestätigt') }}</span>
 											<span class="rw-legend__item"><ClockOutlineIcon :size="16" class="rw-sicon rw-sicon--datev-pending" /> {{ t('rechnungswerk', 'gesendet') }}</span>
@@ -69,7 +69,7 @@
 						<td>
 							<span class="rw-status-cell">
 								<component :is="statusIcon(inv.status)" :size="20" :class="['rw-sicon', `rw-sicon--${inv.status}`]" :title="statusLabel(inv.status)" />
-								<component :is="datevIcon(inv.datevStatus)" v-if="datevFeatureActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
+								<component :is="datevIcon(inv.datevStatus)" v-if="datevColumnActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
 							</span>
 						</td>
 						<td>
@@ -169,6 +169,13 @@ const error = ref('')
 // an IMAP host is configured; without it a "pending" status would hang forever.
 // So the DATEV column/legend only make sense when the feature is actually set up.
 const datevFeatureActive = computed(() => !!settingsStore.settings?.imapHost)
+// datevStatus ships with the invoice list, imapHost only after a separate async
+// settings fetch. Gating the DATEV icons on imapHost alone left them missing on
+// a cold load until that fetch resolved (#237). So the column is active as soon
+// as either the feature is set up OR any invoice actually carries a DATEV status
+// — the latter arrives with the list, so the icons no longer flash in late.
+const hasDatevData = computed(() => store.invoices.some(inv => !!inv.datevStatus))
+const datevColumnActive = computed(() => datevFeatureActive.value || hasDatevData.value)
 
 // --- Payment tracking / filtering (#117) --------------------------------
 type PaymentFilter = 'all' | 'open' | 'overdue' | 'paid'
