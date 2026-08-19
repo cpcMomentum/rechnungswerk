@@ -1,10 +1,10 @@
 {
     "hashes": {
-        "CHANGELOG.md": "a310d503cfcdbafa956bf726d7e39a210eb5f8fcb7be3ce147197b55a5a68721bc898a2bed905cf517f11a974c8178454b5ad2a4e9c5c97806f7c528585ab06a",
+        "CHANGELOG.md": "cf84747fac083f8f28acac367a5fbfe5ef3a07ab74a7463343051843b360111fd3971dc86b818cfecb02f81c43148ea2f6b6c1ff95dd3781ca206c2e73848586",
         "README.md": "7fdfebcb92d719ebacb08c94331b69d8d4c97ac79fb31b6a8eb71e1e28374229b8a6e3a0ec1d55d920695653f66be26babdae5651412d787dc5d7b151228c3be",
-        "appinfo\/info.xml": "a89af74d5523a1a0ff072e66b2b5d9038213d8ae2a2e71c698540fe442c6ba5483f3b89e49ae6acf85223da9e00e1df128815442ad9caef1291e85724922ed85",
+        "appinfo\/info.xml": "ac1b0283dca7e900ad2fe5ead99f8f7a383f099d546a0d5bfa9d83d4e117903ff2b805293d34537c88aeab692560a528220e115d48539e3aa645335a13df9864",
         "appinfo\/routes.php": "beb87f2f82006cff8924e09deb5157d2f136bc0ea8ebab30678a2333e26c1f72af210c629f83109831c017d9115c3ee3fe2f1405e40d93c5db58b8a73b78b962",
-        "css\/rechnungswerk-main.css": "42d0c15a026c0a640b3c9ec2b741b0ae81f421d21b49e235c7019c9a7b03a46b657768d5603efc885e80400b1fe2d81e70135c9750d1581a70553fbc0e403c00",
+        "css\/rechnungswerk-main.css": "6f3e4338430e13e4cfcd423aae0a01bb263dbdc1072abdc38c0948806d44224ac8612f06881ece083cf55b9b52267374f56b62a09e6e1b7002119ecec0714e9a",
         "img\/app-dark.svg": "6465cb2822d838ee74dd0a6dfa276635355ffd47e68700f4b283719bd1247c14aa2b86fab6c0d185daafe8046a4a7a8c2e0043b771384f979d3c610fa37ad2fd",
         "img\/app.svg": "ab7969f28c54d24fa8ca5ba784201f899fa2156b03511505141f8dfb56938a0c53747546fab4e3da9ce892941ecfbc0210160fa33ce880128d0d057e532f0ebf",
         "js\/ConflictPicker-xfTmMtHU.chunk.mjs": "2b6a62b543626571117b857b6c2461a3052b47c5f398ec5a1b8a4bd9a211d425ea4bdfde5a0faead289b1ecbaf1c9a0dd7d7aba3eb62dff4906b42f997494127",
@@ -24,12 +24,12 @@
         "js\/createElementId-DhjFt1I9-C3zSrX7C.chunk.mjs": "c2475c14e3fbfd0a2cb9d875555644ced866299205a8dc19183ac231c3b66feab443e47d3a7f7a011b68fd918de604c0456175e34f2de985c8abcc86714ef7ce",
         "js\/mdi-CpchYUUV-BlQjFBKG.chunk.mjs": "fef19c1b88f3d6862af88765f17a1b9d134492bcf34acb8b40e4f5a7a7ae58593e99dc0472bfe29fd1e340651e12455d1e5e0004c16ad424b70e763447e0b7f5",
         "js\/preview-Bef-XMOh.chunk.mjs": "efb200760ab6ef2787e6ba4cd8a7438008fbfafd98a00fdf4e59062949dbc36a5084352ca76458b072079b8f0d4a085963f2a4d91153e0f00dc18ab53e83394f",
-        "js\/rechnungswerk-main.mjs": "3e863188c39c4ad81b0808c37a5d85a9db397f5d9392ffaf2df012ea7c912cfdbb597dc651eefbded1aed565588bf90ab37b6b7717b18bd88ba13a9d961c043f",
+        "js\/rechnungswerk-main.mjs": "f8ef1cf3aa2d7430f05fcaa63a783dc4472fb6b4257dc5c655579b77da007483f976d908a7d6da9ea3faf789951c0dfb18eb9f8af4ca11dcf6be39a636571ea1",
         "js\/rolldown-runtime-B0aSnxlc.chunk.mjs": "8b11c5478dde454b57eb2510bfcdbc08b9ad5e9440e8b0c173fbd267be01248c1a6868d7209cafbdbf2e3f4980e3a8fd2b1e4996ec8ca7c547ac4050587fa7d8",
-        "l10n\/de.js": "2b0b3f19d25ccca856b8ea08e76f5019059813e3c27513533ba2daa68790a6c9240c8f51e3145b1d71e9574a51bb306fd0b8b788b8b8b536d1a9d225901a05c1",
-        "l10n\/de.json": "7ef2b5343557b95396dd79ad33afff4aa2f4e9926a3d2bf3eec15f28e1666bb5088beadb90dec6eed32125b1a677c7e0a9dcd14ee051155fab8210f2fa31ea0e",
-        "l10n\/en.js": "6bd2656c372f6c1ed5371bc2cc5f4f298734effe5e0abcaf534f2dc9646f5e60f45d580d1f27d94f6076516df273fe3b9c58c94b0c9f8961e553d40289909e56",
-        "l10n\/en.json": "cd0dde9bb5b74bd8d98b3f0c9bc99ca47d4a861b2b13c21d60370bc35ca9926afa8986311b3f3e61abe136a7c5a2bd8b970de4a65c9e08bebbd25f35bc57d12c",
+        "l10n\/de.js": "9de975157a8e49a081bda400746ad0b4f9aa15a3509c5ca21542d61f4710729aee88a3468a1743a47e40061612c96818ca4ddd4d560f0f73768d8f5532ec1b5d",
+        "l10n\/de.json": "ccb749d9c8573fd4b1c8d3b43000ce908e051460ae3c8e9a6e7eb7203812101b358b47be0713b0f5e15eca1069d7ef84cfe9cbb28945d34f7c3d50c64fcc31d9",
+        "l10n\/en.js": "e6c6d6a6902ca27038804d637e6a03e96e65c4c62562414e5822e6d5e990eeef6823c2263fe1addb348262efde8964e03b5816f74676cea125b2c1facf3f4769",
+        "l10n\/en.json": "74d41852e71a150dc992437574bb4a9eb2a93762b4db0d439584a0f4af0c3605aff43de8d0974f0015134cbd75bb77e9b653cc0fcac6f0ac2dee1699d4b63084",
         "lib\/AppInfo\/Application.php": "6500268ab4d8d87384ee6435e886d971692bf7eae8f82841b32582019e90c2b3bf226c78385661f9203e1e2686880e860d6c2295e28605efa2c4b6c172b7c30c",
         "lib\/BackgroundJob\/DatevConfirmationJob.php": "cd30d65c6bac27e1cba12d319af388899863f7900e156a7107f5d55b0775059787288f84d63ac9f65cd2842ee279e166aeb9f568d9b5d48ac1249ca031bac5cf",
         "lib\/BackgroundJob\/DocumentBackfillJob.php": "b44c790938ae5b3a4a2e8dd786e5fe47df0b9ad78b7394f594062ad3d42fad318a5e5339b6451a67cd27693d848686e68984fd2552be21685b4b1efe9a774227",
@@ -2814,6 +2814,6 @@
         "vendor\/thecodingmachine\/safe\/lib\/special_cases.php": "4a2ce25c3bf03ce9785c1071178905e07b5a3ad1b50481102d5f4ea15c9a91253e85ca08adb230cc297daad4797c9c3eb6bb15a0df97d58e16b5b6d547bef020",
         "vendor\/thecodingmachine\/safe\/rector-migrate.php": "849f528746ded11cfb3dd370580474c10da3c268cc118790617f0941328b8d33bfecc3e674f8de532893affa74b53601b16c93c3de67a663988623f26d4c93f9"
     },
-    "signature": "va0uhwJzq2P4zvaHVB3fWQKju55E+j+yHBvI8LaVS6t\/2upAwBC+DiqTpqW6Fcu7Z6JXJf+ViAfqh+Vdvh74Ek\/gmy\/CQaQHdfRqKJC3zeeiSfCYq2knSly6wkmHE55rlE+xYmnhfFLGF2lPbKdhsMUqKo+s6G6mLOI57yX12wL0oAiA3b0OSDiw5PcpQZ3SaxRg58vgbJpMrTPQkXffo8UOW09+pakCD3bzpW+8ltBwbIpO0i07YjhxEcJdcrIguxPFXjTuW52gWRNociNu8ZsNLpZK\/BPZkmd4z28QnEI3az6SLM1NOFMFTyx0v7LT+W0qfL3dH3zqijJ5pTBoLQ==",
+    "signature": "oCDpjZX7kbEBvY+GiRPa74eiBiLiHLlwfdw8ItoOuHNZ\/47rxW7dHI1ZetCGCW5MkpkTBDHstuldtpylT4D\/+Yjupk+uG29Qb7YP6\/1WJgw291v8y\/2qcVTMQ6+lltlNo35yBUdpLaUHxazqRZWURtJvsI4mzvzLUxImsWCAHgzfBLjvf\/nzQDKv8i\/XRG\/X89l4WypvNNn\/kej1EJnzccZYNHWPj0sv\/T\/lBvVhtzUaIr89HfKOJW32QmRrdB1G5jSoUlV6+G5x6qAlkox+R8kwvtMVgwJlEnNQTOb8vOjQnuWXxRrYl26Q5ixMJtrJ80aw6ykLZEd24vrP96ODTg==",
     "certificate": "-----BEGIN CERTIFICATE-----\r\nMIIDCDCCAfACAhNyMA0GCSqGSIb3DQEBCwUAMHsxCzAJBgNVBAYTAkRFMRswGQYD\r\nVQQIDBJCYWRlbi1XdWVydHRlbWJlcmcxFzAVBgNVBAoMDk5leHRjbG91ZCBHbWJI\r\nMTYwNAYDVQQDDC1OZXh0Y2xvdWQgQ29kZSBTaWduaW5nIEludGVybWVkaWF0ZSBB\r\ndXRob3JpdHkwHhcNMjYwNjIyMDcyMDE5WhcNMzYwOTI3MDcyMDE5WjAYMRYwFAYD\r\nVQQDDA1yZWNobnVuZ3N3ZXJrMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC\r\nAQEAxwoS75lgcuMhZyoEXdTSGHtBaDVUXobuzzXLGIysuquaVwnAwdK+PJTqrPQh\r\nUymsvwBOGiZNLhWL+b7YhvdAhmKdVSxX4X6IhnerumFnie+df8oqTO5+EhpRKAPr\r\nB2uJngJDZI9iLzq752SDymW48EQRNotrNJzAIuOv6S+JjGQl6zF2AGqArPWtLg5b\r\nqqL4hl4o8deNIDQYlc+jky9nDcAAze2U0bB8SQvLCl+kupThBG0FpWujgIeibiWU\r\n1cR7M+YLOT8GDX021ixo6421BndkNqHKMCxZ+F6dDHa3aGq0qaH9AFyeVS8vkH84\r\neKkGfPEwZc4l\/t5tiQ3rwYE7jwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBfbkus\r\nKxEo6U+jlkymaBgpz35CycwCNmTWwuuLGU287vzbKcaU9iBWSc+qFd8BtGXrE0kc\r\naQzX0quIryB+IQ42hIVYuSqTQ9HTlXT95o\/bX9uKxSx0YDI6jkqt5HnTwVycLGWc\r\nVu741ETcaRn7zqRWrFk3L0RsgWC7gtq\/W6yCQaj1iJYk47Di+b5qUCcIWcMbUNyR\r\nstIdzJf6O2PQXQF8TDkv7xbQGCRizMVpnhSvGpCA\/Pwr7XwN\/XlNJPbzMt0T+DSA\r\ngXnVu454raanP0asyRTBHZY\/QrYleHT6JFvOZjxIXSku+ZHLFrDfaMAlKaoWGlD0\r\n318qOb\/IOCBSOiBa\r\n-----END CERTIFICATE-----"
 }
