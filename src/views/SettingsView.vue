@@ -2,7 +2,9 @@
 	<div class="rw-view">
 		<h2 class="rw-settings-title">{{ t('rechnungswerk', 'Einstellungen') }}</h2>
 
-		<NcNoteCard v-if="error" type="error" :text="error" />
+		<div ref="errorAnchor">
+			<NcNoteCard v-if="error" type="error" :text="error" />
+		</div>
 
 		<div v-if="form" class="settings-form">
 			<!-- Firma -->
@@ -455,7 +457,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 // FilePicker statt des seit NC 30 veralteten OC.dialogs (#221). Das Stylesheet
@@ -492,6 +494,20 @@ function goToSnippets() {
 const archiveFolderPath = ref<string | null>(null)
 const archiveBusy = ref(false)
 const error = ref('')
+const errorAnchor = ref<HTMLElement | null>(null)
+
+/**
+ * Show an error and scroll it into view. The form is long and the note card
+ * sits at the very top, so a failure triggered while scrolled to the bottom
+ * (e.g. at the save button) would otherwise be invisible — the save then looks
+ * like it silently did nothing (#265).
+ */
+async function showError(message: string): Promise<void> {
+	error.value = message
+	await nextTick()
+	errorAnchor.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
 const confirmSmallBusiness = ref(false)
 const confirmDatevAutoSend = ref(false)
 const confirmArchive = ref(false)
@@ -915,20 +931,36 @@ async function onSave() {
 	// in the format, otherwise numbers repeat every Jan 1.
 	const fmt = (form.value.numberFormat || '').trim()
 	if (form.value.numberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(fmt)) {
-		error.value = t('rechnungswerk', 'Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.')
+		showError(t('rechnungswerk', 'Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.'))
 		return
 	}
 	// Same rule for the independent quote number circle (#111).
 	const quoteFmt = (form.value.quoteNumberFormat || '').trim()
 	if (form.value.quoteNumberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(quoteFmt)) {
-		error.value = t('rechnungswerk', 'Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.')
+		showError(t('rechnungswerk', 'Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.'))
 		return
 	}
 	// Mirror the server rule: the file-name scheme needs {nummer} for uniqueness.
 	const fileFmt = (form.value.fileNameFormat || '').trim()
 	if (fileFmt !== '' && !fileFmt.includes('{nummer}')) {
-		error.value = t('rechnungswerk', 'Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.')
+		showError(t('rechnungswerk', 'Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben.'))
 		return
+	}
+	// Validate the e-mail fields client-side and name the culprit: the server
+	// rejects the WHOLE settings save on a single invalid address, so without
+	// this the user only sees a generic "invalid e-mail" for one of three fields
+	// (#265). Same loose shape the browser's type="email" accepts.
+	const emailFields: { value: string | null | undefined, label: string }[] = [
+		{ value: form.value.contactEmail, label: t('rechnungswerk', 'Kontakt-E-Mail') },
+		{ value: form.value.smtpFromEmail, label: t('rechnungswerk', 'Absender-E-Mail') },
+		{ value: form.value.datevUploadMail, label: t('rechnungswerk', 'DATEV-Upload-Mail') },
+	]
+	for (const { value, label } of emailFields) {
+		const mail = (value || '').trim()
+		if (mail !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+			showError(t('rechnungswerk', 'Bitte eine gültige E-Mail-Adresse angeben ({field}).', { field: label }))
+			return
+		}
 	}
 	savingPerms.value = true
 	try {
@@ -996,7 +1028,7 @@ async function onTestSmtp() {
 }
 
 function fail(e: unknown, fallback: string) {
-	error.value = (e as { message?: string }).message ?? fallback
+	showError((e as { message?: string }).message ?? fallback)
 	console.error('[rechnungswerk] settings:', e)
 }
 </script>

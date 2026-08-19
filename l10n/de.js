@@ -439,6 +439,7 @@ OC.L10N.register(
     "Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein." : "Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein.",
     "Der SMTP-Port muss zwischen 1 und 65535 liegen." : "Der SMTP-Port muss zwischen 1 und 65535 liegen.",
     "Bitte eine gültige E-Mail-Adresse angeben." : "Bitte eine gültige E-Mail-Adresse angeben.",
+    "Bitte eine gültige E-Mail-Adresse angeben ({field})." : "Bitte eine gültige E-Mail-Adresse angeben ({field}).",
     "Ungültiger Dokumenttyp." : "Ungültiger Dokumenttyp.",
     "Ungültiger Textbereich." : "Ungültiger Textbereich.",
     "Die Telefonnummer darf höchstens 64 Zeichen lang sein." : "Die Telefonnummer darf höchstens 64 Zeichen lang sein.",
