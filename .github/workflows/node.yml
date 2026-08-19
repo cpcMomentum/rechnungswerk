@@ -32,12 +32,17 @@ jobs:
           node-version: '24'
 
       - name: Abhaengigkeiten installieren
-        # npm/cli#4828: ein auf anderem OS erzeugter Lock laesst das plattform-
-        # spezifische rollup-Binary fehlen. Lock entfernen erzwingt frische,
-        # plattform-korrekte Aufloesung auf dem Linux-Runner.
-        run: |
-          rm -f package-lock.json
-          npm install --no-audit --no-fund
+        # `npm ci` statt `npm install`, und das Lockfile bleibt liegen. Bis zum
+        # 15.08.2026 stand hier `rm -f package-lock.json` mit Verweis auf
+        # npm/cli#4828 (fehlendes rollup-Binary). Der Fehler, der tatsaechlich
+        # auftrat, war ein anderer: npm 10 meldet auf einem synchronen Lock
+        # faelschlich "Missing: pinia@3.0.4". Mit npm 11 -- das mit Node 24
+        # kommt -- laeuft `npm ci` durch.
+        #
+        # Das ist die Voraussetzung fuer den Frische-Schritt weiter unten:
+        # ohne gepinnte Installation weicht der CI-Build vom lokalen ab und der
+        # Vergleich meldet immer (nc-app-tooling#1).
+        run: npm ci
 
       # Bis 08.08.2026 hiess dieser Job "lint-and-build", ohne je zu linten
       # (#210): das Paket war deklariert, aber es gab keine Konfiguration, kein
@@ -61,3 +66,32 @@ jobs:
 
       - name: Produktions-Build
         run: npm run build
+
+      # Der eigentliche Frische-Test: passt das eingecheckte Bundle zu den
+      # Quellen? Der Schritt darueber hat gerade neu gebaut -- weicht js/ oder
+      # css/ jetzt vom Commit ab, wurde beim Aendern der Quellen der Build
+      # vergessen. Genau so blieb bei contractmanager#327 eine verwundbare
+      # dompurify-Version im ausgelieferten Bundle stehen.
+      #
+      # Gemessen statt geraten. Der Vorgaenger (nc-bundle-check) schloss aus
+      # "src/ geaendert, js/ nicht" auf eine Absicht und lag bei reinen Typ- und
+      # Kommentaraenderungen falsch; sein Ausweg [skip bundle-check] hebelte ihn
+      # ganz aus. Beides faellt hiermit weg (nc-app-tooling#1).
+      #
+      # Traegt, weil der Build byte-reproduzierbar ist: alle fuenf Apps bauen
+      # unter Linux mit npm 11 aus dem auf macOS erzeugten Lockfile
+      # byte-identisch (nachgemessen 15.08.2026, Node 20/22/24 einzeln).
+      #
+      # git status statt git diff: der Diff sieht nur getrackte Dateien. Bei
+      # worktime und rechnungswerk tragen die Chunks Content-Hashes im Namen --
+      # ein neu entstandener Chunk kaeme als UNTRACKED daher und rutschte
+      # durch, waehrend die alte Datei unveraendert daneben liegen bleibt.
+      # status --porcelain erfasst geaendert, geloescht und neu.
+      - name: Bundle passt zum Quellstand
+        run: |
+          ABWEICHUNG=$(git status --porcelain -- js/ css/)
+          if [ -n "$ABWEICHUNG" ]; then
+            echo "$ABWEICHUNG"
+            echo "::error::Das eingecheckte Bundle passt nicht zu den Quellen. Bitte 'npm run build' laufen lassen und das Ergebnis mitcommitten."
+            exit 1
+          fi

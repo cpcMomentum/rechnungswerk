@@ -286,6 +286,33 @@
 .app-rechnungswerk .rw-subline--overdue {
 	color: #c0392b;
 }
+/* Paid date (#257): the subline is a button that opens an inline date field. */
+.app-rechnungswerk button.rw-subline--editable {
+	display: inline-block;
+	background: none;
+	border: none;
+	padding: 0;
+	font: inherit;
+	font-size: 0.82em;
+	text-align: right;
+	text-decoration: underline dotted;
+	text-underline-offset: 2px;
+	cursor: pointer;
+}
+.app-rechnungswerk button.rw-subline--editable:hover,
+.app-rechnungswerk button.rw-subline--editable:focus-visible {
+	color: var(--color-main-text);
+}
+.app-rechnungswerk .rw-paid-edit {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 4px;
+	margin-top: 2px;
+}
+.app-rechnungswerk .rw-paid-input {
+	width: 9.5em;
+}
 .app-rechnungswerk .rw-row--overdue td:first-child {
 	box-shadow: inset 3px 0 0 #c0392b;
 }

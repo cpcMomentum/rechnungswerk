@@ -7,6 +7,34 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-08-19
+
+Drei Verbesserungen aus der praktischen Nutzung: ein häufig gewünschter kleiner
+Komfort beim Bezahlt-Markieren, ein Anzeigefehler bei der DATEV-Spalte und — am
+wichtigsten — eine Speicher-Falle in den Einstellungen, die beim Einrichten wie
+Datenverlust wirken konnte.
+
+### Added
+- **Das Zahldatum lässt sich nachträglich anpassen.** Der Klick auf die
+  Bezahlt-Checkbox setzt weiterhin sofort das heutige Datum. Neu: Die Anzeige
+  „bezahlt am {Datum}" in der Rechnungsliste ist jetzt anklickbar und öffnet ein
+  kleines Datumsfeld, vorbelegt mit dem gesetzten Datum — so lässt sich eine
+  Zahlung, die an einem anderen Tag einging, ohne Umweg korrigieren (#257)
+
+### Fixed
+- **Die DATEV-Spalte erscheint jetzt sofort beim Öffnen der Rechnungsliste.**
+  Bisher war sie an die asynchron nachgeladenen Einstellungen gebunden und
+  fehlte beim Kaltstart, bis dieser Fetch durch war. Jetzt hängt die Anzeige an
+  den mit der Liste gelieferten DATEV-Status, sodass die Icons zeitgleich mit
+  den Rechnungen erscheinen (#237)
+- **Speicherfehler in den Einstellungen sind nicht mehr unsichtbar.** Der Server
+  lehnt beim Speichern die gesamte Anfrage ab, wenn ein einziges Feld ungültig
+  ist (z. B. eine unvollständige E-Mail-Adresse). Die Fehlermeldung stand oben,
+  der Speichern-Button unten — wer unten klickte, sah nichts und hielt das
+  Speichern für erfolgt. Jetzt scrollt jede Fehlermeldung in den sichtbaren
+  Bereich, und die drei E-Mail-Felder werden schon vor dem Absenden geprüft und
+  namentlich benannt (#265)
+
 ## [0.5.0] - 2026-08-14
 
 Ein Release für alle, die die App auf Englisch bedienen: Fehlermeldungen kamen
@@ -416,7 +444,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.3.1...v0.4.0

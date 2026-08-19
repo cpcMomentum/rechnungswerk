@@ -44,7 +44,7 @@
 											<span class="rw-legend__item"><PencilOutlineIcon :size="16" class="rw-sicon rw-sicon--draft" /> {{ t('rechnungswerk', 'Entwurf') }}</span>
 											<span class="rw-legend__item"><CloseCircleIcon :size="16" class="rw-sicon rw-sicon--cancelled" /> {{ t('rechnungswerk', 'Storniert') }}</span>
 										</div>
-										<div v-if="datevFeatureActive" class="rw-info-popup__group">
+										<div v-if="datevColumnActive" class="rw-info-popup__group">
 											<span class="rw-legend__label">{{ t('rechnungswerk', 'DATEV-Übergabe') }}</span>
 											<span class="rw-legend__item"><CheckCircleIcon :size="16" class="rw-sicon rw-sicon--datev-confirmed" /> {{ t('rechnungswerk', 'bestätigt') }}</span>
 											<span class="rw-legend__item"><ClockOutlineIcon :size="16" class="rw-sicon rw-sicon--datev-pending" /> {{ t('rechnungswerk', 'gesendet') }}</span>
@@ -69,7 +69,7 @@
 						<td>
 							<span class="rw-status-cell">
 								<component :is="statusIcon(inv.status)" :size="20" :class="['rw-sicon', `rw-sicon--${inv.status}`]" :title="statusLabel(inv.status)" />
-								<component :is="datevIcon(inv.datevStatus)" v-if="datevFeatureActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
+								<component :is="datevIcon(inv.datevStatus)" v-if="datevColumnActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
 							</span>
 						</td>
 						<td>
@@ -80,7 +80,22 @@
 						<td>{{ formatDate(inv.issueDate ?? inv.createdAt) }}</td>
 						<td class="num">
 							<span :class="amountClass(inv)">{{ formatCents(inv.totalCents) }}</span>
-							<div v-if="paymentSubline(inv)" :class="['rw-subline', { 'rw-subline--overdue': inv.paymentStatus === 'overdue' }]">{{ paymentSubline(inv) }}</div>
+							<div v-if="editingPaidId === inv.id" class="rw-paid-edit" @click.stop>
+								<input v-model="paidDraft" type="date" class="rw-input rw-paid-input"
+									:aria-label="t('rechnungswerk', 'Zahldatum')"
+									@keyup.enter="savePaidDate(inv)" @keyup.esc="cancelPaidEdit">
+								<NcButton variant="primary" :aria-label="t('rechnungswerk', 'Zahldatum speichern')"
+									:title="t('rechnungswerk', 'Zahldatum speichern')" @click.stop="savePaidDate(inv)">
+									<template #icon><CheckIcon :size="18" /></template>
+								</NcButton>
+								<NcButton variant="tertiary" :aria-label="t('rechnungswerk', 'Abbrechen')"
+									:title="t('rechnungswerk', 'Abbrechen')" @click.stop="cancelPaidEdit">
+									<template #icon><CloseIcon :size="18" /></template>
+								</NcButton>
+							</div>
+							<button v-else-if="inv.paymentStatus === 'paid'" type="button" class="rw-subline rw-subline--editable"
+								:title="t('rechnungswerk', 'Zahldatum ändern')" @click.stop="startPaidEdit(inv)">{{ paymentSubline(inv) }}</button>
+							<div v-else-if="paymentSubline(inv)" :class="['rw-subline', { 'rw-subline--overdue': inv.paymentStatus === 'overdue' }]">{{ paymentSubline(inv) }}</div>
 						</td>
 						<td class="rw-col-paid">
 							<button v-if="inv.paymentStatus"
@@ -137,6 +152,8 @@ import ClockOutlineIcon from 'vue-material-design-icons/ClockOutline.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import CheckboxBlankOutlineIcon from 'vue-material-design-icons/CheckboxBlankOutline.vue'
 import CheckboxMarkedIcon from 'vue-material-design-icons/CheckboxMarked.vue'
+import CheckIcon from 'vue-material-design-icons/Check.vue'
+import CloseIcon from 'vue-material-design-icons/Close.vue'
 import { useInvoiceStore } from '@/stores/invoiceStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { downloadInvoicePdf } from '@/api/invoices'
@@ -152,6 +169,13 @@ const error = ref('')
 // an IMAP host is configured; without it a "pending" status would hang forever.
 // So the DATEV column/legend only make sense when the feature is actually set up.
 const datevFeatureActive = computed(() => !!settingsStore.settings?.imapHost)
+// datevStatus ships with the invoice list, imapHost only after a separate async
+// settings fetch. Gating the DATEV icons on imapHost alone left them missing on
+// a cold load until that fetch resolved (#237). So the column is active as soon
+// as either the feature is set up OR any invoice actually carries a DATEV status
+// — the latter arrives with the list, so the icons no longer flash in late.
+const hasDatevData = computed(() => store.invoices.some(inv => !!inv.datevStatus))
+const datevColumnActive = computed(() => datevFeatureActive.value || hasDatevData.value)
 
 // --- Payment tracking / filtering (#117) --------------------------------
 type PaymentFilter = 'all' | 'open' | 'overdue' | 'paid'
@@ -267,6 +291,44 @@ async function togglePaid(inv: Invoice) {
 		}
 	} catch (e) {
 		error.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Zahlungsstatus konnte nicht geändert werden')
+	}
+}
+
+// Inline correction of the payment date (#257). The checkbox keeps setting today
+// on one click; clicking the "bezahlt am {date}" line opens a date field prefilled
+// with the current payment date. Format is Y-m-d — exactly what the backend's
+// parseDate() expects and what a native date input yields.
+const editingPaidId = ref<number | null>(null)
+const paidDraft = ref('')
+
+function toDateInput(iso: string | null): string {
+	const d = iso ? parseLocalDate(iso) : new Date()
+	const month = String(d.getMonth() + 1).padStart(2, '0')
+	const day = String(d.getDate()).padStart(2, '0')
+	return `${d.getFullYear()}-${month}-${day}`
+}
+
+function startPaidEdit(inv: Invoice) {
+	error.value = ''
+	paidDraft.value = toDateInput(inv.paidAt)
+	editingPaidId.value = inv.id
+}
+
+function cancelPaidEdit() {
+	editingPaidId.value = null
+}
+
+async function savePaidDate(inv: Invoice) {
+	if (!paidDraft.value) {
+		cancelPaidEdit()
+		return
+	}
+	error.value = ''
+	try {
+		await store.markPaid(inv.id, paidDraft.value)
+		editingPaidId.value = null
+	} catch (e) {
+		error.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Zahldatum konnte nicht geändert werden')
 	}
 }
 
