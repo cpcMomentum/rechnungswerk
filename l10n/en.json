@@ -438,6 +438,7 @@
         "Die Akzentfarbe muss ein Hex-Farbwert wie #1a2b3c sein.": "The accent colour must be a hex colour value such as #1a2b3c.",
         "Der SMTP-Port muss zwischen 1 und 65535 liegen.": "The SMTP port must be between 1 and 65535.",
         "Bitte eine gültige E-Mail-Adresse angeben.": "Please enter a valid email address.",
+        "Bitte eine gültige E-Mail-Adresse angeben ({field}).": "Please enter a valid email address ({field}).",
         "Ungültiger Dokumenttyp.": "Invalid document type.",
         "Ungültiger Textbereich.": "Invalid text slot.",
         "Die Telefonnummer darf höchstens 64 Zeichen lang sein.": "The phone number must not exceed 64 characters.",
