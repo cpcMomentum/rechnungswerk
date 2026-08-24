@@ -20,6 +20,9 @@
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }">
 					<template #icon><FileDocumentIcon :size="20" /></template>
 				</NcAppNavigationItem>
+				<NcAppNavigationItem :name="t('rechnungswerk', 'Beitragsabrechnung')" :to="{ name: 'membership-fees' }">
+					<template #icon><FileDocumentIcon :size="20" /></template>
+				</NcAppNavigationItem>
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Angebote')" :to="{ name: 'quotes' }">
 					<template #icon><FileDocumentOutlineIcon :size="20" /></template>
 				</NcAppNavigationItem>
