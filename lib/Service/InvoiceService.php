@@ -197,75 +197,218 @@ class InvoiceService {
 	}
 
 	/**
-	 * Festschreibung: assign the final sequential number and lock the invoice.
+	 * Normale Festschreibung.
+	 *
+	 * Das Rechnungsdatum entspricht dem Zeitpunkt der Festschreibung.
+	 */
+	public function commit(int $id): array {
+		return $this->commitInternal(
+			$id,
+			null,
+			null
+		);
+	}
+
+	/**
+	 * Festschreibung mit einem ausdrücklich vorgegebenen
+	 * Rechnungs- und optionalen Fälligkeitsdatum.
+	 *
+	 * Dieser Weg wird unter anderem für Beitragsrechnungen verwendet.
+	 *
+	 * Der Zeitpunkt der tatsächlichen Festschreibung bleibt davon getrennt
+	 * und wird weiterhin in committedAt gespeichert.
 	 *
 	 * @return array<string, mixed>
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 * @throws ValidationException
 	 */
-	public function commit(int $id): array {
-		$invoice = $this->assertInvoiceType($this->findById($id));
+	public function commitWithDates(
+		int $id,
+		DateTime $issueDate,
+		?DateTime $dueDate = null,
+	): array {
+		$issueDate = clone $issueDate;
+		$issueDate->setTime(0, 0, 0);
+
+		if ($dueDate !== null) {
+			$dueDate = clone $dueDate;
+			$dueDate->setTime(0, 0, 0);
+
+			if ($dueDate < $issueDate) {
+				throw new ValidationException(
+					$this->l10n->t(
+						'Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.'
+					)
+				);
+			}
+		}
+
+		return $this->commitInternal(
+			$id,
+			$issueDate,
+			$dueDate
+		);
+	}
+
+	/**
+	 * Gemeinsame Festschreibungslogik.
+	 *
+	 * Wenn kein Rechnungsdatum vorgegeben wurde, verhält sich die Methode
+	 * exakt wie die bisherige normale Festschreibung.
+	 *
+	 * @return array<string, mixed>
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 * @throws ValidationException
+	 */
+	private function commitInternal(
+		int $id,
+		?DateTime $requestedIssueDate,
+		?DateTime $requestedDueDate,
+	): array {
+		$invoice = $this->assertInvoiceType(
+			$this->findById($id)
+	);
+
+	$this->assertDraft($invoice);
+
+	$items = $this->itemMapper->findByInvoice(
+		(int)$invoice->getId()
+	);
+
+	if (count($items) === 0) {
+		throw new ValidationException(
+			$this->l10n->t(
+				'Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.'
+			)
+		);
+	}
+
+	if (($invoice->getRecipientName() ?? '') === '') {
+		throw new ValidationException(
+			$this->l10n->t(
+				'Ein Empfänger ist zum Festschreiben erforderlich.'
+			)
+		);
+	}
+
+	/*
+	 * Settings vor der Transaktion sicherstellen.
+	 */
+	$this->settingsService->getCompany();
+
+	/*
+	 * Wichtig:
+	 *
+	 * committedAt = tatsächlicher Zeitpunkt der Festschreibung
+	 *
+	 * issueDate = fachliches Rechnungsdatum
+	 */
+	$committedAt = new DateTime();
+
+	$issueDate = $requestedIssueDate !== null
+		? clone $requestedIssueDate
+		: clone $committedAt;
+
+	if ($requestedIssueDate !== null) {
+		$issueDate->setTime(0, 0, 0);
+	}
+
+	$dueDate = null;
+
+	if ($requestedDueDate !== null) {
+		$dueDate = clone $requestedDueDate;
+		$dueDate->setTime(0, 0, 0);
+	} elseif ($invoice->getPaymentTermDays() !== null) {
+		$dueDate = clone $issueDate;
+
+		$dueDate->modify(
+			'+' . (int)$invoice->getPaymentTermDays() . ' days'
+		);
+
+		$dueDate->setTime(0, 0, 0);
+	}
+
+	if (
+		$dueDate !== null
+		&& $dueDate < $issueDate
+	) {
+		throw new ValidationException(
+			$this->l10n->t(
+				'Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.'
+			)
+		);
+	}
+
+	$this->db->beginTransaction();
+
+	try {
+		/*
+		 * Datensatz unter Row-Lock erneut lesen.
+		 *
+		 * Dadurch bleibt der bisherige Schutz vor parallelen
+		 * Festschreibungen erhalten.
+		 */
+		$invoice = $this->findByIdForUpdate($id);
+
 		$this->assertDraft($invoice);
 
-		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
-		if (count($items) === 0) {
-			throw new ValidationException($this->l10n->t('Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.'));
-		}
-		if (($invoice->getRecipientName() ?? '') === '') {
-			throw new ValidationException($this->l10n->t('Ein Empfänger ist zum Festschreiben erforderlich.'));
-		}
+		/*
+		 * Der Nummernkreis orientiert sich am tatsächlichen
+		 * Rechnungsdatum.
+		 *
+		 * Das ist insbesondere bei jahresbezogenen Nummernkreisen
+		 * wichtig.
+		 */
+		$number = $this
+			->settingsService
+			->reserveNextNumber($issueDate);
 
-		// Create the settings row outside the transaction: a failed INSERT would
-		// otherwise abort the commit transaction on PostgreSQL.
-		$this->settingsService->getCompany();
+		$invoice->setNumber($number);
+		$invoice->setStatus(
+			Invoice::STATUS_COMMITTED
+		);
 
-		$now = new DateTime();
+		$invoice->setIssueDate($issueDate);
+		$invoice->setDueDate($dueDate);
 
-		$this->db->beginTransaction();
-		try {
-			// Re-read under a row lock and re-check the status inside the
-			// transaction. Two concurrent commits on the same draft would
-			// otherwise both pass the pre-check and each reserve a number,
-			// leaving a gap in the sequence (GoBD violation).
-			$invoice = $this->findByIdForUpdate($id);
-			$this->assertDraft($invoice);
+		/*
+		 * Tatsächlicher Festschreibungszeitpunkt.
+		 *
+		 * Dieser darf NICHT auf das Rechnungsdatum zurückdatiert
+		 * werden.
+		 */
+		$invoice->setCommittedAt($committedAt);
+		$invoice->setUpdatedAt($committedAt);
 
-			$number = $this->settingsService->reserveNextNumber($now);
-			$invoice->setNumber($number);
-			$invoice->setStatus(Invoice::STATUS_COMMITTED);
-			$invoice->setIssueDate($now);
-			if ($invoice->getPaymentTermDays() !== null) {
-				$due = (clone $now);
-				$due->modify('+' . (int)$invoice->getPaymentTermDays() . ' days');
-				$due->setTime(0, 0, 0);
-				$invoice->setDueDate($due);
-			}
-			$invoice->setCommittedAt($now);
-			$invoice->setUpdatedAt($now);
-			$this->recomputeTotals($invoice);
-			$this->invoiceMapper->update($invoice);
-			$this->db->commit();
+		$this->recomputeTotals($invoice);
+
+		$this->invoiceMapper->update($invoice);
+
+		$this->db->commit();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
 			throw $e;
 		}
 
-		// Fire-and-forget DATEV hand-off AFTER the invoice is committed: the
-		// invoice is already legally finalised, so a mail failure must never
-		// roll it back — it is only logged. The result is surfaced to the UI.
-		// Beleg einfrieren, BEVOR er irgendwohin geht (#181, Schritt 2). Ab hier
-		// wird er nur noch gelesen, nie neu erzeugt: DATEV, Kundenversand,
-		// Download und Ablage bekommen damit garantiert dieselbe Datei.
-		//
-		// Ausserhalb der Transaktion, weil ein Dateisystem-Schreibvorgang sich
-		// nicht zurueckrollen laesst — und weil die Rechnungsnummer erst in der
-		// Transaktion entsteht, vorher gaebe es gar nichts zu rendern.
+		/*
+		* Ab hier bleibt das bestehende RechnungsWerk-Verhalten erhalten:
+		*
+		* - PDF einfrieren
+		* - DATEV-Automatik
+		* - Archivierung
+		*/
 		$this->freezeDocument($invoice);
 
 		$result = $this->present($invoice);
-		$result['datevMailSent'] = $this->maybeSendToDatev($invoice);
-		$result['archived'] = $this->maybeArchive($invoice);
+
+		$result['datevMailSent'] =
+			$this->maybeSendToDatev($invoice);
+
+		$result['archived'] =
+			$this->maybeArchive($invoice);
+
 		return $result;
 	}
 
