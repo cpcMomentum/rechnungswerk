@@ -3128,7 +3128,7 @@ var yo = () => ho("/permission-info"), bo = () => ho("/permissions"), xo = (e) =
 			});
 		};
 	}
-}), [["__scopeId", "data-v-0240eb12"]]), To = {
+}), [["__scopeId", "data-v-9de912de"]]), To = {
 	name: "InformationOutlineIcon",
 	emits: ["click"],
 	props: {
@@ -3181,7 +3181,7 @@ var jo = /*#__PURE__*/ Q(To, [["render", Ao]]), Mo = { class: "info-icon-wrapper
 			_: 3
 		})]));
 	}
-}), [["__scopeId", "data-v-04f73240"]]), Fo = {
+}), [["__scopeId", "data-v-6c57a620"]]), Fo = {
 	name: "PlusIcon",
 	emits: ["click"],
 	props: {
@@ -4354,7 +4354,7 @@ var _u = /*#__PURE__*/ Q(du, [["render", gu]]), vu = (e) => ho(`/contacts/search
 			onMousedown: M((t) => c(e), ["prevent"])
 		}, [z("strong", null, n(e.name), 1), e.email ? (p(), q("span", wu, n(e.email), 1)) : E("", !0)], 40, Cu))), 128))])) : E("", !0)]));
 	}
-}), [["__scopeId", "data-v-090ca623"]]), Eu = null, Du = () => (Eu === null && (Eu = ho("/countries").catch((e) => {
+}), [["__scopeId", "data-v-23f7f625"]]), Eu = null, Du = () => (Eu === null && (Eu = ho("/countries").catch((e) => {
 	throw Eu = null, e;
 })), Eu), Ou = ["disabled", "title"], ku = ["value"], Au = ["value"], ju = /* @__PURE__ */ r({
 	__name: "CountrySelect",
@@ -4481,7 +4481,7 @@ var _u = /*#__PURE__*/ Q(du, [["render", gu]]), vu = (e) => ho(`/contacts/search
 			e.vatId
 		].filter(Boolean).join(" · ")), 1)], 40, Bu))), 128))])) : E("", !0)]));
 	}
-}), [["__scopeId", "data-v-07c58316"]]);
+}), [["__scopeId", "data-v-4ad9c538"]]);
 //#endregion
 //#region src/types/editor.ts
 function Uu(e = 1900) {
@@ -4725,7 +4725,7 @@ var Ju = { class: "rw-table-wrap" }, Yu = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["menuName"])) : E("", !0)]))]));
 	}
-}), [["__scopeId", "data-v-040baef2"]]), wd = { class: "confirm-dialog" }, Td = { class: "confirm-dialog__message" }, Ed = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-04862899"]]), wd = { class: "confirm-dialog" }, Td = { class: "confirm-dialog__message" }, Ed = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ConfirmDialog",
 	props: {
 		open: { type: Boolean },
@@ -4763,7 +4763,7 @@ var Ju = { class: "rw-table-wrap" }, Yu = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["open", "name"]));
 	}
-}), [["__scopeId", "data-v-5cb119d3"]]);
+}), [["__scopeId", "data-v-54981555"]]);
 //#endregion
 //#region src/utils/modalEsc.ts
 function Dd(e, t) {
@@ -4841,7 +4841,7 @@ var Od = { class: "send-modal" }, kd = { class: "send-modal__hint" }, Ad = { cla
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-ccb30ce0"]]), Fd = () => ho("/quotes"), Id = (e) => ho(`/quotes/${e}`), Ld = (e) => $("/quotes", { data: e }), Rd = (e, t) => go(`/quotes/${e}`, { data: t }), zd = (e) => vo(`/quotes/${e}`), Bd = (e) => $(`/quotes/${e}/commit`, {}), Vd = (e) => $(`/quotes/${e}/accept`, {}), Hd = (e) => $(`/quotes/${e}/reject`, {}), Ud = (e) => $(`/quotes/${e}/convert`, {}), Wd = (e) => $(`/quotes/${e}/revise`, {}), Gd = (e) => po(`/quotes/${e}/pdf`), Kd = (e) => po(`/quotes/${e}/preview`) + "?t=" + Date.now(), qd = (e) => {
+}), [["__scopeId", "data-v-2f5a808a"]]), Fd = () => ho("/quotes"), Id = (e) => ho(`/quotes/${e}`), Ld = (e) => $("/quotes", { data: e }), Rd = (e, t) => go(`/quotes/${e}`, { data: t }), zd = (e) => vo(`/quotes/${e}`), Bd = (e) => $(`/quotes/${e}/commit`, {}), Vd = (e) => $(`/quotes/${e}/accept`, {}), Hd = (e) => $(`/quotes/${e}/reject`, {}), Ud = (e) => $(`/quotes/${e}/convert`, {}), Wd = (e) => $(`/quotes/${e}/revise`, {}), Gd = (e) => po(`/quotes/${e}/pdf`), Kd = (e) => po(`/quotes/${e}/preview`) + "?t=" + Date.now(), qd = (e) => {
 	let t = document.createElement("a");
 	t.href = Gd(e), t.download = "", t.rel = "noopener", t.style.display = "none", document.body.appendChild(t), t.click(), t.remove();
 }, Jd = (e, t) => $(`/quotes/${e}/send`, t), Yd = $t("quote", () => {
@@ -5906,7 +5906,7 @@ var sf = $t("textSnippet", () => {
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-7c371e87"]]), cm = { class: "membership-fees" }, lm = { class: "page-header" }, um = { class: "title-row" }, dm = {
+}), [["__scopeId", "data-v-7576b8a3"]]), cm = { class: "membership-fees" }, lm = { class: "page-header" }, um = { class: "title-row" }, dm = {
 	key: 1,
 	class: "status-badge status-badge--new"
 }, fm = {
@@ -6427,7 +6427,7 @@ Fortfahren?`)) {
 				disabled: T.value,
 				onClick: R
 			}, {
-				default: F(() => [A(n(y.value ? "Speichert …" : "Speichern"), 1)]),
+				default: F(() => [A(n(y.value ? "Speichert\xA0…" : "Speichern"), 1)]),
 				_: 1
 			}, 8, ["disabled"]), J(Y(X), {
 				variant: "secondary",
@@ -6490,13 +6490,13 @@ Fortfahren?`)) {
 					disabled: T.value || !ne.value,
 					onClick: V
 				}, {
-					default: F(() => [A(n(b.value ? "Erstellt …" : "Beitragsrechnungen erstellen"), 1)]),
+					default: F(() => [A(n(b.value ? "Erstellt\xA0…" : "Beitragsrechnungen erstellen"), 1)]),
 					_: 1
 				}, 8, ["disabled"])])) : te.value ? (p(), q("div", Eh, [z("strong", null, " Beitragslauf " + n(r.value) + " wurde bereits gestartet. ", 1), t[49] ||= z("span", null, " Die Beitragskonfiguration ist deshalb gesperrt. ", -1)])) : E("", !0)
 			], 64)) : (p(), q("div", Dh, " Noch keine Vorschau geladen. "))])
 		], 64))]));
 	}
-}), [["__scopeId", "data-v-b1e7d0df"]]), kh = {
+}), [["__scopeId", "data-v-a3d9d7c6"]]), kh = {
 	name: "AlertCircleOutlineIcon",
 	emits: ["click"],
 	props: {
@@ -6691,7 +6691,7 @@ var Fh = /*#__PURE__*/ Q(kh, [["render", Ph]]), Ih = { class: "rw-view" }, Lh = 
 			], 10, Gh))), 128))])])])])) : E("", !0)
 		]));
 	}
-}), [["__scopeId", "data-v-726ffd4f"]]), Qh = { class: "product-modal" }, $h = { class: "field" }, eg = { class: "field" }, tg = { class: "field-row" }, ng = { class: "field" }, rg = ["value"], ig = { class: "field" }, ag = { class: "field" }, og = ["value"], sg = { class: "field" }, cg = ["placeholder"], lg = { class: "hint" }, ug = { class: "actions" }, dg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-62bdd46f"]]), Qh = { class: "product-modal" }, $h = { class: "field" }, eg = { class: "field" }, tg = { class: "field-row" }, ng = { class: "field" }, rg = ["value"], ig = { class: "field" }, ag = { class: "field" }, og = ["value"], sg = { class: "field" }, cg = ["placeholder"], lg = { class: "hint" }, ug = { class: "actions" }, dg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ProductEditModal",
 	props: {
 		open: { type: Boolean },
@@ -6800,7 +6800,7 @@ var Fh = /*#__PURE__*/ Q(kh, [["render", Ph]]), Ih = { class: "rw-view" }, Lh = 
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-b3908c2c"]]), fg = { class: "rw-view" }, pg = { class: "rw-view__head" }, mg = {
+}), [["__scopeId", "data-v-e77e93c0"]]), fg = { class: "rw-view" }, pg = { class: "rw-view__head" }, mg = {
 	key: 2,
 	class: "rw-table-wrap"
 }, hg = { class: "rw-table" }, gg = { class: "num" }, _g = { class: "num" }, vg = ["onClick"], yg = {
@@ -7077,7 +7077,7 @@ var Rg = /*#__PURE__*/ Q(Mg, [["render", Lg]]), zg = { class: "snippet-modal" },
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-ae47764f"]]), Zg = { class: "rw-view" }, Qg = { class: "rw-view__head" }, $g = { class: "rw-muted rw-intro" }, e_ = {
+}), [["__scopeId", "data-v-b60fbea6"]]), Zg = { class: "rw-view" }, Qg = { class: "rw-view__head" }, $g = { class: "rw-muted rw-intro" }, e_ = {
 	key: 2,
 	class: "rw-snippet-groups"
 }, t_ = { class: "rw-snippet-group__head" }, n_ = { class: "rw-table-wrap" }, r_ = { class: "rw-table" }, i_ = ["onClick"], a_ = {
@@ -7237,7 +7237,7 @@ var Rg = /*#__PURE__*/ Q(Mg, [["render", Lg]]), zg = { class: "snippet-modal" },
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-e218386d"]]), l_ = {
+}), [["__scopeId", "data-v-c438c8e2"]]), l_ = {
 	name: "AccountArrowRightIcon",
 	emits: ["click"],
 	props: {
@@ -7469,7 +7469,7 @@ var h_ = /*#__PURE__*/ Q(l_, [["render", m_]]), g_ = { class: "customer-modal" }
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-6e071637"]]), X_ = { class: "rw-view" }, Z_ = { class: "rw-view__head" }, Q_ = { class: "rw-view__actions" }, $_ = {
+}), [["__scopeId", "data-v-2d237eab"]]), X_ = { class: "rw-view" }, Z_ = { class: "rw-view__head" }, Q_ = { class: "rw-view__actions" }, $_ = {
 	key: 2,
 	class: "rw-table-wrap"
 }, ev = { class: "rw-table" }, tv = ["onClick"], nv = { class: "rw-muted" }, rv = {
@@ -7625,7 +7625,7 @@ var h_ = /*#__PURE__*/ Q(l_, [["render", m_]]), g_ = { class: "customer-modal" }
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-b579e3bc"]]), lv = {
+}), [["__scopeId", "data-v-1eff74a5"]]), lv = {
 	name: "ContentSaveIcon",
 	emits: ["click"],
 	props: {
@@ -7826,7 +7826,10 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 }, Wy = {
 	key: 1,
 	class: "rw-archive-folder__empty"
-}, Gy = { class: "rw-field" }, Ky = ["placeholder"], qy = { class: "rw-hint" }, Jy = { class: "rw-section" }, Yy = { class: "rw-hint" }, Xy = { class: "rw-form-row" }, Zy = { class: "rw-field" }, Qy = { class: "rw-field rw-field--narrow" }, $y = { class: "rw-field rw-field--narrow" }, eb = { value: "none" }, tb = { class: "rw-form-row" }, nb = { class: "rw-field" }, rb = { class: "rw-field" }, ib = ["placeholder"], ab = { class: "smtp-test" }, ob = { class: "rw-section" }, sb = { class: "rw-hint" }, cb = { class: "rw-form-row" }, lb = { class: "rw-field" }, ub = { class: "rw-field rw-field--narrow" }, db = { class: "rw-field rw-field--narrow" }, fb = { class: "rw-form-row" }, pb = { class: "rw-field" }, mb = { class: "rw-field" }, hb = ["placeholder"], gb = { class: "rw-section" }, _b = { class: "rw-hint" }, vb = { class: "rw-section" }, yb = { class: "rw-hint rw-access-intro" }, bb = { class: "rw-access-group" }, xb = { class: "rw-access-label" }, Sb = { class: "rw-hint rw-access-desc" }, Cb = { class: "rw-access-group" }, wb = { class: "rw-access-label" }, Tb = { class: "rw-hint rw-access-desc" }, Eb = { class: "rw-action-bar" }, Db = [
+}, Gy = { class: "rw-field" }, Ky = ["placeholder"], qy = { class: "rw-hint" }, Jy = { class: "rw-section" }, Yy = { class: "rw-hint" }, Xy = { class: "rw-form-row" }, Zy = { class: "rw-field" }, Qy = { class: "rw-field rw-field--narrow" }, $y = { class: "rw-field rw-field--narrow" }, eb = { value: "none" }, tb = { class: "rw-form-row" }, nb = { class: "rw-field" }, rb = { class: "rw-field" }, ib = ["placeholder"], ab = { class: "smtp-test" }, ob = { class: "rw-section" }, sb = { class: "rw-hint" }, cb = { class: "rw-form-row" }, lb = { class: "rw-field" }, ub = { class: "rw-field rw-field--narrow" }, db = { class: "rw-field rw-field--narrow" }, fb = { class: "rw-form-row" }, pb = { class: "rw-field" }, mb = { class: "rw-field" }, hb = ["placeholder"], gb = { class: "rw-section" }, _b = { class: "rw-hint" }, vb = { class: "rw-section" }, yb = {
+	key: 0,
+	class: "rw-field"
+}, bb = { class: "rw-section" }, xb = { class: "rw-hint rw-access-intro" }, Sb = { class: "rw-access-group" }, Cb = { class: "rw-access-label" }, wb = { class: "rw-hint rw-access-desc" }, Tb = { class: "rw-access-group" }, Eb = { class: "rw-access-label" }, Db = { class: "rw-hint rw-access-desc" }, Ob = { class: "rw-action-bar" }, kb = [
 	{
 		path: "/",
 		redirect: { name: "invoices" }
@@ -8296,12 +8299,12 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 								_: 1
 							})) : E("", !0)])]),
 							z("div", ny, [
-								z("table", ry, [z("thead", null, [z("tr", { style: v(j.value) }, [...t[40] ||= [
+								z("table", ry, [z("thead", null, [z("tr", { style: v(j.value) }, [...t[42] ||= [
 									z("th", null, "Beschreibung", -1),
 									z("th", { class: "num" }, "Menge", -1),
 									z("th", { class: "num" }, "Einzelpreis", -1),
 									z("th", { class: "num" }, "Betrag", -1)
-								]], 4)]), t[41] ||= z("tbody", null, [z("tr", null, [
+								]], 4)]), t[43] ||= z("tbody", null, [z("tr", null, [
 									z("td", null, "Beratungsleistung"),
 									z("td", { class: "num" }, "2"),
 									z("td", { class: "num" }, "95,00 €"),
@@ -8344,7 +8347,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 							}, null, 512), [[O, i.value.numberFormat]])]),
 							z("p", my, [
 								A(n(Y(f)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
-								t[42] ||= z("br", null, null, -1),
+								t[44] ||= z("br", null, null, -1),
 								A(" " + n(Y(f)("rechnungswerk", "Vorschau: {preview}", { preview: pe.value })), 1)
 							]),
 							z("div", hy, [
@@ -8382,7 +8385,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 							}, null, 512), [[O, i.value.quoteNumberFormat]])]),
 							z("p", yy, [
 								A(n(Y(f)("rechnungswerk", "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
-								t[43] ||= z("br", null, null, -1),
+								t[45] ||= z("br", null, null, -1),
 								A(" " + n(Y(f)("rechnungswerk", "Vorschau: {preview}", { preview: me.value })), 1)
 							]),
 							z("div", by, [
@@ -8419,7 +8422,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 							}, null, 512), [[O, i.value.fileNameFormat]])]),
 							z("p", wy, [
 								A(n(Y(f)("rechnungswerk", "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.")) + " ", 1),
-								t[44] ||= z("br", null, null, -1),
+								t[46] ||= z("br", null, null, -1),
 								A(" " + n(Y(f)("rechnungswerk", "Vorschau: {preview}", { preview: he.value })), 1)
 							])
 						]),
@@ -8538,7 +8541,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 							}, null, 8, Ky), [[O, i.value.archiveSubfolder]])]),
 							z("p", qy, [
 								A(n(Y(f)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {MM} Monat, {DD} Tag (Rechnungsdatum). Unterordner werden bei Bedarf angelegt. Vorhandene Dateien werden nie überschrieben.")) + " ", 1),
-								t[45] ||= z("br", null, null, -1),
+								t[47] ||= z("br", null, null, -1),
 								A(" " + n(Y(f)("rechnungswerk", "Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.")), 1)
 							])
 						]),
@@ -8567,8 +8570,8 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 									"onUpdate:modelValue": t[24] ||= (e) => i.value.smtpSecurity = e,
 									class: "rw-input"
 								}, [
-									t[46] ||= z("option", { value: "starttls" }, "STARTTLS", -1),
-									t[47] ||= z("option", { value: "ssl" }, "SSL/TLS", -1),
+									t[48] ||= z("option", { value: "starttls" }, "STARTTLS", -1),
+									t[49] ||= z("option", { value: "ssl" }, "SSL/TLS", -1),
 									z("option", eb, n(Y(f)("rechnungswerk", "Keine")), 1)
 								], 512), [[ae, i.value.smtpSecurity]])])
 							]),
@@ -8617,7 +8620,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 								z("label", db, [z("span", null, n(Y(f)("rechnungswerk", "Verschlüsselung")), 1), G(z("select", {
 									"onUpdate:modelValue": t[29] ||= (e) => i.value.imapSecurity = e,
 									class: "rw-input"
-								}, [...t[48] ||= [
+								}, [...t[50] ||= [
 									z("option", { value: "ssl" }, "SSL/TLS", -1),
 									z("option", { value: "starttls" }, "STARTTLS", -1),
 									z("option", { value: "tls" }, "TLS", -1)
@@ -8652,14 +8655,31 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 							})
 						]),
 						z("section", vb, [
+							z("h3", null, n(Y(f)("rechnungswerk", "Verein")), 1),
+							J(Y(bt), {
+								type: "switch",
+								modelValue: i.value.clubMode,
+								"onUpdate:modelValue": t[33] ||= (e) => i.value.clubMode = e
+							}, {
+								default: F(() => [A(n(Y(f)("rechnungswerk", "Vereinsmodus aktivieren")), 1)]),
+								_: 1
+							}, 8, ["modelValue"]),
+							i.value.clubMode ? (p(), q("label", yb, [z("span", null, n(Y(f)("rechnungswerk", "Mitgliedergruppe")), 1), J(Y(pt), {
+								modelValue: e.memberGroup,
+								"onUpdate:modelValue": t[34] ||= (t) => e.memberGroup = t,
+								options: e.groupOptions,
+								label: "displayName"
+							}, null, 8, ["modelValue", "options"])])) : E("", !0)
+						]),
+						z("section", bb, [
 							z("h3", null, n(Y(f)("rechnungswerk", "Zugriff & Administration")), 1),
-							z("p", yb, n(Y(f)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
-							z("div", bb, [
-								z("span", xb, n(Y(f)("rechnungswerk", "App-Administratoren")), 1),
-								z("p", Sb, n(Y(f)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
+							z("p", xb, n(Y(f)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
+							z("div", Sb, [
+								z("span", Cb, n(Y(f)("rechnungswerk", "App-Administratoren")), 1),
+								z("p", wb, n(Y(f)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
 								J(Y(pt), {
 									modelValue: ne.value,
-									"onUpdate:modelValue": t[33] ||= (e) => ne.value = e,
+									"onUpdate:modelValue": t[35] ||= (e) => ne.value = e,
 									options: ie.value,
 									loading: L.value,
 									multiple: !0,
@@ -8677,12 +8697,12 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 									"placeholder"
 								])
 							]),
-							z("div", Cb, [
-								z("span", wb, n(Y(f)("rechnungswerk", "Berechtigte Nutzer")), 1),
-								z("p", Tb, n(Y(f)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
+							z("div", Tb, [
+								z("span", Eb, n(Y(f)("rechnungswerk", "Berechtigte Nutzer")), 1),
+								z("p", Db, n(Y(f)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
 								J(Y(pt), {
 									modelValue: re.value,
-									"onUpdate:modelValue": t[34] ||= (e) => re.value = e,
+									"onUpdate:modelValue": t[36] ||= (e) => re.value = e,
 									options: ie.value,
 									loading: L.value,
 									multiple: !0,
@@ -8701,7 +8721,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 								])
 							])
 						]),
-						z("div", Eb, [J(Y(X), {
+						z("div", Ob, [J(Y(X), {
 							variant: "primary",
 							disabled: Y(r).saving || R.value,
 							onClick: Ne
@@ -8716,7 +8736,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 						name: Y(f)("rechnungswerk", "Kleinunternehmer §19 aktivieren"),
 						message: Y(f)("rechnungswerk", "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?"),
 						confirmLabel: Y(f)("rechnungswerk", "Aktivieren"),
-						onClose: t[35] ||= (e) => m.value = !1,
+						onClose: t[37] ||= (e) => m.value = !1,
 						onConfirm: be
 					}, null, 8, [
 						"open",
@@ -8729,7 +8749,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 						name: Y(f)("rechnungswerk", "Automatischen DATEV-Versand aktivieren"),
 						message: Y(f)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?"),
 						confirmLabel: Y(f)("rechnungswerk", "Aktivieren"),
-						onClose: t[36] ||= (e) => h.value = !1,
+						onClose: t[38] ||= (e) => h.value = !1,
 						onConfirm: Se
 					}, null, 8, [
 						"open",
@@ -8742,7 +8762,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 						name: Y(f)("rechnungswerk", "Automatische Ablage aktivieren"),
 						message: Y(f)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?"),
 						confirmLabel: Y(f)("rechnungswerk", "Aktivieren"),
-						onClose: t[37] ||= (e) => g.value = !1,
+						onClose: t[39] ||= (e) => g.value = !1,
 						onConfirm: we
 					}, null, 8, [
 						"open",
@@ -8755,7 +8775,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 						name: Y(f)("rechnungswerk", "Nummernkreis auf „Fortlaufend“ stellen"),
 						message: Y(f)("rechnungswerk", "Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?"),
 						confirmLabel: Y(f)("rechnungswerk", "Fortlaufend aktivieren"),
-						onClose: t[38] ||= (e) => _.value = !1,
+						onClose: t[40] ||= (e) => _.value = !1,
 						onConfirm: Ee
 					}, null, 8, [
 						"open",
@@ -8768,7 +8788,7 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 						name: Y(f)("rechnungswerk", "Angebots-Nummernkreis auf „Fortlaufend“ stellen"),
 						message: Y(f)("rechnungswerk", "Der Angebots-Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Fortfahren?"),
 						confirmLabel: Y(f)("rechnungswerk", "Fortlaufend aktivieren"),
-						onClose: t[39] ||= (e) => y.value = !1,
+						onClose: t[41] ||= (e) => y.value = !1,
 						onConfirm: Oe
 					}, null, 8, [
 						"open",
@@ -8778,17 +8798,17 @@ var Mv = { class: "rw-view" }, Nv = { class: "rw-settings-title" }, Pv = {
 					])
 				]));
 			}
-		}), [["__scopeId", "data-v-aad18780"]])
+		}), [["__scopeId", "data-v-2574a00b"]])
 	}
-], Ob = Rr({
+], Ab = Rr({
 	history: or(),
-	routes: Db
+	routes: kb
 });
 //#endregion
 //#region src/main.js
 document.addEventListener("DOMContentLoaded", () => {
 	let e = ne(wo);
-	e.use(zt()), e.use(Ob), e.use(Te, { themes: { tooltip: { delay: {
+	e.use(zt()), e.use(Ab), e.use(Te, { themes: { tooltip: { delay: {
 		show: 100,
 		hide: 0
 	} } } }), e.mount(".app-rechnungswerk");
