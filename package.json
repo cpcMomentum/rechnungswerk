@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mkdir -p js css && cp -r dist/js/* js/ && cp -r dist/css/* css/",
+    "build": "vite build && shx mkdir -p js css && shx cp -r dist/js/* js/ && shx cp -r dist/css/* css/",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
@@ -44,6 +44,7 @@
     "happy-dom": "^20.9.0",
     "nc-app-tooling": "github:cpcMomentum/nc-app-tooling#v1.11.0",
     "sass": "^1.70.0",
+    "shx": "^0.4.0",
     "typescript": "^5.7.2",
     "vite": "^8.2.1",
     "vitest": "^4.1.4"
