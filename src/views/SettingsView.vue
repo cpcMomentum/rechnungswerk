@@ -370,6 +370,36 @@
 				</NcButton>
 			</section>
 
+			<section class="rw-section">
+				<h3>
+					{{ t('rechnungswerk', 'Verein') }}
+				</h3>
+
+				<NcCheckboxRadioSwitch
+					type="switch"
+					:modelValue="form.clubMode"
+					@update:modelValue="v => form.clubMode = v">
+
+					{{ t('rechnungswerk', 'Vereinsmodus aktivieren') }}
+
+				</NcCheckboxRadioSwitch>
+
+				<label v-if="form.clubMode" class="rw-field">
+
+					<span>
+						{{ t('rechnungswerk', 'Mitgliedergruppe') }}
+					</span>
+
+					<NcSelect
+						v-model="memberGroup"
+						:options="groupOptions"
+						label="displayName"
+					/>
+
+				</label>
+
+			</section>
+
 			<!-- Zugriff & Administration -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>

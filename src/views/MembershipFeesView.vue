@@ -341,7 +341,7 @@
 							variant="primary"
 							:disabled="busy"
 							@click="saveConfiguration">
-							{{ saving ? 'Speichert …' : 'Speichern' }}
+							{{ saving ? 'Speichert …' : 'Speichern' }}
 						</NcButton>
 
 						<NcButton
@@ -513,7 +513,7 @@
 							variant="primary"
 							:disabled="busy || !previewCanCreate"
 							@click="createDraftInvoices">
-							{{ creating ? 'Erstellt …' : 'Beitragsrechnungen erstellen' }}
+							{{ creating ? 'Erstellt …' : 'Beitragsrechnungen erstellen' }}
 						</NcButton>
 					</div>
 
@@ -929,13 +929,13 @@ async function copyPreviousYear(): Promise<void> {
 
 		showSuccess(
 			`Beitragswerte aus ${previousYear} wurden übernommen. `
-				+ 'Bitte prüfen und anschließend speichern.',
+			+ 'Bitte prüfen und anschließend speichern.',
 		)
 	} catch (error) {
 		const apiError = error as ApiError
 		showError(
 			`Vorjahr ${previousYear} konnte nicht übernommen werden: `
-				+ apiError.message,
+			+ apiError.message,
 		)
 	}
 }
@@ -985,8 +985,8 @@ async function createDraftInvoices(): Promise<void> {
 
 		showSuccess(
 			`Beitragslauf ${year.value} wurde gestartet. `
-				+ `${summary.draftCreated} Rechnungsentwürfe wurden neu erstellt`
-				+ (summary.alreadyExists > 0
+			+ `${summary.draftCreated} Rechnungsentwürfe wurden neu erstellt`
+			+ (summary.alreadyExists > 0
 					? `, ${summary.alreadyExists} waren bereits vorhanden.`
 					: '.'),
 		)

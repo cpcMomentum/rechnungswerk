@@ -465,7 +465,10 @@ OC.L10N.register(
     "Rechnung nicht gefunden." : "Invoice not found.",
     "Stornobelege können nicht dupliziert werden." : "Cancellation documents cannot be duplicated.",
     "Textbaustein nicht gefunden." : "Text snippet not found.",
-    "Beitragsabrechnung": "Membership fee billing",
-    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "The due date must not be before the invoice date."
+    "Beitragsabrechnung" : "Membership fee billing",
+    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "The due date must not be before the invoice date.",
+    "Verein": "Club",
+	"Vereinsmodus aktivieren": "Club mode activate",
+	"Mitgliedergruppe": "Member Group"
 },
 "nplurals=2; plural=(n != 1);");

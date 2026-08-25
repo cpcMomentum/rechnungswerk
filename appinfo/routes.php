@@ -99,5 +99,7 @@ return [
 		['name' => 'membership_invoice#getConfiguration',	'url' => '/api/v1/membership-invoices/configuration',	'verb' => 'GET'],
 		['name' => 'membership_invoice#batchCreateDrafts',	'url' => '/api/v1/membership-invoices/batch-create-drafts',	'verb' => 'POST'],
 		['name' => 'membership_invoice#batchCommit',	'url' => '/api/v1/membership-invoices/batch-commit',	'verb' => 'POST'],
+		// Nextcloud groups for club configuration
+		['name' => 'group#index', 'url' => '/api/v1/groups', 'verb' => 'GET'],
 	],
 ];

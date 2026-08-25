@@ -466,6 +466,9 @@ OC.L10N.register(
     "Stornobelege können nicht dupliziert werden." : "Stornobelege können nicht dupliziert werden.",
     "Textbaustein nicht gefunden." : "Textbaustein nicht gefunden.",
     "Beitragsabrechnung" : "Beitragsabrechnung",
-    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen."
+    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.",
+    "Verein" : "Verein",
+    "Vereinsmodus aktivieren" : "Vereinsmodus aktivieren",
+    "Mitgliedergruppe" : "Mitgliedergruppe"
 },
 "nplurals=2; plural=(n != 1);");
