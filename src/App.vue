@@ -20,7 +20,10 @@
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }">
 					<template #icon><FileDocumentIcon :size="20" /></template>
 				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('rechnungswerk', 'Beitragsabrechnung')" :to="{ name: 'membership-fees' }">
+				<NcAppNavigationItem
+					v-if="clubMode"
+					:name="t('rechnungswerk', 'Beitragsabrechnung')"
+					:to="{ name: 'membership-fees' }">
 					<template #icon><FileDocumentIcon :size="20" /></template>
 				</NcAppNavigationItem>
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Angebote')" :to="{ name: 'quotes' }">
@@ -69,13 +72,23 @@ import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import { usePermissionStore } from '@/stores/permissionStore'
+import { useClubStatusStore } from '@/stores/clubStatusStore'
 
 const store = usePermissionStore()
+const clubStatusStore = useClubStatusStore()
+
 const hasAccess = computed(() => store.info?.hasAccess ?? false)
 const isAdmin = computed(() => store.info?.isAdmin ?? false)
+const clubMode = computed(() => clubStatusStore.clubMode)
 
-onMounted(() => {
-	store.fetch()
+onMounted(async () => {
+	await store.fetch()
+
+	if (!store.info?.hasAccess) {
+		return
+	}
+
+	await clubStatusStore.fetch()
 })
 </script>
 

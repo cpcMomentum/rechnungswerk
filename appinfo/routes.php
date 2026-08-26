@@ -103,6 +103,7 @@ return [
 
 		//Vereinsmodus
 		['name' => 'group#index', 'url' => '/api/v1/groups', 'verb' => 'GET'],
+		['name' => 'club_status#show', 'url' => '/api/v1/club-status', 'verb' => 'GET'],
 		['name' => 'club_settings#show',	'url' => '/api/v1/club-settings',	'verb' => 'GET'],
 		['name' => 'club_settings#update',	'url' => '/api/v1/club-settings',	'verb' => 'PUT'],
 	],

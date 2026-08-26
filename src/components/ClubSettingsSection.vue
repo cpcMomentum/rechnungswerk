@@ -50,6 +50,9 @@ import {
 	saveClubSettings,
 } from '@/api/clubSettings'
 import { getGroups, type GroupOption } from '@/api/groups'
+import { useClubStatusStore } from '@/stores/clubStatusStore'
+
+const clubStatusStore = useClubStatusStore()
 
 const clubMode = ref(false)
 const memberGroup = ref<string | null>(null)
@@ -101,6 +104,10 @@ async function load(): Promise<void> {
 
 		clubMode.value = settings.clubMode
 		memberGroup.value = settings.memberGroup
+
+		// Zentralen Status synchronisieren, damit Navigation und spätere
+		// Router-Prüfungen denselben Vereinsmodus verwenden.
+		clubStatusStore.setClubMode(settings.clubMode)
 	} catch (e) {
 		error.value = (e as { message?: string }).message
 			?? t('rechnungswerk', 'Laden fehlgeschlagen')
@@ -134,6 +141,10 @@ async function save(): Promise<void> {
 
 		clubMode.value = settings.clubMode
 		memberGroup.value = settings.memberGroup
+
+		// Erst nach erfolgreichem Speichern den globalen Status ändern.
+		// Dadurch verschwindet/erscheint die Beitragsabrechnung sofort.
+		clubStatusStore.setClubMode(settings.clubMode)
 	} catch (e) {
 		error.value = (e as { message?: string }).message
 			?? t('rechnungswerk', 'Speichern fehlgeschlagen')
