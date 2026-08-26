@@ -370,35 +370,7 @@
 				</NcButton>
 			</section>
 
-			<section class="rw-section">
-				<h3>
-					{{ t('rechnungswerk', 'Verein') }}
-				</h3>
-
-				<NcCheckboxRadioSwitch
-					type="switch"
-					:modelValue="form.clubMode"
-					@update:modelValue="v => form.clubMode = v">
-
-					{{ t('rechnungswerk', 'Vereinsmodus aktivieren') }}
-
-				</NcCheckboxRadioSwitch>
-
-				<label v-if="form.clubMode" class="rw-field">
-
-					<span>
-						{{ t('rechnungswerk', 'Mitgliedergruppe') }}
-					</span>
-
-					<NcSelect
-						v-model="memberGroup"
-						:options="groupOptions"
-						label="displayName"
-					/>
-
-				</label>
-
-			</section>
+			<ClubSettingsSection />
 
 			<!-- Zugriff & Administration -->
 			<section class="rw-section">
@@ -503,6 +475,7 @@ import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import ClubSettingsSection from '@/components/ClubSettingsSection.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'

@@ -9,28 +9,29 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Controller;
 
+use InvalidArgumentException;
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Service\ClubSettingsService;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\IGroupManager;
 use OCP\IRequest;
 
-class GroupController extends Controller {
+class ClubSettingsController extends Controller {
 
 	public function __construct(
 		IRequest $request,
 		private readonly ?string $userId,
-		private readonly IGroupManager $groupManager,
+		private readonly ClubSettingsService $clubSettingsService,
 		private readonly PermissionService $permissionService
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
 	#[NoAdminRequired]
-	public function index(): DataResponse {
+	public function show(): DataResponse {
 		if ($this->userId === null) {
 			return new DataResponse(
 				['error' => 'Not authenticated'],
@@ -45,25 +46,42 @@ class GroupController extends Controller {
 			);
 		}
 
-		$groups = [];
+		return new DataResponse(
+			$this->clubSettingsService->get()
+		);
+	}
 
-		foreach ($this->groupManager->search('') as $group) {
-			$groupId = $group->getGID();
-
-			$groups[] = [
-				'id' => $groupId,
-				'displayName' => $groupId,
-			];
+	#[NoAdminRequired]
+	public function update(
+		bool $clubMode,
+		?string $memberGroup = null
+	): DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(
+				['error' => 'Not authenticated'],
+				Http::STATUS_UNAUTHORIZED
+			);
 		}
 
-		usort(
-			$groups,
-			static fn(array $a, array $b): int =>
-				strcasecmp($a['displayName'], $b['displayName'])
-		);
+		if (!$this->permissionService->isAdmin($this->userId)) {
+			return new DataResponse(
+				['error' => 'Forbidden'],
+				Http::STATUS_FORBIDDEN
+			);
+		}
 
-		return new DataResponse([
-			'groups' => $groups,
-		]);
+		try {
+			return new DataResponse(
+				$this->clubSettingsService->save(
+					$clubMode,
+					$memberGroup
+				)
+			);
+		} catch (InvalidArgumentException $e) {
+			return new DataResponse(
+				['error' => $e->getMessage()],
+				Http::STATUS_BAD_REQUEST
+			);
+		}
 	}
 }
