@@ -470,6 +470,7 @@ OC.L10N.register(
     "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein." : "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein.",
     "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde." : "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.",
     "Die nächste Rechnungsnummer muss positiv sein." : "Die nächste Rechnungsnummer muss positiv sein.",
-    "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden."
+    "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden.",
+    "Produkt suchen und einfügen …" : "Produkt suchen und einfügen …"
 },
 "nplurals=2; plural=(n != 1);");
