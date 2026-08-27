@@ -141,6 +141,11 @@
 					<br>
 					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
 				</p>
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Nächste Rechnungsnummer') }}</span>
+					<input v-model.number="nextNumberInput" class="rw-input" type="number" min="1" step="1" /></label>
+				<p class="rw-hint">
+					{{ t('rechnungswerk', 'Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.') }}
+				</p>
 				<div class="rw-field rw-reset-mode">
 					<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
 					<NcCheckboxRadioSwitch
@@ -522,6 +527,9 @@ const currentDay = ref(new Date().getDate())
 const currentYearFromSettings = ref<number | null>(null)
 const currentQuoteCounter = ref(0)
 const currentQuoteYearFromSettings = ref<number | null>(null)
+// #270: the next invoice number, editable. UI works in "next number"; the server
+// stores the raw counter (last-issued = next − 1), converted on save.
+const nextNumberInput = ref<number | null>(null)
 
 // Akzentfarbe (#171): leer bedeutet, dass die Rechnung auf die Standardfarbe
 // zurueckfaellt — deshalb zeigt die Vorschau dann genau diese.
@@ -567,16 +575,29 @@ const noOptionsText = computed(() => {
 	return t('rechnungswerk', 'Keine Treffer.')
 })
 
+// Effective last-issued counter of the active series. Continuous: the counter
+// never resets. Yearly: it restarts at 1 once the calendar year rolls over, so
+// a stored counter from a past year counts as 0 for the current year.
+const activeCounterBase = computed(() => {
+	if (form.value?.numberResetMode === 'continuous') {
+		return currentCounter.value
+	}
+	return currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0
+})
+
+/** Smallest next number the forward-only rule (#270) allows. */
+const minNextNumber = computed(() => activeCounterBase.value + 1)
+
 const preview = computed(() => {
 	if (!form.value) {
 		return ''
 	}
-	// Continuous: the counter never resets, so the next number is always
-	// current + 1. Yearly: it restarts at 1 once the calendar year rolls over.
-	const base = form.value.numberResetMode === 'continuous'
-		? currentCounter.value
-		: (currentYear.value === currentYearFromSettings.value ? currentCounter.value : 0)
-	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', base + 1, currentYear.value, currentMonth.value, currentDay.value)
+	// Render with the edited next number so the preview follows the input; fall
+	// back to the natural next (last-issued + 1) when the field is empty.
+	const next = nextNumberInput.value && nextNumberInput.value > 0
+		? nextNumberInput.value
+		: minNextNumber.value
+	return previewInvoiceNumber(form.value.numberFormat || 'RE-{YYYY}-{####}', next, currentYear.value, currentMonth.value, currentDay.value)
 })
 
 /** Live preview of the next quote number (#111), mirroring the invoice preview. */
@@ -657,6 +678,14 @@ function hydrate() {
 	currentYearFromSettings.value = s.numberCounterYear
 	currentQuoteCounter.value = s.quoteNumberCounter
 	currentQuoteYearFromSettings.value = s.quoteNumberCounterYear
+	// #270: seed the editable "next number" field from the active series
+	// (last-issued + 1), mirroring the preview logic.
+	{
+		const base = s.numberResetMode === 'continuous'
+			? s.numberCounter
+			: (currentYear.value === s.numberCounterYear ? s.numberCounter : 0)
+		nextNumberInput.value = base + 1
+	}
 	archiveFolderPath.value = s.archiveFolderPath ?? null
 	form.value = {
 		companyName: s.companyName,
@@ -934,6 +963,18 @@ async function onSave() {
 		showError(t('rechnungswerk', 'Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.'))
 		return
 	}
+	// #270: the next number must be a positive integer and may only move the
+	// circle forward — mirror the server's forward-only rule so the user gets a
+	// clear message instead of a rejected save.
+	const nextNr = nextNumberInput.value
+	if (nextNr === null || nextNr === undefined || !Number.isInteger(nextNr) || nextNr < 1) {
+		showError(t('rechnungswerk', 'Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein.'))
+		return
+	}
+	if (nextNr < minNextNumber.value) {
+		showError(t('rechnungswerk', 'Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.', { min: minNextNumber.value, issued: activeCounterBase.value }))
+		return
+	}
 	// Same rule for the independent quote number circle (#111).
 	const quoteFmt = (form.value.quoteNumberFormat || '').trim()
 	if (form.value.quoteNumberResetMode === 'yearly' && !/\{YYYY\}|\{YY\}/.test(quoteFmt)) {
@@ -965,6 +1006,13 @@ async function onSave() {
 	savingPerms.value = true
 	try {
 		const payload = { ...form.value } as SettingsSave
+		// #270: the UI works in "next number"; the server stores the raw counter
+		// (last-issued = next − 1). Only persist it when the admin actually moved
+		// the circle forward — sending the unchanged natural next would needlessly
+		// re-anchor the counter year on every unrelated settings save.
+		if (nextNr > minNextNumber.value) {
+			payload.numberCounter = nextNr - 1
+		}
 		// The logo is managed via its own endpoints (setLogo/deleteLogo), not the
 		// generic save — the server ignores logoFileId here, so don't send it.
 		delete payload.logoFileId

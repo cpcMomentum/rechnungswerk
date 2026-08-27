@@ -214,6 +214,79 @@ class SettingsServiceTest extends TestCase {
 		$this->assertSame($currentYear, $saved->getQuoteNumberCounterYear(), 'quote counter year anchored to current year');
 	}
 
+	// --- Manually set next invoice number (#270) -------------------------
+
+	public function testSaveSetsNextInvoiceNumberForward(): void {
+		// The UI sends the raw counter (next number − 1). A jump forward is the
+		// migration case: continue an existing sequence at, say, 143.
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save(['numberCounter' => 142]);
+
+		$currentYear = (int)(new \DateTime())->format('Y');
+		$this->assertSame(142, $saved->getNumberCounter(), 'stored counter is next − 1');
+		$this->assertSame($currentYear, $saved->getNumberCounterYear(), 'year is anchored on set');
+	}
+
+	public function testSaveRejectsNextInvoiceNumberBelowIssued(): void {
+		// Continuous circle with 50 already issued: setting the counter to 40
+		// would let the app re-issue numbers 41..50 and break §14 uniqueness.
+		$s = $this->existing();
+		$s->setNumberResetMode('continuous');
+		$s->setNumberCounter(50);
+		$this->mapper->method('findByOwner')->willReturn($s);
+
+		$this->expectException(ValidationException::class);
+		$this->service->save(['numberCounter' => 40]);
+	}
+
+	public function testSaveAllowsNextInvoiceNumberEqualToActive(): void {
+		// counter == active is a no-op (next number stays the same) and must pass.
+		$s = $this->existing();
+		$s->setNumberResetMode('continuous');
+		$s->setNumberCounter(50);
+		$this->mapper->method('findByOwner')->willReturn($s);
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save(['numberCounter' => 50]);
+
+		$this->assertSame(50, $saved->getNumberCounter());
+	}
+
+	public function testYearlyPastYearAllowsLowNextNumber(): void {
+		// Yearly circle whose stored counter belongs to a past year: this year's
+		// active counter is 0, so starting low (e.g. next = 6) is legitimate even
+		// though a high number was issued last year.
+		$s = $this->existing();
+		$s->setNumberResetMode('yearly');
+		$s->setNumberFormat('RE-{YYYY}-{####}');
+		$s->setNumberCounter(1234);
+		$s->setNumberCounterYear(2019);
+		$this->mapper->method('findByOwner')->willReturn($s);
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$saved = $this->service->save(['numberCounter' => 5]);
+
+		$currentYear = (int)(new \DateTime())->format('Y');
+		$this->assertSame(5, $saved->getNumberCounter());
+		$this->assertSame($currentYear, $saved->getNumberCounterYear());
+	}
+
+	public function testYearlyCurrentYearRejectsBelowIssued(): void {
+		// Same year: the stored counter IS the active high-water mark, so going
+		// below it is rejected.
+		$s = $this->existing();
+		$s->setNumberResetMode('yearly');
+		$s->setNumberFormat('RE-{YYYY}-{####}');
+		$s->setNumberCounter(1234);
+		$s->setNumberCounterYear((int)(new \DateTime())->format('Y'));
+		$this->mapper->method('findByOwner')->willReturn($s);
+
+		$this->expectException(ValidationException::class);
+		$this->service->save(['numberCounter' => 100]);
+	}
+
 	private function existing(): Settings {
 		$settings = new Settings();
 		$settings->setOwnerUserId('alice');
