@@ -464,6 +464,12 @@ OC.L10N.register(
     "Produkt nicht gefunden." : "Product not found.",
     "Rechnung nicht gefunden." : "Invoice not found.",
     "Stornobelege können nicht dupliziert werden." : "Cancellation documents cannot be duplicated.",
-    "Textbaustein nicht gefunden." : "Text snippet not found."
+    "Textbaustein nicht gefunden." : "Text snippet not found.",
+    "Nächste Rechnungsnummer" : "Next invoice number",
+    "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene." : "The sequential number of the next invoice. To continue an existing number sequence, set the desired value here. Numbers can only be moved forward, never below one already issued.",
+    "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein." : "The next invoice number must be a whole number of at least 1.",
+    "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde." : "The next invoice number must be at least {min}, because number {issued} has already been issued.",
+    "Die nächste Rechnungsnummer muss positiv sein." : "The next invoice number must be positive.",
+    "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "The next invoice number must be at least %1$s, because number %2$s has already been issued. Numbers can only be moved forward."
 },
 "nplurals=2; plural=(n != 1);");

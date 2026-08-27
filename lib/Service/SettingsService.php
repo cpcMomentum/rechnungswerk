@@ -227,6 +227,16 @@ class SettingsService {
 				$settings->setNumberCounterYear((int)(new DateTime())->format('Y'));
 			}
 		}
+		// Manuell gesetzte nächste Rechnungsnummer (#270): die Anfrage trägt den
+		// rohen Zähler (zuletzt vergeben = gewünschte nächste − 1, in der UI
+		// umgerechnet). Das Zählerjahr wird aufs aktuelle Jahr verankert, damit
+		// ein jährlicher Nummernkreis den Startwert auf DIESES Jahr anwendet
+		// (fortlaufend ignoriert das Jahr). validate() hat die Vorwärts-Invariante
+		// bereits erzwungen.
+		if (array_key_exists('numberCounter', $data) && $data['numberCounter'] !== null && $data['numberCounter'] !== '') {
+			$settings->setNumberCounter(max(0, (int)$data['numberCounter']));
+			$settings->setNumberCounterYear((int)(new DateTime())->format('Y'));
+		}
 		if (($settings->getQuoteNumberFormat() ?? '') === '') {
 			$settings->setQuoteNumberFormat(Settings::DEFAULT_QUOTE_NUMBER_FORMAT);
 		}
@@ -354,6 +364,30 @@ class SettingsService {
 			if ($effectiveMode === Settings::RESET_MODE_YEARLY
 				&& !InvoiceCalculator::formatHasYear($effectiveFormat)) {
 				throw new ValidationException($this->l10n->t('Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern.'));
+			}
+		}
+
+		// #270: eine manuell gesetzte nächste Rechnungsnummer darf den Kreis nur
+		// VORWÄRTS bewegen. Ein Wert unter einer bereits vergebenen Nummer ließe
+		// die App eine Nummer erneut vergeben und verletzt die §14-UStG-
+		// Einmaligkeit (der Unique-Index über `number` ist der harte Backstop;
+		// diese Prüfung meldet es früh und verständlich). Der effektive aktive
+		// Zähler ist bei fortlaufend der gespeicherte, bei jährlich nur dann,
+		// wenn das Zählerjahr das laufende Jahr ist — sonst 0 (neues Jahr, Reset).
+		if (array_key_exists('numberCounter', $data) && $data['numberCounter'] !== null && $data['numberCounter'] !== '') {
+			$newCounter = (int)$data['numberCounter'];
+			if ($newCounter < 0) {
+				throw new ValidationException($this->l10n->t('Die nächste Rechnungsnummer muss positiv sein.'));
+			}
+			$effectiveMode = array_key_exists('numberResetMode', $data)
+				? (string)$data['numberResetMode']
+				: ($current->getNumberResetMode() ?: Settings::DEFAULT_RESET_MODE);
+			$currentYear = (int)(new DateTime())->format('Y');
+			$activeCounter = ($effectiveMode === Settings::RESET_MODE_CONTINUOUS
+				|| $current->getNumberCounterYear() === $currentYear)
+				? (int)$current->getNumberCounter() : 0;
+			if ($newCounter < $activeCounter) {
+				throw new ValidationException($this->l10n->t('Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden.', [$activeCounter + 1, $activeCounter]));
 			}
 		}
 

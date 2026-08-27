@@ -464,6 +464,12 @@ OC.L10N.register(
     "Produkt nicht gefunden." : "Produkt nicht gefunden.",
     "Rechnung nicht gefunden." : "Rechnung nicht gefunden.",
     "Stornobelege können nicht dupliziert werden." : "Stornobelege können nicht dupliziert werden.",
-    "Textbaustein nicht gefunden." : "Textbaustein nicht gefunden."
+    "Textbaustein nicht gefunden." : "Textbaustein nicht gefunden.",
+    "Nächste Rechnungsnummer" : "Nächste Rechnungsnummer",
+    "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene." : "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.",
+    "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein." : "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein.",
+    "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde." : "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.",
+    "Die nächste Rechnungsnummer muss positiv sein." : "Die nächste Rechnungsnummer muss positiv sein.",
+    "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden."
 },
 "nplurals=2; plural=(n != 1);");
