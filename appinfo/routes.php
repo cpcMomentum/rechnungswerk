@@ -99,6 +99,7 @@ return [
 		['name' => 'membership_invoice#getConfiguration',	'url' => '/api/v1/membership-invoices/configuration',	'verb' => 'GET'],
 		['name' => 'membership_invoice#batchCreateDrafts',	'url' => '/api/v1/membership-invoices/batch-create-drafts',	'verb' => 'POST'],
 		['name' => 'membership_invoice#batchCommit',	'url' => '/api/v1/membership-invoices/batch-commit',	'verb' => 'POST'],
+		['name' => 'membership_invoice_file#batchStore',	'url' => '/api/v1/membership-invoices/batch-store-files',	'verb' => 'POST'],
 
 
 		//Vereinsmodus
