@@ -101,12 +101,7 @@
 				<template #icon><PlusIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Position hinzufügen') }}
 			</NcButton>
-			<NcActions v-if="products.length > 0" :menuName="t('rechnungswerk', 'Aus Produkt')">
-				<template #icon><PackageVariantIcon :size="20" /></template>
-				<NcActionButton v-for="p in products" :key="p.id" @click="addFromProduct(p)">
-					{{ p.name }}
-				</NcActionButton>
-			</NcActions>
+			<ProductPicker v-if="products.length > 0" :products="products" @select="addFromProduct" />
 		</div>
 	</div>
 </template>
@@ -115,11 +110,9 @@
 import { watch } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import DeleteIcon from 'vue-material-design-icons/Delete.vue'
-import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
+import ProductPicker from '@/components/ProductPicker.vue'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product } from '@/types/api'
 import { emptyItem, itemFromProduct, type EditorItem } from '@/types/editor'
 import { formatCents, formatTaxRate, euroInputToE4, e4ToEuroInput } from '@/utils/money'

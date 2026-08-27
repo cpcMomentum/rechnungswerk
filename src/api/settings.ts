@@ -18,7 +18,9 @@ export interface SmtpTestInput {
 export const testSmtp = (data: SmtpTestInput): Promise<{ ok: boolean }> =>
 	apiPost<{ ok: boolean }, SmtpTestInput>('/smtp/test', data)
 
-export type SettingsSave = Partial<Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' | 'quoteNumberCounter' | 'quoteNumberCounterYear' | 'smtpPasswordSet' | 'imapPasswordSet'>>
+// numberCounter is writable (#270: set the next invoice number). numberCounterYear
+// stays server-derived; the quote counters remain read-only for now.
+export type SettingsSave = Partial<Omit<Settings, 'id' | 'numberCounterYear' | 'quoteNumberCounter' | 'quoteNumberCounterYear' | 'smtpPasswordSet' | 'imapPasswordSet'>>
 	& { smtpPassword?: string, imapPassword?: string }
 
 export const getSettings = (): Promise<Settings> =>

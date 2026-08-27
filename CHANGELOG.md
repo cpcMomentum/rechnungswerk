@@ -7,6 +7,26 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-08-27
+
+Zwei Verbesserungen aus Anwender-Feedback: der saubere Einstieg in eine bereits
+laufende Rechnungsnummern-Folge und ein leichter auffindbarer Weg, hinterlegte
+Produkte in eine Rechnung zu übernehmen.
+
+### Added
+- **Die nächste Rechnungsnummer lässt sich setzen.** In den Einstellungen kann
+  der Startwert der laufenden Nummer vorgegeben werden, um an eine bestehende
+  Nummernfolge anzuknüpfen (z. B. bei „RE-2026-0143" einsteigen). Nummern lassen
+  sich nur vorwärts setzen, nie unter eine bereits vergebene — die gesetzliche
+  Einmaligkeit nach §14 UStG bleibt gewahrt (#270)
+
+### Changed
+- **Produkte lassen sich bei der Rechnungserstellung direkt suchen und
+  einfügen.** An die Stelle des unauffälligen „Aus Produkt"-Menüs tritt ein
+  Suchfeld „Produkt suchen und einfügen …" in der Positions-Leiste: Tippen
+  schlägt passende Produkte mit Preis und Einheit vor, die Auswahl fügt die
+  Position ein. Frei getippte Positionen bleiben unverändert möglich (#273)
+
 ## [0.5.1] - 2026-08-19
 
 Drei Verbesserungen aus der praktischen Nutzung: ein häufig gewünschter kleiner
