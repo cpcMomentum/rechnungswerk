@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Service\ClubSettingsService;
 use OCA\Rechnungswerk\Service\MemberDirectoryService;
 use OCA\Rechnungswerk\Service\MembershipFeeConfigurationService;
 use OCA\Rechnungswerk\Service\MembershipFeeService;
@@ -28,6 +29,7 @@ class MembershipInvoiceController extends Controller {
 		private readonly MembershipFeeService $membershipFeeService,
 		private readonly MembershipInvoiceBatchService $membershipInvoiceBatchService,
 		private readonly MembershipFeeConfigurationService $membershipFeeConfigurationService,
+		private readonly ClubSettingsService $clubSettingsService,
 		private readonly PermissionService $permissionService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
@@ -324,13 +326,13 @@ class MembershipInvoiceController extends Controller {
 			return $denied;
 		}
 
-		$group = trim($group);
+		$group = $this->getConfiguredMemberGroup();
 
-		if ($group === '') {
+		if ($group === null) {
 			return new DataResponse(
 				[
 					'success' => false,
-					'error' => 'Keine Vereinsgruppe angegeben.',
+					'error' => 'Keine Mitgliedergruppe für den Vereinsmodus konfiguriert.',
 				],
 				Http::STATUS_BAD_REQUEST
 			);
@@ -390,6 +392,18 @@ class MembershipInvoiceController extends Controller {
 			return $denied;
 		}
 
+		$group = $this->getConfiguredMemberGroup();
+
+		if ($group === null) {
+			return new DataResponse(
+				[
+					'success' => false,
+					'error' => 'Keine Mitgliedergruppe für den Vereinsmodus konfiguriert.',
+				],
+				Http::STATUS_BAD_REQUEST
+			);
+		}
+
 		try {
 			$result = $this
 				->membershipFeeConfigurationService
@@ -441,13 +455,13 @@ class MembershipInvoiceController extends Controller {
 			$year = (int)date('Y');
 		}
 
-		$group = trim($group);
+		$group = $this->getConfiguredMemberGroup();
 
-		if ($group === '') {
+		if ($group === null) {
 			return new DataResponse(
 				[
 					'success' => false,
-					'error' => 'Keine Vereinsgruppe angegeben.',
+					'error' => 'Keine Mitgliedergruppe für den Vereinsmodus konfiguriert.',
 				],
 				Http::STATUS_BAD_REQUEST
 			);
@@ -504,13 +518,13 @@ class MembershipInvoiceController extends Controller {
 			return $denied;
 		}
 
-		$group = trim($group);
+		$group = $this->getConfiguredMemberGroup();
 
-		if ($group === '') {
+		if ($group === null) {
 			return new DataResponse(
 				[
 					'success' => false,
-					'error' => 'Keine Vereinsgruppe angegeben.',
+					'error' => 'Keine Mitgliedergruppe für den Vereinsmodus konfiguriert.',
 				],
 				Http::STATUS_BAD_REQUEST
 			);
@@ -583,6 +597,9 @@ class MembershipInvoiceController extends Controller {
 				Http::STATUS_FORBIDDEN
 			);
 		}
+		if (($denied = $this->guardClubMode()) !== null) {
+			return $denied;
+		}
 
 		return null;
 	}
@@ -612,6 +629,9 @@ class MembershipInvoiceController extends Controller {
 				Http::STATUS_FORBIDDEN
 			);
 		}
+		if (($denied = $this->guardClubMode()) !== null) {
+			return $denied;
+		}
 
 		return null;
 	}
@@ -639,6 +659,9 @@ class MembershipInvoiceController extends Controller {
 				Http::STATUS_FORBIDDEN
 			);
 		}
+		if (($denied = $this->guardClubMode()) !== null) {
+			return $denied;
+		}
 
 		return null;
 	}
@@ -655,7 +678,19 @@ class MembershipInvoiceController extends Controller {
             return $guard;
         }
 
-        if ($year === 0) {
+		$group = $this->getConfiguredMemberGroup();
+
+		if ($group === null) {
+			return new DataResponse(
+				[
+					'success' => false,
+					'error' => 'Keine Mitgliedergruppe für den Vereinsmodus konfiguriert.',
+				],
+				Http::STATUS_BAD_REQUEST
+			);
+		}
+
+		if ($year === 0) {
             $year = (int)date('Y');
         }
 
@@ -684,4 +719,37 @@ class MembershipInvoiceController extends Controller {
             );
         }
     }
+	/**
+	 * Ist der Vereinsmodus aktiviert?
+	 */
+	private function guardClubMode(): ?DataResponse {
+		$settings = $this->clubSettingsService->get();
+
+		if ($settings['clubMode'] !== true) {
+			return new DataResponse(
+				[
+					'success' => false,
+					'error' => 'Der Vereinsmodus ist deaktiviert.',
+				],
+				Http::STATUS_FORBIDDEN
+			);
+		}
+
+		return null;
+	}
+	/**
+	 * Liefert die zentral konfigurierte Mitgliedergruppe.
+	 */
+	private function getConfiguredMemberGroup(): ?string {
+		$settings = $this->clubSettingsService->get();
+		$memberGroup = $settings['memberGroup'] ?? null;
+
+		if (!is_string($memberGroup)) {
+			return null;
+		}
+
+		$memberGroup = trim($memberGroup);
+
+		return $memberGroup !== '' ? $memberGroup : null;
+	}
 }

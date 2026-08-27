@@ -3203,7 +3203,7 @@ var No = /*#__PURE__*/ Q(Do, [["render", Mo]]), Po = { class: "info-icon-wrapper
 			_: 3
 		})]));
 	}
-}), [["__scopeId", "data-v-04f73240"]]), Lo = {
+}), [["__scopeId", "data-v-6c57a620"]]), Lo = {
 	name: "PlusIcon",
 	emits: ["click"],
 	props: {
@@ -4376,7 +4376,7 @@ var yu = /*#__PURE__*/ Q(pu, [["render", vu]]), bu = (e) => $(`/contacts/search?
 			onMousedown: M((t) => c(e), ["prevent"])
 		}, [z("strong", null, n(e.name), 1), e.email ? (p(), q("span", Eu, n(e.email), 1)) : E("", !0)], 40, Tu))), 128))])) : E("", !0)]));
 	}
-}), [["__scopeId", "data-v-090ca623"]]), Ou = null, ku = () => (Ou === null && (Ou = $("/countries").catch((e) => {
+}), [["__scopeId", "data-v-23f7f625"]]), Ou = null, ku = () => (Ou === null && (Ou = $("/countries").catch((e) => {
 	throw Ou = null, e;
 })), Ou), Au = ["disabled", "title"], ju = ["value"], Mu = ["value"], Nu = /* @__PURE__ */ r({
 	__name: "CountrySelect",
@@ -4503,7 +4503,7 @@ var yu = /*#__PURE__*/ Q(pu, [["render", vu]]), bu = (e) => $(`/contacts/search?
 			e.vatId
 		].filter(Boolean).join(" · ")), 1)], 40, Hu))), 128))])) : E("", !0)]));
 	}
-}), [["__scopeId", "data-v-07c58316"]]);
+}), [["__scopeId", "data-v-4ad9c538"]]);
 //#endregion
 //#region src/types/editor.ts
 function Gu(e = 1900) {
@@ -4747,7 +4747,7 @@ var Xu = { class: "rw-table-wrap" }, Zu = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["menuName"])) : E("", !0)]))]));
 	}
-}), [["__scopeId", "data-v-040baef2"]]), Ed = { class: "confirm-dialog" }, Dd = { class: "confirm-dialog__message" }, Od = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-04862899"]]), Ed = { class: "confirm-dialog" }, Dd = { class: "confirm-dialog__message" }, Od = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ConfirmDialog",
 	props: {
 		open: { type: Boolean },
@@ -4785,7 +4785,7 @@ var Xu = { class: "rw-table-wrap" }, Zu = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["open", "name"]));
 	}
-}), [["__scopeId", "data-v-5cb119d3"]]);
+}), [["__scopeId", "data-v-54981555"]]);
 //#endregion
 //#region src/utils/modalEsc.ts
 function kd(e, t) {
@@ -4863,7 +4863,7 @@ var Ad = { class: "send-modal" }, jd = { class: "send-modal__hint" }, Md = { cla
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-ccb30ce0"]]), Ld = () => $("/quotes"), Rd = (e) => $(`/quotes/${e}`), zd = (e) => ho("/quotes", { data: e }), Bd = (e, t) => go(`/quotes/${e}`, { data: t }), Vd = (e) => vo(`/quotes/${e}`), Hd = (e) => ho(`/quotes/${e}/commit`, {}), Ud = (e) => ho(`/quotes/${e}/accept`, {}), Wd = (e) => ho(`/quotes/${e}/reject`, {}), Gd = (e) => ho(`/quotes/${e}/convert`, {}), Kd = (e) => ho(`/quotes/${e}/revise`, {}), qd = (e) => po(`/quotes/${e}/pdf`), Jd = (e) => po(`/quotes/${e}/preview`) + "?t=" + Date.now(), Yd = (e) => {
+}), [["__scopeId", "data-v-2f5a808a"]]), Ld = () => $("/quotes"), Rd = (e) => $(`/quotes/${e}`), zd = (e) => ho("/quotes", { data: e }), Bd = (e, t) => go(`/quotes/${e}`, { data: t }), Vd = (e) => vo(`/quotes/${e}`), Hd = (e) => ho(`/quotes/${e}/commit`, {}), Ud = (e) => ho(`/quotes/${e}/accept`, {}), Wd = (e) => ho(`/quotes/${e}/reject`, {}), Gd = (e) => ho(`/quotes/${e}/convert`, {}), Kd = (e) => ho(`/quotes/${e}/revise`, {}), qd = (e) => po(`/quotes/${e}/pdf`), Jd = (e) => po(`/quotes/${e}/preview`) + "?t=" + Date.now(), Yd = (e) => {
 	let t = document.createElement("a");
 	t.href = qd(e), t.download = "", t.rel = "noopener", t.style.display = "none", document.body.appendChild(t), t.click(), t.remove();
 }, Xd = (e, t) => ho(`/quotes/${e}/send`, t), Zd = $t("quote", () => {
@@ -5928,7 +5928,7 @@ var lf = $t("textSnippet", () => {
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-7c371e87"]]), um = { class: "membership-fees" }, dm = { class: "page-header" }, fm = { class: "title-row" }, pm = {
+}), [["__scopeId", "data-v-7576b8a3"]]), um = { class: "membership-fees" }, dm = { class: "page-header" }, fm = { class: "title-row" }, pm = {
 	key: 1,
 	class: "status-badge status-badge--new"
 }, mm = {
@@ -6518,7 +6518,7 @@ Fortfahren?`)) {
 			], 64)) : (p(), q("div", kh, " Noch keine Vorschau geladen. "))])
 		], 64))]));
 	}
-}), [["__scopeId", "data-v-09ec5682"]]), jh = {
+}), [["__scopeId", "data-v-a3d9d7c6"]]), jh = {
 	name: "AlertCircleOutlineIcon",
 	emits: ["click"],
 	props: {
@@ -6713,7 +6713,7 @@ var Lh = /*#__PURE__*/ Q(jh, [["render", Ih]]), Rh = { class: "rw-view" }, zh = 
 			], 10, qh))), 128))])])])])) : E("", !0)
 		]));
 	}
-}), [["__scopeId", "data-v-726ffd4f"]]), eg = { class: "product-modal" }, tg = { class: "field" }, ng = { class: "field" }, rg = { class: "field-row" }, ig = { class: "field" }, ag = ["value"], og = { class: "field" }, sg = { class: "field" }, cg = ["value"], lg = { class: "field" }, ug = ["placeholder"], dg = { class: "hint" }, fg = { class: "actions" }, pg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
+}), [["__scopeId", "data-v-62bdd46f"]]), eg = { class: "product-modal" }, tg = { class: "field" }, ng = { class: "field" }, rg = { class: "field-row" }, ig = { class: "field" }, ag = ["value"], og = { class: "field" }, sg = { class: "field" }, cg = ["value"], lg = { class: "field" }, ug = ["placeholder"], dg = { class: "hint" }, fg = { class: "actions" }, pg = /*#__PURE__*/ Q(/* @__PURE__ */ r({
 	__name: "ProductEditModal",
 	props: {
 		open: { type: Boolean },
@@ -6822,7 +6822,7 @@ var Lh = /*#__PURE__*/ Q(jh, [["render", Ih]]), Rh = { class: "rw-view" }, zh = 
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-b3908c2c"]]), mg = { class: "rw-view" }, hg = { class: "rw-view__head" }, gg = {
+}), [["__scopeId", "data-v-e77e93c0"]]), mg = { class: "rw-view" }, hg = { class: "rw-view__head" }, gg = {
 	key: 2,
 	class: "rw-table-wrap"
 }, _g = { class: "rw-table" }, vg = { class: "num" }, yg = { class: "num" }, bg = ["onClick"], xg = {
@@ -7099,7 +7099,7 @@ var Bg = /*#__PURE__*/ Q(Pg, [["render", zg]]), Vg = { class: "snippet-modal" },
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-ae47764f"]]), $g = { class: "rw-view" }, e_ = { class: "rw-view__head" }, t_ = { class: "rw-muted rw-intro" }, n_ = {
+}), [["__scopeId", "data-v-b60fbea6"]]), $g = { class: "rw-view" }, e_ = { class: "rw-view__head" }, t_ = { class: "rw-muted rw-intro" }, n_ = {
 	key: 2,
 	class: "rw-snippet-groups"
 }, r_ = { class: "rw-snippet-group__head" }, i_ = { class: "rw-table-wrap" }, a_ = { class: "rw-table" }, o_ = ["onClick"], s_ = {
@@ -7259,7 +7259,7 @@ var Bg = /*#__PURE__*/ Q(Pg, [["render", zg]]), Vg = { class: "snippet-modal" },
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-e218386d"]]), d_ = {
+}), [["__scopeId", "data-v-c438c8e2"]]), d_ = {
 	name: "AccountArrowRightIcon",
 	emits: ["click"],
 	props: {
@@ -7491,7 +7491,7 @@ var __ = /*#__PURE__*/ Q(d_, [["render", g_]]), v_ = { class: "customer-modal" }
 			_: 1
 		}, 8, ["name"])) : E("", !0);
 	}
-}), [["__scopeId", "data-v-6e071637"]]), Q_ = { class: "rw-view" }, $_ = { class: "rw-view__head" }, ev = { class: "rw-view__actions" }, tv = {
+}), [["__scopeId", "data-v-2d237eab"]]), Q_ = { class: "rw-view" }, $_ = { class: "rw-view__head" }, ev = { class: "rw-view__actions" }, tv = {
 	key: 2,
 	class: "rw-table-wrap"
 }, nv = { class: "rw-table" }, rv = ["onClick"], iv = { class: "rw-muted" }, av = {
@@ -7647,7 +7647,7 @@ var __ = /*#__PURE__*/ Q(d_, [["render", g_]]), v_ = { class: "customer-modal" }
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-b579e3bc"]]), dv = {
+}), [["__scopeId", "data-v-1eff74a5"]]), dv = {
 	name: "ContentSaveIcon",
 	emits: ["click"],
 	props: {
@@ -8898,7 +8898,7 @@ var Vv = { class: "rw-view" }, Hv = { class: "rw-settings-title" }, Uv = {
 					])
 				]));
 			}
-		}), [["__scopeId", "data-v-d34d3562"]])
+		}), [["__scopeId", "data-v-d13b27ad"]])
 	}
 ], Lb = Rr({
 	history: or(),
@@ -8906,7 +8906,11 @@ var Vv = { class: "rw-view" }, Hv = { class: "rw-settings-title" }, Uv = {
 });
 //#endregion
 //#region src/main.js
-document.addEventListener("DOMContentLoaded", () => {
+Lb.beforeEach(async (e) => {
+	if (e.name !== "membership-fees") return !0;
+	let t = To();
+	return t.loaded || await t.fetch(), t.clubMode ? !0 : { name: "invoices" };
+}), document.addEventListener("DOMContentLoaded", () => {
 	let e = ne(Eo);
 	e.use(zt()), e.use(Lb), e.use(Te, { themes: { tooltip: { delay: {
 		show: 100,

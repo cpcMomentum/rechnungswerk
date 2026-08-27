@@ -13,6 +13,7 @@ import TextSnippetsView from '@/views/TextSnippetsView.vue'
 import CustomersView from '@/views/CustomersView.vue'
 import MyContactView from '@/views/MyContactView.vue'
 import SettingsView from '@/views/SettingsView.vue'
+import { useClubStatusStore } from '@/stores/clubStatusStore'
 
 const routes: RouteRecordRaw[] = [
 	{ path: '/', redirect: { name: 'invoices' } },
@@ -35,4 +36,21 @@ const routes: RouteRecordRaw[] = [
 export const router = createRouter({
 	history: createWebHashHistory(),
 	routes,
+})
+router.beforeEach(async (to) => {
+	if (to.name !== 'membership-fees') {
+		return true
+	}
+
+	const clubStatusStore = useClubStatusStore()
+
+	if (!clubStatusStore.loaded) {
+		await clubStatusStore.fetch()
+	}
+
+	if (!clubStatusStore.clubMode) {
+		return { name: 'invoices' }
+	}
+
+	return true
 })
