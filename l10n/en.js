@@ -90,7 +90,6 @@ OC.L10N.register(
     "An Kunde senden" : "Send to customer",
     "anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF)." : "please find your invoice attached as an e-invoice (ZUGFeRD PDF).",
     "App-Administratoren" : "App administrators",
-    "Aus Produkt" : "From product",
     "Automatischen DATEV-Versand aktivieren" : "Enable automatic DATEV delivery",
     "Bankname" : "Bank name",
     "Bankverbindung" : "Bank details",
