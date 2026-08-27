@@ -100,6 +100,7 @@ return [
 		['name' => 'membership_invoice#batchCreateDrafts',	'url' => '/api/v1/membership-invoices/batch-create-drafts',	'verb' => 'POST'],
 		['name' => 'membership_invoice#batchCommit',	'url' => '/api/v1/membership-invoices/batch-commit',	'verb' => 'POST'],
 		['name' => 'membership_invoice_file#batchStore',	'url' => '/api/v1/membership-invoices/batch-store-files',	'verb' => 'POST'],
+		['name' => 'membership_invoice_mail#batchSend',	'url' => '/api/v1/membership-invoices/batch-send-mails',	'verb' => 'POST'],
 
 
 		//Vereinsmodus
