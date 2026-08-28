@@ -25,6 +25,7 @@ use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IRequest;
+use OCP\IGroupManager;
 
 /**
  * Central company settings. Readable by every user with access (the editor
@@ -41,6 +42,7 @@ class SettingsController extends Controller {
 		private readonly SettingsService $settingsService,
 		private readonly PermissionService $permissionService,
 		private readonly IRootFolder $rootFolder,
+		private readonly IGroupManager $groupManager,		
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -217,5 +219,43 @@ class SettingsController extends Controller {
 			Http::STATUS_OK,
 			['Content-Type' => $mime],
 		);
+	}
+
+	#[NoAdminRequired]
+	public function groups(): DataResponse {
+
+		if ($this->userId === null) {
+			return new DataResponse(
+				['error' => 'Not authenticated'],
+				Http::STATUS_UNAUTHORIZED
+			);
+		}
+
+		if (!$this->permissionService->isAdmin($this->userId)) {
+			return new DataResponse(
+				['error' => 'Forbidden'],
+				Http::STATUS_FORBIDDEN
+			);
+		}
+
+		$groups = [];
+
+		foreach ($this->groupManager->search('') as $group) {
+
+			$groups[] = [
+				'id' => $group->getGID(),
+				'displayName' => $group->getDisplayName(),
+			];
+		}
+
+		usort(
+			$groups,
+			fn($a, $b) => strcmp(
+				$a['displayName'],
+				$b['displayName']
+			)
+		);
+
+		return new DataResponse($groups);
 	}
 }

@@ -89,5 +89,24 @@ return [
 		['name' => 'admin#updatePermissions',  'url' => '/api/v1/permissions',         'verb' => 'PUT'],
 		['name' => 'admin#searchPrincipals',   'url' => '/api/v1/principals/search',   'verb' => 'GET'],
 		['name' => 'admin#testSmtp',           'url' => '/api/v1/smtp/test',           'verb' => 'POST'],
+
+		//Beitragsrechnungen
+		['name' => 'membership_invoice#preview',	'url' => '/api/v1/membership-invoices/preview',	'verb' => 'GET'],
+		['name' => 'membership_invoice#profile',	'url' => '/api/v1/membership-invoices/profile',	'verb' => 'GET'],
+		['name' => 'membership_invoice#fee',		'url' => '/api/v1/membership-invoices/fee',		'verb' => 'GET'],
+		['name' => 'membership_invoice#batchPreview',	'url' => '/api/v1/membership-invoices/batch-preview',	'verb' => 'GET'],
+		['name' => 'membership_invoice#saveConfiguration',	'url' => '/api/v1/membership-invoices/configuration',	'verb' => 'POST'],
+		['name' => 'membership_invoice#getConfiguration',	'url' => '/api/v1/membership-invoices/configuration',	'verb' => 'GET'],
+		['name' => 'membership_invoice#batchCreateDrafts',	'url' => '/api/v1/membership-invoices/batch-create-drafts',	'verb' => 'POST'],
+		['name' => 'membership_invoice#batchCommit',	'url' => '/api/v1/membership-invoices/batch-commit',	'verb' => 'POST'],
+		['name' => 'membership_invoice_file#batchStore',	'url' => '/api/v1/membership-invoices/batch-store-files',	'verb' => 'POST'],
+		['name' => 'membership_invoice_mail#batchSend',	'url' => '/api/v1/membership-invoices/batch-send-mails',	'verb' => 'POST'],
+
+
+		//Vereinsmodus
+		['name' => 'group#index', 'url' => '/api/v1/groups', 'verb' => 'GET'],
+		['name' => 'club_status#show', 'url' => '/api/v1/club-status', 'verb' => 'GET'],
+		['name' => 'club_settings#show',	'url' => '/api/v1/club-settings',	'verb' => 'GET'],
+		['name' => 'club_settings#update',	'url' => '/api/v1/club-settings',	'verb' => 'PUT'],
 	],
 ];
