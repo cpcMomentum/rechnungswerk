@@ -44,6 +44,12 @@ jobs:
         # Vergleich meldet immer (nc-app-tooling#1).
         run: npm ci
 
+      - name: Schema-Portabilitaet
+        run: npx nc-schema-check
+
+      - name: Notification-Vertraege
+        run: npx nc-notification-check
+
       # Bis 08.08.2026 hiess dieser Job "lint-and-build", ohne je zu linten
       # (#210): das Paket war deklariert, aber es gab keine Konfiguration, kein
       # Skript und keinen Schritt. Ein Pruefschritt, der nichts prueft, ist
