@@ -66,7 +66,6 @@
 		"An Kunde senden": "Send to customer",
 		"anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).": "please find your invoice attached as an e-invoice (ZUGFeRD PDF).",
 		"App-Administratoren": "App administrators",
-		"Aus Produkt": "From product",
 		"Automatischen DATEV-Versand aktivieren": "Enable automatic DATEV delivery",
 		"Bankname": "Bank name",
 		"Bankverbindung": "Bank details",
@@ -251,12 +250,11 @@
 		"Zugriff & Administration": "Access & administration",
 		"Zwischensumme (netto)": "Subtotal (net)",
 		"Offen gesamt:": "Total open:",
-		"Bezahlt": "Paid",
+		"bezahlt": "paid",
 		"Alle": "All",
 		"Offen": "Open",
 		"Überfällig": "Overdue",
 		"bezahlt am {date}": "paid on {date}",
-		"bezahlt": "paid",
 		"1 Tag überfällig": "1 day overdue",
 		"{days} Tage überfällig": "{days} days overdue",
 		"fällig heute": "due today",
@@ -468,7 +466,15 @@
 		"Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "The due date must not be before the invoice date.",
 		"Verein": "Club",
 		"Vereinsmodus aktivieren": "Club mode activate",
-		"Mitgliedergruppe": "Member Group"
+		"Mitgliedergruppe": "Member Group",
+		"Nächste Rechnungsnummer": "Next invoice number",
+		"Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.": "The sequential number of the next invoice. To continue an existing number sequence, set the desired value here. Numbers can only be moved forward, never below one already issued.",
+		"Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein.": "The next invoice number must be a whole number of at least 1.",
+		"Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.": "The next invoice number must be at least {min}, because number {issued} has already been issued.",
+		"Die nächste Rechnungsnummer muss positiv sein.": "The next invoice number must be positive.",
+		"Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden.": "The next invoice number must be at least %1$s, because number %2$s has already been issued. Numbers can only be moved forward.",
+		"Produkt suchen und einfügen …": "Search and add a product …",
+		"Bezahlt": "Paid"
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }
