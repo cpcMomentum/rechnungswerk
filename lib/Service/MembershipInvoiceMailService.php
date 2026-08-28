@@ -883,7 +883,20 @@ final class MembershipInvoiceMailService {
 				? 'Guten Tag ' . $name . ','
 				: 'Guten Tag,';
 
-		return $salutation
+		$settings =
+			$this->settingsService->getCompany();
+
+		$senderName = trim(
+			(string)$settings->getClubName()
+		);
+
+		if ($senderName === '') {
+			$senderName = trim(
+				(string)$settings->getCompanyName()
+			);
+		}
+
+		$body = $salutation
 			. "\n\n"
 			. 'anbei erhalten Sie Ihre Beitragsrechnung für das Jahr '
 			. $year
@@ -898,6 +911,12 @@ final class MembershipInvoiceMailService {
 			. 'Die Rechnung ist als PDF beigefügt.'
 			. "\n\n"
 			. 'Mit freundlichen Grüßen';
+
+		if ($senderName !== '') {
+			$body .= "\n\n" . $senderName;
+		}
+
+		return $body;
 	}
 
 	/**
