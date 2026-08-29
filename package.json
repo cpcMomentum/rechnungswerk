@@ -42,7 +42,7 @@
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.8.1",
     "happy-dom": "^20.9.0",
-    "nc-app-tooling": "github:cpcMomentum/nc-app-tooling#v1.13.0",
+    "nc-app-tooling": "github:cpcMomentum/nc-app-tooling#v1.14.0",
     "sass": "^1.70.0",
     "typescript": "^5.7.2",
     "vite": "^8.2.1",
