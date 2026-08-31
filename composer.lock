@@ -587,21 +587,25 @@
         },
         {
             "name": "horstoeko/zugferd",
-            "version": "v1.0.124",
+            "version": "v1.0.130",
             "source": {
                 "type": "git",
                 "url": "https://github.com/horstoeko/zugferd.git",
-                "reference": "e6cfed36422d5893ed7bb53d633cf1fff0c4ba45"
+                "reference": "d9c54f136141a5762f0c4e995aa877a7ef391edc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/e6cfed36422d5893ed7bb53d633cf1fff0c4ba45",
-                "reference": "e6cfed36422d5893ed7bb53d633cf1fff0c4ba45",
+                "url": "https://api.github.com/repos/horstoeko/zugferd/zipball/d9c54f136141a5762f0c4e995aa877a7ef391edc",
+                "reference": "d9c54f136141a5762f0c4e995aa877a7ef391edc",
                 "shasum": ""
             },
             "require": {
+                "ext-dom": "*",
                 "ext-fileinfo": "*",
+                "ext-json": "*",
+                "ext-libxml": "*",
                 "ext-simplexml": "*",
+                "ext-zip": "*",
                 "goetas-webservices/xsd2php-runtime": "^0.2.13",
                 "horstoeko/mimedb": "^1",
                 "horstoeko/stringmanagement": "^1",
@@ -656,9 +660,9 @@
             ],
             "support": {
                 "issues": "https://github.com/horstoeko/zugferd/issues",
-                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.124"
+                "source": "https://github.com/horstoeko/zugferd/tree/v1.0.130"
             },
-            "time": "2026-06-15T09:04:22+00:00"
+            "time": "2026-08-26T16:25:22+00:00"
         },
         {
             "name": "jms/metadata",
@@ -726,16 +730,16 @@
         },
         {
             "name": "jms/serializer",
-            "version": "3.32.7",
+            "version": "3.32.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "d725ebd288688bb24f47ee467b1299b0fc6d04f8"
+                "reference": "74cb5e8930df5864609eaf08e05fd3b93a1f88f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/d725ebd288688bb24f47ee467b1299b0fc6d04f8",
-                "reference": "d725ebd288688bb24f47ee467b1299b0fc6d04f8",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/74cb5e8930df5864609eaf08e05fd3b93a1f88f4",
+                "reference": "74cb5e8930df5864609eaf08e05fd3b93a1f88f4",
                 "shasum": ""
             },
             "require": {
@@ -759,6 +763,7 @@
                 "phpunit/phpunit": "^9.0 || ^10.0 || ^11.0",
                 "psr/container": "^1.0 || ^2.0",
                 "rector/rector": "^1.0.0 || ^2.0",
+                "symfony/clock": "^6.4 || ^7.0 || ^8.0",
                 "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0 || ^8.0",
                 "symfony/expression-language": "^5.4 || ^6.0 || ^7.0 || ^8.0",
                 "symfony/filesystem": "^5.4 || ^6.0 || ^7.0 || ^8.0",
@@ -811,7 +816,7 @@
             ],
             "support": {
                 "issues": "https://github.com/schmittjoh/serializer/issues",
-                "source": "https://github.com/schmittjoh/serializer/tree/3.32.7"
+                "source": "https://github.com/schmittjoh/serializer/tree/3.32.8"
             },
             "funding": [
                 {
@@ -823,7 +828,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-03-11T20:11:17+00:00"
+            "time": "2026-08-31T22:35:14+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -976,16 +981,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.3.3",
+            "version": "2.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "fb19eedd2bb67ff8cf7a5502ad329e701d6398a3"
+                "reference": "148cefffaf0233e4c08cc13db8a195a56dd6dfe9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/fb19eedd2bb67ff8cf7a5502ad329e701d6398a3",
-                "reference": "fb19eedd2bb67ff8cf7a5502ad329e701d6398a3",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/148cefffaf0233e4c08cc13db8a195a56dd6dfe9",
+                "reference": "148cefffaf0233e4c08cc13db8a195a56dd6dfe9",
                 "shasum": ""
             },
             "require": {
@@ -1017,9 +1022,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.3"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.5"
             },
-            "time": "2026-07-08T07:01:06+00:00"
+            "time": "2026-08-31T16:05:28+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",
@@ -1343,16 +1348,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v7.4.14",
+            "version": "v7.4.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "13b38720174286f55d1761152b575a8d1436fc25"
+                "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/13b38720174286f55d1761152b575a8d1436fc25",
-                "reference": "13b38720174286f55d1761152b575a8d1436fc25",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
+                "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
                 "shasum": ""
             },
             "require": {
@@ -1387,7 +1392,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v7.4.14"
+                "source": "https://github.com/symfony/finder/tree/v7.4.17"
             },
             "funding": [
                 {
@@ -1407,7 +1412,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-27T08:31:18+00:00"
+            "time": "2026-08-21T12:09:28+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -1659,16 +1664,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v7.4.13",
+            "version": "v7.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "f5804be144caceb570f6747519999636b664f24c"
+                "reference": "058d17fc284cce14efb2385783b55014a461b176"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/f5804be144caceb570f6747519999636b664f24c",
-                "reference": "f5804be144caceb570f6747519999636b664f24c",
+                "url": "https://api.github.com/repos/symfony/process/zipball/058d17fc284cce14efb2385783b55014a461b176",
+                "reference": "058d17fc284cce14efb2385783b55014a461b176",
                 "shasum": ""
             },
             "require": {
@@ -1700,7 +1705,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v7.4.13"
+                "source": "https://github.com/symfony/process/tree/v7.4.18"
             },
             "funding": [
                 {
@@ -1720,7 +1725,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-23T16:05:06+00:00"
+            "time": "2026-08-21T17:40:08+00:00"
         },
         {
             "name": "symfony/translation-contracts",
@@ -1806,16 +1811,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v7.4.16",
+            "version": "v7.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "3aee77358ab14090337183657e554668bc94ab4a"
+                "reference": "976bd879fda78de30ee4688fd38ae87bc4d2dc76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/3aee77358ab14090337183657e554668bc94ab4a",
-                "reference": "3aee77358ab14090337183657e554668bc94ab4a",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/976bd879fda78de30ee4688fd38ae87bc4d2dc76",
+                "reference": "976bd879fda78de30ee4688fd38ae87bc4d2dc76",
                 "shasum": ""
             },
             "require": {
@@ -1886,7 +1891,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v7.4.16"
+                "source": "https://github.com/symfony/validator/tree/v7.4.18"
             },
             "funding": [
                 {
@@ -1906,20 +1911,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-06T09:41:15+00:00"
+            "time": "2026-08-30T00:47:26+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v7.4.15",
+            "version": "v7.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "e101850ded5d2c0d44bf32abb8996404afec2dec"
+                "reference": "4cef939e55b8a21c5780418de0d98ab00d0736e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/e101850ded5d2c0d44bf32abb8996404afec2dec",
-                "reference": "e101850ded5d2c0d44bf32abb8996404afec2dec",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/4cef939e55b8a21c5780418de0d98ab00d0736e1",
+                "reference": "4cef939e55b8a21c5780418de0d98ab00d0736e1",
                 "shasum": ""
             },
             "require": {
@@ -1962,7 +1967,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v7.4.15"
+                "source": "https://github.com/symfony/yaml/tree/v7.4.18"
             },
             "funding": [
                 {
@@ -1982,7 +1987,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-21T15:13:06+00:00"
+            "time": "2026-08-30T00:47:26+00:00"
         },
         {
             "name": "thecodingmachine/safe",
@@ -2345,16 +2350,16 @@
         },
         {
             "name": "nextcloud/ocp",
-            "version": "v34.0.2",
+            "version": "v34.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "81cbb2c594afe0fa978885bf7accd0440199520a"
+                "reference": "3fb764be792476e4dcf1593101d978fc1dc8ac9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/81cbb2c594afe0fa978885bf7accd0440199520a",
-                "reference": "81cbb2c594afe0fa978885bf7accd0440199520a",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/3fb764be792476e4dcf1593101d978fc1dc8ac9a",
+                "reference": "3fb764be792476e4dcf1593101d978fc1dc8ac9a",
                 "shasum": ""
             },
             "require": {
@@ -2388,9 +2393,9 @@
             "description": "Composer package containing Nextcloud's public OCP API and the unstable NCU API",
             "support": {
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
-                "source": "https://github.com/nextcloud-deps/ocp/tree/v34.0.2"
+                "source": "https://github.com/nextcloud-deps/ocp/tree/v34.0.3"
             },
-            "time": "2026-07-16T01:28:13+00:00"
+            "time": "2026-08-07T02:03:36+00:00"
         },
         {
             "name": "nikic/php-parser",
