@@ -1,15 +1,34 @@
-# Dependabot-Konfiguration (#157-Umfeld, eingefuehrt 07.08.2026).
+# Dependabot-Konfiguration — flottenweit vereinheitlicht (nc-app-tooling#13),
+# inkl. Major-Suppression aus contractmanager#394.
 #
-# Bis hierher gab es keine dependabot.yml. Damit liefen ausschliesslich
-# Security-Updates, und die zielen immer auf den Standard-Branch, also main.
-# Das widerspricht dem Branch-Workflow: main bekommt nur Releases, gesammelt
-# wird auf develop. Sechs Dependabot-PRs lagen deshalb wochenlang auf dem
-# falschen Ziel und liefen der Entwicklung 13 Commits hinterher.
+# Vorlage ist rechnungswerks Fassung (eingefuehrt 07.08.2026), die sich in der
+# Flotte bewaehrt hat. Alle Apps leiten die getesteten nextcloud/ocp-Versionen
+# aus info.xml ab (worktime#21), der canary laeuft gegen dev-master. Das
+# laufende Nachziehen der Abhaengigkeiten selbst besorgt Dependabot hier, inkl.
+# nextcloud/ocp (composer).
 #
-# VORBEHALT: target-branch lenkt die geplanten Versionsupdates auf develop.
-# Ob GitHub auch Security-Updates dorthin lenkt, geht aus der Dokumentation
-# nicht eindeutig hervor; nach derzeitigem Stand zielen sie weiter auf main.
-# Solche PRs werden wie bisher von Hand nach develop uebernommen.
+# WARUM target-branch develop: Ohne diese Angabe zielen geplante Updates auf den
+# Standard-Branch (main). main bekommt aber nur Releases, gesammelt wird auf
+# develop. Ohne die Lenkung laegen die PRs auf dem falschen Ziel und liefen der
+# Entwicklung hinterher.
+#
+# VORBEHALT: target-branch lenkt die geplanten Versionsupdates auf develop. Ob
+# GitHub auch Security-Updates dorthin lenkt, ist der Doku nicht eindeutig zu
+# entnehmen; nach derzeitigem Stand zielen sie weiter auf main. Solche PRs
+# werden wie bisher von Hand nach develop uebernommen.
+#
+# WARUM nur minor/patch gruppiert, keine Majors: Ohne Gruppierung entsteht pro
+# Paket ein eigener PR; minor/patch werden daher gebuendelt. Major-Spruenge
+# werden bewusst NICHT mehr als PR geoeffnet (ignore-Block unten) — sie
+# betreffen bei uns fast nur Dev-Werkzeug (eslint/vite/typescript) oder
+# Vue-3-only-Libs (pinia, vue-router) auf Vue-2-Apps, bringen der App keinen
+# Nutzen und kosten nur Zeit. Ein gewuenschter Major wird bei Bedarf von Hand
+# angestossen.
+#
+# WICHTIG — Sicherheit bleibt: Der ignore-Block betrifft nur die geplanten
+# Versionsupdates. Sicherheits-Alerts (Security-Tab) feuern unabhaengig von
+# dieser Datei weiter und werden von Hand behoben. Sicherheitsfixes sind zudem
+# meist patch/minor innerhalb des aktuellen Majors und laufen ohnehin durch.
 
 version: 2
 
@@ -21,14 +40,17 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
-    # Ohne Gruppierung entsteht pro Paket ein eigener PR. Genau so sind die
-    # sechs offenen entstanden, obwohl es fast nur transitive Patch-Spruenge
-    # waren. Patch und Minor kommen deshalb gebuendelt.
     groups:
       npm-minor-und-patch:
         update-types:
           - minor
           - patch
+    ignore:
+      # Keine Major-Versionsupdates als PR (nur Dev-Werkzeug/Vue-3-Libs, kein
+      # App-Nutzen). Security-Alerts bleiben davon unberuehrt (siehe Kopf).
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
@@ -45,6 +67,11 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # Keine Major-Versionsupdates als PR (Security-Alerts bleiben unberuehrt).
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
