@@ -464,7 +464,7 @@
         "Stornobelege können nicht dupliziert werden.": "Les avoirs ne peuvent pas être dupliqués.",
         "Textbaustein nicht gefunden.": "Modèle de texte introuvable.",
         "Nächste Rechnungsnummer": "Prochain numéro de facture",
-        "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.": "Le numéro séquentiel de la prochaine facture. Pour reprendre une numérotation existante, définissez ici la valeur souhaitée. Les numéros ne peuvent que croitre, jamais ramenés à un numéro déjà attribué.",
+        "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.": "Le numéro séquentiel de la prochaine facture. Pour reprendre une numérotation existante, définissez ici la valeur souhaitée. Les numéros ne peuvent que croître, jamais ramenés à un numéro déjà attribué.",
         "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein.": "Le prochain numéro de facture doit être un nombre entier supérieur ou égal à 1.",
         "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.": "Le prochain numéro de facture doit être au moins {min}, car le numéro {issued} a déjà été attribué.",
         "Die nächste Rechnungsnummer muss positiv sein.": "Le prochain numéro de facture doit être positif.",
