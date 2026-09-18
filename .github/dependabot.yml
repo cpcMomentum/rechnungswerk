@@ -51,6 +51,19 @@ updates:
       - dependency-name: "*"
         update-types:
           - version-update:semver-major
+      # nc-app-tooling haengt in package.json als Git-Tag
+      # (github:cpcMomentum/nc-app-tooling#v1.14.0), nicht als Version.
+      # Dependabot sortiert solche Tags als Zeichenketten: "v1.9.0" landet
+      # hinter "v1.11.0", weil die 9 groesser ist als die 1. Ergebnis war PR
+      # #261 (17.08.2026) — ein Downgrade von v1.11.0 auf v1.9.0, als waere
+      # das ein Update. Das wiederholt sich mit jedem Tag ab v1.10.0.
+      #
+      # Ein Update braucht es hier ohnehin nicht: das Werkzeug wird bewusst
+      # flottenweit im Gleichschritt gehoben (Tag und Version im selben
+      # Commit, dann alle fuenf Apps nachziehen). Wer es hier allein
+      # hochzoege, braechte die Flotte auseinander — genau das, wogegen das
+      # Repo gebaut ist.
+      - dependency-name: "nc-app-tooling"
     commit-message:
       prefix: chore(deps)
       prefix-development: chore(deps-dev)
@@ -88,5 +101,12 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # nc-app-tooling wird ZUSAETZLICH als Reusable Workflow referenziert
+      # (canary.yml: uses …/canary.yml@vX). Das ist ein eigener Dependabot-
+      # Eintrag im github-actions-Oekosystem — Name ist der volle Pfad, nicht
+      # "nc-app-tooling". Ergebnis ohne dieses ignore war PR #285. Auch dieser
+      # Kanal wird flottenweit im Gleichschritt gehoben, nicht pro App.
+      - dependency-name: "cpcMomentum/nc-app-tooling*"
     commit-message:
       prefix: ci(deps)
