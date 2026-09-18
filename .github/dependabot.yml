@@ -101,5 +101,12 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # nc-app-tooling wird ZUSAETZLICH als Reusable Workflow referenziert
+      # (canary.yml: uses …/canary.yml@vX). Das ist ein eigener Dependabot-
+      # Eintrag im github-actions-Oekosystem — Name ist der volle Pfad, nicht
+      # "nc-app-tooling". Ergebnis ohne dieses ignore war PR #285. Auch dieser
+      # Kanal wird flottenweit im Gleichschritt gehoben, nicht pro App.
+      - dependency-name: "cpcMomentum/nc-app-tooling*"
     commit-message:
       prefix: ci(deps)
