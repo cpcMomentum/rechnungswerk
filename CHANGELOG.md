@@ -7,6 +7,21 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Changed
+- **RechnungsWerk ist für Nextcloud 35 freigegeben** (unterstützt werden jetzt
+  NC 31 bis 35). Die Unit-Suite läuft grün gegen die OCP-Schnittstellen von
+  NC 35, keine der genutzten APIs wurde entfernt oder geändert. Die
+  PHP-Untergrenze der App bleibt bei 8.2: Nextcloud 35 verlangt selbst
+  mindestens PHP 8.3, für NC 31 bis 34 ändert sich damit nichts (#309)
+
+### Fixed
+- **Wartung:** Der wöchentliche Kompatibilitäts-Wächter und die Unit-Test-Läufe
+  scheiterten an einem neuen Nextcloud-Major, sobald dieses die PHP-Untergrenze
+  anhob — und zwar bevor ein einziger Test lief. Gemeldet wurde es trotzdem als
+  „API-Änderung". Die Test-Läufe wählen die geprüften Nextcloud-Versionen jetzt
+  passend zur PHP-Version des Laufs aus, und der Wächter benennt die beiden
+  Ursachen getrennt. Zusätzlich wird gegen PHP 8.5 getestet (#309)
+
 ## [0.5.3] - 2026-09-21
 
 Ein neues Fenster meldet Neuerungen direkt in der App, eine zusätzliche
