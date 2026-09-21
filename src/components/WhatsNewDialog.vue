@@ -59,6 +59,7 @@ import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import FolderIcon from 'vue-material-design-icons/Folder.vue'
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue'
 import StarIcon from 'vue-material-design-icons/Star.vue'
+import TranslateIcon from 'vue-material-design-icons/Translate.vue'
 import type { WhatsNewEntry } from '@/types/api'
 import { getWhatsNew, markWhatsNewSeen } from '@/api/whatsnew'
 import { escCloses } from '@/utils/modalEsc'
@@ -91,6 +92,7 @@ const ICONS: Record<string, Component> = {
 	folder: FolderIcon,
 	magnify: MagnifyIcon,
 	star: StarIcon,
+	translate: TranslateIcon,
 }
 
 const open = ref(false)
