@@ -297,3 +297,23 @@ export interface Settings {
 	introDefault: string | null
 	closingDefault: string | null
 }
+
+/** „Was ist neu?"-Fenster (#308) — ein Eintrag, bereits in Nutzersprache. */
+export interface WhatsNewEntry {
+	title: string
+	text: string
+	/** Name aus der Symbolliste des Dialogs; unbekannt oder leer = Stern. */
+	icon: string
+	/** Wo die Neuerung sitzt, etwa „Kunden". Leer = keine Fundort-Zeile. */
+	where: string
+	/** Stelle ist adminpflichtig; der Dialog schreibt es dazu. */
+	adminOnly: boolean
+	/** WerkPlus-Feature: Badge und Link auf werkwolke.de. */
+	plus: boolean
+}
+
+/** Antwort von `GET /whatsnew`. Leere Liste heisst: kein Fenster. */
+export interface WhatsNewPayload {
+	version: string
+	entries: WhatsNewEntry[]
+}

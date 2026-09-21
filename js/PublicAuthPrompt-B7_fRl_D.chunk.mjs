@@ -1,9 +1,9 @@
 import { c as e, s as t } from "./logger-Dmvqkkgn.chunk.mjs";
 import { En as n, Un as r, Vn as i, an as a, dn as o, in as s, ln as c, lr as l, nn as u, on as d, pr as f, tr as p, zn as m } from "./createElementId-XLh0NVJk.chunk.mjs";
-import { O as h, i as g, n as _, o as v, s as y, w as b } from "./chunks-C8_Df2hW.chunk.mjs";
+import { T as h, i as g, n as _, o as v, s as y, w as b } from "./chunks-DrYk3xeN.chunk.mjs";
 import { t as x } from "./NcTextField.vue_vue_type_script_setup_true_lang-C2t_3wGw.chunk.mjs";
-import { i as S, n as C, t as w } from "./dist-Rp_bJ0m4.chunk.mjs";
-import "./FilePicker-BNJJWKyy.chunk.mjs";
+import { i as S, n as C, t as w } from "./dist-oESYOil-.chunk.mjs";
+import "./FilePicker-CmON9OVd.chunk.mjs";
 //#region node_modules/@nextcloud/dialogs/dist/chunks/PublicAuthPrompt.mjs
 function T(e) {
 	if (e.trim() === "") return y("Names must not be empty.");

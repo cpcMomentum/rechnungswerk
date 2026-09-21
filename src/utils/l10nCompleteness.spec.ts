@@ -212,6 +212,8 @@ describe('Übersetzungen sind vollständig', () => {
 		const GLEICH = new Set([
 			'BIC', 'Bank', 'Branding', 'Format', 'IBAN', 'Name', 'Port', 'Status',
 			'Text', 'Tonne', 'kWh', 'kg', 'm²',
+			// „Version {version}" lautet im Englischen wortgleich (#308).
+			'Version {version}',
 		])
 		for (const name of ['en.json', 'en.js']) {
 			const untranslated = Object.entries(FILES[name])

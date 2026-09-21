@@ -1,8 +1,8 @@
 import { An as e, En as t, Ln as n, Qt as r, Un as i, Vn as a, X as o, Xt as s, Z as c, _n as l, an as u, cn as d, dn as f, in as p, ir as m, ln as h, lr as g, nn as _, on as v, pr as y, rn as b, tr as x, ur as S, zn as C } from "./createElementId-XLh0NVJk.chunk.mjs";
-import { a as w, f as T, i as E, n as D, o as O, p as k, s as A, u as j, w as M, y as N } from "./chunks-C8_Df2hW.chunk.mjs";
+import { a as w, f as T, i as E, n as D, o as O, p as k, s as A, u as j, w as M, y as N } from "./chunks-DrYk3xeN.chunk.mjs";
 import { t as P } from "./NcCheckboxRadioSwitch-BdRECR9E.chunk.mjs";
-import { a as F, s as I } from "./dist-Rp_bJ0m4.chunk.mjs";
-import { n as L, t as R } from "./FilePicker-BNJJWKyy.chunk.mjs";
+import { a as F, s as I } from "./dist-oESYOil-.chunk.mjs";
+import { n as L, t as R } from "./FilePicker-CmON9OVd.chunk.mjs";
 //#region node_modules/@nextcloud/dialogs/dist/chunks/ConflictPicker.mjs
 var z = ["src"], B = { key: 1 }, V = { class: "hidden-visually" }, H = /* @__PURE__ */ D(/* @__PURE__ */ f({
 	__name: "ConflictPickerCard",

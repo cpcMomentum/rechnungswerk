@@ -469,7 +469,13 @@
         "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.": "Le prochain numéro de facture doit être au moins {min}, car le numéro {issued} a déjà été attribué.",
         "Die nächste Rechnungsnummer muss positiv sein.": "Le prochain numéro de facture doit être positif.",
         "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden.": "Le prochain numéro de facture doit être au moins %1$s, car le numéro %2$s a déjà été attribué. Les numéros ne peuvent qu'augmenter.",
-        "Produkt suchen und einfügen …": "Rechercher et insérer un produit…"
+        "Produkt suchen und einfügen …": "Rechercher et insérer un produit…",
+        "Was ist neu in RechnungsWerk": "Nouveautés dans RechnungsWerk",
+        "Version {version}": "Version {version}",
+        "Zu finden unter": "À trouver sous",
+        "(nur für Administratoren)": "(administrateurs uniquement)",
+        "Mehr zu WerkPlus": "En savoir plus sur WerkPlus",
+        "Alles klar": "C'est noté"
     },
     "pluralForm": "nplurals=2; plural=(n > 1);"
 }

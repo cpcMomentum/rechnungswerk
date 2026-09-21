@@ -470,6 +470,12 @@ OC.L10N.register(
     "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde." : "The next invoice number must be at least {min}, because number {issued} has already been issued.",
     "Die nächste Rechnungsnummer muss positiv sein." : "The next invoice number must be positive.",
     "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "The next invoice number must be at least %1$s, because number %2$s has already been issued. Numbers can only be moved forward.",
-    "Produkt suchen und einfügen …" : "Search and add a product …"
+    "Produkt suchen und einfügen …" : "Search and add a product …",
+    "Was ist neu in RechnungsWerk" : "What's new in RechnungsWerk",
+    "Version {version}" : "Version {version}",
+    "Zu finden unter" : "Found under",
+    "(nur für Administratoren)" : "(administrators only)",
+    "Mehr zu WerkPlus" : "More about WerkPlus",
+    "Alles klar" : "Got it"
 },
 "nplurals=2; plural=(n != 1);");
