@@ -120,9 +120,6 @@ class MailService {
 
 	// --- dedicated SMTP account (PHPMailer) -----------------------------
 
-	/**
-	 * @param array{host: string, port: int, security: string, user: string, password: string} $cfg
-	 */
 	private function sendViaPhpMailer(
 		string $to,
 		string $subject,
