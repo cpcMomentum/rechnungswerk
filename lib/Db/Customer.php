@@ -22,6 +22,8 @@ use OCP\DB\Types;
  * @method void setName(string $name)
  * @method ?string getVatId()
  * @method void setVatId(?string $vatId)
+ * @method ?string getAddressAddition()
+ * @method void setAddressAddition(?string $addressAddition)
  * @method ?string getAddress()
  * @method void setAddress(?string $address)
  * @method ?string getPostalCode()
@@ -60,6 +62,8 @@ class Customer extends Entity implements JsonSerializable {
 	protected ?string $customerNumber = null;
 	protected ?string $name = null;
 	protected ?string $vatId = null;
+	/** Freie Zeile zwischen Firmenname und Strasse, etwa „z. Hd. ..." (#304). */
+	protected ?string $addressAddition = null;
 	protected ?string $address = null;
 	protected ?string $postalCode = null;
 	protected ?string $city = null;
@@ -82,6 +86,7 @@ class Customer extends Entity implements JsonSerializable {
 		$this->addType('customerNumber', Types::STRING);
 		$this->addType('name', Types::STRING);
 		$this->addType('vatId', Types::STRING);
+		$this->addType('addressAddition', Types::STRING);
 		$this->addType('address', Types::TEXT);
 		$this->addType('postalCode', Types::STRING);
 		$this->addType('city', Types::STRING);
@@ -106,6 +111,7 @@ class Customer extends Entity implements JsonSerializable {
 			'customerNumber' => $this->getCustomerNumber(),
 			'name' => $this->getName(),
 			'vatId' => $this->getVatId(),
+			'addressAddition' => $this->getAddressAddition(),
 			'address' => $this->getAddress(),
 			'postalCode' => $this->getPostalCode(),
 			'city' => $this->getCity(),

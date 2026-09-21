@@ -28,6 +28,8 @@ use OCP\DB\Types;
  * @method void setRecipientContactId(?string $recipientContactId)
  * @method ?int getCustomerId()
  * @method void setCustomerId(?int $customerId)
+ * @method ?string getRecipientAddressAddition()
+ * @method void setRecipientAddressAddition(?string $recipientAddressAddition)
  * @method ?string getRecipientAddress()
  * @method void setRecipientAddress(?string $recipientAddress)
  * @method ?string getRecipientPostalCode()
@@ -211,6 +213,8 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?string $recipientName = null;
 	protected ?string $recipientContactId = null;
 	protected ?int $customerId = null;
+	/** Beim Festschreiben eingefrorener Adresszusatz des Empfaengers (#304). */
+	protected ?string $recipientAddressAddition = null;
 	protected ?string $recipientAddress = null;
 	protected ?string $recipientPostalCode = null;
 	protected ?string $recipientCity = null;
@@ -292,6 +296,7 @@ class Invoice extends Entity implements JsonSerializable {
 		$this->addType('recipientName', Types::STRING);
 		$this->addType('recipientContactId', Types::STRING);
 		$this->addType('customerId', Types::INTEGER);
+		$this->addType('recipientAddressAddition', Types::STRING);
 		$this->addType('recipientAddress', Types::TEXT);
 		$this->addType('recipientPostalCode', Types::STRING);
 		$this->addType('recipientCity', Types::STRING);
@@ -409,6 +414,7 @@ class Invoice extends Entity implements JsonSerializable {
 			'recipientName' => $this->getRecipientName(),
 			'recipientContactId' => $this->getRecipientContactId(),
 			'customerId' => $this->getCustomerId(),
+			'recipientAddressAddition' => $this->getRecipientAddressAddition(),
 			'recipientAddress' => $this->getRecipientAddress(),
 			'recipientPostalCode' => $this->getRecipientPostalCode(),
 			'recipientCity' => $this->getRecipientCity(),

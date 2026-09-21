@@ -78,6 +78,8 @@ export interface Customer {
 	customerNumber: string
 	name: string
 	vatId: string | null
+	/** Freie Zeile zwischen Firmenname und Straße, etwa „z. Hd. ..." (#304). */
+	addressAddition: string | null
 	address: string | null
 	postalCode: string | null
 	city: string | null
@@ -156,6 +158,8 @@ export interface Invoice {
 	recipientName: string | null
 	recipientContactId: string | null
 	customerId: number | null
+	/** Beim Festschreiben eingefrorener Adresszusatz (#304). */
+	recipientAddressAddition: string | null
 	recipientAddress: string | null
 	recipientPostalCode: string | null
 	recipientCity: string | null

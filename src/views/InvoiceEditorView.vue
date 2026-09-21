@@ -87,6 +87,10 @@
 					<input v-model="form.recipientEmail" class="rw-input" type="email" :readonly="readonly" /></label>
 			</div>
 			<div class="rw-form-row">
+				<label class="rw-field"><span>{{ t('rechnungswerk', 'Adresszusatz') }}</span>
+					<input v-model="form.recipientAddressAddition" class="rw-input" type="text" :readonly="readonly" /></label>
+			</div>
+			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Straße') }}</span>
 					<input v-model="form.recipientAddress" class="rw-input" type="text" :readonly="readonly" /></label>
 				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'PLZ') }}</span>
@@ -445,7 +449,7 @@ const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | nul
 
 const emptyForm = () => ({
 	customerId: null as number | null,
-	recipientName: '', recipientEmail: '', recipientAddress: '', recipientPostalCode: '',
+	recipientName: '', recipientEmail: '', recipientAddressAddition: '', recipientAddress: '', recipientPostalCode: '',
 	recipientCity: '', recipientCountry: 'DE', recipientVatId: '', recipientContactId: '',
 	recipientContactPerson: '', recipientPhone: '',
 	sellerContactPerson: '', sellerContactPhone: '', sellerContactEmail: '',
@@ -665,6 +669,7 @@ async function load(id: number, token: number = navToken) {
 	form.customerId = detail.customerId ?? null
 	form.recipientName = detail.recipientName ?? ''
 	form.recipientEmail = detail.recipientEmail ?? ''
+	form.recipientAddressAddition = detail.recipientAddressAddition ?? ''
 	form.recipientAddress = detail.recipientAddress ?? ''
 	form.recipientPostalCode = detail.recipientPostalCode ?? ''
 	form.recipientCity = detail.recipientCity ?? ''
@@ -707,6 +712,7 @@ function onCustomerSelect(c: Customer) {
 	form.recipientName = c.name
 	form.recipientContactId = ''
 	form.recipientEmail = c.email ?? ''
+	form.recipientAddressAddition = c.addressAddition ?? ''
 	form.recipientAddress = c.address ?? ''
 	form.recipientPostalCode = c.postalCode ?? ''
 	form.recipientCity = c.city ?? ''
@@ -728,6 +734,9 @@ function onContactSelect(c: ContactMatch) {
 	if (c.phone) {
 		form.recipientPhone = c.phone
 	}
+	// Ein Nextcloud-Kontakt kennt keinen Adresszusatz; ein Rest vom vorher
+	// gewaehlten Kunden darf nicht stehenbleiben.
+	form.recipientAddressAddition = ''
 	form.recipientAddress = c.address
 	form.recipientPostalCode = c.postalCode
 	form.recipientCity = c.city

@@ -133,6 +133,14 @@ class CustomerService {
 				throw new ValidationException($this->l10n->t('Die Kundennummer darf höchstens 64 Zeichen lang sein.'));
 			}
 		}
+		if (array_key_exists('addressAddition', $data)) {
+			// Die Spalte ist 255 Zeichen breit; ohne Pruefung liefe ein laengerer
+			// Wert erst in der Datenbank auf und dort als 500er (#304).
+			$addition = trim((string)($data['addressAddition'] ?? ''));
+			if (mb_strlen($addition) > 255) {
+				throw new ValidationException($this->l10n->t('Der Adresszusatz darf höchstens 255 Zeichen lang sein.'));
+			}
+		}
 		if (array_key_exists('iban', $data) && trim((string)$data['iban']) !== '' && !$this->isValidIban((string)$data['iban'])) {
 			throw new ValidationException($this->l10n->t('Die IBAN ist ungültig (Format oder Prüfziffer).'));
 		}
@@ -178,6 +186,7 @@ class CustomerService {
 		}
 		foreach ([
 			'vatId' => 'setVatId',
+			'addressAddition' => 'setAddressAddition',
 			'address' => 'setAddress',
 			'postalCode' => 'setPostalCode',
 			'city' => 'setCity',
