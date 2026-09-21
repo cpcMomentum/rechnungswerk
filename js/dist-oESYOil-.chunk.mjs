@@ -1,6 +1,6 @@
 import { n as e } from "./logger-Dmvqkkgn.chunk.mjs";
 import { Ct as t, St as n } from "./createElementId-XLh0NVJk.chunk.mjs";
-import { C as r, S as i, b as a, k as o, x as s, y as c } from "./chunks-C8_Df2hW.chunk.mjs";
+import { C as r, S as i, b as a, k as o, x as s, y as c } from "./chunks-DrYk3xeN.chunk.mjs";
 //#region node_modules/@nextcloud/files/dist/chunks/logger.mjs
 var l = Object.freeze({
 	Folder: "folder",

@@ -1,6 +1,6 @@
 import { a as e, d as t, g as n, o as r, r as i, u as a } from "./logger-Dmvqkkgn.chunk.mjs";
 import { Bn as o, En as s, Mn as c, Q as l, Qt as u, Un as d, X as f, Xt as p, Z as m, an as h, c as g, cn as _, dn as ee, f as te, fr as v, in as y, jn as b, ln as ne, lr as x, mn as S, on as C, pr as w, rn as T, sn as re, t as E, tn as D, ur as O, vn as k } from "./createElementId-XLh0NVJk.chunk.mjs";
-import { F as A, I as j, N as ie, P as ae } from "./chunks-C8_Df2hW.chunk.mjs";
+import { F as A, I as j, N as ie, P as ae } from "./chunks-DrYk3xeN.chunk.mjs";
 //#region node_modules/@nextcloud/vue/dist/chunks/actionGlobal.mjs
 var M = {
 	beforeUpdate() {

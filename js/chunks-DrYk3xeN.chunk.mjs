@@ -717,112 +717,20 @@ function xt() {
 	}
 }
 //#endregion
-//#region node_modules/@nextcloud/vue/dist/chunks/NcNoteCard.mjs
-var St = ["role"], Ct = {
-	key: 0,
-	class: "notecard__heading"
-}, wt = { class: "notecard__text" }, Tt = /* @__PURE__ */ C(/* @__PURE__ */ P({
-	__name: "NcNoteCard",
-	props: {
-		heading: { default: void 0 },
-		showAlert: { type: Boolean },
-		text: { default: void 0 },
-		type: { default: "warning" }
-	},
-	setup(e) {
-		let t = e, n = V(() => t.showAlert || t.type === "error"), i = V(() => {
-			switch (t.type) {
-				case "error": return xe;
-				case "success": return Se;
-				case "info": return Oe;
-				default: return Ce;
-			}
-		});
-		return (t, a) => (p(), H("div", {
-			class: K(["notecard", {
-				[`notecard--${e.type}`]: e.type,
-				"notecard--legacy": z(r)
-			}]),
-			role: n.value ? "alert" : "note"
-		}, [L(t.$slots, "icon", {}, () => [R(z(k), {
-			path: i.value,
-			class: K(["notecard__icon", { "notecard__icon--heading": e.heading }]),
-			inline: ""
-		}, null, 8, ["path", "class"])], !0), W("div", null, [e.heading ? (p(), H("p", Ct, U(e.heading), 1)) : M("", !0), L(t.$slots, "default", {}, () => [W("p", wt, U(e.text), 1)], !0)])], 10, St));
-	}
-}), [["__scopeId", "data-v-6be9fa31"]]);
-//#endregion
-//#region node_modules/@nextcloud/vue/dist/chunks/NcDialogButton.vue_vue_type_script_setup_true_lang.mjs
-f(h);
-var Et = /* @__PURE__ */ P({
-	__name: "NcDialogButton",
-	props: {
-		callback: {
-			type: Function,
-			default: () => {}
-		},
-		disabled: {
-			type: Boolean,
-			default: !1
-		},
-		icon: { default: void 0 },
-		label: {},
-		type: { default: "button" },
-		variant: { default: "tertiary" }
-	},
-	emits: ["click"],
-	setup(e, { emit: t }) {
-		let n = e, r = t, i = G(!1);
-		async function a(e) {
-			if (!i.value) {
-				i.value = !0;
-				try {
-					let t = n.type !== "reset" && void 0, i = await n.callback?.() ?? t;
-					i !== !1 && r("click", e, i);
-				} finally {
-					i.value = !1;
-				}
-			}
-		}
-		return (t, n) => (p(), F(z(A), {
-			"aria-label": e.label,
-			disabled: e.disabled,
-			type: e.type,
-			variant: e.variant,
-			onClick: a
-		}, {
-			icon: E(() => [L(t.$slots, "icon", {}, () => [i.value ? (p(), F(z(Fe), {
-				key: 0,
-				name: z(d)("Loading\xA0…")
-			}, null, 8, ["name"])) : e.icon === void 0 ? M("", !0) : (p(), F(z(k), {
-				key: 1,
-				svg: e.icon
-			}, null, 8, ["svg"]))])]),
-			default: E(() => [me(U(e.label) + " ", 1)]),
-			_: 3
-		}, 8, [
-			"aria-label",
-			"disabled",
-			"type",
-			"variant"
-		]));
-	}
-});
-//#endregion
 //#region node_modules/@nextcloud/vue/dist/composables/useFormatDateTime/index.mjs
 f(x);
-var Dt = {
+var St = {
 	long: d("a few seconds ago"),
 	short: d("seconds ago"),
 	narrow: d("sec. ago")
 };
-function Ot(e = Date.now(), t = {}) {
+function Ct(e = Date.now(), t = {}) {
 	let n, r = V(() => new Date(N(e))), i = V(() => {
 		let { language: e, relativeTime: n, ignoreSeconds: r } = N(t);
 		return {
 			...e && { language: e },
 			...n && { relativeTime: n },
-			ignoreSeconds: r ? Dt[n || "long"] : !1
+			ignoreSeconds: r ? St[n || "long"] : !1
 		};
 	}), a = G("");
 	g(o);
@@ -839,7 +747,7 @@ function Ot(e = Date.now(), t = {}) {
 	}
 	return J(() => n && window.clearTimeout(n)), _e(a);
 }
-function kt(e, t) {
+function wt(e, t) {
 	let n = V(() => ({
 		locale: ie(),
 		format: {
@@ -852,22 +760,22 @@ function kt(e, t) {
 }
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/platform.mjs
-var At = /mac|ipad|iphone|darwin/i.test(navigator.userAgent), jt = window.OCP?.Accessibility?.disableKeyboardShortcuts?.(), Mt = /^[a-zA-Z0-9]$/, Nt = /^[^\x20-\x7F]$/;
-function Pt(e, t) {
+var Tt = /mac|ipad|iphone|darwin/i.test(navigator.userAgent), Et = window.OCP?.Accessibility?.disableKeyboardShortcuts?.(), Dt = /^[a-zA-Z0-9]$/, Ot = /^[^\x20-\x7F]$/;
+function kt(e, t) {
 	return !(e.target instanceof HTMLElement) || e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement || e.target.isContentEditable ? !0 : !t.allowInModal && Array.from(document.getElementsByClassName("modal-mask")).filter((e) => e.checkVisibility()).length > 0;
 }
-function Ft(e, t) {
+function At(e, t) {
 	return (n) => {
-		(At ? n.metaKey : n.ctrlKey) === !!t.ctrl && n.altKey === !!t.alt && (t.shift === void 0 || n.shiftKey === !!t.shift) && (Pt(n, t) || (t.prevent && n.preventDefault(), t.stop && n.stopPropagation(), e(n)));
+		(Tt ? n.metaKey : n.ctrlKey) === !!t.ctrl && n.altKey === !!t.alt && (t.shift === void 0 || n.shiftKey === !!t.shift) && (kt(n, t) || (t.prevent && n.preventDefault(), t.stop && n.stopPropagation(), e(n)));
 	};
 }
-function It(e, t = () => {}, n = {}) {
-	if (jt) return () => {};
-	let r = (e, t) => e.key === t ? !0 : n.caseSensitive && t === t.toLowerCase() != (e.key === e.key.toLowerCase()) ? !1 : Mt.test(t) && Nt.test(e.key) ? e.code.replace(/^(?:Key|Digit|Numpad)/, "") === t.toUpperCase() : e.key.toLowerCase() === t.toLowerCase(), i = (t) => typeof e == "function" ? e(t) : typeof e == "string" ? r(t, e) : !Array.isArray(e) || e.some((e) => r(t, e)), a = ht(i, Ft(t, n), {
+function jt(e, t = () => {}, n = {}) {
+	if (Et) return () => {};
+	let r = (e, t) => e.key === t ? !0 : n.caseSensitive && t === t.toLowerCase() != (e.key === e.key.toLowerCase()) ? !1 : Dt.test(t) && Ot.test(e.key) ? e.code.replace(/^(?:Key|Digit|Numpad)/, "") === t.toUpperCase() : e.key.toLowerCase() === t.toLowerCase(), i = (t) => typeof e == "function" ? e(t) : typeof e == "string" ? r(t, e) : !Array.isArray(e) || e.some((e) => r(t, e)), a = ht(i, At(t, n), {
 		eventName: "keydown",
 		dedupe: !0,
 		passive: !n.prevent
-	}), o = n.push ? ht(i, Ft(t, n), {
+	}), o = n.push ? ht(i, At(t, n), {
 		eventName: "keyup",
 		passive: !n.prevent
 	}) : () => {};
@@ -877,38 +785,38 @@ function It(e, t = () => {}, n = {}) {
 }
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/functions/isDarkTheme/index.mjs
-function Lt(e = document.body) {
+function Mt(e = document.body) {
 	let t = window.getComputedStyle(e).getPropertyValue("--background-invert-if-dark");
 	return t !== void 0 && t === "invert(100%)";
 }
-Lt();
+Mt();
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/composables/useIsFullscreen/index.mjs
-var Rt = G(zt());
+var Nt = G(Pt());
 window.addEventListener("resize", () => {
-	Rt.value = zt();
+	Nt.value = Pt();
 });
-function zt() {
+function Pt() {
 	return window.outerHeight === window.screen.height;
 }
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/NcModal.mjs
-function Bt(e) {
+function Ft(e) {
 	return e.parent ? "vapor" in e || "vapor" in e.parent ? (s("Vapor instances are not supported in useScopeIdAttrs :("), null) : e.parent.subTree === e.vnode ? e.parent : null : null;
 }
-function Vt(e) {
-	let t = [e], n = Bt(e);
-	for (; n;) t.push(n), n = Bt(n);
+function It(e) {
+	let t = [e], n = Ft(e);
+	for (; n;) t.push(n), n = Ft(n);
 	return t;
 }
-function Ht() {
+function Lt() {
 	let e = ye();
 	if (!e) throw Error("useScopeId must be called within a setup context");
-	let t = Vt(e).map((e) => e.vnode.scopeId).filter(Boolean);
+	let t = It(e).map((e) => e.vnode.scopeId).filter(Boolean);
 	return Object.fromEntries(t.map((e) => [e, ""]));
 }
 f(S, T);
-var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "data-theme-dark"], Gt = ["id"], Kt = { class: "icons-menu" }, qt = ["title"], Jt = ["id"], Yt = { class: "modal-container__content" }, Xt = /* @__PURE__ */ C(/* @__PURE__ */ P({
+var Rt = ["aria-labelledby", "aria-describedby"], zt = ["data-theme-light", "data-theme-dark"], Bt = ["id"], Vt = { class: "icons-menu" }, Ht = ["title"], Ut = ["id"], Wt = { class: "modal-container__content" }, Gt = /* @__PURE__ */ C(/* @__PURE__ */ P({
 	inheritAttrs: !1,
 	__name: "NcModal",
 	props: /* @__PURE__ */ j({
@@ -955,7 +863,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 			v11237964: ie.value,
 			v5117887e: C.value
 		}));
-		let n = b(e, "show"), r = b(e, "slideshowRunning"), i = e, o = t, f = Ht(), m = Ee(), h = Y("mask"), _;
+		let n = b(e, "show"), r = b(e, "slideshowRunning"), i = e, o = t, f = Lt(), m = Ee(), h = Y("mask"), _;
 		J(() => j()), D(() => i.additionalTrapElements, (e) => {
 			_ && _.updateContainerElements([h.value, ...e]);
 		});
@@ -964,9 +872,9 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 			r.value && !i.slideshowPaused ? S() : y.value && x();
 		});
 		let C = V(() => `${i.slideshowDelay}ms`), { stop: te } = yt(h, { onSwipeEnd: O });
-		J(te), It("Escape", () => {
+		J(te), jt("Escape", () => {
 			je().at(-1) === _ && ue();
-		}, { allowInModal: !0 }), It(["ArrowLeft", "ArrowRight"], (e) => {
+		}, { allowInModal: !0 }), jt(["ArrowLeft", "ArrowRight"], (e) => {
 			(!document.activeElement || h.value.contains(document.activeElement)) && (e.key === "ArrowLeft" === Me ? T() : oe());
 		}, { allowInModal: !0 });
 		let w = ne(), ie = V(() => {
@@ -1054,7 +962,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 					key: 0,
 					id: "modal-name-" + z(m),
 					class: "modal-header__name"
-				}, U(e.name), 9, Gt)), W("div", Kt, [
+				}, U(e.name), 9, Bt)), W("div", Vt, [
 					e.hasNext && e.enableSlideshow ? (p(), H("button", {
 						key: 0,
 						class: K(["play-pause-icons", { "play-pause-icons--paused": e.slideshowPaused }]),
@@ -1079,7 +987,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 						r: "15",
 						cx: "25",
 						cy: "25"
-					}, null, -1)]])) : M("", !0)], 10, qt)) : M("", !0),
+					}, null, -1)]])) : M("", !0)], 10, Ht)) : M("", !0),
 					R(et, {
 						class: "header-actions",
 						inline: e.inlineActions
@@ -1097,7 +1005,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 						icon: E(() => [R(k, { path: z(be) }, null, 8, ["path"])]),
 						_: 1
 					}, 8, ["aria-label"])) : M("", !0)
-				])], 8, Wt)) : M("", !0)]),
+				])], 8, zt)) : M("", !0)]),
 				_: 3
 			}), R(c, {
 				name: `modal-${e.outTransition ? "out" : "in"}`,
@@ -1132,7 +1040,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 					W("div", {
 						id: "modal-description-" + z(m),
 						class: "modal-container"
-					}, [W("div", Yt, [L(t.$slots, "default", {}, void 0, !0)]), !e.noClose && !e.closeButtonOutside ? (p(), F(A, {
+					}, [W("div", Wt, [L(t.$slots, "default", {}, void 0, !0)]), !e.noClose && !e.closeButtonOutside ? (p(), F(A, {
 						key: 0,
 						"aria-label": z(d)("Close"),
 						class: "modal-container__close",
@@ -1141,7 +1049,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 					}, {
 						icon: E(() => [R(k, { path: z(be) }, null, 8, ["path"])]),
 						_: 1
-					}, 8, ["aria-label"])) : M("", !0)], 8, Jt),
+					}, 8, ["aria-label"])) : M("", !0)], 8, Ut),
 					R(c, {
 						name: "fade-visibility",
 						appear: ""
@@ -1163,11 +1071,100 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 					})
 				], 34), [[v, n.value]])]),
 				_: 3
-			}, 8, ["name"])], 16, Ut), [[v, n.value]])]),
+			}, 8, ["name"])], 16, Rt), [[v, n.value]])]),
 			_: 3
 		})], 8, ["disabled", "to"]));
 	}
-}), [["__scopeId", "data-v-8a639337"]]), Zt = ["id", "textContent"], Qt = ["aria-label", "aria-labelledby"], $t = { class: "dialog__text" }, en = { class: "dialog__actions" }, tn = /* @__PURE__ */ C(/* @__PURE__ */ P({
+}), [["__scopeId", "data-v-8a639337"]]), Kt = ["role"], qt = {
+	key: 0,
+	class: "notecard__heading"
+}, Jt = { class: "notecard__text" }, Yt = /* @__PURE__ */ C(/* @__PURE__ */ P({
+	__name: "NcNoteCard",
+	props: {
+		heading: { default: void 0 },
+		showAlert: { type: Boolean },
+		text: { default: void 0 },
+		type: { default: "warning" }
+	},
+	setup(e) {
+		let t = e, n = V(() => t.showAlert || t.type === "error"), i = V(() => {
+			switch (t.type) {
+				case "error": return xe;
+				case "success": return Se;
+				case "info": return Oe;
+				default: return Ce;
+			}
+		});
+		return (t, a) => (p(), H("div", {
+			class: K(["notecard", {
+				[`notecard--${e.type}`]: e.type,
+				"notecard--legacy": z(r)
+			}]),
+			role: n.value ? "alert" : "note"
+		}, [L(t.$slots, "icon", {}, () => [R(z(k), {
+			path: i.value,
+			class: K(["notecard__icon", { "notecard__icon--heading": e.heading }]),
+			inline: ""
+		}, null, 8, ["path", "class"])], !0), W("div", null, [e.heading ? (p(), H("p", qt, U(e.heading), 1)) : M("", !0), L(t.$slots, "default", {}, () => [W("p", Jt, U(e.text), 1)], !0)])], 10, Kt));
+	}
+}), [["__scopeId", "data-v-6be9fa31"]]);
+//#endregion
+//#region node_modules/@nextcloud/vue/dist/chunks/NcDialogButton.vue_vue_type_script_setup_true_lang.mjs
+f(h);
+var Xt = /* @__PURE__ */ P({
+	__name: "NcDialogButton",
+	props: {
+		callback: {
+			type: Function,
+			default: () => {}
+		},
+		disabled: {
+			type: Boolean,
+			default: !1
+		},
+		icon: { default: void 0 },
+		label: {},
+		type: { default: "button" },
+		variant: { default: "tertiary" }
+	},
+	emits: ["click"],
+	setup(e, { emit: t }) {
+		let n = e, r = t, i = G(!1);
+		async function a(e) {
+			if (!i.value) {
+				i.value = !0;
+				try {
+					let t = n.type !== "reset" && void 0, i = await n.callback?.() ?? t;
+					i !== !1 && r("click", e, i);
+				} finally {
+					i.value = !1;
+				}
+			}
+		}
+		return (t, n) => (p(), F(z(A), {
+			"aria-label": e.label,
+			disabled: e.disabled,
+			type: e.type,
+			variant: e.variant,
+			onClick: a
+		}, {
+			icon: E(() => [L(t.$slots, "icon", {}, () => [i.value ? (p(), F(z(Fe), {
+				key: 0,
+				name: z(d)("Loading\xA0…")
+			}, null, 8, ["name"])) : e.icon === void 0 ? M("", !0) : (p(), F(z(k), {
+				key: 1,
+				svg: e.icon
+			}, null, 8, ["svg"]))])]),
+			default: E(() => [me(U(e.label) + " ", 1)]),
+			_: 3
+		}, 8, [
+			"aria-label",
+			"disabled",
+			"type",
+			"variant"
+		]));
+	}
+}), Zt = ["id", "textContent"], Qt = ["aria-label", "aria-labelledby"], $t = { class: "dialog__text" }, en = { class: "dialog__actions" }, tn = /* @__PURE__ */ C(/* @__PURE__ */ P({
 	__name: "NcDialog",
 	props: /* @__PURE__ */ j({
 		name: {},
@@ -1230,7 +1227,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 			closeOnClickOutside: r.closeOnClickOutside,
 			additionalTrapElements: r.additionalTrapElements
 		}));
-		return (t, r) => n.value ? (p(), F(z(Xt), q({
+		return (t, r) => n.value ? (p(), F(z(Gt), q({
 			key: 0,
 			class: "dialog__modal",
 			disableSwipe: ""
@@ -1254,7 +1251,7 @@ var Ut = ["aria-labelledby", "aria-describedby"], Wt = ["data-theme-light", "dat
 					class: K(["dialog__navigation", e.navigationClasses]),
 					"aria-label": d.value,
 					"aria-labelledby": f.value
-				}, [L(t.$slots, "navigation", { isCollapsed: c.value }, void 0, !0)], 10, Qt)) : M("", !0), W("div", { class: K(["dialog__content", e.contentClasses]) }, [L(t.$slots, "default", {}, () => [W("p", $t, U(e.message), 1)], !0)], 2)], 2), W("div", en, [L(t.$slots, "actions", {}, () => [(p(!0), H(w, null, o(e.buttons, (e, t) => (p(), F(z(Et), q({ key: t }, { ref_for: !0 }, e, { onClick: (t, n) => y(e, n) }), null, 16, ["onClick"]))), 128))], !0)])]),
+				}, [L(t.$slots, "navigation", { isCollapsed: c.value }, void 0, !0)], 10, Qt)) : M("", !0), W("div", { class: K(["dialog__content", e.contentClasses]) }, [L(t.$slots, "default", {}, () => [W("p", $t, U(e.message), 1)], !0)], 2)], 2), W("div", en, [L(t.$slots, "actions", {}, () => [(p(!0), H(w, null, o(e.buttons, (e, t) => (p(), F(z(Xt), q({ key: t }, { ref_for: !0 }, e, { onClick: (t, n) => y(e, n) }), null, 16, ["onClick"]))), 128))], !0)])]),
 				_: 3
 			}, 16, ["class"]))]),
 			_: 3
@@ -14851,7 +14848,7 @@ var wn = Cn.build(), Tn = wn.ngettext.bind(wn), Q = wn.gettext.bind(wn), En = t(
 		this.title = e, this.multiSelect = t, this.mimeTypeFilter = n, this.directoriesAllowed = r, this.noMenu = i, this.path = o, this.filter = s, this.canPick = c, this.buttons = a, this.container = l, this.disabledNavigation = u;
 	}
 	async pickNodes() {
-		let { default: e } = await import("./FilePicker-BNJJWKyy.chunk.mjs"), t = await nn(e, {
+		let { default: e } = await import("./FilePicker-CmON9OVd.chunk.mjs"), t = await nn(e, {
 			allowPickDirectory: this.directoriesAllowed,
 			noMenu: this.noMenu,
 			buttons: this.buttons,
@@ -15208,4 +15205,4 @@ function Zn(e, t) {
 	});
 }
 //#endregion
-export { bt as A, cn as C, kt as D, Ot as E, He as F, Ve as I, Be as L, yt as M, et as N, Tt as O, Ze as P, sn as S, Xt as T, yn as _, Tn as a, on as b, ln as c, fn as d, mn as f, vn as g, _n as h, En as i, gt as j, xt as k, un as l, gn as m, Pn as n, Zn as o, hn as p, An as r, Q as s, Dn as t, dn as u, bn as v, tn as w, rn as x, an as y };
+export { bt as A, cn as C, Ct as D, Gt as E, He as F, Ve as I, Be as L, yt as M, et as N, wt as O, Ze as P, sn as S, Yt as T, yn as _, Tn as a, on as b, ln as c, fn as d, mn as f, vn as g, _n as h, En as i, gt as j, xt as k, un as l, gn as m, Pn as n, Zn as o, hn as p, An as r, Q as s, Dn as t, dn as u, bn as v, tn as w, rn as x, an as y };

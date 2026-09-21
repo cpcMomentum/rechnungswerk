@@ -1,0 +1,50 @@
+{
+	"0.5.3": [
+		{
+			"title": {
+				"de": "Neuerungen erscheinen ab jetzt in diesem Fenster",
+				"en": "From now on new features appear in this window"
+			},
+			"text": {
+				"de": "Nach einem Update zeigt RechnungsWerk hier kurz, was sich geändert hat. Einmal je Version, wegklickbar, danach kommt es nicht wieder.",
+				"en": "After an update RechnungsWerk briefly shows you what has changed. Once per version, dismissable, and it will not come back."
+			},
+			"icon": "star",
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Adresszusatz beim Kunden",
+				"en": "Address supplement for customers"
+			},
+			"text": {
+				"de": "Beim Kunden lässt sich jetzt eine zweite Adresszeile hinterlegen, etwa eine Abteilung, ein z. Hd. oder ein Gebäude. Sie steht auf der Rechnung und wird in der E-Rechnung mitgegeben.",
+				"en": "Customers can now carry a second address line, for example a department, an attention line or a building. It appears on the invoice and is included in the e-invoice."
+			},
+			"icon": "account-group",
+			"where": {
+				"de": "Kunden",
+				"en": "Customers"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Der Ablageordner bleibt nach dem Speichern stehen",
+				"en": "The archive folder stays visible after saving"
+			},
+			"text": {
+				"de": "In den Grundeinstellungen wirkte das Feld nach dem Speichern leer, obwohl der Ordner gesetzt war. Der Pfad bleibt jetzt sichtbar, auch nach dem Neuladen.",
+				"en": "In the basic settings the field looked empty after saving although the folder was set. The path now stays visible, even after a reload."
+			},
+			"icon": "folder",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings"
+			},
+			"adminOnly": true,
+			"plus": false
+		}
+	]
+}
