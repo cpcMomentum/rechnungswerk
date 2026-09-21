@@ -35,7 +35,6 @@ class MailService {
 	/**
 	 * Send a single invoice PDF as a mail attachment.
 	 *
-	 * @param array{host: string, port: int, security: string, user: string, password: string}|null $smtpConfig
 	 * @throws ValidationException if the recipient address is invalid
 	 * @throws \RuntimeException if delivery fails
 	 */
@@ -46,7 +45,7 @@ class MailService {
 		string $pdfContent,
 		string $pdfFilename,
 		Settings $settings,
-		?array $smtpConfig = null,
+		?MailAccount $smtpConfig = null,
 	): ?string {
 		if (!$this->mailer->validateMailAddress($to)) {
 			throw new ValidationException($this->l10n->t('Die Empfängeradresse ist ungültig.'));
@@ -63,10 +62,9 @@ class MailService {
 	 * Verify an SMTP account (host/port/encryption/credentials) without sending,
 	 * for the settings "test connection" button.
 	 *
-	 * @param array{host: string, port: int, security: string, user: string, password: string} $smtpConfig
 	 * @throws \RuntimeException on connection/auth failure
 	 */
-	public function testSmtpConnection(array $smtpConfig): void {
+	public function testSmtpConnection(MailAccount $smtpConfig): void {
 		$mail = $this->buildPhpMailer($smtpConfig);
 		try {
 			if (!$mail->smtpConnect()) {
@@ -132,11 +130,11 @@ class MailService {
 		string $pdfContent,
 		string $pdfFilename,
 		Settings $settings,
-		array $cfg,
+		MailAccount $cfg,
 	): ?string {
 		$fromEmail = trim((string)$settings->getSmtpFromEmail());
 		if ($fromEmail === '') {
-			$fromEmail = $cfg['user'];
+			$fromEmail = $cfg->user();
 		}
 		if ($fromEmail === '' || !$this->mailer->validateMailAddress($fromEmail)) {
 			throw new \RuntimeException('Kein gültiger Absender für den SMTP-Versand konfiguriert.');
@@ -164,24 +162,24 @@ class MailService {
 	/**
 	 * @param array{host: string, port: int, security: string, user: string, password: string} $cfg
 	 */
-	private function buildPhpMailer(array $cfg): PHPMailer {
+	private function buildPhpMailer(MailAccount $cfg): PHPMailer {
 		$mail = new PHPMailer(true);
 		$mail->isSMTP();
-		$mail->Host = $cfg['host'];
-		$mail->Port = $cfg['port'];
+		$mail->Host = $cfg->host();
+		$mail->Port = $cfg->port();
 		$mail->CharSet = PHPMailer::CHARSET_UTF8;
 		$mail->Timeout = 15;
-		if ($cfg['user'] !== '') {
+		if ($cfg->user() !== '') {
 			$mail->SMTPAuth = true;
-			$mail->Username = $cfg['user'];
-			$mail->Password = $cfg['password'];
+			$mail->Username = $cfg->user();
+			$mail->Password = $cfg->password();
 		}
-		$mail->SMTPSecure = match ($cfg['security']) {
+		$mail->SMTPSecure = match ($cfg->security()) {
 			'ssl' => PHPMailer::ENCRYPTION_SMTPS,
 			'none' => '',
 			default => PHPMailer::ENCRYPTION_STARTTLS,
 		};
-		if ($cfg['security'] === 'none') {
+		if ($cfg->security() === 'none') {
 			$mail->SMTPAutoTLS = false;
 		}
 		return $mail;

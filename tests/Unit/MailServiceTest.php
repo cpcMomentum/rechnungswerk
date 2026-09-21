@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\Tests\Unit;
 
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\MailAccount;
 use OCA\Rechnungswerk\Service\MailService;
 use OCP\Mail\IAttachment;
 use OCP\Mail\IMailer;
@@ -97,11 +98,12 @@ class MailServiceTest extends TestCase {
 	 * @dataProvider smtpConfigProvider
 	 */
 	public function testBuildPhpMailerMapsConfig(array $cfg, string $expectedSecure, bool $expectedAuth): void {
+		$konto = new MailAccount($cfg['host'], $cfg['port'], $cfg['security'], $cfg['user'], $cfg['password']);
 		$service = new MailService($this->createMock(IMailer::class), $this->l10nStub());
 		$method = new \ReflectionMethod(MailService::class, 'buildPhpMailer');
 		$method->setAccessible(true);
 		/** @var PHPMailer $mail */
-		$mail = $method->invoke($service, $cfg);
+		$mail = $method->invoke($service, $konto);
 
 		$this->assertSame($cfg['host'], $mail->Host);
 		$this->assertSame($cfg['port'], $mail->Port);

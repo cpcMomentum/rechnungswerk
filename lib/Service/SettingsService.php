@@ -48,9 +48,8 @@ class SettingsService {
 	 * account is configured (host empty) → caller falls back to Nextcloud's
 	 * system mailer.
 	 *
-	 * @return array{host: string, port: int, security: string, user: string, password: string}|null
 	 */
-	public function getSmtpConfig(): ?array {
+	public function getSmtpConfig(): ?MailAccount {
 		$s = $this->getCompany();
 		$host = trim((string)$s->getSmtpHost());
 		if ($host === '') {
@@ -65,22 +64,21 @@ class SettingsService {
 				$password = '';
 			}
 		}
-		return [
-			'host' => $host,
-			'port' => (int)($s->getSmtpPort() ?: 587),
-			'security' => $s->getSmtpSecurity() ?: 'starttls',
-			'user' => (string)$s->getSmtpUser(),
-			'password' => $password,
-		];
+		return new MailAccount(
+			$host,
+			(int)($s->getSmtpPort() ?: 587),
+			$s->getSmtpSecurity() ?: 'starttls',
+			(string)$s->getSmtpUser(),
+			$password,
+		);
 	}
 
 	/**
 	 * Decrypted IMAP config for the DATEV confirmation poller (#36), or null if
 	 * no IMAP account is configured (host empty).
 	 *
-	 * @return array{host: string, port: int, security: string, user: string, password: string}|null
 	 */
-	public function getImapConfig(): ?array {
+	public function getImapConfig(): ?MailAccount {
 		$s = $this->getCompany();
 		$host = trim((string)$s->getImapHost());
 		if ($host === '') {
@@ -95,13 +93,13 @@ class SettingsService {
 				$password = '';
 			}
 		}
-		return [
-			'host' => $host,
-			'port' => (int)($s->getImapPort() ?: 993),
-			'security' => $s->getImapSecurity() ?: 'ssl',
-			'user' => (string)$s->getImapUser(),
-			'password' => $password,
-		];
+		return new MailAccount(
+			$host,
+			(int)($s->getImapPort() ?: 993),
+			$s->getImapSecurity() ?: 'ssl',
+			(string)$s->getImapUser(),
+			$password,
+		);
 	}
 
 	/**

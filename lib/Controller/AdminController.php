@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Service\MailService;
+use OCA\Rechnungswerk\Service\MailAccount;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\AppFramework\Controller;
@@ -54,16 +55,16 @@ class AdminController extends Controller {
 		}
 		if ($password === '') {
 			$stored = $this->settingsService->getSmtpConfig();
-			$password = $stored['password'] ?? '';
+			$password = $stored?->password() ?? '';
 		}
 		try {
-			$this->mailService->testSmtpConnection([
-				'host' => trim($host),
-				'port' => $port,
-				'security' => $security,
-				'user' => $user,
-				'password' => $password,
-			]);
+			$this->mailService->testSmtpConnection(new MailAccount(
+				trim($host),
+				$port,
+				$security,
+				$user,
+				$password,
+			));
 			return new DataResponse(['ok' => true]);
 		} catch (\Throwable $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);

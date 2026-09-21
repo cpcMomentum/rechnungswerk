@@ -94,10 +94,10 @@ class SettingsServiceTest extends TestCase {
 
 		$cfg = $this->service->getSmtpConfig();
 		$this->assertNotNull($cfg);
-		$this->assertSame('smtp.example.com', $cfg['host']);
-		$this->assertSame(465, $cfg['port']);
-		$this->assertSame('ssl', $cfg['security']);
-		$this->assertSame('secret', $cfg['password']);
+		$this->assertSame('smtp.example.com', $cfg->host());
+		$this->assertSame(465, $cfg->port());
+		$this->assertSame('ssl', $cfg->security());
+		$this->assertSame('secret', $cfg->password());
 	}
 
 	public function testGetSmtpConfigIsNullWithoutHost(): void {
