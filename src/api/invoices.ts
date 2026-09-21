@@ -27,6 +27,7 @@ export interface InvoiceInput {
 	customerId?: number | null
 	recipientName?: string | null
 	recipientContactId?: string | null
+	recipientAddressAddition?: string | null
 	recipientAddress?: string | null
 	recipientPostalCode?: string | null
 	recipientCity?: string | null

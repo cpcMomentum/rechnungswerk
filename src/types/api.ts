@@ -78,6 +78,8 @@ export interface Customer {
 	customerNumber: string
 	name: string
 	vatId: string | null
+	/** Freie Zeile zwischen Firmenname und Straße, etwa „z. Hd. ..." (#304). */
+	addressAddition: string | null
 	address: string | null
 	postalCode: string | null
 	city: string | null
@@ -156,6 +158,8 @@ export interface Invoice {
 	recipientName: string | null
 	recipientContactId: string | null
 	customerId: number | null
+	/** Beim Festschreiben eingefrorener Adresszusatz (#304). */
+	recipientAddressAddition: string | null
 	recipientAddress: string | null
 	recipientPostalCode: string | null
 	recipientCity: string | null
@@ -296,4 +300,24 @@ export interface Settings {
 	greetingDefault: string | null
 	introDefault: string | null
 	closingDefault: string | null
+}
+
+/** „Was ist neu?"-Fenster (#308) — ein Eintrag, bereits in Nutzersprache. */
+export interface WhatsNewEntry {
+	title: string
+	text: string
+	/** Name aus der Symbolliste des Dialogs; unbekannt oder leer = Stern. */
+	icon: string
+	/** Wo die Neuerung sitzt, etwa „Kunden". Leer = keine Fundort-Zeile. */
+	where: string
+	/** Stelle ist adminpflichtig; der Dialog schreibt es dazu. */
+	adminOnly: boolean
+	/** WerkPlus-Feature: Badge und Link auf werkwolke.de. */
+	plus: boolean
+}
+
+/** Antwort von `GET /whatsnew`. Leere Liste heisst: kein Fenster. */
+export interface WhatsNewPayload {
+	version: string
+	entries: WhatsNewEntry[]
 }

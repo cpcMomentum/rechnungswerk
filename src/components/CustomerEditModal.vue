@@ -28,6 +28,11 @@
 			<div class="form-section">
 				<h3>{{ t('rechnungswerk', 'Anschrift') }}</h3>
 				<label class="field">
+					<span>{{ t('rechnungswerk', 'Adresszusatz') }}</span>
+					<input v-model="form.addressAddition" class="input" type="text"
+						:placeholder="t('rechnungswerk', 'z. Hd. Frau Meyer, Gebäude B, c/o …')" />
+				</label>
+				<label class="field">
 					<span>{{ t('rechnungswerk', 'Straße & Hausnummer') }}</span>
 					<input v-model="form.address" class="input" type="text" />
 				</label>
@@ -153,6 +158,7 @@ type Form = {
 	customerNumber: string
 	name: string
 	vatId: string
+	addressAddition: string
 	address: string
 	postalCode: string
 	city: string
@@ -168,7 +174,7 @@ type Form = {
 }
 
 const blank = (): Form => ({
-	customerNumber: '', name: '', vatId: '', address: '', postalCode: '', city: '',
+	customerNumber: '', name: '', vatId: '', addressAddition: '', address: '', postalCode: '', city: '',
 	country: 'DE', contactPerson: '', phone: '', email: '', bankAccountHolder: '',
 	iban: '', bic: '', bankName: '', note: '',
 })
@@ -202,6 +208,7 @@ watch(() => props.open, (open) => {
 		form.customerNumber = c.customerNumber ?? ''
 		form.name = c.name ?? ''
 		form.vatId = c.vatId ?? ''
+		form.addressAddition = c.addressAddition ?? ''
 		form.address = c.address ?? ''
 		form.postalCode = c.postalCode ?? ''
 		form.city = c.city ?? ''
@@ -245,6 +252,7 @@ function onSave() {
 		customerNumber: form.customerNumber.trim(),
 		name: form.name.trim(),
 		vatId: trimmedOrNull(form.vatId),
+		addressAddition: trimmedOrNull(form.addressAddition),
 		address: trimmedOrNull(form.address),
 		postalCode: trimmedOrNull(form.postalCode),
 		city: trimmedOrNull(form.city),

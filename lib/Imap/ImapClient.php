@@ -86,8 +86,15 @@ class ImapClient {
 		}
 	}
 
-	/** Authenticate and cache the server capability list. */
-	public function login(string $user, string $password): void {
+	/**
+	 * Authenticate and cache the server capability list.
+	 *
+	 * $password is marked #[\SensitiveParameter] so a LOGIN failure (thrown from
+	 * command() below) does not carry the raw password into this frame's args in
+	 * an exception trace — the same leak MailAccount closes for the config object,
+	 * but this method still takes plain strings.
+	 */
+	public function login(string $user, #[\SensitiveParameter] string $password): void {
 		$this->command('LOGIN ' . $this->quote($user) . ' ' . $this->quote($password));
 		$resp = $this->command('CAPABILITY');
 		if (preg_match('/^\* CAPABILITY (.+)$/mi', $resp['raw'], $m)) {
