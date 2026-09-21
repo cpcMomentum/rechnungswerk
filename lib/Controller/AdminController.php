@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
-use OCA\Rechnungswerk\Service\MailService;
 use OCA\Rechnungswerk\Service\MailAccount;
+use OCA\Rechnungswerk\Service\MailService;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\AppFramework\Controller;
