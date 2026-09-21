@@ -47,7 +47,6 @@ class SettingsService {
 	 * Decrypted SMTP server config for the mailer, or null if no own SMTP
 	 * account is configured (host empty) → caller falls back to Nextcloud's
 	 * system mailer.
-	 *
 	 */
 	public function getSmtpConfig(): ?MailAccount {
 		$s = $this->getCompany();
@@ -76,7 +75,6 @@ class SettingsService {
 	/**
 	 * Decrypted IMAP config for the DATEV confirmation poller (#36), or null if
 	 * no IMAP account is configured (host empty).
-	 *
 	 */
 	public function getImapConfig(): ?MailAccount {
 		$s = $this->getCompany();

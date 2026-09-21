@@ -159,9 +159,6 @@ class MailService {
 		}
 	}
 
-	/**
-	 * @param array{host: string, port: int, security: string, user: string, password: string} $cfg
-	 */
 	private function buildPhpMailer(MailAccount $cfg): PHPMailer {
 		$mail = new PHPMailer(true);
 		$mail->isSMTP();
