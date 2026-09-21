@@ -39,7 +39,16 @@ class SettingsControllerSaveTest extends TestCase {
 		$node = $this->createMock(Folder::class);
 		$node->method('getPath')->willReturn('/admin/files/Rechnungen');
 
-		$userFolder = $this->createMock(Folder::class);
+		// Der Rueckgabetyp von IRootFolder::getUserFolder ist versionsabhaengig
+		// (OCP 33 untypisiert, dev-master IUserFolder, das Folder erweitert). Der
+		// generierte Mock erzwingt diesen Typ auf PHP-Ebene, daher den konkreten
+		// Typ per Reflection ableiten statt Folder fest zu verdrahten — so laeuft
+		// der Test gegen beide OCP-Versionen (Canary gegen dev-master inklusive).
+		$rt = (new \ReflectionMethod(IRootFolder::class, 'getUserFolder'))->getReturnType();
+		$userFolderClass = ($rt instanceof \ReflectionNamedType && !$rt->isBuiltin())
+			? $rt->getName()
+			: Folder::class;
+		$userFolder = $this->createMock($userFolderClass);
 		$userFolder->method('getById')->willReturn([$node]);
 		$userFolder->method('getRelativePath')->willReturn('Rechnungen');
 
