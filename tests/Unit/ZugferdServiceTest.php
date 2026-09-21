@@ -351,6 +351,75 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('20260516', $xml);
 	}
 
+	public function testAdresszusatzStehtAlsEigeneAdresszeileImXml(): void {
+		// EN16931: der Zusatz gehoert in BT-50, die Strasse rutscht auf BT-51 —
+		// nicht beides in eine Zeile geklebt (#304).
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientAddressAddition('z. Hd. Frau Meyer');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertMatchesRegularExpression(
+			'#<ram:LineOne>z\. Hd\. Frau Meyer</ram:LineOne>\s*<ram:LineTwo>Kundenweg 5</ram:LineTwo>#',
+			$xml,
+			'Zusatz in Zeile 1, Strasse in Zeile 2',
+		);
+		$this->assertStringNotContainsString('z. Hd. Frau Meyer Kundenweg 5', $xml);
+	}
+
+	public function testOhneAdresszusatzBleibtDieStrasseInZeileEins(): void {
+		// Bestandsbelege muessen unveraendert aussehen: keine leere zweite Zeile.
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('<ram:LineOne>Kundenweg 5</ram:LineOne>', $xml);
+		$this->assertStringNotContainsString('<ram:LineTwo>', $xml);
+	}
+
+	public function testLeererAdresszusatzErzeugtKeineZeile(): void {
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientAddressAddition('   ');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('<ram:LineOne>Kundenweg 5</ram:LineOne>', $xml);
+		$this->assertStringNotContainsString('<ram:LineTwo>', $xml);
+	}
+
+	public function testAdresszusatzStehtImPdfZwischenNameUndStrasse(): void {
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientAddressAddition('Gebäude B');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $settings, false);
+
+		$this->assertMatchesRegularExpression(
+			'#Kunde AG<br>Gebäude B<br>Kundenweg 5#u',
+			$html,
+			'Reihenfolge im Adressblock: Name, Zusatz, Strasse',
+		);
+	}
+
 	private function renderHtml(Invoice $invoice, array $items, Settings $settings, bool $preview): string {
 		$m = new \ReflectionMethod(ZugferdService::class, 'renderHtml');
 		return (string)$m->invoke($this->service, $invoice, $items, $settings, null, null, $preview);

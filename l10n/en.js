@@ -476,6 +476,9 @@ OC.L10N.register(
     "Zu finden unter" : "Found under",
     "(nur für Administratoren)" : "(administrators only)",
     "Mehr zu WerkPlus" : "More about WerkPlus",
-    "Alles klar" : "Got it"
+    "Alles klar" : "Got it",
+    "Adresszusatz" : "Address supplement",
+    "z. Hd. Frau Meyer, Gebäude B, c/o …" : "Attn. Ms Meyer, Building B, c/o …",
+    "Der Adresszusatz darf höchstens 255 Zeichen lang sein." : "The address supplement must not exceed 255 characters."
 },
 "nplurals=2; plural=(n != 1);");

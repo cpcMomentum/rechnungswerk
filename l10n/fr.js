@@ -476,6 +476,9 @@ OC.L10N.register(
     "Zu finden unter" : "À trouver sous",
     "(nur für Administratoren)" : "(administrateurs uniquement)",
     "Mehr zu WerkPlus" : "En savoir plus sur WerkPlus",
-    "Alles klar" : "C'est noté"
+    "Alles klar" : "C'est noté",
+    "Adresszusatz" : "Complément d'adresse",
+    "z. Hd. Frau Meyer, Gebäude B, c/o …" : "À l'attention de Mme Meyer, bâtiment B, c/o …",
+    "Der Adresszusatz darf höchstens 255 Zeichen lang sein." : "Le complément d'adresse ne doit pas dépasser 255 caractères."
 },
 "nplurals=2; plural=(n > 1);");
