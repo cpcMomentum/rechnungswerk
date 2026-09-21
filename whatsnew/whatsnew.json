@@ -3,11 +3,13 @@
 		{
 			"title": {
 				"de": "Neuerungen erscheinen ab jetzt in diesem Fenster",
-				"en": "From now on new features appear in this window"
+				"en": "From now on new features appear in this window",
+				"fr": "Les nouveautés apparaissent désormais dans cette fenêtre"
 			},
 			"text": {
 				"de": "Nach einem Update zeigt RechnungsWerk hier kurz, was sich geändert hat. Einmal je Version, wegklickbar, danach kommt es nicht wieder.",
-				"en": "After an update RechnungsWerk briefly shows you what has changed. Once per version, dismissable, and it will not come back."
+				"en": "After an update RechnungsWerk briefly shows you what has changed. Once per version, dismissable, and it will not come back.",
+				"fr": "Après une mise à jour, RechnungsWerk vous montre brièvement ce qui a changé. Une fois par version, avec possibilité de fermer, et la fenêtre ne revient plus."
 			},
 			"icon": "star",
 			"plus": false
@@ -15,16 +17,19 @@
 		{
 			"title": {
 				"de": "Adresszusatz beim Kunden",
-				"en": "Address supplement for customers"
+				"en": "Address supplement for customers",
+				"fr": "Complément d'adresse chez le client"
 			},
 			"text": {
 				"de": "Beim Kunden lässt sich jetzt eine zweite Adresszeile hinterlegen, etwa eine Abteilung, ein z. Hd. oder ein Gebäude. Sie steht auf der Rechnung und wird in der E-Rechnung mitgegeben.",
-				"en": "Customers can now carry a second address line, for example a department, an attention line or a building. It appears on the invoice and is included in the e-invoice."
+				"en": "Customers can now carry a second address line, for example a department, an attention line or a building. It appears on the invoice and is included in the e-invoice.",
+				"fr": "Une deuxième ligne d'adresse peut désormais être enregistrée pour le client, par exemple un service, une mention « à l'attention de » ou un bâtiment. Elle figure sur la facture et est transmise dans la facture électronique."
 			},
 			"icon": "account-group",
 			"where": {
 				"de": "Kunden",
-				"en": "Customers"
+				"en": "Customers",
+				"fr": "Clients"
 			},
 			"adminOnly": false,
 			"plus": false
@@ -32,18 +37,35 @@
 		{
 			"title": {
 				"de": "Der Ablageordner bleibt nach dem Speichern stehen",
-				"en": "The archive folder stays visible after saving"
+				"en": "The archive folder stays visible after saving",
+				"fr": "Le dossier de classement reste visible après l'enregistrement"
 			},
 			"text": {
 				"de": "In den Grundeinstellungen wirkte das Feld nach dem Speichern leer, obwohl der Ordner gesetzt war. Der Pfad bleibt jetzt sichtbar, auch nach dem Neuladen.",
-				"en": "In the basic settings the field looked empty after saving although the folder was set. The path now stays visible, even after a reload."
+				"en": "In the basic settings the field looked empty after saving although the folder was set. The path now stays visible, even after a reload.",
+				"fr": "Dans les paramètres de base, le champ semblait vide après l'enregistrement, bien que le dossier soit défini. Le chemin reste désormais visible, même après un rechargement."
 			},
 			"icon": "folder",
 			"where": {
 				"de": "Einstellungen",
-				"en": "Settings"
+				"en": "Settings",
+				"fr": "Paramètres"
 			},
 			"adminOnly": true,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "RechnungsWerk spricht jetzt auch Französisch",
+				"en": "RechnungsWerk now speaks French as well",
+				"fr": "RechnungsWerk parle désormais aussi français"
+			},
+			"text": {
+				"de": "Die Oberfläche gibt es zusätzlich zu Deutsch und Englisch auf Französisch. Welche Sprache erscheint, richtet sich nach der Einstellung Ihres Nextcloud-Kontos.",
+				"en": "Besides German and English the interface is now available in French. The language follows the setting of your Nextcloud account.",
+				"fr": "En plus de l'allemand et de l'anglais, l'interface est désormais disponible en français. La langue suit le réglage de votre compte Nextcloud."
+			},
+			"icon": "translate",
 			"plus": false
 		}
 	]

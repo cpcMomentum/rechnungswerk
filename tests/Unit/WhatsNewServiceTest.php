@@ -32,7 +32,7 @@ class WhatsNewServiceTest extends TestCase {
 	 */
 	private const BEKANNTE_SYMBOLE = [
 		'account-group', 'chart-bar', 'cog', 'counter', 'email',
-		'file-document', 'folder', 'magnify', 'star',
+		'file-document', 'folder', 'magnify', 'star', 'translate',
 	];
 
 	private string $appDir;
