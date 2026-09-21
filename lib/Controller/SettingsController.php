@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCA\Rechnungswerk\Service\SettingsService;
@@ -53,12 +54,24 @@ class SettingsController extends Controller {
 		if (!$this->permissionService->hasAccess($this->userId)) {
 			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
-		$settings = $this->settingsService->getCompany();
+		return new DataResponse($this->serialize($this->settingsService->getCompany()));
+	}
+
+	/**
+	 * Serialize settings with the computed archive-folder display path added.
+	 *
+	 * Both show() and save() return this shape so the client always receives
+	 * archiveFolderPath. Returning the raw entity from save() (no computed path)
+	 * made the picked folder's label vanish after saving until a reload (#301).
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function serialize(Settings $settings): array {
 		$data = $settings->jsonSerialize();
 		// Display path of the archive target, resolved from the viewer's own
 		// files so the label matches what the admin sees in the picker.
 		$data['archiveFolderPath'] = $this->archiveFolderPath($settings->getArchiveFolderId());
-		return new DataResponse($data);
+		return $data;
 	}
 
 	/** User-relative display path of the archive folder, or null if unset/unreachable. */
@@ -90,7 +103,7 @@ class SettingsController extends Controller {
 			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
 		try {
-			return new DataResponse($this->settingsService->save($data));
+			return new DataResponse($this->serialize($this->settingsService->save($data)));
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
