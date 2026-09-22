@@ -8,13 +8,23 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 ## [Unreleased]
 
 ### Changed
-- **RechnungsWerk ist für Nextcloud 35 freigegeben** (unterstützt werden jetzt
-  NC 31 bis 35). Die Unit-Suite läuft grün gegen die OCP-Schnittstellen von
-  NC 35, keine der genutzten APIs wurde entfernt oder geändert. Die
-  PHP-Untergrenze der App bleibt bei 8.2: Nextcloud 35 verlangt selbst
-  mindestens PHP 8.3, für NC 31 bis 34 ändert sich damit nichts (#309)
+- **Unterstützt werden jetzt Nextcloud 32 bis 35.** Nextcloud 35 ist geprüft
+  und freigegeben: die Unit-Suite läuft grün gegen dessen OCP-Schnittstellen,
+  keine der genutzten APIs wurde entfernt oder geändert (#309). Nextcloud 31
+  fällt dafür weg — die Zeilensperre bei der Nummernvergabe gibt es dort nicht,
+  Festschreiben, Stornieren und das Festschreiben von Angeboten liefen seit
+  Juni 2026 in einen Fehler. Das ist jetzt ehrlich ausgewiesen, statt eine
+  Kompatibilität zu versprechen, die es nicht gab (#319). Die PHP-Untergrenze
+  der App bleibt bei 8.2; Nextcloud 35 selbst verlangt mindestens PHP 8.3
 
 ### Fixed
+- **Festschreiben auf SQLite-Instanzen.** Auf Nextcloud-Installationen mit
+  SQLite ließ sich keine Rechnung festschreiben, nicht stornieren und kein
+  Angebot festschreiben — die Oberfläche meldete nur „Request failed with
+  status code 500". Ursache war eine Zeilensperre bei der Nummernvergabe, die
+  SQLite nicht kennt. Auf SQLite entfällt sie jetzt; doppelte Rechnungsnummern
+  kann das nicht auslösen, weil SQLite ohnehin nur einen Schreiber zulässt
+  (#319)
 - **Wartung:** Der wöchentliche Kompatibilitäts-Wächter und die Unit-Test-Läufe
   scheiterten an einem neuen Nextcloud-Major, sobald dieses die PHP-Untergrenze
   anhob — und zwar bevor ein einziger Test lief. Gemeldet wurde es trotzdem als
