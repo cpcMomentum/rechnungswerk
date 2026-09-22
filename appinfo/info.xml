@@ -56,7 +56,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
         <database>sqlite</database>
         <database>mysql</database>
         <database>pgsql</database>
-        <nextcloud min-version="31" max-version="35"/>
+        <nextcloud min-version="32" max-version="35"/>
     </dependencies>
 
     <!--
