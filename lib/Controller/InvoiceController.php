@@ -199,6 +199,10 @@ class InvoiceController extends Controller {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+		} catch (ValidationException $e) {
+			// Wie beim Festschreiben: fehlt der Firmenname, ist das eine Angabe,
+			// die der Nutzer nachholen kann (#313) — kein Serverfehler.
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 	}
 

@@ -18,6 +18,14 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
   der App bleibt bei 8.2; Nextcloud 35 selbst verlangt mindestens PHP 8.3
 
 ### Fixed
+- **Festschreiben ohne Firmenname.** Waren die Grundeinstellungen noch leer,
+  liess sich eine Rechnung festschreiben, aber es entstand kein Beleg: Die
+  Nummer war vergeben, die Rechnung nach § 14 UStG unveränderlich, und der
+  Download meldete nur „Die PDF-Erzeugung ist fehlgeschlagen." RechnungsWerk
+  weist jetzt vor dem Festschreiben und vor dem Stornieren darauf hin, dass
+  der Firmenname fehlt, und verbraucht dabei keine Nummer. Bereits entstandene
+  Fälle holt der Nachzieh-Auftrag von selbst nach, sobald der Name hinterlegt
+  ist (#313)
 - **Festschreiben auf SQLite-Instanzen.** Auf Nextcloud-Installationen mit
   SQLite ließ sich keine Rechnung festschreiben, nicht stornieren und kein
   Angebot festschreiben — die Oberfläche meldete nur „Request failed with
