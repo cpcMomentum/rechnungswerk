@@ -35,6 +35,10 @@ class RowLockTest extends TestCase {
 			'postgres' => [IDBConnection::PLATFORM_POSTGRES],
 			'mysql' => [IDBConnection::PLATFORM_MYSQL],
 			'oracle' => [IDBConnection::PLATFORM_ORACLE],
+			// getDatabaseProvider() reports MariaDB as 'mysql' unless asked in
+			// strict mode, where it says 'mariadb'. Spelled out rather than
+			// using PLATFORM_MARIADB, which older OCP versions do not have.
+			'mariadb (strict)' => ['mariadb'],
 		];
 	}
 
