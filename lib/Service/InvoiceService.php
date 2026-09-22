@@ -443,6 +443,7 @@ class InvoiceService {
 	 * @return array<string, mixed> the cancellation document
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
+	 * @throws ValidationException
 	 */
 	public function cancel(int $id, string $userId): array {
 		$original = $this->assertInvoiceType($this->findById($id));
@@ -772,9 +773,6 @@ class InvoiceService {
 	}
 
 	/**
-	 * @throws IllegalStateException
-	 */
-	/**
 	 * Ohne Firmennamen entsteht kein Beleg: der ZUGFeRD-Anteil der PDF braucht
 	 * den Verkaeufer als Metadatum, und die Bibliothek bricht ohne ihn ab. Die
 	 * Nummer waere dann aber schon vergeben und der Beleg nach § 14 UStG
@@ -792,6 +790,9 @@ class InvoiceService {
 		throw new ValidationException($this->l10n->t('Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).'));
 	}
 
+	/**
+	 * @throws IllegalStateException
+	 */
 	private function assertDraft(Invoice $invoice): void {
 		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
 			throw new IllegalStateException($this->l10n->t('Festgeschriebene oder stornierte Rechnungen können nicht mehr geändert werden.'));
