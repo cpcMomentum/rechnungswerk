@@ -90,6 +90,21 @@ class ZugferdServiceTest extends TestCase {
 		return $i;
 	}
 
+	/**
+	 * Ohne Firmennamen lief die Bibliothek beim Bau der PDF-Metadaten in einen
+	 * TypeError, der nichts darueber sagte, was fehlt (#313). Jetzt scheitert
+	 * der Bau vorher und benennt die Ursache. Kein Platzhalter-Absender.
+	 */
+	public function testXmlWithoutSellerNameIsRefusedWithATellingMessage(): void {
+		$settings = $this->settings();
+		$settings->setCompanyName(null);
+
+		$this->expectException(\RuntimeException::class);
+		$this->expectExceptionMessageMatches('/seller name/i');
+
+		$this->service->buildXml($this->invoice(), [$this->item(9500, 1900, 19000)], $settings);
+	}
+
 	public function testFreeTextUnitLabelMapsToGenericCodeInXml(): void {
 		// A free-text unit ("Personen") on top of a non-C62 standard code (HUR):
 		// the XML must fall back to the generic C62 so it stays EN16931-valid, and

@@ -269,7 +269,18 @@ class ZugferdService {
 	}
 
 	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings, Invoice $invoice): void {
-		$builder->setDocumentSeller($settings->getCompanyName() ?? '');
+		// Zweite Sicherung hinter der Pruefung beim Festschreiben (#313): ohne
+		// Verkaeufernamen laeuft die Bibliothek beim Bau der XMP-Metadaten in
+		// einen TypeError ("Argument #2 ($default) must be of type string, null
+		// given"), der nichts darueber sagt, was fehlt. Bewusst KEIN Platzhalter
+		// als Ersatz: ein Beleg mit erfundenem Absender waere schlimmer als
+		// keiner. Trifft in der Praxis nur Wege ohne die Pruefung davor, etwa
+		// den Nachzieh-Auftrag fuer Altbestand.
+		$seller = $settings->getCompanyName() ?? '';
+		if ($seller === '') {
+			throw new \RuntimeException('Cannot build an EN16931 document without a seller name (company name is empty, see #313)');
+		}
+		$builder->setDocumentSeller($seller);
 		if (($settings->getVatId() ?? '') !== '') {
 			$builder->addDocumentSellerVATRegistrationNumber($settings->getVatId());
 		}
