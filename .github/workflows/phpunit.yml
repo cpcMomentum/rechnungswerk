@@ -64,7 +64,9 @@ jobs:
       # nach der PHP-Untergrenze der jeweiligen Version (NC 35 laesst PHP 8.2
       # fallen). Lag als Inline-Bash in jeder App und liegt seit v1.16.0 im
       # Tooling — Begruendung und Tests dort (nc-app-tooling#28).
-      # Ausgaben unveraendert: steps.derive.outputs.ocp und .uebersprungen.
+      # steps.derive.outputs.ocp bleibt wie gehabt; .uebersprungen kommt als
+      # Output neu dazu (die Inline-Fassung schrieb es nur ins Log) und wird
+      # hier nicht konsumiert — die Diagnosezeile steht weiter im Lauf.
       - uses: cpcMomentum/nc-app-tooling/.github/actions/ocp-versionen@v1.16.0
         id: derive
         with:
