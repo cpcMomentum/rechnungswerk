@@ -300,6 +300,8 @@ export interface Settings {
 	greetingDefault: string | null
 	introDefault: string | null
 	closingDefault: string | null
+	clubMode: boolean
+	memberGroup: string | null
 }
 
 /** „Was ist neu?"-Fenster (#308) — ein Eintrag, bereits in Nutzersprache. */

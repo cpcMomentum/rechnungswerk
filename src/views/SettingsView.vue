@@ -375,6 +375,8 @@
 				</NcButton>
 			</section>
 
+			<ClubSettingsSection />
+
 			<!-- Zugriff & Administration -->
 			<section class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
@@ -478,6 +480,7 @@ import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import ClubSettingsSection from '@/components/ClubSettingsSection.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'

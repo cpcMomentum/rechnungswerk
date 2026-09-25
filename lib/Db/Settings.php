@@ -112,6 +112,16 @@ use OCP\DB\Types;
  * @method void setIntroDefault(?string $introDefault)
  * @method ?string getClosingDefault()
  * @method void setClosingDefault(?string $closingDefault)
+ * @method int getClubEnabled()
+ * @method void setClubEnabled(int $clubEnabled)
+ * @method ?string getClubGroup()
+ * @method void setClubGroup(?string $clubGroup)
+ * @method ?string getClubName()
+ * @method void setClubName(?string $clubName)
+ * @method int getClubMode()
+ * @method void setClubMode(int $clubMode)
+ * @method ?string getMemberGroup()
+ * @method void setMemberGroup(?string $memberGroup)
  * @method ?\DateTime getCreatedAt()
  * @method void setCreatedAt(?\DateTime $createdAt)
  * @method ?\DateTime getUpdatedAt()
@@ -180,6 +190,11 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?string $greetingDefault = null;
 	protected ?string $introDefault = null;
 	protected ?string $closingDefault = null;
+	protected ?int $clubEnabled = null;
+	protected ?string $clubGroup = null;
+	protected ?string $clubName = null;
+	protected ?int $clubMode = null;
+	protected ?string $memberGroup = null;
 	protected ?\DateTime $createdAt = null;
 	protected ?\DateTime $updatedAt = null;
 
@@ -232,6 +247,11 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('greetingDefault', Types::TEXT);
 		$this->addType('introDefault', Types::TEXT);
 		$this->addType('closingDefault', Types::TEXT);
+		$this->addType('clubEnabled', Types::SMALLINT);
+		$this->addType('clubGroup', Types::STRING);
+		$this->addType('clubName', Types::STRING);
+		$this->addType('clubMode', Types::SMALLINT);
+		$this->addType('memberGroup', Types::STRING);
 		$this->addType('createdAt', Types::DATETIME);
 		$this->addType('updatedAt', Types::DATETIME);
 	}
@@ -287,6 +307,11 @@ class Settings extends Entity implements JsonSerializable {
 			'greetingDefault' => $this->getGreetingDefault(),
 			'introDefault' => $this->getIntroDefault(),
 			'closingDefault' => $this->getClosingDefault(),
+			'clubEnabled' => (bool)$this->getClubEnabled(),
+			'clubGroup' => $this->getClubGroup(),
+			'clubName' => $this->getClubName(),
+			'clubMode' => (int)$this->getClubMode(),
+			'memberGroup' => $this->getMemberGroup(),
 		];
 	}
 }
