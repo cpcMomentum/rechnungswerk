@@ -83,6 +83,10 @@ return [
 		// Laenderliste fuer die Auswahlfelder (#167)
 		['name' => 'country#index', 'url' => '/api/v1/countries', 'verb' => 'GET'],
 
+		// „Was ist neu?"-Fenster (#308)
+		['name' => 'whatsNew#index', 'url' => '/api/v1/whatsnew',      'verb' => 'GET'],
+		['name' => 'whatsNew#seen',  'url' => '/api/v1/whatsnew/seen', 'verb' => 'POST'],
+
 		// Access control / app admin
 		['name' => 'admin#permissionInfo',     'url' => '/api/v1/permission-info',     'verb' => 'GET'],
 		['name' => 'admin#getPermissions',     'url' => '/api/v1/permissions',         'verb' => 'GET'],

@@ -69,13 +69,13 @@ class DatevConfirmationService {
 			}
 		}
 
-		$client = new ImapClient($cfg['host'], $cfg['port'], $cfg['security'], true);
+		$client = new ImapClient($cfg->host(), $cfg->port(), $cfg->security(), true);
 		$client->connect();
 
 		$seen = 0;
 		$matched = 0;
 		try {
-			$client->login($cfg['user'], $cfg['password']);
+			$client->login($cfg->user(), $cfg->password());
 
 			// Confirmations may not stay in INBOX (mail rules / external automations
 			// archive them), so search across folders — but skip the obvious noise.

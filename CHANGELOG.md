@@ -7,6 +7,47 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-09-21
+
+Ein neues Fenster meldet Neuerungen direkt in der App, eine zusätzliche
+Adresszeile für Kunden, und eine Sicherheitslücke im Protokoll geschlossen.
+
+### Added
+- **„Was ist neu?"-Fenster.** Nach einem Update zeigt RechnungsWerk einmal je
+  Version kurz, was sich geändert hat, in Nutzersprache, mit einem Symbol je
+  Eintrag und dem Hinweis, wo die Neuerung zu finden ist. Wegklickbar, kehrt
+  nicht zurück, und bei einer frischen Installation erscheint es gar nicht
+  erst. Die Inhalte liegen als Datei im App-Paket, es wird nichts von fremden
+  Servern nachgeladen (#308)
+- **Adresszusatz beim Kunden.** Eine freie Zeile zwischen Firmenname und
+  Straße, etwa „z. Hd. Frau Meyer", „Gebäude B" oder „c/o …". Sie steht auf der
+  Rechnung und wird in der E-Rechnung als eigene Adresszeile übergeben
+  (EN16931 BT-50), nicht mit der Straße verklebt. Beim Festschreiben wird der
+  Zusatz mit eingefroren, ein Umzug des Kunden ändert also keine alte Rechnung
+  (#304)
+
+### Security
+- **SMTP- und IMAP-Passwort landeten im Protokoll.** Schlug ein Mailversand
+  fehl, schrieb Nextcloud die Ausnahme samt Aufrufargumenten nach
+  `nextcloud.log`, und darin stand die Zugangskonfiguration im Klartext,
+  Passwort inklusive. Die Zugangsdaten stecken jetzt in einem Objekt mit
+  privaten Feldern, im Protokoll erscheint nur noch der Klassenname.
+
+  **Betroffen:** Installationen mit eigenem SMTP-Konto in der App, bei denen
+  mindestens ein Versand fehlschlug. Wer dazugehört, sollte das Mail-Passwort
+  wechseln und alte Protokolle prüfen. Ohne eigenes SMTP-Konto läuft der
+  Versand über den Nextcloud-Systemmailer, dort gehen keine Zugangsdaten durch
+  diesen Code (#314)
+
+### Fixed
+- **Der Ablageordner bleibt nach dem Speichern stehen.** In den
+  Grundeinstellungen wirkte das Feld nach dem Speichern leer, obwohl der Ordner
+  gesetzt war. Der Ordner war die ganze Zeit korrekt hinterlegt, nur die
+  Anzeige fiel weg (#301)
+
+### Changed
+- Französische Übersetzung der Oberfläche (#299)
+
 ## [0.5.2] - 2026-08-27
 
 Zwei Verbesserungen aus Anwender-Feedback: der saubere Einstieg in eine bereits

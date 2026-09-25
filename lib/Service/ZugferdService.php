@@ -315,9 +315,15 @@ class ZugferdService {
 		if (($invoice->getRecipientVatId() ?? '') !== '') {
 			$builder->addDocumentBuyerVATRegistrationNumber($invoice->getRecipientVatId());
 		}
+		// EN16931 kennt drei freie Adresszeilen (BT-50/51/163). Damit die
+		// Reihenfolge stimmt (Firmenname, Zusatz, Strasse) steht der Zusatz in
+		// Zeile 1 und die Strasse rutscht auf Zeile 2. Ohne Zusatz bleibt alles
+		// wie bisher, damit die Belege unveraendert aussehen (#304).
+		$zusatz = trim((string)$invoice->getRecipientAddressAddition());
+		$strasse = (string)($invoice->getRecipientAddress() ?? '');
 		$builder->setDocumentBuyerAddress(
-			$invoice->getRecipientAddress() ?? '',
-			null,
+			$zusatz !== '' ? $zusatz : $strasse,
+			$zusatz !== '' ? $strasse : null,
 			null,
 			$invoice->getRecipientPostalCode() ?? '',
 			$invoice->getRecipientCity() ?? '',
@@ -653,6 +659,7 @@ class ZugferdService {
 		$recipientLines = array_filter([
 			$invoice->getRecipientName(),
 			($invoice->getRecipientContactPerson() ?? '') !== '' ? 'z. Hd. ' . $invoice->getRecipientContactPerson() : null,
+			$invoice->getRecipientAddressAddition(),
 			$invoice->getRecipientAddress(),
 			trim((string)$invoice->getRecipientPostalCode() . ' ' . (string)$invoice->getRecipientCity()),
 			($country !== '' && $country !== 'DE') ? $country : null,

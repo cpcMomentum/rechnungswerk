@@ -926,7 +926,7 @@ class InvoiceService {
 	 */
 	private function applyHeader(Invoice $invoice, array $data): void {
 		$strings = [
-			'recipientName', 'recipientContactId', 'recipientAddress', 'recipientPostalCode',
+			'recipientName', 'recipientContactId', 'recipientAddressAddition', 'recipientAddress', 'recipientPostalCode',
 			'recipientCity', 'recipientEmail', 'recipientVatId', 'recipientContactPerson',
 			'recipientPhone', 'sellerContactPerson', 'sellerContactPhone', 'sellerContactEmail',
 			'referenceNumber',
@@ -971,6 +971,7 @@ class InvoiceService {
 		$to->setRecipientName($from->getRecipientName());
 		$to->setRecipientContactId($from->getRecipientContactId());
 		$to->setCustomerId($from->getCustomerId());
+		$to->setRecipientAddressAddition($from->getRecipientAddressAddition());
 		$to->setRecipientAddress($from->getRecipientAddress());
 		$to->setRecipientPostalCode($from->getRecipientPostalCode());
 		$to->setRecipientCity($from->getRecipientCity());

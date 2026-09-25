@@ -50,6 +50,9 @@
 			<NcAppContent>
 				<router-view />
 			</NcAppContent>
+
+			<!-- „Was ist neu?"-Fenster (#308): erst wenn der Zugriff feststeht. -->
+			<WhatsNewDialog />
 		</template>
 	</NcContent>
 </template>
@@ -71,6 +74,7 @@ import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
+import WhatsNewDialog from '@/components/WhatsNewDialog.vue'
 import { usePermissionStore } from '@/stores/permissionStore'
 import { useClubStatusStore } from '@/stores/clubStatusStore'
 
