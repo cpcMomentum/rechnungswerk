@@ -479,7 +479,8 @@
 		"Adresszusatz": "Address supplement",
 		"z. Hd. Frau Meyer, Gebäude B, c/o …": "Attn. Ms Meyer, Building B, c/o …",
 		"Der Adresszusatz darf höchstens 255 Zeichen lang sein.": "The address supplement must not exceed 255 characters.",
-		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).": "Please enter your company name first. Without it, no valid document can be created. You will find it under Settings (administrators only)."
+		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).": "Please enter your company name first. Without it, no valid document can be created. You will find it under Settings (administrators only).",
+		"Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.": "Appears on the document directly below the company name. You can also put “Attn. Ms Meyer” here — the contact person appears only in the e-invoice, not in the postal address."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

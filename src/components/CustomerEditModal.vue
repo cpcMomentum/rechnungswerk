@@ -31,6 +31,7 @@
 					<span>{{ t('rechnungswerk', 'Adresszusatz') }}</span>
 					<input v-model="form.addressAddition" class="input" type="text"
 						:placeholder="t('rechnungswerk', 'z. Hd. Frau Meyer, Gebäude B, c/o …')" />
+					<span class="hint">{{ t('rechnungswerk', 'Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.') }}</span>
 				</label>
 				<label class="field">
 					<span>{{ t('rechnungswerk', 'Straße & Hausnummer') }}</span>
@@ -295,6 +296,11 @@ function onSave() {
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	color: var(--color-text-maxcontrast);
+}
+.hint {
+	font-size: 0.85em;
+	color: var(--color-text-maxcontrast);
+	margin: 0;
 }
 .field {
 	display: flex;
