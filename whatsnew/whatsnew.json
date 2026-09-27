@@ -1,4 +1,86 @@
 {
+	"0.6.0": [
+		{
+			"title": {
+				"de": "Ansprechpartner steht nicht mehr doppelt im Beleg",
+				"en": "Contact person no longer appears twice on the document",
+				"fr": "L'interlocuteur n'apparaît plus en double sur le document"
+			},
+			"text": {
+				"de": "Wer beim Kunden einen Ansprechpartner und einen Adresszusatz pflegte, sah beide Zeilen fast gleich untereinander. Was in der Anschrift steht, entscheidet jetzt allein der Adresszusatz — auch ein „z. Hd. …“ gehört dorthin. Der Ansprechpartner wird weiterhin in der E-Rechnung mitgegeben.",
+				"en": "If you kept both a contact person and an address supplement for a customer, the two nearly identical lines appeared one below the other. What shows in the address is now decided by the address supplement alone — an “Attn. …” belongs there too. The contact person is still included in the e-invoice.",
+				"fr": "Si vous renseigniez à la fois un interlocuteur et un complément d'adresse, les deux lignes presque identiques se suivaient. Ce qui figure dans l'adresse dépend désormais du seul complément d'adresse — une mention « à l'attention de » y a aussi sa place. L'interlocuteur reste transmis dans la facture électronique."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Kunden",
+				"en": "Customers",
+				"fr": "Clients"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Festschreiben auf SQLite-Instanzen repariert",
+				"en": "Finalising fixed on SQLite instances",
+				"fr": "Finalisation corrigée sur les instances SQLite"
+			},
+			"text": {
+				"de": "Auf Nextcloud-Installationen mit SQLite ließ sich keine Rechnung festschreiben, nicht stornieren und kein Angebot festschreiben — es kam nur eine Fehlermeldung. Das funktioniert jetzt.",
+				"en": "On Nextcloud installations using SQLite it was impossible to finalise an invoice, cancel one or finalise a quote — only an error appeared. That works now.",
+				"fr": "Sur les installations Nextcloud utilisant SQLite, il était impossible de finaliser une facture, d'en annuler une ou de finaliser un devis — seule une erreur s'affichait. Cela fonctionne désormais."
+			},
+			"icon": "counter",
+			"where": {
+				"de": "Rechnungen",
+				"en": "Invoices",
+				"fr": "Factures"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Ohne Firmenname wird keine Nummer mehr verbraucht",
+				"en": "No number is used up without a company name",
+				"fr": "Plus de numéro consommé sans nom d'entreprise"
+			},
+			"text": {
+				"de": "Waren die Grundeinstellungen noch leer, entstand beim Festschreiben zwar eine Rechnungsnummer, aber kein Beleg. RechnungsWerk weist jetzt vorher darauf hin. Bereits entstandene Fälle holt die App von selbst nach, sobald der Firmenname hinterlegt ist.",
+				"en": "If the basic settings were still empty, finalising used up an invoice number but produced no document. RechnungsWerk now points this out beforehand, and existing cases are completed automatically once the company name is set.",
+				"fr": "Si les réglages de base étaient encore vides, la finalisation consommait un numéro sans produire de document. RechnungsWerk le signale désormais au préalable et rattrape les cas existants dès que le nom de l'entreprise est renseigné."
+			},
+			"icon": "cog",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Bereit für Nextcloud 35, Nextcloud 31 fällt weg",
+				"en": "Ready for Nextcloud 35, Nextcloud 31 dropped",
+				"fr": "Compatible Nextcloud 35, Nextcloud 31 abandonné"
+			},
+			"text": {
+				"de": "RechnungsWerk läuft jetzt auf Nextcloud 32 bis 35. Nextcloud 31 wird nicht mehr unterstützt: Die dort fehlende Zeilensperre ließ das Festschreiben seit Juni 2026 fehlschlagen — das ist jetzt ehrlich ausgewiesen, statt eine Kompatibilität zu versprechen, die es nicht gab.",
+				"en": "RechnungsWerk now runs on Nextcloud 32 to 35. Nextcloud 31 is no longer supported: the row lock missing there had made finalising fail since June 2026 — this is now stated honestly instead of promising a compatibility that did not exist.",
+				"fr": "RechnungsWerk fonctionne désormais sur Nextcloud 32 à 35. Nextcloud 31 n'est plus pris en charge : le verrou de ligne absent y faisait échouer la finalisation depuis juin 2026 — c'est désormais annoncé honnêtement plutôt que de promettre une compatibilité inexistante."
+			},
+			"icon": "cog",
+			"where": {
+				"de": "Nextcloud-Verwaltung",
+				"en": "Nextcloud administration",
+				"fr": "Administration Nextcloud"
+			},
+			"adminOnly": true,
+			"plus": false
+		}
+	],
 	"0.5.3": [
 		{
 			"title": {

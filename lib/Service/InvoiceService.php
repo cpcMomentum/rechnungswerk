@@ -218,7 +218,8 @@ class InvoiceService {
 
 		// Create the settings row outside the transaction: a failed INSERT would
 		// otherwise abort the commit transaction on PostgreSQL.
-		$this->settingsService->getCompany();
+		$settings = $this->settingsService->getCompany();
+		$this->assertSellerNameSet($settings);
 
 		$now = new DateTime();
 
@@ -442,6 +443,7 @@ class InvoiceService {
 	 * @return array<string, mixed> the cancellation document
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
+	 * @throws ValidationException
 	 */
 	public function cancel(int $id, string $userId): array {
 		$original = $this->assertInvoiceType($this->findById($id));
@@ -449,7 +451,8 @@ class InvoiceService {
 			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
 		}
 
-		$this->settingsService->getCompany();
+		$settings = $this->settingsService->getCompany();
+		$this->assertSellerNameSet($settings);
 
 		$now = new DateTime();
 
@@ -767,6 +770,24 @@ class InvoiceService {
 		} catch (DoesNotExistException) {
 			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
 		}
+	}
+
+	/**
+	 * Ohne Firmennamen entsteht kein Beleg: der ZUGFeRD-Anteil der PDF braucht
+	 * den Verkaeufer als Metadatum, und die Bibliothek bricht ohne ihn ab. Die
+	 * Nummer waere dann aber schon vergeben und der Beleg nach § 14 UStG
+	 * unveraenderlich — eine nummerierte Rechnung ohne PDF, die sich nur noch
+	 * stornieren liesse (#313). Deshalb VOR der Transaktion pruefen, damit gar
+	 * keine Nummer verbraucht wird.
+	 *
+	 * @throws ValidationException
+	 */
+	private function assertSellerNameSet(Settings $settings): void {
+		if (($settings->getCompanyName() ?? '') !== '') {
+			return;
+		}
+
+		throw new ValidationException($this->l10n->t('Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).'));
 	}
 
 	/**

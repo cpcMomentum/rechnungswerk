@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Service;
 
 use DateTime;
+use OCA\Rechnungswerk\Db\RowLock;
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Db\SettingsMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
@@ -474,9 +475,10 @@ class SettingsService {
 	 * in sync so switching back to 'yearly' has a correct anchor.
 	 *
 	 * MUST be called inside a DB transaction owned by the caller. The central
-	 * company settings row is locked with SELECT ... FOR UPDATE so that
-	 * concurrent commits serialise and can never hand out the same sequential
-	 * number (a duplicate invoice number would violate GoBD).
+	 * company settings row is locked (SELECT ... FOR UPDATE where the database
+	 * supports it, see RowLock) so that concurrent commits serialise and can
+	 * never hand out the same sequential number (a duplicate invoice number
+	 * would violate GoBD).
 	 */
 	public function reserveNextNumber(\DateTimeInterface $date): string {
 		$this->getCompany();
@@ -486,8 +488,8 @@ class SettingsService {
 		$select = $this->db->getQueryBuilder();
 		$select->select('number_counter', 'number_counter_year', 'number_format', 'number_reset_mode')
 			->from(self::SETTINGS_TABLE)
-			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)))
-			->forUpdate();
+			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)));
+		$select = RowLock::apply($select, $this->db);
 		$result = $select->executeQuery();
 		$row = $result->fetch();
 		$result->closeCursor();
@@ -533,7 +535,7 @@ class SettingsService {
 	 * quote number.
 	 *
 	 * MUST be called inside a DB transaction owned by the caller (the company
-	 * settings row is locked with SELECT ... FOR UPDATE for the rest of it).
+	 * settings row is locked for the rest of it, see RowLock).
 	 */
 	public function reserveNextQuoteNumber(\DateTimeInterface $date): string {
 		$this->getCompany();
@@ -542,8 +544,8 @@ class SettingsService {
 		$select = $this->db->getQueryBuilder();
 		$select->select('quote_number_counter', 'quote_number_counter_year', 'quote_number_format', 'quote_number_reset_mode')
 			->from(self::SETTINGS_TABLE)
-			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)))
-			->forUpdate();
+			->where($select->expr()->eq('owner_user_id', $select->createNamedParameter(self::COMPANY_KEY)));
+		$select = RowLock::apply($select, $this->db);
 		$result = $select->executeQuery();
 		$row = $result->fetch();
 		$result->closeCursor();

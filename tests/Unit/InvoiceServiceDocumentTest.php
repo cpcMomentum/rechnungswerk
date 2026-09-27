@@ -15,6 +15,7 @@ use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
+use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ArchiveService;
 use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
@@ -330,6 +331,109 @@ class InvoiceServiceDocumentTest extends TestCase {
 		$this->assertFalse($service->freezeDocument($invoice, true));
 		$this->assertNull($invoice->getDocumentFrozenAt());
 		$this->assertNull($invoice->getDocumentBackfilled());
+	}
+
+	/**
+	 * Ohne Firmennamen entstand eine festgeschriebene Rechnung mit Nummer, aber
+	 * ohne Beleg: die Nummer war verbraucht, der Beleg nach § 14 UStG
+	 * unveraenderlich, und die PDF fehlte (#313). Die Pruefung liegt vor der
+	 * Transaktion — es darf gar keine Nummer gezogen werden.
+	 */
+	public function testCommitWithoutSellerNameIsRefusedAndBurnsNoNumber(): void {
+		$service = $this->serviceWithoutSellerName($draft = $this->draftInvoice(), $settingsService);
+
+		$settingsService->expects($this->never())->method('reserveNextNumber');
+		$this->invoiceMapper->expects($this->never())->method('update');
+
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessageMatches('/Firmennamen/');
+
+		$service->commit((int)$draft->getId());
+	}
+
+	/** Dasselbe beim Storno: auch dort entstuende sonst ein Beleg ohne PDF. */
+	public function testCancelWithoutSellerNameIsRefusedAndBurnsNoNumber(): void {
+		$committed = $this->committedInvoice();
+		$service = $this->serviceWithoutSellerName($committed, $settingsService);
+
+		$settingsService->expects($this->never())->method('reserveNextNumber');
+
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessageMatches('/Firmennamen/');
+
+		$service->cancel((int)$committed->getId(), 'alice');
+	}
+
+	/** Mit Firmennamen laeuft derselbe Weg durch — die Sperre trifft nur den Leerfall. */
+	public function testCommitWithSellerNameReservesTheNumber(): void {
+		$draft = $this->draftInvoice();
+		$this->invoiceMapper->method('findOne')->willReturn($draft);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($draft);
+		$this->invoiceMapper->method('update')->willReturnArgument(0);
+		$this->itemMapper->method('findByInvoice')->willReturn([$this->anItem()]);
+		$this->documentStore->method('read')->willReturn(self::FROZEN);
+		$this->settingsService->expects($this->once())
+			->method('reserveNextNumber')
+			->willReturn('RE-2026-0001');
+
+		$this->service->commit((int)$draft->getId());
+
+		$this->assertSame('RE-2026-0001', $draft->getNumber());
+		$this->assertSame(Invoice::STATUS_COMMITTED, $draft->getStatus());
+	}
+
+	private function draftInvoice(): Invoice {
+		$invoice = new Invoice();
+		$invoice->setId(9);
+		$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
+		$invoice->setStatus(Invoice::STATUS_DRAFT);
+		$invoice->setRecipientName('Kunde AG');
+		return $invoice;
+	}
+
+	private function anItem(): InvoiceItem {
+		$item = new InvoiceItem();
+		$item->setDescription('Leistung');
+		$item->setQuantity('1');
+		$item->setUnitPriceE4(950000);
+		$item->setTaxRateBp(1900);
+		$item->setLineTotalCents(9500);
+		return $item;
+	}
+
+	/**
+	 * Wie $this->service, nur mit leerem Firmennamen in den Einstellungen.
+	 *
+	 * @param SettingsService|null $settingsService wird gesetzt, damit der Test
+	 *   Erwartungen an die Nummernvergabe formulieren kann
+	 */
+	private function serviceWithoutSellerName(Invoice $invoice, &$settingsService = null): InvoiceService {
+		$settings = new Settings();
+		$settings->setOwnerUserId('__company__');
+		$settings->setCompanyName(null);
+		$settings->setFileNameFormat('{nummer}');
+
+		$settingsService = $this->createMock(SettingsService::class);
+		$settingsService->method('getCompany')->willReturn($settings);
+
+		$this->invoiceMapper->method('findOne')->willReturn($invoice);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($invoice);
+		$this->itemMapper->method('findByInvoice')->willReturn([$this->anItem()]);
+
+		return new InvoiceService(
+			$this->invoiceMapper,
+			$this->itemMapper,
+			$settingsService,
+			$this->zugferdService,
+			$this->archiveService,
+			$this->documentStore,
+			$this->mailService,
+			$this->createMock(CountryService::class),
+			$this->db,
+			$this->createMock(LoggerInterface::class),
+			new NumberFormatMessage($this->l10nStub()),
+			$this->l10nStub(),
+		);
 	}
 
 }

@@ -269,7 +269,18 @@ class ZugferdService {
 	}
 
 	private function applySeller(ZugferdDocumentBuilder $builder, Settings $settings, Invoice $invoice): void {
-		$builder->setDocumentSeller($settings->getCompanyName() ?? '');
+		// Zweite Sicherung hinter der Pruefung beim Festschreiben (#313): ohne
+		// Verkaeufernamen laeuft die Bibliothek beim Bau der XMP-Metadaten in
+		// einen TypeError ("Argument #2 ($default) must be of type string, null
+		// given"), der nichts darueber sagt, was fehlt. Bewusst KEIN Platzhalter
+		// als Ersatz: ein Beleg mit erfundenem Absender waere schlimmer als
+		// keiner. Trifft in der Praxis nur Wege ohne die Pruefung davor, etwa
+		// den Nachzieh-Auftrag fuer Altbestand.
+		$seller = $settings->getCompanyName() ?? '';
+		if ($seller === '') {
+			throw new \RuntimeException('Cannot build an EN16931 document without a seller name (company name is empty, see #313)');
+		}
+		$builder->setDocumentSeller($seller);
 		if (($settings->getVatId() ?? '') !== '') {
 			$builder->addDocumentSellerVATRegistrationNumber($settings->getVatId());
 		}
@@ -656,9 +667,16 @@ class ZugferdService {
 			? '<div class="company-contact">' . implode(' &middot; ', $sellerContact) . '</div>' : '';
 
 		$country = (string)$invoice->getRecipientCountry();
+		// Der Ansprechpartner steht bewusst NICHT im Adressblock (#328). Er ist
+		// Kontakt, nicht Anschrift — im XML trennt das Format beides ohnehin
+		// (Adresse BG-8/BT-50 ff., Ansprechpartner BT-56 im Kaeufer-Kontakt
+		// BG-9), und fuer die eigene Seite fuehrt der Beleg ihn seit jeher als
+		// Kontaktzeile im Kopf. Bis hierher setzte das PDF zusaetzlich eine
+		// Zeile „z. Hd. <Person>" ueber den Adresszusatz; wer beides pflegte,
+		// bekam sie doppelt. Was in der Anschrift steht, entscheidet jetzt
+		// allein der Adresszusatz — auch ein „z. Hd. ..." gehoert dorthin.
 		$recipientLines = array_filter([
 			$invoice->getRecipientName(),
-			($invoice->getRecipientContactPerson() ?? '') !== '' ? 'z. Hd. ' . $invoice->getRecipientContactPerson() : null,
 			$invoice->getRecipientAddressAddition(),
 			$invoice->getRecipientAddress(),
 			trim((string)$invoice->getRecipientPostalCode() . ' ' . (string)$invoice->getRecipientCity()),

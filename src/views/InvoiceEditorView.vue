@@ -88,7 +88,8 @@
 			</div>
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Adresszusatz') }}</span>
-					<input v-model="form.recipientAddressAddition" class="rw-input" type="text" :readonly="readonly" /></label>
+					<input v-model="form.recipientAddressAddition" class="rw-input" type="text" :readonly="readonly" />
+					<span class="rw-hint">{{ t('rechnungswerk', 'Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.') }}</span></label>
 			</div>
 			<div class="rw-form-row">
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Straße') }}</span>
