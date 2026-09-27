@@ -5,7 +5,7 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unreleased]
+## [0.6.0] - 2026-09-27
 
 ### Changed
 - **Unterstützt werden jetzt Nextcloud 32 bis 35.** Nextcloud 35 ist geprüft
@@ -33,6 +33,16 @@ Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
   SQLite nicht kennt. Auf SQLite entfällt sie jetzt; doppelte Rechnungsnummern
   kann das nicht auslösen, weil SQLite ohnehin nur einen Schreiber zulässt
   (#319)
+- **Adresszusatz und Ansprechpartner doppelten sich im Beleg.** Wer beim Kunden
+  einen Ansprechpartner *und* einen Adresszusatz pflegte, bekam zwei fast gleiche
+  Zeilen untereinander („z. Hd. Frau Meyer"), weil der Adressblock die Zeile
+  zusätzlich aus dem Ansprechpartner ableitete — und der Platzhalter am
+  Adresszusatz ausdrücklich dazu einlud, dasselbe noch einmal einzutragen. Der
+  Ansprechpartner ist Kontakt, nicht Anschrift: Er steht jetzt nur noch in der
+  E-Rechnung (BT-56), wo er immer hingehörte. Was in der Anschrift erscheint,
+  entscheidet allein der Adresszusatz — auch ein „z. Hd. …" gehört dorthin, und
+  ein Hinweis an beiden Pflegestellen sagt das. Künftige Belege sehen dadurch
+  anders aus, wenn bisher nur der Ansprechpartner gepflegt war (#328)
 - **Wartung:** Der wöchentliche Kompatibilitäts-Wächter und die Unit-Test-Läufe
   scheiterten an einem neuen Nextcloud-Major, sobald dieses die PHP-Untergrenze
   anhob — und zwar bevor ein einziger Test lief. Gemeldet wurde es trotzdem als
@@ -538,7 +548,10 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.3...v0.6.0
+[0.5.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.0...v0.4.1
