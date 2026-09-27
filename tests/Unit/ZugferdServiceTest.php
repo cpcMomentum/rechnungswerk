@@ -435,6 +435,56 @@ class ZugferdServiceTest extends TestCase {
 		);
 	}
 
+	/**
+	 * **Der Ansprechpartner gehoert nicht in die Anschrift (#328).**
+	 *
+	 * Bis hierher setzte das PDF eine Zeile „z. Hd. <Person>" ueber den
+	 * Adresszusatz. Wer beide Felder pflegte — und der Platzhalter am
+	 * Adresszusatz lud ausdruecklich dazu ein —, bekam sie doppelt. Was in der
+	 * Anschrift steht, entscheidet jetzt allein der Adresszusatz.
+	 */
+	public function testAnsprechpartnerStehtNichtImAdressblock(): void {
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientContactPerson('Frau Meyer');
+		$invoice->setRecipientAddressAddition('z. Hd. Frau Meyer');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $settings, false);
+
+		$this->assertSame(
+			1,
+			substr_count($html, 'z. Hd. Frau Meyer'),
+			'Die Zeile steht genau einmal — aus dem Adresszusatz, nicht zusaetzlich aus dem Ansprechpartner.',
+		);
+		$this->assertMatchesRegularExpression(
+			'#Kunde AG<br>z\. Hd\. Frau Meyer<br>Kundenweg 5#u',
+			$html,
+			'Reihenfolge: Name, Adresszusatz, Strasse',
+		);
+	}
+
+	/**
+	 * Und er ist deshalb nicht verloren: Die E-Rechnung fuehrt ihn weiter in
+	 * BT-56 (Kaeufer-Kontakt, BG-9) — dort war er immer richtig aufgehoben.
+	 */
+	public function testAnsprechpartnerBleibtImXmlErhalten(): void {
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientContactPerson('Frau Meyer');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('Frau Meyer', $xml, 'BT-56 traegt den Ansprechpartner weiterhin.');
+	}
+
 	private function renderHtml(Invoice $invoice, array $items, Settings $settings, bool $preview): string {
 		$m = new \ReflectionMethod(ZugferdService::class, 'renderHtml');
 		return (string)$m->invoke($this->service, $invoice, $items, $settings, null, null, $preview);

@@ -480,6 +480,7 @@ OC.L10N.register(
     "Adresszusatz" : "Complément d'adresse",
     "z. Hd. Frau Meyer, Gebäude B, c/o …" : "À l'attention de Mme Meyer, bâtiment B, c/o …",
     "Der Adresszusatz darf höchstens 255 Zeichen lang sein." : "Le complément d'adresse ne doit pas dépasser 255 caractères.",
-    "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren)." : "Veuillez d'abord saisir le nom de votre entreprise. Sans lui, aucun document valide ne peut être créé. Vous le trouverez dans les Paramètres (administrateurs uniquement)."
+    "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren)." : "Veuillez d'abord saisir le nom de votre entreprise. Sans lui, aucun document valide ne peut être créé. Vous le trouverez dans les Paramètres (administrateurs uniquement).",
+    "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift." : "Apparaît sur le document juste sous le nom de l’entreprise. Vous pouvez aussi y écrire « À l’attention de Mme Meyer » — l’interlocuteur n’apparaît que dans la facture électronique, pas dans l’adresse."
 },
 "nplurals=2; plural=(n > 1);");
