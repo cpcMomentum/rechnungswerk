@@ -2439,7 +2439,7 @@ function ra(e) {
 }
 var ia = "missing-app-name";
 try {
-	ia = "RECHNUNGSWERK";
+	ia = "rechnungswerk";
 } catch {
 	a.error("The `@nextcloud/vue` library was used without setting / replacing the `appName`.");
 }
