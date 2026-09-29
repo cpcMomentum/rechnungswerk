@@ -469,7 +469,6 @@
 		"Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.": "Le prochain numéro de facture doit être au moins {min}, car le numéro {issued} a déjà été attribué.",
 		"Die nächste Rechnungsnummer muss positiv sein.": "Le prochain numéro de facture doit être positif.",
 		"Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden.": "Le prochain numéro de facture doit être au moins %1$s, car le numéro %2$s a déjà été attribué. Les numéros ne peuvent qu'augmenter.",
-		"Produkt suchen und einfügen …": "Rechercher et insérer un produit…",
 		"Was ist neu in RechnungsWerk": "Nouveautés dans RechnungsWerk",
 		"Version {version}": "Version {version}",
 		"Zu finden unter": "À trouver sous",
@@ -480,7 +479,11 @@
 		"z. Hd. Frau Meyer, Gebäude B, c/o …": "À l'attention de Mme Meyer, bâtiment B, c/o …",
 		"Der Adresszusatz darf höchstens 255 Zeichen lang sein.": "Le complément d'adresse ne doit pas dépasser 255 caractères.",
 		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).": "Veuillez d'abord saisir le nom de votre entreprise. Sans lui, aucun document valide ne peut être créé. Vous le trouverez dans les Paramètres (administrateurs uniquement).",
-		"Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.": "Apparaît sur le document juste sous le nom de l’entreprise. Vous pouvez aussi y écrire « À l’attention de Mme Meyer » — l’interlocuteur n’apparaît que dans la facture électronique, pas dans l’adresse."
+		"Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.": "Apparaît sur le document juste sous le nom de l’entreprise. Vous pouvez aussi y écrire « À l’attention de Mme Meyer » — l’interlocuteur n’apparaît que dans la facture électronique, pas dans l’adresse.",
+		"Noch keine Produkte angelegt": "Aucun produit encore créé",
+		"Alle Produkte ({gesamt})": "Tous les produits ({gesamt})",
+		"{treffer} Treffer": "{treffer} résultats",
+		"Produkt wählen oder suchen …": "Choisir ou rechercher un produit …"
 	},
 	"pluralForm": "nplurals=2; plural=(n > 1);"
 }

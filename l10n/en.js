@@ -470,7 +470,6 @@ OC.L10N.register(
     "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde." : "The next invoice number must be at least {min}, because number {issued} has already been issued.",
     "Die nächste Rechnungsnummer muss positiv sein." : "The next invoice number must be positive.",
     "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "The next invoice number must be at least %1$s, because number %2$s has already been issued. Numbers can only be moved forward.",
-    "Produkt suchen und einfügen …" : "Search and add a product …",
     "Was ist neu in RechnungsWerk" : "What's new in RechnungsWerk",
     "Version {version}" : "Version {version}",
     "Zu finden unter" : "Found under",
@@ -481,6 +480,10 @@ OC.L10N.register(
     "z. Hd. Frau Meyer, Gebäude B, c/o …" : "Attn. Ms Meyer, Building B, c/o …",
     "Der Adresszusatz darf höchstens 255 Zeichen lang sein." : "The address supplement must not exceed 255 characters.",
     "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren)." : "Please enter your company name first. Without it, no valid document can be created. You will find it under Settings (administrators only).",
-    "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift." : "Appears on the document directly below the company name. You can also put “Attn. Ms Meyer” here — the contact person appears only in the e-invoice, not in the postal address."
+    "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift." : "Appears on the document directly below the company name. You can also put “Attn. Ms Meyer” here — the contact person appears only in the e-invoice, not in the postal address.",
+    "Noch keine Produkte angelegt" : "No products created yet",
+    "Alle Produkte ({gesamt})" : "All products ({gesamt})",
+    "{treffer} Treffer" : "{treffer} matches",
+    "Produkt wählen oder suchen …" : "Choose or search for a product …"
 },
 "nplurals=2; plural=(n != 1);");

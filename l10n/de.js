@@ -470,7 +470,6 @@ OC.L10N.register(
     "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde." : "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.",
     "Die nächste Rechnungsnummer muss positiv sein." : "Die nächste Rechnungsnummer muss positiv sein.",
     "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden." : "Die nächste Rechnungsnummer muss mindestens %1$s sein, da bereits die Nummer %2$s vergeben wurde. Nummern können nur vorwärts gesetzt werden.",
-    "Produkt suchen und einfügen …" : "Produkt suchen und einfügen …",
     "Was ist neu in RechnungsWerk" : "Was ist neu in RechnungsWerk",
     "Version {version}" : "Version {version}",
     "Zu finden unter" : "Zu finden unter",
@@ -481,6 +480,10 @@ OC.L10N.register(
     "z. Hd. Frau Meyer, Gebäude B, c/o …" : "z. Hd. Frau Meyer, Gebäude B, c/o …",
     "Der Adresszusatz darf höchstens 255 Zeichen lang sein." : "Der Adresszusatz darf höchstens 255 Zeichen lang sein.",
     "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren)." : "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).",
-    "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift." : "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift."
+    "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift." : "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.",
+    "Noch keine Produkte angelegt" : "Noch keine Produkte angelegt",
+    "Alle Produkte ({gesamt})" : "Alle Produkte ({gesamt})",
+    "{treffer} Treffer" : "{treffer} Treffer",
+    "Produkt wählen oder suchen …" : "Produkt wählen oder suchen …"
 },
 "nplurals=2; plural=(n != 1);");

@@ -101,17 +101,31 @@
 				<template #icon><PlusIcon :size="20" /></template>
 				{{ t('rechnungswerk', 'Position hinzufügen') }}
 			</NcButton>
+			<!--
+				#346: Ohne Produkte stand hier bislang NICHTS, weil das Feld an
+				`products.length > 0` hing. Wer noch keine angelegt hatte, erfuhr
+				nie, dass es die Funktion gibt, und tippte jede Position von Hand.
+				Im Leerzustand tritt deshalb ein Weg zum Produktbereich an die
+				Stelle des Feldes. Der Kommentar steht VOR dem Paar, nicht
+				zwischen v-if und v-else.
+			-->
 			<ProductPicker v-if="products.length > 0" :products="products" @select="addFromProduct" />
+			<NcButton v-else variant="tertiary" @click="zuProdukten">
+				<template #icon><PackageVariantIcon :size="20" /></template>
+				{{ t('rechnungswerk', 'Noch keine Produkte angelegt') }}
+			</NcButton>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import DeleteIcon from 'vue-material-design-icons/Delete.vue'
+import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import ProductPicker from '@/components/ProductPicker.vue'
 import { TAX_RATES_BP, UNIT_CODE_LABELS, UNIT_CODES, type Product } from '@/types/api'
 import { emptyItem, itemFromProduct, type EditorItem } from '@/types/editor'
@@ -162,12 +176,60 @@ watch(() => props.smallBusiness, (sb) => {
 	}
 }, { immediate: true })
 
+const router = useRouter()
+
+/** #346: Aus dem Leerzustand direkt dorthin, wo Produkte entstehen. */
+function zuProdukten() {
+	router.push({ name: 'products' })
+}
+
+/**
+ * Eine unberuehrte Zeile ist eine, die der Anlage-Zustand hinterlassen hat:
+ * ohne Bezeichnung und ohne Beschreibung. Menge, Einheit und Steuersatz sind
+ * vorbelegt und sagen deshalb nichts darueber aus, ob jemand die Zeile schon
+ * benutzt; der Preis kann legitim 0,00 sein.
+ */
+function istUnberuehrt(item: EditorItem): boolean {
+	return item.name.trim() === '' && item.description.trim() === ''
+}
+
+/**
+ * Index einer unberuehrten LETZTEN Zeile, sonst -1.
+ *
+ * Nur die letzte: Eine leere Zeile mitten im Beleg kann als Abstandhalter
+ * gewollt sein, die letzte ist der Rest des Anlage-Zustands.
+ */
+function letzteLeereZeile(): number {
+	const i = items.value.length - 1
+
+	return i >= 0 && istUnberuehrt(items.value[i]) ? i : -1
+}
+
 function add() {
+	// #347: Steht schon eine unberuehrte Zeile da, waere eine zweite nur
+	// Leerlauf – dann bleibt es bei der einen.
+	if (letzteLeereZeile() !== -1) {
+		return
+	}
 	items.value.push(emptyItem(props.smallBusiness ? 0 : (props.defaultTaxRateBp ?? 1900)))
 }
 
+/**
+ * #347: Das Produkt FUELLT die leere Startzeile, statt sich darunter zu setzen.
+ *
+ * Ein neuer Entwurf beginnt mit einer unberuehrten Position. Wer daraufhin ein
+ * Produkt einfuegte, hatte sie als erste Zeile mit 0,00 im Beleg stehen und
+ * musste sie von Hand wegwerfen.
+ */
 function addFromProduct(product: Product) {
-	items.value.push(itemFromProduct(product, props.smallBusiness ?? false))
+	const neu = itemFromProduct(product, props.smallBusiness ?? false)
+	const leer = letzteLeereZeile()
+	if (leer !== -1) {
+		items.value.splice(leer, 1, neu)
+
+		return
+	}
+	items.value.push(neu)
 }
 
 function remove(index: number) {
