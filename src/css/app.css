@@ -501,6 +501,12 @@
 }
 .app-rechnungswerk .rw-toolbar {
 	display: flex;
+	/*
+	 * Mittig: Der Knopf ist 40 px hoch (NcButton), das Produktfeld 34 px wie
+	 * jedes Eingabefeld in Nextcloud. Ohne `center` haengen beide an der
+	 * Oberkante und sitzen sichtbar versetzt nebeneinander.
+	 */
+	align-items: center;
 	gap: 8px;
 	margin-top: 12px;
 }
