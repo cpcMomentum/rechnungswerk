@@ -10481,7 +10481,7 @@ var cS = { class: "rw-view" }, lS = { class: "rw-settings-title" }, uS = {
 					])
 				]));
 			}
-		}), [["__scopeId", "data-v-4afd80b8"]])
+		}), [["__scopeId", "data-v-8a4e7cba"]])
 	}
 ], sw = Gr({
 	history: pr(),

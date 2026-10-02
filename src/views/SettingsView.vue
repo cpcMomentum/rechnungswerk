@@ -1170,11 +1170,6 @@ function fail(e: unknown, fallback: string) {
 	font-size: 22px;
 	font-weight: 700;
 }
-.settings-form {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-}
 /* Akzentfarbe (#171): Ausloeser des NcColorPicker plus Musterstreifen. */
 .rw-accent {
 	display: flex;
