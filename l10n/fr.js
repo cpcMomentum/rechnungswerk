@@ -484,6 +484,13 @@ OC.L10N.register(
     "Noch keine Produkte angelegt" : "Aucun produit encore créé",
     "Alle Produkte ({gesamt})" : "Tous les produits ({gesamt})",
     "{treffer} Treffer" : "{treffer} résultats",
-    "Produkt wählen oder suchen …" : "Choisir ou rechercher un produit …"
+    "Produkt wählen oder suchen …" : "Choisir ou rechercher un produit …",
+    "Bereiche" : "Sections",
+    "Einstellungs-Navigation" : "Navigation des paramètres",
+    "Belege" : "Documents",
+    "Buchhaltung" : "Comptabilité",
+    "Eigenes SMTP-Konto" : "Compte SMTP propre",
+    "DATEV-Rückmeldung" : "Retour DATEV",
+    "Ablage & Zugriff" : "Stockage et accès"
 },
 "nplurals=2; plural=(n > 1);");

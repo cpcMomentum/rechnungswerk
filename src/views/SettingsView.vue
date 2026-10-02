@@ -6,416 +6,424 @@
 			<NcNoteCard v-if="error" type="error" :text="error" />
 		</div>
 
-		<div v-if="form" class="settings-form">
-			<!-- Firma -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Firma') }}</h3>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Firmenname') }}</span>
-					<input v-model="form.companyName" class="rw-input" type="text" /></label>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Adresse') }}</span>
-					<textarea v-model="form.companyAddress" class="rw-input" rows="3" /></label>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr.') }}</span>
-						<input v-model="form.vatId" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
-						<input v-model="form.taxNumber" class="rw-input" type="text" /></label>
-				</div>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
-						<input v-model="form.contactPerson" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon') }}</span>
-						<input v-model="form.contactPhone" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Kontakt-E-Mail') }}</span>
-						<input v-model="form.contactEmail" class="rw-input" type="email" /></label>
-				</div>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).') }}</p>
-			</section>
+		<div v-if="form" class="rw-settingspage">
+			<RwSettingsNav
+				:groups="navGroups"
+				:modelValue="activeSection"
+				:ariaLabel="t('rechnungswerk', 'Einstellungs-Navigation')"
+				@update:modelValue="activeSection = $event" />
 
-			<!-- Bank -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Bankverbindung') }}</h3>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'IBAN') }}</span>
-						<input v-model="form.iban" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'BIC') }}</span>
-						<input v-model="form.bic" class="rw-input" type="text" /></label>
-				</div>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Bankname') }}</span>
-					<input v-model="form.bankName" class="rw-input" type="text" /></label>
-				<NcCheckboxRadioSwitch
-					type="switch"
-					:modelValue="form.girocodeEnabled"
-					:disabled="!form.iban && !form.girocodeEnabled"
-					@update:modelValue="(v: boolean) => { if (form) form.girocodeEnabled = v }">
-					{{ t('rechnungswerk', 'Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen') }}
-				</NcCheckboxRadioSwitch>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.') }}
-				</p>
-			</section>
-
-			<!-- Branding -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Branding') }}</h3>
-				<div class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
-					<!-- NcColorPicker statt <input type="color">: Letzteres reicht auf
-					     macOS an den Farbdialog des Betriebssystems durch, den die
-					     Seite nicht wieder schliessen kann (#171). Der Default-Slot
-					     ist der Ausloeser des Popovers.
-					     advancedFields an, paletteOnly bewusst NICHT: eine
-					     Firmenfarbe ist vorgegeben, nicht auswaehlbar. -->
-					<div class="rw-accent">
-						<NcColorPicker :modelValue="accentValue"
-							advancedFields
-							@update:modelValue="onAccentPicked">
-							<!-- Die Beschriftung steht daneben und ist nicht mehr wie beim
-							     vorherigen <label><input> implizit zugeordnet. -->
-							<button type="button"
-								class="rw-accent__trigger"
-								:aria-label="t('rechnungswerk', 'Akzentfarbe') + ': ' + accentValue.toUpperCase()"
-								:style="accentStyle">
-								{{ accentValue.toUpperCase() }}
-							</button>
-						</NcColorPicker>
-						<NcButton v-if="form.accentColor" variant="tertiary" @click="form.accentColor = null">
-							{{ t('rechnungswerk', 'Zurücksetzen') }}
-						</NcButton>
+			<div class="rw-settingspage__content">
+				<!-- Firma -->
+				<section v-show="activeSection === 'firma'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Firma') }}</h3>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Firmenname') }}</span>
+						<input v-model="form.companyName" class="rw-input" type="text" /></label>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Adresse') }}</span>
+						<textarea v-model="form.companyAddress" class="rw-input" rows="3" /></label>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'USt-IdNr.') }}</span>
+							<input v-model="form.vatId" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
+							<input v-model="form.taxNumber" class="rw-input" type="text" /></label>
 					</div>
-				</div>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
+							<input v-model="form.contactPerson" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Telefon') }}</span>
+							<input v-model="form.contactPhone" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Kontakt-E-Mail') }}</span>
+							<input v-model="form.contactEmail" class="rw-input" type="email" /></label>
+					</div>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).') }}</p>
+				</section>
 
-				<!-- Musterstreifen: zeigt die Kopfzeile der Positionstabelle so, wie
-				     sie im PDF erscheint. Die Spaltentitel sind bewusst NICHT
-				     uebersetzt, weil das erzeugte PDF sie fest auf Deutsch setzt
-				     (ZugferdService::renderHtml). Eine Uebersetzung wuerde die
-				     Vorschau vom tatsaechlichen Dokument abweichen lassen. -->
-				<div class="rw-field">
-					<table class="rw-accent-preview">
-						<thead>
-							<tr :style="accentStyle">
-								<th>Beschreibung</th>
-								<th class="num">Menge</th>
-								<th class="num">Einzelpreis</th>
-								<th class="num">Betrag</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>Beratungsleistung</td>
-								<td class="num">2</td>
-								<td class="num">95,00 €</td>
-								<td class="num">190,00 €</td>
-							</tr>
-						</tbody>
-					</table>
-					<p class="rw-hint">{{ t('rechnungswerk', 'So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.') }}</p>
-					<p v-if="accentNeedsDarkText" class="rw-hint">
-						{{ t('rechnungswerk', 'Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.') }}
+				<!-- Bank -->
+				<section v-show="activeSection === 'bank'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Bankverbindung') }}</h3>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'IBAN') }}</span>
+							<input v-model="form.iban" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'BIC') }}</span>
+							<input v-model="form.bic" class="rw-input" type="text" /></label>
+					</div>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Bankname') }}</span>
+						<input v-model="form.bankName" class="rw-input" type="text" /></label>
+					<NcCheckboxRadioSwitch
+						type="switch"
+						:modelValue="form.girocodeEnabled"
+						:disabled="!form.iban && !form.girocodeEnabled"
+						@update:modelValue="(v: boolean) => { if (form) form.girocodeEnabled = v }">
+						{{ t('rechnungswerk', 'Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen') }}
+					</NcCheckboxRadioSwitch>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.') }}
 					</p>
-				</div>
+				</section>
 
-				<div class="rw-field">
-					<span>{{ t('rechnungswerk', 'Firmenlogo') }}</span>
-					<div class="rw-logo">
-						<img v-if="form.logoFileId" :src="logoSrc" :alt="t('rechnungswerk', 'Firmenlogo')" class="rw-logo__preview" />
-						<span v-else class="rw-logo__empty">{{ t('rechnungswerk', 'Kein Logo gewählt') }}</span>
-						<div class="rw-logo__actions">
-							<NcButton :disabled="logoBusy" @click="onPickLogo">
-								{{ form.logoFileId ? t('rechnungswerk', 'Logo ändern') : t('rechnungswerk', 'Logo wählen') }}
+				<!-- Branding -->
+				<section v-show="activeSection === 'branding'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Branding') }}</h3>
+					<div class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
+						<!-- NcColorPicker statt <input type="color">: Letzteres reicht auf
+						     macOS an den Farbdialog des Betriebssystems durch, den die
+						     Seite nicht wieder schliessen kann (#171). Der Default-Slot
+						     ist der Ausloeser des Popovers.
+						     advancedFields an, paletteOnly bewusst NICHT: eine
+						     Firmenfarbe ist vorgegeben, nicht auswaehlbar. -->
+						<div class="rw-accent">
+							<NcColorPicker :modelValue="accentValue"
+								advancedFields
+								@update:modelValue="onAccentPicked">
+								<!-- Die Beschriftung steht daneben und ist nicht mehr wie beim
+								     vorherigen <label><input> implizit zugeordnet. -->
+								<button type="button"
+									class="rw-accent__trigger"
+									:aria-label="t('rechnungswerk', 'Akzentfarbe') + ': ' + accentValue.toUpperCase()"
+									:style="accentStyle">
+									{{ accentValue.toUpperCase() }}
+								</button>
+							</NcColorPicker>
+							<NcButton v-if="form.accentColor" variant="tertiary" @click="form.accentColor = null">
+								{{ t('rechnungswerk', 'Zurücksetzen') }}
 							</NcButton>
-							<NcButton v-if="form.logoFileId" variant="tertiary" :disabled="logoBusy" @click="onRemoveLogo">
+						</div>
+					</div>
+
+					<!-- Musterstreifen: zeigt die Kopfzeile der Positionstabelle so, wie
+					     sie im PDF erscheint. Die Spaltentitel sind bewusst NICHT
+					     uebersetzt, weil das erzeugte PDF sie fest auf Deutsch setzt
+					     (ZugferdService::renderHtml). Eine Uebersetzung wuerde die
+					     Vorschau vom tatsaechlichen Dokument abweichen lassen. -->
+					<div class="rw-field">
+						<table class="rw-accent-preview">
+							<thead>
+								<tr :style="accentStyle">
+									<th>Beschreibung</th>
+									<th class="num">Menge</th>
+									<th class="num">Einzelpreis</th>
+									<th class="num">Betrag</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Beratungsleistung</td>
+									<td class="num">2</td>
+									<td class="num">95,00 €</td>
+									<td class="num">190,00 €</td>
+								</tr>
+							</tbody>
+						</table>
+						<p class="rw-hint">{{ t('rechnungswerk', 'So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.') }}</p>
+						<p v-if="accentNeedsDarkText" class="rw-hint">
+							{{ t('rechnungswerk', 'Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.') }}
+						</p>
+					</div>
+
+					<div class="rw-field">
+						<span>{{ t('rechnungswerk', 'Firmenlogo') }}</span>
+						<div class="rw-logo">
+							<img v-if="form.logoFileId" :src="logoSrc" :alt="t('rechnungswerk', 'Firmenlogo')" class="rw-logo__preview" />
+							<span v-else class="rw-logo__empty">{{ t('rechnungswerk', 'Kein Logo gewählt') }}</span>
+							<div class="rw-logo__actions">
+								<NcButton :disabled="logoBusy" @click="onPickLogo">
+									{{ form.logoFileId ? t('rechnungswerk', 'Logo ändern') : t('rechnungswerk', 'Logo wählen') }}
+								</NcButton>
+								<NcButton v-if="form.logoFileId" variant="tertiary" :disabled="logoBusy" @click="onRemoveLogo">
+									{{ t('rechnungswerk', 'Entfernen') }}
+								</NcButton>
+							</div>
+						</div>
+						<p class="rw-hint">{{ t('rechnungswerk', 'Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.') }}</p>
+					</div>
+				</section>
+
+				<!-- Rechnungsnummer -->
+				<section v-show="activeSection === 'rechnungsnummer'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Rechnungsnummer') }}</h3>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
+						<input v-model="form.numberFormat" class="rw-input" type="text" /></label>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
+						<br>
+						{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
+					</p>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Nächste Rechnungsnummer') }}</span>
+						<input v-model.number="nextNumberInput" class="rw-input" type="number" min="1" step="1" /></label>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.') }}
+					</p>
+					<div class="rw-field rw-reset-mode">
+						<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
+						<NcCheckboxRadioSwitch
+							type="radio"
+							name="rw-reset-mode"
+							value="yearly"
+							:modelValue="form.numberResetMode"
+							@update:modelValue="onSelectResetMode">
+							{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							type="radio"
+							name="rw-reset-mode"
+							value="continuous"
+							:modelValue="form.numberResetMode"
+							@update:modelValue="onSelectResetMode">
+							{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.') }}
+					</p>
+				</section>
+
+				<!-- Angebotsnummer (#111) -->
+				<section v-show="activeSection === 'angebotsnummer'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Angebotsnummer') }}</h3>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
+						<input v-model="form.quoteNumberFormat" class="rw-input" type="text" placeholder="AN-{YYYY}-{####}" /></label>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
+						<br>
+						{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: quotePreview }) }}
+					</p>
+					<div class="rw-field rw-reset-mode">
+						<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
+						<NcCheckboxRadioSwitch
+							type="radio"
+							name="rw-quote-reset-mode"
+							value="yearly"
+							:modelValue="form.quoteNumberResetMode"
+							@update:modelValue="onSelectQuoteResetMode">
+							{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							type="radio"
+							name="rw-quote-reset-mode"
+							value="continuous"
+							:modelValue="form.quoteNumberResetMode"
+							@update:modelValue="onSelectQuoteResetMode">
+							{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.') }}
+					</p>
+				</section>
+
+				<!-- PDF-Dateiname -->
+				<section v-show="activeSection === 'dateiname'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'PDF-Dateiname') }}</h3>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Schema') }}</span>
+						<input v-model="form.fileNameFormat" class="rw-input" type="text" /></label>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.') }}
+						<br>
+						{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: fileNamePreview }) }}
+					</p>
+				</section>
+
+				<!-- Steuer -->
+				<section v-show="activeSection === 'steuer'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Steuer') }}</h3>
+					<NcCheckboxRadioSwitch
+						type="switch"
+						:modelValue="form.smallBusiness"
+						@update:modelValue="onToggleSmallBusiness">
+						{{ t('rechnungswerk', 'Kleinunternehmer nach §19 UStG (kein USt-Ausweis)') }}
+					</NcCheckboxRadioSwitch>
+					<label v-if="form.smallBusiness" class="rw-field">
+						<span>{{ t('rechnungswerk', 'Hinweistext auf der Rechnung (§ 19 UStG)') }}</span>
+						<textarea v-model="form.smallBusinessNote" class="rw-input" rows="2"
+							:placeholder="SMALL_BUSINESS_NOTE_DEFAULT" />
+						<span class="rw-hint">{{ t('rechnungswerk', 'Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.') }}</span>
+					</label>
+					<label v-if="!form.smallBusiness" class="rw-field tax-rate-field">
+						<span>{{ t('rechnungswerk', 'Standard-USt-Satz') }}</span>
+						<select v-model.number="form.defaultTaxRateBp" class="rw-input">
+							<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
+						</select>
+					</label>
+				</section>
+
+				<!-- Zahlung -->
+				<section v-show="activeSection === 'zahlung'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Zahlung') }}</h3>
+					<label class="rw-field rw-field--narrow">
+						<span>{{ t('rechnungswerk', 'Standard-Zahlungsziel (Tage)') }}</span>
+						<input v-model.number="form.defaultPaymentTermDays" class="rw-input" type="number" min="0" step="1" placeholder="14" />
+					</label>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.') }}</p>
+				</section>
+
+				<!-- Versand -->
+				<section v-show="activeSection === 'versand'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Versand') }}</h3>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'DATEV-Upload-Mail') }}</span>
+						<input v-model="form.datevUploadMail" class="rw-input" type="email" /></label>
+					<NcCheckboxRadioSwitch
+						type="switch"
+						:modelValue="form.datevAutoSend"
+						:disabled="!form.datevUploadMail"
+						@update:modelValue="onToggleDatevAutoSend">
+						{{ t('rechnungswerk', 'E-Rechnung beim Festschreiben automatisch an DATEV senden') }}
+					</NcCheckboxRadioSwitch>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.') }}</p>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-Name') }}</span>
+							<input v-model="form.smtpFromName" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-E-Mail') }}</span>
+							<input v-model="form.smtpFromEmail" class="rw-input" type="email" /></label>
+					</div>
+				</section>
+
+				<!-- Ablage in Nextcloud -->
+				<section v-show="activeSection === 'ablage'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Ablage in Nextcloud') }}</h3>
+					<div class="rw-field">
+						<span>{{ t('rechnungswerk', 'Zielordner') }}</span>
+						<div class="rw-archive-folder">
+							<span v-if="archiveFolderPath" class="rw-archive-folder__path">{{ archiveFolderPath }}</span>
+							<span v-else class="rw-archive-folder__empty">{{ t('rechnungswerk', 'Kein Ordner gewählt') }}</span>
+							<NcButton :disabled="archiveBusy" @click="onPickArchiveFolder">
+								{{ archiveFolderPath ? t('rechnungswerk', 'Ordner ändern') : t('rechnungswerk', 'Ordner wählen') }}
+							</NcButton>
+							<NcButton v-if="archiveFolderPath" variant="tertiary" :disabled="archiveBusy" @click="onRemoveArchiveFolder">
 								{{ t('rechnungswerk', 'Entfernen') }}
 							</NcButton>
 						</div>
 					</div>
-					<p class="rw-hint">{{ t('rechnungswerk', 'Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.') }}</p>
-				</div>
-			</section>
-
-			<!-- Rechnungsnummer -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Rechnungsnummer') }}</h3>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
-					<input v-model="form.numberFormat" class="rw-input" type="text" /></label>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
-					<br>
-					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview }) }}
-				</p>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Nächste Rechnungsnummer') }}</span>
-					<input v-model.number="nextNumberInput" class="rw-input" type="number" min="1" step="1" /></label>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.') }}
-				</p>
-				<div class="rw-field rw-reset-mode">
-					<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
 					<NcCheckboxRadioSwitch
-						type="radio"
-						name="rw-reset-mode"
-						value="yearly"
-						:modelValue="form.numberResetMode"
-						@update:modelValue="onSelectResetMode">
-						{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
+						type="switch"
+						:modelValue="form.archiveEnabled"
+						:disabled="!form.archiveFolderId"
+						@update:modelValue="onToggleArchive">
+						{{ t('rechnungswerk', 'ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen') }}
 					</NcCheckboxRadioSwitch>
-					<NcCheckboxRadioSwitch
-						type="radio"
-						name="rw-reset-mode"
-						value="continuous"
-						:modelValue="form.numberResetMode"
-						@update:modelValue="onSelectResetMode">
-						{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
-					</NcCheckboxRadioSwitch>
-				</div>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.') }}
-				</p>
-			</section>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Unterordner (optional)') }}</span>
+						<input v-model="form.archiveSubfolder" class="rw-input" type="text"
+							:placeholder="t('rechnungswerk', 'z. B. {YYYY}')" /></label>
+					<p class="rw-hint">
+						{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {MM} Monat, {DD} Tag (Rechnungsdatum). Unterordner werden bei Bedarf angelegt. Vorhandene Dateien werden nie überschrieben.') }}
+						<br>
+						{{ t('rechnungswerk', 'Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.') }}
+					</p>
+				</section>
 
-			<!-- Angebotsnummer (#111) -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Angebotsnummer') }}</h3>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
-					<input v-model="form.quoteNumberFormat" class="rw-input" type="text" placeholder="AN-{YYYY}-{####}" /></label>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.') }}
-					<br>
-					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: quotePreview }) }}
-				</p>
-				<div class="rw-field rw-reset-mode">
-					<span>{{ t('rechnungswerk', 'Nummernkreis') }}</span>
-					<NcCheckboxRadioSwitch
-						type="radio"
-						name="rw-quote-reset-mode"
-						value="yearly"
-						:modelValue="form.quoteNumberResetMode"
-						@update:modelValue="onSelectQuoteResetMode">
-						{{ t('rechnungswerk', 'Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)') }}
-					</NcCheckboxRadioSwitch>
-					<NcCheckboxRadioSwitch
-						type="radio"
-						name="rw-quote-reset-mode"
-						value="continuous"
-						:modelValue="form.quoteNumberResetMode"
-						@update:modelValue="onSelectQuoteResetMode">
-						{{ t('rechnungswerk', 'Fortlaufend (Zähler läuft über Jahre durch)') }}
-					</NcCheckboxRadioSwitch>
-				</div>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.') }}
-				</p>
-			</section>
-
-			<!-- PDF-Dateiname -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'PDF-Dateiname') }}</h3>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Schema') }}</span>
-					<input v-model="form.fileNameFormat" class="rw-input" type="text" /></label>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.') }}
-					<br>
-					{{ t('rechnungswerk', 'Vorschau: {preview}', { preview: fileNamePreview }) }}
-				</p>
-			</section>
-
-			<!-- Steuer -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Steuer') }}</h3>
-				<NcCheckboxRadioSwitch
-					type="switch"
-					:modelValue="form.smallBusiness"
-					@update:modelValue="onToggleSmallBusiness">
-					{{ t('rechnungswerk', 'Kleinunternehmer nach §19 UStG (kein USt-Ausweis)') }}
-				</NcCheckboxRadioSwitch>
-				<label v-if="form.smallBusiness" class="rw-field">
-					<span>{{ t('rechnungswerk', 'Hinweistext auf der Rechnung (§ 19 UStG)') }}</span>
-					<textarea v-model="form.smallBusinessNote" class="rw-input" rows="2"
-						:placeholder="SMALL_BUSINESS_NOTE_DEFAULT" />
-					<span class="rw-hint">{{ t('rechnungswerk', 'Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.') }}</span>
-				</label>
-				<label v-if="!form.smallBusiness" class="rw-field tax-rate-field">
-					<span>{{ t('rechnungswerk', 'Standard-USt-Satz') }}</span>
-					<select v-model.number="form.defaultTaxRateBp" class="rw-input">
-						<option v-for="bp in TAX_RATES_BP" :key="bp" :value="bp">{{ formatTaxRate(bp) }}</option>
-					</select>
-				</label>
-			</section>
-
-			<!-- Zahlung -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Zahlung') }}</h3>
-				<label class="rw-field rw-field--narrow">
-					<span>{{ t('rechnungswerk', 'Standard-Zahlungsziel (Tage)') }}</span>
-					<input v-model.number="form.defaultPaymentTermDays" class="rw-input" type="number" min="0" step="1" placeholder="14" />
-				</label>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.') }}</p>
-			</section>
-
-			<!-- Versand -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Versand') }}</h3>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'DATEV-Upload-Mail') }}</span>
-					<input v-model="form.datevUploadMail" class="rw-input" type="email" /></label>
-				<NcCheckboxRadioSwitch
-					type="switch"
-					:modelValue="form.datevAutoSend"
-					:disabled="!form.datevUploadMail"
-					@update:modelValue="onToggleDatevAutoSend">
-					{{ t('rechnungswerk', 'E-Rechnung beim Festschreiben automatisch an DATEV senden') }}
-				</NcCheckboxRadioSwitch>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.') }}</p>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-Name') }}</span>
-						<input v-model="form.smtpFromName" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Absender-E-Mail') }}</span>
-						<input v-model="form.smtpFromEmail" class="rw-input" type="email" /></label>
-				</div>
-			</section>
-
-			<!-- Ablage in Nextcloud -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Ablage in Nextcloud') }}</h3>
-				<div class="rw-field">
-					<span>{{ t('rechnungswerk', 'Zielordner') }}</span>
-					<div class="rw-archive-folder">
-						<span v-if="archiveFolderPath" class="rw-archive-folder__path">{{ archiveFolderPath }}</span>
-						<span v-else class="rw-archive-folder__empty">{{ t('rechnungswerk', 'Kein Ordner gewählt') }}</span>
-						<NcButton :disabled="archiveBusy" @click="onPickArchiveFolder">
-							{{ archiveFolderPath ? t('rechnungswerk', 'Ordner ändern') : t('rechnungswerk', 'Ordner wählen') }}
+				<!-- Eigenes SMTP-Konto -->
+				<section v-show="activeSection === 'smtp'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Eigenes SMTP-Konto (optional)') }}</h3>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).') }}</p>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Server (Host)') }}</span>
+							<input v-model="form.smtpHost" class="rw-input" type="text" placeholder="smtp.example.com" /></label>
+						<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Port') }}</span>
+							<input v-model.number="form.smtpPort" class="rw-input" type="number" placeholder="587" /></label>
+						<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Verschlüsselung') }}</span>
+							<select v-model="form.smtpSecurity" class="rw-input">
+								<option value="starttls">STARTTLS</option>
+								<option value="ssl">SSL/TLS</option>
+								<option value="none">{{ t('rechnungswerk', 'Keine') }}</option>
+							</select></label>
+					</div>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Benutzer') }}</span>
+							<input v-model="form.smtpUser" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Passwort') }}</span>
+							<input v-model="smtpPassword" class="rw-input" type="password"
+								:placeholder="form.smtpPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
+					</div>
+					<div class="smtp-test">
+						<NcButton :disabled="!form.smtpHost || testingSmtp" @click="onTestSmtp">
+							{{ t('rechnungswerk', 'Verbindung testen') }}
 						</NcButton>
-						<NcButton v-if="archiveFolderPath" variant="tertiary" :disabled="archiveBusy" @click="onRemoveArchiveFolder">
-							{{ t('rechnungswerk', 'Entfernen') }}
+						<span v-if="smtpTestResult" :class="['smtp-test__result', smtpTestOk ? 'rw-ok' : 'rw-err']">{{ smtpTestResult }}</span>
+					</div>
+				</section>
+
+				<!-- IMAP-Konto für DATEV-Empfangsbestätigung -->
+				<section v-show="activeSection === 'datev'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'DATEV-Rückmeldung (IMAP, optional)') }}</h3>
+					<p class="rw-hint">{{ t('rechnungswerk', 'DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.') }}</p>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Server (Host)') }}</span>
+							<input v-model="form.imapHost" class="rw-input" type="text" placeholder="imap.example.com" /></label>
+						<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Port') }}</span>
+							<input v-model.number="form.imapPort" class="rw-input" type="number" placeholder="993" /></label>
+						<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Verschlüsselung') }}</span>
+							<select v-model="form.imapSecurity" class="rw-input">
+								<option value="ssl">SSL/TLS</option>
+								<option value="starttls">STARTTLS</option>
+								<option value="tls">TLS</option>
+							</select></label>
+					</div>
+					<div class="rw-form-row">
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Benutzer') }}</span>
+							<input v-model="form.imapUser" class="rw-input" type="text" /></label>
+						<label class="rw-field"><span>{{ t('rechnungswerk', 'Passwort') }}</span>
+							<input v-model="imapPassword" class="rw-input" type="password"
+								:placeholder="form.imapPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
+					</div>
+					<NcCheckboxRadioSwitch
+						:modelValue="form.imapCleanup"
+						:disabled="!form.imapHost"
+						@update:modelValue="(v) => form.imapCleanup = v">
+						{{ t('rechnungswerk', 'Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)') }}
+					</NcCheckboxRadioSwitch>
+				</section>
+
+				<!-- Standardtexte → jetzt eigene Verwaltung (#126/#141) -->
+				<section v-show="activeSection === 'texte'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.') }}</p>
+					<NcButton @click="goToSnippets">
+						<template #icon><TextBoxIcon :size="20" /></template>
+						{{ t('rechnungswerk', 'Textbausteine verwalten') }}
+					</NcButton>
+				</section>
+
+				<!-- Zugriff & Administration -->
+				<section v-show="activeSection === 'zugriff'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
+					<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
+
+					<div class="rw-access-group">
+						<span class="rw-access-label">{{ t('rechnungswerk', 'App-Administratoren') }}</span>
+						<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.') }}</p>
+						<NcSelect v-model="appAdmins"
+							:options="searchResults"
+							:loading="searching"
+							:multiple="true"
+							keepOpen
+							label="displayName"
+							:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+							@search="onPrincipalSearch">
+							<template #no-options>{{ noOptionsText }}</template>
+						</NcSelect>
+					</div>
+
+					<div class="rw-access-group">
+						<span class="rw-access-label">{{ t('rechnungswerk', 'Berechtigte Nutzer') }}</span>
+						<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.') }}</p>
+						<NcSelect v-model="appUsers"
+							:options="searchResults"
+							:loading="searching"
+							:multiple="true"
+							keepOpen
+							label="displayName"
+							:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
+							@search="onPrincipalSearch">
+							<template #no-options>{{ noOptionsText }}</template>
+						</NcSelect>
+					</div>
+				</section>
+
+					<div class="rw-action-bar">
+						<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
+							<template #icon><ContentSaveIcon :size="20" /></template>
+							{{ t('rechnungswerk', 'Speichern') }}
 						</NcButton>
 					</div>
-				</div>
-				<NcCheckboxRadioSwitch
-					type="switch"
-					:modelValue="form.archiveEnabled"
-					:disabled="!form.archiveFolderId"
-					@update:modelValue="onToggleArchive">
-					{{ t('rechnungswerk', 'ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen') }}
-				</NcCheckboxRadioSwitch>
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'Unterordner (optional)') }}</span>
-					<input v-model="form.archiveSubfolder" class="rw-input" type="text"
-						:placeholder="t('rechnungswerk', 'z. B. {YYYY}')" /></label>
-				<p class="rw-hint">
-					{{ t('rechnungswerk', 'Platzhalter: {YYYY} Jahr, {MM} Monat, {DD} Tag (Rechnungsdatum). Unterordner werden bei Bedarf angelegt. Vorhandene Dateien werden nie überschrieben.') }}
-					<br>
-					{{ t('rechnungswerk', 'Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.') }}
-				</p>
-			</section>
-
-			<!-- Eigenes SMTP-Konto -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Eigenes SMTP-Konto (optional)') }}</h3>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).') }}</p>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Server (Host)') }}</span>
-						<input v-model="form.smtpHost" class="rw-input" type="text" placeholder="smtp.example.com" /></label>
-					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Port') }}</span>
-						<input v-model.number="form.smtpPort" class="rw-input" type="number" placeholder="587" /></label>
-					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Verschlüsselung') }}</span>
-						<select v-model="form.smtpSecurity" class="rw-input">
-							<option value="starttls">STARTTLS</option>
-							<option value="ssl">SSL/TLS</option>
-							<option value="none">{{ t('rechnungswerk', 'Keine') }}</option>
-						</select></label>
-				</div>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Benutzer') }}</span>
-						<input v-model="form.smtpUser" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Passwort') }}</span>
-						<input v-model="smtpPassword" class="rw-input" type="password"
-							:placeholder="form.smtpPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
-				</div>
-				<div class="smtp-test">
-					<NcButton :disabled="!form.smtpHost || testingSmtp" @click="onTestSmtp">
-						{{ t('rechnungswerk', 'Verbindung testen') }}
-					</NcButton>
-					<span v-if="smtpTestResult" :class="['smtp-test__result', smtpTestOk ? 'rw-ok' : 'rw-err']">{{ smtpTestResult }}</span>
-				</div>
-			</section>
-
-			<!-- IMAP-Konto für DATEV-Empfangsbestätigung -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'DATEV-Rückmeldung (IMAP, optional)') }}</h3>
-				<p class="rw-hint">{{ t('rechnungswerk', 'DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.') }}</p>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Server (Host)') }}</span>
-						<input v-model="form.imapHost" class="rw-input" type="text" placeholder="imap.example.com" /></label>
-					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Port') }}</span>
-						<input v-model.number="form.imapPort" class="rw-input" type="number" placeholder="993" /></label>
-					<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Verschlüsselung') }}</span>
-						<select v-model="form.imapSecurity" class="rw-input">
-							<option value="ssl">SSL/TLS</option>
-							<option value="starttls">STARTTLS</option>
-							<option value="tls">TLS</option>
-						</select></label>
-				</div>
-				<div class="rw-form-row">
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Benutzer') }}</span>
-						<input v-model="form.imapUser" class="rw-input" type="text" /></label>
-					<label class="rw-field"><span>{{ t('rechnungswerk', 'Passwort') }}</span>
-						<input v-model="imapPassword" class="rw-input" type="password"
-							:placeholder="form.imapPasswordSet ? t('rechnungswerk', '•••••••• (gespeichert, leer lassen)') : ''" /></label>
-				</div>
-				<NcCheckboxRadioSwitch
-					:modelValue="form.imapCleanup"
-					:disabled="!form.imapHost"
-					@update:modelValue="(v) => form.imapCleanup = v">
-					{{ t('rechnungswerk', 'Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)') }}
-				</NcCheckboxRadioSwitch>
-			</section>
-
-			<!-- Standardtexte → jetzt eigene Verwaltung (#126/#141) -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.') }}</p>
-				<NcButton @click="goToSnippets">
-					<template #icon><TextBoxIcon :size="20" /></template>
-					{{ t('rechnungswerk', 'Textbausteine verwalten') }}
-				</NcButton>
-			</section>
-
-			<!-- Zugriff & Administration -->
-			<section class="rw-section">
-				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
-				<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
-
-				<div class="rw-access-group">
-					<span class="rw-access-label">{{ t('rechnungswerk', 'App-Administratoren') }}</span>
-					<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.') }}</p>
-					<NcSelect v-model="appAdmins"
-						:options="searchResults"
-						:loading="searching"
-						:multiple="true"
-						keepOpen
-						label="displayName"
-						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
-						@search="onPrincipalSearch">
-						<template #no-options>{{ noOptionsText }}</template>
-					</NcSelect>
-				</div>
-
-				<div class="rw-access-group">
-					<span class="rw-access-label">{{ t('rechnungswerk', 'Berechtigte Nutzer') }}</span>
-					<p class="rw-hint rw-access-desc">{{ t('rechnungswerk', 'Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.') }}</p>
-					<NcSelect v-model="appUsers"
-						:options="searchResults"
-						:loading="searching"
-						:multiple="true"
-						keepOpen
-						label="displayName"
-						:placeholder="t('rechnungswerk', 'Name eingeben, um Nutzer oder Gruppe zu suchen …')"
-						@search="onPrincipalSearch">
-						<template #no-options>{{ noOptionsText }}</template>
-					</NcSelect>
-				</div>
-			</section>
-
-			<div class="rw-action-bar">
-				<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
-					<template #icon><ContentSaveIcon :size="20" /></template>
-					{{ t('rechnungswerk', 'Speichern') }}
-				</NcButton>
 			</div>
 		</div>
 
@@ -478,6 +486,21 @@ import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import RwSettingsNav, { type SettingsGroup } from '@/components/RwSettingsNav.vue'
+import OfficeBuildingIcon from 'vue-material-design-icons/OfficeBuilding.vue'
+import BankIcon from 'vue-material-design-icons/Bank.vue'
+import PaletteIcon from 'vue-material-design-icons/Palette.vue'
+import CounterIcon from 'vue-material-design-icons/Counter.vue'
+import FileSignIcon from 'vue-material-design-icons/FileSign.vue'
+import FileDocumentOutlineIcon from 'vue-material-design-icons/FileDocumentOutline.vue'
+import TextBoxOutlineIcon from 'vue-material-design-icons/TextBoxOutline.vue'
+import PercentIcon from 'vue-material-design-icons/Percent.vue'
+import CreditCardOutlineIcon from 'vue-material-design-icons/CreditCardOutline.vue'
+import EmailOutlineIcon from 'vue-material-design-icons/EmailOutline.vue'
+import ServerNetworkIcon from 'vue-material-design-icons/ServerNetwork.vue'
+import EmailSyncOutlineIcon from 'vue-material-design-icons/EmailSyncOutline.vue'
+import FolderOutlineIcon from 'vue-material-design-icons/FolderOutline.vue'
+import ShieldAccountOutlineIcon from 'vue-material-design-icons/ShieldAccountOutline.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'
@@ -492,6 +515,62 @@ type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' 
 const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+
+/**
+ * Die Bereiche der Einstellungsseite (#350).
+ *
+ * Vorher lagen alle vierzehn Abschnitte untereinander auf einer Seite; wer
+ * einen bestimmten suchte, scrollte an allen anderen vorbei. Die Gruppierung
+ * folgt der Frage, wonach jemand sucht — nicht der Reihenfolge, in der die
+ * Abschnitte historisch entstanden sind.
+ *
+ * Keine Rechtepruefung je Bereich: Die gesamte Seite ist admin-only (siehe
+ * `isAdmin` am Navigationseintrag in App.vue), wer sie sieht, sieht alles.
+ */
+const navGroups = computed<SettingsGroup[]>(() => [
+	{
+		label: t('rechnungswerk', 'Firma'),
+		items: [
+			{ key: 'firma', label: t('rechnungswerk', 'Firma'), icon: OfficeBuildingIcon },
+			{ key: 'bank', label: t('rechnungswerk', 'Bankverbindung'), icon: BankIcon },
+			{ key: 'branding', label: t('rechnungswerk', 'Branding'), icon: PaletteIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Belege'),
+		items: [
+			{ key: 'rechnungsnummer', label: t('rechnungswerk', 'Rechnungsnummer'), icon: CounterIcon },
+			{ key: 'angebotsnummer', label: t('rechnungswerk', 'Angebotsnummer'), icon: FileSignIcon },
+			{ key: 'dateiname', label: t('rechnungswerk', 'PDF-Dateiname'), icon: FileDocumentOutlineIcon },
+			{ key: 'texte', label: t('rechnungswerk', 'Standardtexte'), icon: TextBoxOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Buchhaltung'),
+		items: [
+			{ key: 'steuer', label: t('rechnungswerk', 'Steuer'), icon: PercentIcon },
+			{ key: 'zahlung', label: t('rechnungswerk', 'Zahlung'), icon: CreditCardOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Versand'),
+		items: [
+			{ key: 'versand', label: t('rechnungswerk', 'Versand'), icon: EmailOutlineIcon },
+			{ key: 'smtp', label: t('rechnungswerk', 'Eigenes SMTP-Konto'), icon: ServerNetworkIcon },
+			{ key: 'datev', label: t('rechnungswerk', 'DATEV-Rückmeldung'), icon: EmailSyncOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Ablage & Zugriff'),
+		items: [
+			{ key: 'ablage', label: t('rechnungswerk', 'Ablage in Nextcloud'), icon: FolderOutlineIcon },
+			{ key: 'zugriff', label: t('rechnungswerk', 'Zugriff & Administration'), icon: ShieldAccountOutlineIcon },
+		],
+	},
+])
+
+/** Der offene Bereich. Startet beim ersten, wie in projektwerk. */
+const activeSection = ref('firma')
 
 function goToSnippets() {
 	router.push({ name: 'text-snippets' })
@@ -1090,11 +1169,6 @@ function fail(e: unknown, fallback: string) {
 	margin: 0 0 16px;
 	font-size: 22px;
 	font-weight: 700;
-}
-.settings-form {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
 }
 /* Akzentfarbe (#171): Ausloeser des NcColorPicker plus Musterstreifen. */
 .rw-accent {
