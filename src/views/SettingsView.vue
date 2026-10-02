@@ -6,9 +6,16 @@
 			<NcNoteCard v-if="error" type="error" :text="error" />
 		</div>
 
-		<div v-if="form" class="settings-form">
+		<div v-if="form" class="rw-settingspage">
+			<RwSettingsNav
+				:groups="navGroups"
+				:modelValue="activeSection"
+				:ariaLabel="t('rechnungswerk', 'Einstellungs-Navigation')"
+				@update:modelValue="activeSection = $event" />
+
+			<div class="rw-settingspage__content">
 			<!-- Firma -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'firma'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Firma') }}</h3>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Firmenname') }}</span>
 					<input v-model="form.companyName" class="rw-input" type="text" /></label>
@@ -32,7 +39,7 @@
 			</section>
 
 			<!-- Bank -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'bank'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Bankverbindung') }}</h3>
 				<div class="rw-form-row">
 					<label class="rw-field"><span>{{ t('rechnungswerk', 'IBAN') }}</span>
@@ -55,7 +62,7 @@
 			</section>
 
 			<!-- Branding -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'branding'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Branding') }}</h3>
 				<div class="rw-field rw-field--inline"><span>{{ t('rechnungswerk', 'Akzentfarbe') }}</span>
 					<!-- NcColorPicker statt <input type="color">: Letzteres reicht auf
@@ -132,7 +139,7 @@
 			</section>
 
 			<!-- Rechnungsnummer -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'rechnungsnummer'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Rechnungsnummer') }}</h3>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
 					<input v-model="form.numberFormat" class="rw-input" type="text" /></label>
@@ -171,7 +178,7 @@
 			</section>
 
 			<!-- Angebotsnummer (#111) -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'angebotsnummer'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Angebotsnummer') }}</h3>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Format') }}</span>
 					<input v-model="form.quoteNumberFormat" class="rw-input" type="text" placeholder="AN-{YYYY}-{####}" /></label>
@@ -205,7 +212,7 @@
 			</section>
 
 			<!-- PDF-Dateiname -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'dateiname'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'PDF-Dateiname') }}</h3>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'Schema') }}</span>
 					<input v-model="form.fileNameFormat" class="rw-input" type="text" /></label>
@@ -217,7 +224,7 @@
 			</section>
 
 			<!-- Steuer -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'steuer'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Steuer') }}</h3>
 				<NcCheckboxRadioSwitch
 					type="switch"
@@ -240,7 +247,7 @@
 			</section>
 
 			<!-- Zahlung -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'zahlung'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Zahlung') }}</h3>
 				<label class="rw-field rw-field--narrow">
 					<span>{{ t('rechnungswerk', 'Standard-Zahlungsziel (Tage)') }}</span>
@@ -250,7 +257,7 @@
 			</section>
 
 			<!-- Versand -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'versand'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Versand') }}</h3>
 				<label class="rw-field"><span>{{ t('rechnungswerk', 'DATEV-Upload-Mail') }}</span>
 					<input v-model="form.datevUploadMail" class="rw-input" type="email" /></label>
@@ -271,7 +278,7 @@
 			</section>
 
 			<!-- Ablage in Nextcloud -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'ablage'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Ablage in Nextcloud') }}</h3>
 				<div class="rw-field">
 					<span>{{ t('rechnungswerk', 'Zielordner') }}</span>
@@ -304,7 +311,7 @@
 			</section>
 
 			<!-- Eigenes SMTP-Konto -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'smtp'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Eigenes SMTP-Konto (optional)') }}</h3>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).') }}</p>
 				<div class="rw-form-row">
@@ -335,7 +342,7 @@
 			</section>
 
 			<!-- IMAP-Konto für DATEV-Empfangsbestätigung -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'datev'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'DATEV-Rückmeldung (IMAP, optional)') }}</h3>
 				<p class="rw-hint">{{ t('rechnungswerk', 'DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.') }}</p>
 				<div class="rw-form-row">
@@ -366,7 +373,7 @@
 			</section>
 
 			<!-- Standardtexte → jetzt eigene Verwaltung (#126/#141) -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'texte'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Standardtexte') }}</h3>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.') }}</p>
 				<NcButton @click="goToSnippets">
@@ -376,7 +383,7 @@
 			</section>
 
 			<!-- Zugriff & Administration -->
-			<section class="rw-section">
+				<section v-show="activeSection === 'zugriff'" class="rw-section">
 				<h3>{{ t('rechnungswerk', 'Zugriff & Administration') }}</h3>
 				<p class="rw-hint rw-access-intro">{{ t('rechnungswerk', 'Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.') }}</p>
 
@@ -411,11 +418,12 @@
 				</div>
 			</section>
 
-			<div class="rw-action-bar">
-				<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
-					<template #icon><ContentSaveIcon :size="20" /></template>
-					{{ t('rechnungswerk', 'Speichern') }}
-				</NcButton>
+				<div class="rw-action-bar">
+					<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
+						<template #icon><ContentSaveIcon :size="20" /></template>
+						{{ t('rechnungswerk', 'Speichern') }}
+					</NcButton>
+				</div>
 			</div>
 		</div>
 
@@ -478,6 +486,21 @@ import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import ContentSaveIcon from 'vue-material-design-icons/ContentSave.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import RwSettingsNav, { type SettingsGroup } from '@/components/RwSettingsNav.vue'
+import OfficeBuildingIcon from 'vue-material-design-icons/OfficeBuilding.vue'
+import BankIcon from 'vue-material-design-icons/Bank.vue'
+import PaletteIcon from 'vue-material-design-icons/Palette.vue'
+import CounterIcon from 'vue-material-design-icons/Counter.vue'
+import FileSignIcon from 'vue-material-design-icons/FileSign.vue'
+import FileDocumentOutlineIcon from 'vue-material-design-icons/FileDocumentOutline.vue'
+import TextBoxOutlineIcon from 'vue-material-design-icons/TextBoxOutline.vue'
+import PercentIcon from 'vue-material-design-icons/Percent.vue'
+import CreditCardOutlineIcon from 'vue-material-design-icons/CreditCardOutline.vue'
+import EmailOutlineIcon from 'vue-material-design-icons/EmailOutline.vue'
+import ServerNetworkIcon from 'vue-material-design-icons/ServerNetwork.vue'
+import EmailSyncOutlineIcon from 'vue-material-design-icons/EmailSyncOutline.vue'
+import FolderOutlineIcon from 'vue-material-design-icons/FolderOutline.vue'
+import ShieldAccountOutlineIcon from 'vue-material-design-icons/ShieldAccountOutline.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'
@@ -492,6 +515,62 @@ type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' 
 const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+
+/**
+ * Die Bereiche der Einstellungsseite (#350).
+ *
+ * Vorher lagen alle vierzehn Abschnitte untereinander auf einer Seite; wer
+ * einen bestimmten suchte, scrollte an allen anderen vorbei. Die Gruppierung
+ * folgt der Frage, wonach jemand sucht — nicht der Reihenfolge, in der die
+ * Abschnitte historisch entstanden sind.
+ *
+ * Keine Rechtepruefung je Bereich: Die gesamte Seite ist admin-only (siehe
+ * `isAdmin` am Navigationseintrag in App.vue), wer sie sieht, sieht alles.
+ */
+const navGroups = computed<SettingsGroup[]>(() => [
+	{
+		label: t('rechnungswerk', 'Firma'),
+		items: [
+			{ key: 'firma', label: t('rechnungswerk', 'Firma'), icon: OfficeBuildingIcon },
+			{ key: 'bank', label: t('rechnungswerk', 'Bankverbindung'), icon: BankIcon },
+			{ key: 'branding', label: t('rechnungswerk', 'Branding'), icon: PaletteIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Belege'),
+		items: [
+			{ key: 'rechnungsnummer', label: t('rechnungswerk', 'Rechnungsnummer'), icon: CounterIcon },
+			{ key: 'angebotsnummer', label: t('rechnungswerk', 'Angebotsnummer'), icon: FileSignIcon },
+			{ key: 'dateiname', label: t('rechnungswerk', 'PDF-Dateiname'), icon: FileDocumentOutlineIcon },
+			{ key: 'texte', label: t('rechnungswerk', 'Standardtexte'), icon: TextBoxOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Buchhaltung'),
+		items: [
+			{ key: 'steuer', label: t('rechnungswerk', 'Steuer'), icon: PercentIcon },
+			{ key: 'zahlung', label: t('rechnungswerk', 'Zahlung'), icon: CreditCardOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Versand'),
+		items: [
+			{ key: 'versand', label: t('rechnungswerk', 'Versand'), icon: EmailOutlineIcon },
+			{ key: 'smtp', label: t('rechnungswerk', 'Eigenes SMTP-Konto'), icon: ServerNetworkIcon },
+			{ key: 'datev', label: t('rechnungswerk', 'DATEV-Rückmeldung'), icon: EmailSyncOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Ablage & Zugriff'),
+		items: [
+			{ key: 'ablage', label: t('rechnungswerk', 'Ablage in Nextcloud'), icon: FolderOutlineIcon },
+			{ key: 'zugriff', label: t('rechnungswerk', 'Zugriff & Administration'), icon: ShieldAccountOutlineIcon },
+		],
+	},
+])
+
+/** Der offene Bereich. Startet beim ersten, wie in projektwerk. */
+const activeSection = ref('firma')
 
 function goToSnippets() {
 	router.push({ name: 'text-snippets' })

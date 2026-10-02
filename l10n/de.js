@@ -484,6 +484,13 @@ OC.L10N.register(
     "Noch keine Produkte angelegt" : "Noch keine Produkte angelegt",
     "Alle Produkte ({gesamt})" : "Alle Produkte ({gesamt})",
     "{treffer} Treffer" : "{treffer} Treffer",
-    "Produkt wählen oder suchen …" : "Produkt wählen oder suchen …"
+    "Produkt wählen oder suchen …" : "Produkt wählen oder suchen …",
+    "Bereiche" : "Bereiche",
+    "Einstellungs-Navigation" : "Einstellungs-Navigation",
+    "Belege" : "Belege",
+    "Buchhaltung" : "Buchhaltung",
+    "Eigenes SMTP-Konto" : "Eigenes SMTP-Konto",
+    "DATEV-Rückmeldung" : "DATEV-Rückmeldung",
+    "Ablage & Zugriff" : "Ablage & Zugriff"
 },
 "nplurals=2; plural=(n != 1);");
