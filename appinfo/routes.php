@@ -93,5 +93,11 @@ return [
 		['name' => 'admin#updatePermissions',  'url' => '/api/v1/permissions',         'verb' => 'PUT'],
 		['name' => 'admin#searchPrincipals',   'url' => '/api/v1/principals/search',   'verb' => 'GET'],
 		['name' => 'admin#testSmtp',           'url' => '/api/v1/smtp/test',           'verb' => 'POST'],
+
+		// WerkPlus-Lizenz (entitlement-v1)
+		['name' => 'license#show',     'url' => '/api/v1/license',         'verb' => 'GET'],
+		['name' => 'license#activate', 'url' => '/api/v1/license',         'verb' => 'PUT'],
+		['name' => 'license#refresh',  'url' => '/api/v1/license/refresh', 'verb' => 'POST'],
+		['name' => 'license#destroy',  'url' => '/api/v1/license',         'verb' => 'DELETE'],
 	],
 ];
