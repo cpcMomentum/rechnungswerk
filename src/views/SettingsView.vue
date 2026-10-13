@@ -424,6 +424,11 @@
 					<WerkPlusSettings />
 				</section>
 
+				<section v-show="activeSection === 'apikeys'" class="rw-section">
+					<h3>{{ t('rechnungswerk', 'API-Schlüssel') }}</h3>
+					<ApiKeysSection />
+				</section>
+
 					<div v-show="activeSection !== 'werkplus'" class="rw-action-bar">
 						<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
 							<template #icon><ContentSaveIcon :size="20" /></template>
@@ -508,6 +513,8 @@ import EmailSyncOutlineIcon from 'vue-material-design-icons/EmailSyncOutline.vue
 import FolderOutlineIcon from 'vue-material-design-icons/FolderOutline.vue'
 import ShieldAccountOutlineIcon from 'vue-material-design-icons/ShieldAccountOutline.vue'
 import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
+import RobotIcon from 'vue-material-design-icons/Robot.vue'
+import ApiKeysSection from '@/components/ApiKeysSection.vue'
 import WerkPlusSettings from '@/components/WerkPlusSettings.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
@@ -579,6 +586,7 @@ const navGroups = computed<SettingsGroup[]>(() => [
 		label: t('rechnungswerk', 'Lizenz'),
 		items: [
 			{ key: 'werkplus', label: t('rechnungswerk', 'WerkPlus'), icon: KeyOutlineIcon },
+			{ key: 'apikeys', label: t('rechnungswerk', 'API-Schlüssel'), icon: RobotIcon },
 		],
 	},
 ])
