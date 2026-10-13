@@ -543,6 +543,7 @@ OC.L10N.register(
     "Verein" : "Verein",
     "Vereinsmodus aktivieren" : "Vereinsmodus aktivieren",
     "Mitgliedergruppe" : "Mitgliedergruppe",
-    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen."
+    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.",
+    "RechnungsWerk Navigation" : "RechnungsWerk Navigation"
 },
 "nplurals=2; plural=(n != 1);");

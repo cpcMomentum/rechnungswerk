@@ -543,6 +543,7 @@ OC.L10N.register(
     "Verein" : "Association",
     "Vereinsmodus aktivieren" : "Activer le mode association",
     "Mitgliedergruppe" : "Groupe de membres",
-    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "La date d'échéance ne peut pas être antérieure à la date de facturation."
+    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "La date d'échéance ne peut pas être antérieure à la date de facturation.",
+    "RechnungsWerk Navigation" : "Navigation de RechnungsWerk"
 },
 "nplurals=2; plural=(n > 1);");

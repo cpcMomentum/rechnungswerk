@@ -8,45 +8,91 @@
 
 		<template v-else-if="!hasAccess">
 			<NcAppContent>
-				<NcEmptyContent :name="t('rechnungswerk', 'Kein Zugriff')"
+				<NcEmptyContent
+					:name="t('rechnungswerk', 'Kein Zugriff')"
 					:description="t('rechnungswerk', 'Du bist für RechnungsWerk nicht freigeschaltet. Wende dich an einen Administrator.')">
-					<template #icon><LockIcon :size="20" /></template>
+					<template #icon>
+						<LockIcon :size="20" />
+					</template>
 				</NcEmptyContent>
 			</NcAppContent>
 		</template>
 
 		<template v-else>
-			<NcAppNavigation>
-				<NcAppNavigationItem :name="t('rechnungswerk', 'Rechnungen')" :to="{ name: 'invoices' }">
-					<template #icon><FileDocumentIcon :size="20" /></template>
-				</NcAppNavigationItem>
-				<NcAppNavigationItem
-					v-if="clubMode"
-					:name="t('rechnungswerk', 'Beitragsabrechnung')"
-					:to="{ name: 'membership-fees' }">
-					<template #icon><FileDocumentIcon :size="20" /></template>
-				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('rechnungswerk', 'Angebote')" :to="{ name: 'quotes' }">
-					<template #icon><FileDocumentOutlineIcon :size="20" /></template>
-				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('rechnungswerk', 'Kunden')" :to="{ name: 'customers' }">
-					<template #icon><AccountGroupIcon :size="20" /></template>
-				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('rechnungswerk', 'Produkte')" :to="{ name: 'products' }">
-					<template #icon><PackageVariantIcon :size="20" /></template>
-				</NcAppNavigationItem>
-				<NcAppNavigationItem :name="t('rechnungswerk', 'Textbausteine')" :to="{ name: 'text-snippets' }">
-					<template #icon><TextBoxIcon :size="20" /></template>
-				</NcAppNavigationItem>
-				<template #footer>
-					<NcAppNavigationItem :name="t('rechnungswerk', 'Mein Kontakt')" :to="{ name: 'my-contact' }">
-						<template #icon><AccountIcon :size="20" /></template>
+			<NcAppNavigation :aria-label="t('rechnungswerk', 'RechnungsWerk Navigation')">
+				<template #list>
+					<NcAppNavigationItem
+						:name="t('rechnungswerk', 'Rechnungen')"
+						:to="{ name: 'invoices' }">
+						<template #icon>
+							<FileDocumentIcon :size="20" />
+						</template>
 					</NcAppNavigationItem>
-					<NcAppNavigationItem v-if="isAdmin" :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'settings' }">
-						<template #icon><CogIcon :size="20" /></template>
+
+					<NcAppNavigationItem
+						v-if="clubMode"
+						:name="t('rechnungswerk', 'Beitragsabrechnung')"
+						:to="{ name: 'membership-fees' }">
+						<template #icon>
+							<FileDocumentIcon :size="20" />
+						</template>
+					</NcAppNavigationItem>
+
+					<NcAppNavigationItem
+						:name="t('rechnungswerk', 'Angebote')"
+						:to="{ name: 'quotes' }">
+						<template #icon>
+							<FileDocumentOutlineIcon :size="20" />
+						</template>
+					</NcAppNavigationItem>
+
+					<NcAppNavigationItem
+						:name="t('rechnungswerk', 'Kunden')"
+						:to="{ name: 'customers' }">
+						<template #icon>
+							<AccountGroupIcon :size="20" />
+						</template>
+					</NcAppNavigationItem>
+
+					<NcAppNavigationItem
+						:name="t('rechnungswerk', 'Produkte')"
+						:to="{ name: 'products' }">
+						<template #icon>
+							<PackageVariantIcon :size="20" />
+						</template>
+					</NcAppNavigationItem>
+
+					<NcAppNavigationItem
+						:name="t('rechnungswerk', 'Textbausteine')"
+						:to="{ name: 'text-snippets' }">
+						<template #icon>
+							<TextBoxIcon :size="20" />
+						</template>
 					</NcAppNavigationItem>
 				</template>
+
+				<template #footer>
+					<ul class="rw-navigation-footer">
+						<NcAppNavigationItem
+							:name="t('rechnungswerk', 'Mein Kontakt')"
+							:to="{ name: 'my-contact' }">
+							<template #icon>
+								<AccountIcon :size="20" />
+							</template>
+						</NcAppNavigationItem>
+
+						<NcAppNavigationItem
+							v-if="isAdmin"
+							:name="t('rechnungswerk', 'Einstellungen')"
+							:to="{ name: 'settings' }">
+							<template #icon>
+								<CogIcon :size="20" />
+							</template>
+						</NcAppNavigationItem>
+					</ul>
+				</template>
 			</NcAppNavigation>
+
 			<NcAppContent>
 				<router-view />
 			</NcAppContent>
@@ -99,5 +145,14 @@ onMounted(async () => {
 <style scoped>
 .rw-app-loading {
 	margin: 25vh auto 0;
+}
+
+.rw-navigation-footer {
+	display: flex;
+	flex-direction: column;
+	gap: var(--default-grid-baseline, 4px);
+	margin: 0;
+	padding: var(--app-navigation-padding);
+	list-style: none;
 }
 </style>

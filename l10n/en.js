@@ -543,6 +543,7 @@ OC.L10N.register(
     "Verein" : "Club",
     "Vereinsmodus aktivieren" : "Activate club mode",
     "Mitgliedergruppe" : "Member group",
-    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "The due date must not be before the invoice date."
+    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "The due date must not be before the invoice date.",
+    "RechnungsWerk Navigation" : "RechnungsWerk navigation"
 },
 "nplurals=2; plural=(n != 1);");
