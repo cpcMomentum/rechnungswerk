@@ -17,7 +17,7 @@ class AuthContext {
 
 	private bool $resolved = false;
 	private bool $machine = false;
-	private ?string $userId = null;
+	private ?string $actingUserId = null;
 	private ?ApiKey $key = null;
 	/** @var ?array{status: int, error: string, message: string, retryAfter: int} */
 	private ?array $rejection = null;
@@ -32,7 +32,7 @@ class AuthContext {
 	public function __construct(
 		private readonly IRequest $request,
 		private readonly ApiKeyService $apiKeyService,
-		private readonly ?string $sessionUserId,
+		private readonly ?string $userId,
 	) {
 	}
 
@@ -43,7 +43,7 @@ class AuthContext {
 
 	public function getUserId(): ?string {
 		$this->resolve();
-		return $this->userId;
+		return $this->actingUserId;
 	}
 
 	public function hasScope(string $scope): bool {
@@ -66,7 +66,8 @@ class AuthContext {
 		}
 		$this->resolved = true;
 
-		if ($this->sessionUserId !== null) {
+		if ($this->userId !== null) {
+			$this->actingUserId = $this->userId;
 			return;
 		}
 
@@ -87,6 +88,6 @@ class AuthContext {
 			return;
 		}
 		$this->key = $result['key'];
-		$this->userId = $result['key']->getOwnerId();
+		$this->actingUserId = $result['key']->getOwnerId();
 	}
 }

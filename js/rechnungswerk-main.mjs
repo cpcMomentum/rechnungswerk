@@ -9402,10 +9402,10 @@ function pS(e, t, n, r, i, a) {
 		viewBox: "0 0 24 24"
 	}, [Y("path", dS, [n.title ? (g(), K("title", fS, q(n.title), 1)) : R("", !0)])], 8, uS))], 16, lS);
 }
-var mS = /*#__PURE__*/ $(cS, [["render", pS]]), hS = () => hs("/api-keys"), gS = (e, t) => gs("/api-keys", {
+var mS = /*#__PURE__*/ $(cS, [["render", pS]]), hS = () => hs("/api-keys"), gS = (e, t) => gs("/api-keys", { data: {
 	name: e,
 	scopes: t
-}), _S = (e) => ys(`/api-keys/${e}`), vS = { class: "rw-api-keys" }, yS = { class: "rw-hint" }, bS = { class: "rw-api-keys__plaintext" }, xS = {
+} }), _S = (e) => ys(`/api-keys/${e}`), vS = { class: "rw-api-keys" }, yS = { class: "rw-hint" }, bS = { class: "rw-api-keys__plaintext" }, xS = {
 	key: 2,
 	class: "rw-api-keys__table"
 }, SS = { class: "rw-api-keys__actions-head" }, CS = { class: "rw-api-keys__scopes" }, wS = {

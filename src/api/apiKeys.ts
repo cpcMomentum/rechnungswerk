@@ -25,7 +25,7 @@ export const getApiKeys = (): Promise<ApiKey[]> =>
 	apiGet<ApiKey[]>('/api-keys')
 
 export const createApiKey = (name: string, scopes: string[]): Promise<CreatedApiKey> =>
-	apiPost<CreatedApiKey, { name: string, scopes: string[] }>('/api-keys', { name, scopes })
+	apiPost<CreatedApiKey, { data: { name: string, scopes: string[] } }>('/api-keys', { data: { name, scopes } })
 
 export const revokeApiKey = (id: number): Promise<void> =>
 	apiDelete<void>(`/api-keys/${id}`)

@@ -20,6 +20,7 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataDownloadResponse;
@@ -40,6 +41,7 @@ class InvoiceController extends Controller {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function index(): DataResponse {
 		if (($r = $this->guardAccess('invoices:read')) !== null) {
@@ -48,6 +50,7 @@ class InvoiceController extends Controller {
 		return new DataResponse($this->invoiceService->list());
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
 		if (($r = $this->guardAccess('invoices:read')) !== null) {
@@ -60,6 +63,7 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function create(array $data = []): DataResponse {
 		if (($r = $this->guardEdit('invoices:create')) !== null) {
@@ -103,6 +107,7 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function commit(int $id): DataResponse {
 		if (($r = $this->guardEdit('invoices:commit')) !== null) {
@@ -122,6 +127,7 @@ class InvoiceController extends Controller {
 	// GET download triggered via an <a download> click; browsers do not attach
 	// custom request headers (including CSRF tokens) on anchor navigations.
 	// Safe: read-only, access-gated below, authenticated session required.
+	#[PublicPage]
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function download(int $id): Response {
@@ -169,6 +175,7 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function send(int $id, string $to = '', string $subject = '', string $body = ''): DataResponse {
 		if (($r = $this->guardEdit('invoices:send')) !== null) {
@@ -189,6 +196,7 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function cancel(int $id): DataResponse {
 		if (($r = $this->guardEdit('invoices:cancel')) !== null) {
@@ -221,6 +229,7 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function markPaid(int $id, ?string $date = null): DataResponse {
 		if (($r = $this->guardEdit('invoices:pay')) !== null) {
