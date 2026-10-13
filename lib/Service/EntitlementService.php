@@ -25,7 +25,7 @@ class EntitlementService {
 	/** RechnungsWerk-Flags aus der Registry `flags.md` des Backends. */
 	public const FLAGS = [
 		'tenants', 'inbound', 'datev_service', 'api_keys',
-		'girocode', 'sepa_export', 'ai_extract', 'kontingent',
+		'sepa_export', 'ai_extract', 'kontingent',
 	];
 	public const EMPLOYEE_BUCKETS = ['1-5', '6-20', '21-50', '51-200', '200+'];
 	public const DEFAULT_BUCKET = '1-5';
@@ -111,6 +111,43 @@ class EntitlementService {
 		$this->fetchToken($key, $employeeBucket);
 		$this->appConfig->setValueString(Application::APP_ID, self::K_KEY, $key, sensitive: true);
 		$this->appConfig->setValueString(Application::APP_ID, self::K_BUCKET, $employeeBucket);
+	}
+
+	/**
+	 * @throws WerkPlusApiException
+	 * @throws \InvalidArgumentException
+	 */
+	public function startTrial(string $employeeBucket): string {
+		if ($this->get(self::K_KEY) !== '') {
+			throw new \InvalidArgumentException('keySet');
+		}
+		if (!in_array($employeeBucket, self::EMPLOYEE_BUCKETS, true)) {
+			throw new \InvalidArgumentException('employeeBucket');
+		}
+		$now = $this->now();
+		$this->appConfig->setValueString(Application::APP_ID, self::K_LAST_ATTEMPT, (string)$now);
+		$response = $this->client->trial(
+			strtolower($this->getInstanceUuid()),
+			[Application::APP_ID => $this->appManager->getAppVersion(Application::APP_ID)],
+			$employeeBucket,
+		);
+
+		// Vor der Pruefung sichern: Der Server schickt den Schluessel nur dieses eine Mal.
+		$key = self::normalizeKey($response['key']);
+		$this->appConfig->setValueString(Application::APP_ID, self::K_KEY, $key, sensitive: true);
+		$this->appConfig->setValueString(Application::APP_ID, self::K_BUCKET, $employeeBucket);
+		try {
+			$this->verifier->verify($response['token'], $this->getInstanceUuid(), $now);
+		} catch (InvalidTokenException $e) {
+			// Kein Abbruch, sonst sieht der Betreiber den Schluessel nie; die Erneuerung holt ein gueltiges Token.
+			$this->logger->warning('RechnungsWerk: WerkPlus-Token abgelehnt', ['exception' => $e]);
+			$this->recordError(new WerkPlusApiException(self::TOKEN_REJECTED, '', $e), $now, true);
+			// Die naechste Erneuerung soll nicht sechs Stunden warten.
+			$this->appConfig->deleteKey(Application::APP_ID, self::K_LAST_ATTEMPT);
+			return $key;
+		}
+		$this->storeToken($response['token'], $now);
+		return $key;
 	}
 
 	/**
@@ -229,7 +266,11 @@ class EntitlementService {
 			$this->recordError($e, $now, $key === $this->get(self::K_KEY));
 			throw $e;
 		}
-		$this->appConfig->setValueString(Application::APP_ID, self::K_TOKEN, $response['token'], sensitive: true);
+		$this->storeToken($response['token'], $now);
+	}
+
+	private function storeToken(string $jwt, int $now): void {
+		$this->appConfig->setValueString(Application::APP_ID, self::K_TOKEN, $jwt, sensitive: true);
 		$this->appConfig->setValueString(Application::APP_ID, self::K_LAST_CHECK, (string)$now);
 		$this->appConfig->deleteKey(Application::APP_ID, self::K_LAST_ERROR);
 		$this->current = null;

@@ -100,7 +100,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->assertSame('werkplus', $service->tier());
 		$this->assertTrue($service->hasFeature('tenants'));
 		$this->assertTrue($service->hasFeature('inbound'));
-		$this->assertFalse($service->hasFeature('girocode'));
+		$this->assertFalse($service->hasFeature('sepa_export'));
 		$service->getStatus();
 	}
 
@@ -379,6 +379,79 @@ class EntitlementServiceTest extends TestCase {
 
 		$this->config['werkplus_last_error'] = json_encode(['code' => 'SERVER_ERROR', 'serverMessage' => '', 'at' => $this->now - 7 * 3600]);
 		$this->assertTrue($this->service()->isRefreshDue());
+	}
+
+	public function testTrialStoresKeyAndTokenAndReturnsTheKey(): void {
+		$this->config['werkplus_instance_uuid'] = strtoupper(self::UUID);
+		$this->client->expects($this->never())->method('validate');
+		$this->client->expects($this->once())->method('trial')
+			->with(self::UUID, ['rechnungswerk' => '0.7.0'], '21-50')
+			->willReturn(['key' => strtolower(self::KEY)] + $this->response());
+		$service = $this->service();
+
+		$this->assertSame(self::KEY, $service->startTrial('21-50'));
+		$this->assertSame(self::KEY, $this->config['werkplus_key']);
+		$this->assertTrue($this->sensitive['werkplus_key']);
+		$this->assertTrue($this->sensitive['werkplus_token']);
+		$this->assertSame('21-50', $this->config['werkplus_employee_bucket']);
+		$this->assertSame((string)self::NOW, $this->config['werkplus_last_check_at']);
+		$this->assertTrue($service->hasFeature('tenants'));
+		$this->assertNull($service->lastError());
+	}
+
+	public function testNoTrialWhenAKeyIsStored(): void {
+		$this->storeToken();
+		$this->client->expects($this->never())->method('trial');
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('keySet');
+		$this->service()->startTrial('1-5');
+	}
+
+	public function testTrialRejectsAnInvalidBucketBeforeAnyCall(): void {
+		$this->client->expects($this->never())->method('trial');
+		$this->expectException(\InvalidArgumentException::class);
+		$this->service()->startTrial('7');
+	}
+
+	public function testRefusedTrialStoresNothing(): void {
+		$this->client->method('trial')->willThrowException(new WerkPlusApiException('TRIAL_ALREADY_USED', 'schon genutzt'));
+		$service = $this->service();
+		try {
+			$service->startTrial('1-5');
+			$this->fail('Ausnahme erwartet');
+		} catch (WerkPlusApiException $e) {
+			$this->assertSame('TRIAL_ALREADY_USED', $e->getErrorCode());
+		}
+
+		$this->assertArrayNotHasKey('werkplus_key', $this->config);
+		$this->assertArrayNotHasKey('werkplus_token', $this->config);
+		$this->assertNull($service->getStatus()['lastError']);
+	}
+
+	public function testTrialKeyIsKeptWhenItsTokenFailsVerification(): void {
+		$this->client->method('trial')->willReturn([
+			'key' => self::KEY,
+			'token' => $this->token($this->claims(), [], self::foreignKey()['private']),
+			'expiresAt' => 'x',
+			'graceUntil' => 'y',
+		]);
+		$service = $this->service();
+
+		$this->assertSame(self::KEY, $service->startTrial('1-5'));
+		$this->assertSame(self::KEY, $this->config['werkplus_key']);
+		$this->assertArrayNotHasKey('werkplus_token', $this->config);
+		$this->assertSame(EntitlementService::TOKEN_REJECTED, $service->getStatus()['lastError']['code']);
+		$this->assertSame('free', $service->tier());
+		$this->assertTrue($service->isRefreshDue());
+	}
+
+	public function testTrialKeyIsKeptWhenTheTokenIsMissing(): void {
+		$this->client->method('trial')->willReturn(['key' => self::KEY, 'token' => '', 'expiresAt' => '', 'graceUntil' => '']);
+		$service = $this->service();
+
+		$this->assertSame(self::KEY, $service->startTrial('1-5'));
+		$this->assertSame(self::KEY, $this->config['werkplus_key']);
+		$this->assertSame(EntitlementService::TOKEN_REJECTED, $service->lastError()['code']);
 	}
 
 	public function testRefreshIfDueSwallowsFailures(): void {

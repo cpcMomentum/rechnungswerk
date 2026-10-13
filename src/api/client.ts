@@ -15,10 +15,11 @@ export function apiUrl(path: string): string {
 }
 
 function wrapError(error: unknown): ApiError {
-	const axiosError = error as AxiosError<{ error?: string }>
+	const axiosError = error as AxiosError<{ error?: string, code?: string }>
 	const status = axiosError.response?.status ?? 0
 	const message = axiosError.response?.data?.error ?? axiosError.message ?? 'Unknown error'
-	return { status, message }
+	const code = axiosError.response?.data?.code
+	return code ? { status, message, code } : { status, message }
 }
 
 export async function apiGet<T>(path: string): Promise<T> {

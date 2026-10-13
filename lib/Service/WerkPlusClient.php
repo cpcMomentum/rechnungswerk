@@ -39,14 +39,45 @@ class WerkPlusClient {
 	 * @throws WerkPlusApiException
 	 */
 	public function validate(#[\SensitiveParameter] string $key, string $instanceUuid, array $appVersions, string $employeeBucket): array {
-		$payload = [
+		$body = $this->post('/validate', [
 			'key' => $key,
 			'instanceUuid' => $instanceUuid,
 			'appVersions' => $appVersions,
 			'employeeBucket' => $employeeBucket,
-		];
+		]);
+		return self::tokenFields($body);
+	}
+
+	/**
+	 * @param array<string, string> $appVersions
+	 * @return array{key: string, token: string, expiresAt: string, graceUntil: string}
+	 * @throws WerkPlusApiException
+	 */
+	public function trial(string $instanceUuid, array $appVersions, string $employeeBucket): array {
+		$body = $this->post('/trial', [
+			'instanceUuid' => $instanceUuid,
+			'appVersions' => $appVersions,
+			'employeeBucket' => $employeeBucket,
+		]);
+		if (!is_string($body['key'] ?? null) || $body['key'] === '') {
+			throw new WerkPlusApiException(self::INVALID_RESPONSE);
+		}
 		try {
-			$response = $this->clientService->newClient()->post(self::BASE_URL . '/validate', [
+			return ['key' => $body['key']] + self::tokenFields($body);
+		} catch (WerkPlusApiException) {
+			// Der Testzeitraum ist schon verbraucht; der Schluessel muss trotzdem durch, das leere Token faellt in der Pruefung durch.
+			return ['key' => $body['key'], 'token' => '', 'expiresAt' => '', 'graceUntil' => ''];
+		}
+	}
+
+	/**
+	 * @param array<string, mixed> $payload
+	 * @return array<mixed>
+	 * @throws WerkPlusApiException
+	 */
+	private function post(string $path, #[\SensitiveParameter] array $payload): array {
+		try {
+			$response = $this->clientService->newClient()->post(self::BASE_URL . $path, [
 				'json' => $payload,
 				'headers' => ['Accept' => 'application/json'],
 				'timeout' => self::TIMEOUT_SECONDS,
@@ -60,8 +91,19 @@ class WerkPlusClient {
 		if ($response->getStatusCode() !== 200) {
 			throw $this->errorFrom($body);
 		}
-		if (!is_array($body)
-			|| !is_string($body['token'] ?? null)
+		if (!is_array($body)) {
+			throw new WerkPlusApiException(self::INVALID_RESPONSE);
+		}
+		return $body;
+	}
+
+	/**
+	 * @param array<mixed> $body
+	 * @return array{token: string, expiresAt: string, graceUntil: string}
+	 * @throws WerkPlusApiException
+	 */
+	private static function tokenFields(array $body): array {
+		if (!is_string($body['token'] ?? null)
 			|| !is_string($body['expiresAt'] ?? null)
 			|| !is_string($body['graceUntil'] ?? null)) {
 			throw new WerkPlusApiException(self::INVALID_RESPONSE);

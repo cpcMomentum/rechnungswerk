@@ -12,6 +12,13 @@
 
 		<template v-if="status">
 			<NcNoteCard v-if="stateNote" :type="stateNote.type" :text="stateNote.text" />
+			<NcNoteCard v-if="trialKey" type="success" class="rw-werkplus__trial-key">
+				<p v-if="licenseActive">{{ t('rechnungswerk', 'Der Testzeitraum läuft. Das ist dein WerkPlus-Schlüssel:') }}</p>
+				<p v-else>{{ t('rechnungswerk', 'Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:') }}</p>
+				<p><code>{{ trialKey }}</code></p>
+				<p>{{ t('rechnungswerk', 'Bitte bewahre ihn sicher auf. Er ist hinterlegt, wird aber nur jetzt vollständig angezeigt.') }}</p>
+			</NcNoteCard>
+			<NcNoteCard v-if="actionInfo" type="info" :text="actionInfo" />
 			<NcNoteCard v-if="actionError" type="error" :text="actionError" />
 			<NcNoteCard v-else-if="status.lastError" type="warning" :text="status.lastError.message" />
 
@@ -47,6 +54,9 @@
 				<NcButton variant="primary" :disabled="busy || (!keyInput.trim() && !status.keySet)" @click="onActivate">
 					{{ status.keySet ? t('rechnungswerk', 'Speichern und prüfen') : t('rechnungswerk', 'Schlüssel prüfen und speichern') }}
 				</NcButton>
+				<NcButton v-if="!status.keySet" :disabled="busy" @click="confirmTrial = true">
+					{{ t('rechnungswerk', '30 Tage testen') }}
+				</NcButton>
 				<NcButton v-if="status.keySet" :disabled="busy" @click="onRefresh">
 					{{ t('rechnungswerk', 'Jetzt prüfen') }}
 				</NcButton>
@@ -62,6 +72,14 @@
 				<p class="rw-hint">{{ t('rechnungswerk', 'Kennung dieser Installation:') }} <code>{{ status.instanceUuid }}</code></p>
 			</div>
 		</template>
+
+		<ConfirmDialog
+			:open="confirmTrial"
+			:name="t('rechnungswerk', 'WerkPlus 30 Tage testen')"
+			:message="t('rechnungswerk', 'Der Testzeitraum läuft 30 Tage, braucht keine Zahlungsdaten und ist je Installation nur einmal möglich. Jetzt starten?')"
+			:confirmLabel="t('rechnungswerk', 'Testzeitraum starten')"
+			@close="confirmTrial = false"
+			@confirm="onTrial" />
 
 		<ConfirmDialog
 			:open="confirmRemove"
@@ -85,6 +103,7 @@ import {
 	getLicense,
 	refreshLicense,
 	removeLicense,
+	startTrial,
 	type LicenseStatus,
 } from '@/api/license'
 
@@ -94,7 +113,15 @@ const bucket = ref<string>(EMPLOYEE_BUCKETS[0])
 const busy = ref(false)
 const loadError = ref('')
 const actionError = ref('')
+const actionInfo = ref('')
+const trialKey = ref('')
 const confirmRemove = ref(false)
+const confirmTrial = ref(false)
+
+// Kein Fehler im eigentlichen Sinn, der Vertrag verlangt eine ruhige Anzeige.
+const CALM_CODES = ['TRIAL_ALREADY_USED']
+
+const licenseActive = computed(() => status.value?.state === 'valid' || status.value?.state === 'grace')
 
 const tierLabel = computed(() => (status.value?.tier === 'werkplus' ? 'WerkPlus' : t('rechnungswerk', 'Frei')))
 
@@ -148,11 +175,18 @@ async function load(keepBucket = false): Promise<void> {
 async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 	busy.value = true
 	actionError.value = ''
+	actionInfo.value = ''
 	try {
 		apply(await action())
 		keyInput.value = ''
 	} catch (e) {
-		actionError.value = (e as { message?: string }).message ?? t('rechnungswerk', 'WerkPlus hat einen Fehler gemeldet. Bitte versuche es später erneut.')
+		const { message, code } = e as { message?: string, code?: string }
+		const text = message ?? t('rechnungswerk', 'WerkPlus hat einen Fehler gemeldet. Bitte versuche es später erneut.')
+		if (code && CALM_CODES.includes(code)) {
+			actionInfo.value = text
+		} else {
+			actionError.value = text
+		}
 		await load(true)
 	} finally {
 		busy.value = false
@@ -160,7 +194,18 @@ async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 }
 
 function onActivate(): Promise<void> {
+	trialKey.value = ''
 	return run(() => activateLicense(keyInput.value.trim(), bucket.value))
+}
+
+function onTrial(): Promise<void> {
+	confirmTrial.value = false
+	trialKey.value = ''
+	return run(async () => {
+		const result = await startTrial(bucket.value)
+		trialKey.value = result.key
+		return result.status
+	})
 }
 
 function onRefresh(): Promise<void> {
@@ -169,6 +214,7 @@ function onRefresh(): Promise<void> {
 
 function onRemove(): Promise<void> {
 	confirmRemove.value = false
+	trialKey.value = ''
 	return run(removeLicense)
 }
 
@@ -207,7 +253,8 @@ onMounted(load)
 	font-weight: 600;
 }
 
-.rw-werkplus__privacy code {
+.rw-werkplus__privacy code,
+.rw-werkplus__trial-key code {
 	user-select: all;
 }
 </style>

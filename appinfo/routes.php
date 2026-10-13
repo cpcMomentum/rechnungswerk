@@ -115,6 +115,7 @@ return [
 		// WerkPlus-Lizenz (entitlement-v1)
 		['name' => 'license#show',     'url' => '/api/v1/license',         'verb' => 'GET'],
 		['name' => 'license#activate', 'url' => '/api/v1/license',         'verb' => 'PUT'],
+		['name' => 'license#trial',    'url' => '/api/v1/license/trial',   'verb' => 'POST'],
 		['name' => 'license#refresh',  'url' => '/api/v1/license/refresh', 'verb' => 'POST'],
 		['name' => 'license#destroy',  'url' => '/api/v1/license',         'verb' => 'DELETE'],
 	],

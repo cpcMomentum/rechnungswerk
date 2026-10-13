@@ -51,6 +51,47 @@ class WerkPlusClientTest extends TestCase {
 		$this->assertSame(['token' => 'a.b.c', 'expiresAt' => 'e', 'graceUntil' => 'g'], $result);
 	}
 
+	public function testTrialSendsTheContractFieldsWithoutKeyAndReturnsTheKey(): void {
+		$captured = null;
+		$client = $this->client(200, '{"key":"wp_NEU","token":"a.b.c","expiresAt":"e","graceUntil":"g"}', $captured);
+		$result = $client->trial('uuid', ['rechnungswerk' => '0.7.0'], '6-20');
+
+		$this->assertSame('https://api.werkwolke.de/trial', $captured['uri']);
+		$this->assertSame([
+			'instanceUuid' => 'uuid',
+			'appVersions' => ['rechnungswerk' => '0.7.0'],
+			'employeeBucket' => '6-20',
+		], $captured['options']['json']);
+		$this->assertSame(['key' => 'wp_NEU', 'token' => 'a.b.c', 'expiresAt' => 'e', 'graceUntil' => 'g'], $result);
+	}
+
+	public function testTrialWithoutKeyInTheAnswerIsInvalid(): void {
+		foreach (['{"token":"a.b.c","expiresAt":"e","graceUntil":"g"}', '{"key":"","token":"a.b.c","expiresAt":"e","graceUntil":"g"}'] as $body) {
+			try {
+				$this->client(200, $body)->trial('uuid', [], '1-5');
+				$this->fail('Ausnahme erwartet fuer ' . $body);
+			} catch (WerkPlusApiException $e) {
+				$this->assertSame(WerkPlusClient::INVALID_RESPONSE, $e->getErrorCode());
+			}
+		}
+	}
+
+	public function testTrialKeySurvivesBrokenTokenFields(): void {
+		$result = $this->client(200, '{"key":"wp_NEU","token":"a.b.c","graceUntil":"g"}')->trial('uuid', [], '1-5');
+
+		$this->assertSame('wp_NEU', $result['key']);
+		$this->assertSame('', $result['token']);
+	}
+
+	public function testTrialAlreadyUsedIsPassedThrough(): void {
+		try {
+			$this->client(409, '{"error":{"code":"TRIAL_ALREADY_USED","message":"schon genutzt"}}')->trial('uuid', [], '1-5');
+			$this->fail('Ausnahme erwartet');
+		} catch (WerkPlusApiException $e) {
+			$this->assertSame('TRIAL_ALREADY_USED', $e->getErrorCode());
+		}
+	}
+
 	public function testContractErrorCodeIsPassedThroughWithItsMessage(): void {
 		try {
 			$this->call($this->client(403, '{"error":{"code":"KEY_REVOKED","message":"gesperrt"}}'));

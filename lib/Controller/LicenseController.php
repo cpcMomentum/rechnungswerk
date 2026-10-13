@@ -57,6 +57,22 @@ class LicenseController extends Controller {
 		return new DataResponse($this->status());
 	}
 
+	// Der Schluessel steht nur in dieser Antwort; spaeter liefert der Status nur noch den Hinweis.
+	#[NoAdminRequired]
+	public function trial(string $employeeBucket = EntitlementService::DEFAULT_BUCKET): DataResponse {
+		if (($resp = $this->requireAdmin()) !== null) {
+			return $resp;
+		}
+		try {
+			$key = $this->entitlementService->startTrial($employeeBucket);
+		} catch (\InvalidArgumentException $e) {
+			return $this->invalidInput($e->getMessage());
+		} catch (WerkPlusApiException $e) {
+			return $this->apiError($e);
+		}
+		return new DataResponse(['key' => $key, 'status' => $this->status()]);
+	}
+
 	#[NoAdminRequired]
 	public function refresh(): DataResponse {
 		if (($resp = $this->requireAdmin()) !== null) {
@@ -104,9 +120,11 @@ class LicenseController extends Controller {
 	}
 
 	private function invalidInput(string $field): DataResponse {
-		$message = $field === 'employeeBucket'
-			? $this->l10n->t('Bitte wähle eine gültige Größenklasse.')
-			: $this->l10n->t('Bitte gib einen gültigen WerkPlus-Schlüssel ein.');
+		$message = match ($field) {
+			'employeeBucket' => $this->l10n->t('Bitte wähle eine gültige Größenklasse.'),
+			'keySet' => $this->l10n->t('Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich.'),
+			default => $this->l10n->t('Bitte gib einen gültigen WerkPlus-Schlüssel ein.'),
+		};
 		return new DataResponse(['error' => $message, 'code' => 'INPUT_INVALID'], Http::STATUS_BAD_REQUEST);
 	}
 
@@ -118,6 +136,8 @@ class LicenseController extends Controller {
 			'KEY_REVOKED' => $this->l10n->t('Dieser Schlüssel wurde gesperrt. RechnungsWerk arbeitet im freien Umfang weiter.'),
 			'KEY_EXPIRED' => $this->l10n->t('Die Lizenz ist abgelaufen. RechnungsWerk arbeitet im freien Umfang weiter.'),
 			'INSTANCE_LIMIT_REACHED' => $this->l10n->t('Dieser Schlüssel gehört bereits zu einer anderen Installation. Ein Umzug wird vom Anbieter freigeschaltet.'),
+			'TRIAL_ALREADY_USED' => $this->l10n->t('Diese Installation hat den Testzeitraum bereits genutzt. Für WerkPlus brauchst du einen Schlüssel.'),
+			'TRIAL_UNAVAILABLE' => $this->l10n->t('Der Testzeitraum lässt sich gerade nicht in der App starten. Unter werkwolke.de/testen steht, wie du ihn trotzdem bekommst.'),
 			'RATE_LIMITED' => $this->l10n->t('Zu viele Versuche. Bitte versuche es später erneut.'),
 			WerkPlusClient::UNREACHABLE => $this->l10n->t('WerkPlus ist gerade nicht erreichbar. Bitte versuche es später erneut.'),
 			EntitlementService::TOKEN_REJECTED => $this->l10n->t('Die Antwort von WerkPlus ließ sich nicht prüfen. Die Lizenz wurde nicht übernommen.'),

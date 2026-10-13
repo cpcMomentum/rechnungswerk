@@ -29,6 +29,9 @@ export const getLicense = (): Promise<LicenseStatus> =>
 export const activateLicense = (key: string, employeeBucket: string): Promise<LicenseStatus> =>
 	apiPut<LicenseStatus, { key: string, employeeBucket: string }>('/license', { key, employeeBucket })
 
+export const startTrial = (employeeBucket: string): Promise<{ key: string, status: LicenseStatus }> =>
+	apiPost<{ key: string, status: LicenseStatus }, { employeeBucket: string }>('/license/trial', { employeeBucket })
+
 export const refreshLicense = (): Promise<LicenseStatus> =>
 	apiPost<LicenseStatus>('/license/refresh', {})
 
