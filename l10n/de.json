@@ -537,7 +537,13 @@
 		"Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich.": "Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich.",
 		"Diese Installation hat den Testzeitraum bereits genutzt. Für WerkPlus brauchst du einen Schlüssel.": "Diese Installation hat den Testzeitraum bereits genutzt. Für WerkPlus brauchst du einen Schlüssel.",
 		"Der Testzeitraum lässt sich gerade nicht in der App starten. Unter werkwolke.de/testen steht, wie du ihn trotzdem bekommst.": "Der Testzeitraum lässt sich gerade nicht in der App starten. Unter werkwolke.de/testen steht, wie du ihn trotzdem bekommst.",
-		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:"
+		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:",
+		"Beitragsabrechnung": "Beitragsabrechnung",
+		"Verein": "Verein",
+		"Vereinsmodus aktivieren": "Vereinsmodus aktivieren",
+		"Mitgliedergruppe": "Mitgliedergruppe",
+		"Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.",
+		"RechnungsWerk Navigation": "RechnungsWerk Navigation"
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

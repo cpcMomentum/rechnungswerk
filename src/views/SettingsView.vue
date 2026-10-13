@@ -418,13 +418,18 @@
 					</div>
 				</section>
 
+								<!-- Vereinsmodus -->
+				<div v-show="activeSection === 'verein'">
+					<ClubSettingsSection />
+				</div>
+
 				<!-- WerkPlus-Lizenz: eigene Knoepfe, deshalb ohne den gemeinsamen Speichern-Knopf -->
 				<section v-show="activeSection === 'werkplus'" class="rw-section">
 					<h3>{{ t('rechnungswerk', 'WerkPlus') }}</h3>
 					<WerkPlusSettings />
 				</section>
 
-					<div v-show="activeSection !== 'werkplus'" class="rw-action-bar">
+					<div v-show="activeSection !== 'werkplus' && activeSection !== 'verein'"	class="rw-action-bar">
 						<NcButton variant="primary" :disabled="store.saving || savingPerms" @click="onSave">
 							<template #icon><ContentSaveIcon :size="20" /></template>
 							{{ t('rechnungswerk', 'Speichern') }}
@@ -509,6 +514,7 @@ import FolderOutlineIcon from 'vue-material-design-icons/FolderOutline.vue'
 import ShieldAccountOutlineIcon from 'vue-material-design-icons/ShieldAccountOutline.vue'
 import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 import WerkPlusSettings from '@/components/WerkPlusSettings.vue'
+import ClubSettingsSection from '@/components/ClubSettingsSection.vue'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { SMALL_BUSINESS_NOTE_DEFAULT, TAX_RATES_BP, type Settings } from '@/types/api'
 import { testSmtp, setLogo, deleteLogo, logoUrl, setArchiveFolder, deleteArchiveFolder, type SettingsSave } from '@/api/settings'
@@ -573,6 +579,12 @@ const navGroups = computed<SettingsGroup[]>(() => [
 		items: [
 			{ key: 'ablage', label: t('rechnungswerk', 'Ablage in Nextcloud'), icon: FolderOutlineIcon },
 			{ key: 'zugriff', label: t('rechnungswerk', 'Zugriff & Administration'), icon: ShieldAccountOutlineIcon },
+		],
+	},
+	{
+		label: t('rechnungswerk', 'Verein'),
+		items: [
+			{ key: 'verein', label: t('rechnungswerk', 'Verein'), icon: ShieldAccountOutlineIcon },
 		],
 	},
 	{

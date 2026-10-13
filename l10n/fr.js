@@ -538,6 +538,12 @@ OC.L10N.register(
     "Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich." : "Une clé WerkPlus est déjà enregistrée. Une période d’essai n’est possible que sans clé.",
     "Diese Installation hat den Testzeitraum bereits genutzt. Für WerkPlus brauchst du einen Schlüssel." : "Cette installation a déjà utilisé sa période d’essai. Une clé est nécessaire pour WerkPlus.",
     "Der Testzeitraum lässt sich gerade nicht in der App starten. Unter werkwolke.de/testen steht, wie du ihn trotzdem bekommst." : "La période d’essai ne peut pas être lancée dans l’application pour le moment. werkwolke.de/testen explique comment l’obtenir malgré tout.",
-    "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:" : "La période d’essai a commencé, mais la licence n’a pas encore pu être vérifiée. Utilisez « Vérifier maintenant » pour réessayer. Voici votre clé WerkPlus :"
+    "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:" : "La période d’essai a commencé, mais la licence n’a pas encore pu être vérifiée. Utilisez « Vérifier maintenant » pour réessayer. Voici votre clé WerkPlus :",
+    "Beitragsabrechnung" : "Facturation des cotisations",
+    "Verein" : "Association",
+    "Vereinsmodus aktivieren" : "Activer le mode association",
+    "Mitgliedergruppe" : "Groupe de membres",
+    "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "La date d'échéance ne peut pas être antérieure à la date de facturation.",
+    "RechnungsWerk Navigation" : "Navigation de RechnungsWerk"
 },
 "nplurals=2; plural=(n > 1);");

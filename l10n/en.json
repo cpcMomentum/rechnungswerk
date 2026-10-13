@@ -537,7 +537,13 @@
 		"Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich.": "A WerkPlus key is already stored. A trial is only possible without a key.",
 		"Diese Installation hat den Testzeitraum bereits genutzt. Für WerkPlus brauchst du einen Schlüssel.": "This installation has already used its trial. You need a key for WerkPlus.",
 		"Der Testzeitraum lässt sich gerade nicht in der App starten. Unter werkwolke.de/testen steht, wie du ihn trotzdem bekommst.": "The trial cannot be started in the app right now. werkwolke.de/testen explains how to get one anyway.",
-		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Your trial has started, but the licence could not be verified yet. Use “Check now” to try again. This is your WerkPlus key:"
+		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Your trial has started, but the licence could not be verified yet. Use “Check now” to try again. This is your WerkPlus key:",
+		"Beitragsabrechnung": "Membership fee billing",
+		"Verein": "Club",
+		"Vereinsmodus aktivieren": "Activate club mode",
+		"Mitgliedergruppe": "Member group",
+		"Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "The due date must not be before the invoice date.",
+		"RechnungsWerk Navigation": "RechnungsWerk navigation"
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }
