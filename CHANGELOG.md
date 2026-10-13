@@ -5,7 +5,50 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unreleased]
+## [0.6.0] - 2026-09-27
+
+### Changed
+- **Unterstützt werden jetzt Nextcloud 32 bis 35.** Nextcloud 35 ist geprüft
+  und freigegeben: die Unit-Suite läuft grün gegen dessen OCP-Schnittstellen,
+  keine der genutzten APIs wurde entfernt oder geändert (#309). Nextcloud 31
+  fällt dafür weg — die Zeilensperre bei der Nummernvergabe gibt es dort nicht,
+  Festschreiben, Stornieren und das Festschreiben von Angeboten liefen seit
+  Juni 2026 in einen Fehler. Das ist jetzt ehrlich ausgewiesen, statt eine
+  Kompatibilität zu versprechen, die es nicht gab (#319). Die PHP-Untergrenze
+  der App bleibt bei 8.2; Nextcloud 35 selbst verlangt mindestens PHP 8.3
+
+### Fixed
+- **Festschreiben ohne Firmenname.** Waren die Grundeinstellungen noch leer,
+  liess sich eine Rechnung festschreiben, aber es entstand kein Beleg: Die
+  Nummer war vergeben, die Rechnung nach § 14 UStG unveränderlich, und der
+  Download meldete nur „Die PDF-Erzeugung ist fehlgeschlagen." RechnungsWerk
+  weist jetzt vor dem Festschreiben und vor dem Stornieren darauf hin, dass
+  der Firmenname fehlt, und verbraucht dabei keine Nummer. Bereits entstandene
+  Fälle holt der Nachzieh-Auftrag von selbst nach, sobald der Name hinterlegt
+  ist (#313)
+- **Festschreiben auf SQLite-Instanzen.** Auf Nextcloud-Installationen mit
+  SQLite ließ sich keine Rechnung festschreiben, nicht stornieren und kein
+  Angebot festschreiben — die Oberfläche meldete nur „Request failed with
+  status code 500". Ursache war eine Zeilensperre bei der Nummernvergabe, die
+  SQLite nicht kennt. Auf SQLite entfällt sie jetzt; doppelte Rechnungsnummern
+  kann das nicht auslösen, weil SQLite ohnehin nur einen Schreiber zulässt
+  (#319)
+- **Adresszusatz und Ansprechpartner doppelten sich im Beleg.** Wer beim Kunden
+  einen Ansprechpartner *und* einen Adresszusatz pflegte, bekam zwei fast gleiche
+  Zeilen untereinander („z. Hd. Frau Meyer"), weil der Adressblock die Zeile
+  zusätzlich aus dem Ansprechpartner ableitete — und der Platzhalter am
+  Adresszusatz ausdrücklich dazu einlud, dasselbe noch einmal einzutragen. Der
+  Ansprechpartner ist Kontakt, nicht Anschrift: Er steht jetzt nur noch in der
+  E-Rechnung (BT-56), wo er immer hingehörte. Was in der Anschrift erscheint,
+  entscheidet allein der Adresszusatz — auch ein „z. Hd. …" gehört dorthin, und
+  ein Hinweis an beiden Pflegestellen sagt das. Künftige Belege sehen dadurch
+  anders aus, wenn bisher nur der Ansprechpartner gepflegt war (#328)
+- **Wartung:** Der wöchentliche Kompatibilitäts-Wächter und die Unit-Test-Läufe
+  scheiterten an einem neuen Nextcloud-Major, sobald dieses die PHP-Untergrenze
+  anhob — und zwar bevor ein einziger Test lief. Gemeldet wurde es trotzdem als
+  „API-Änderung". Die Test-Läufe wählen die geprüften Nextcloud-Versionen jetzt
+  passend zur PHP-Version des Laufs aus, und der Wächter benennt die beiden
+  Ursachen getrennt. Zusätzlich wird gegen PHP 8.5 getestet (#309)
 
 ## [0.5.3] - 2026-09-21
 
@@ -505,7 +548,10 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.3...v0.6.0
+[0.5.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.4.0...v0.4.1

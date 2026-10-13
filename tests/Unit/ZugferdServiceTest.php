@@ -90,6 +90,21 @@ class ZugferdServiceTest extends TestCase {
 		return $i;
 	}
 
+	/**
+	 * Ohne Firmennamen lief die Bibliothek beim Bau der PDF-Metadaten in einen
+	 * TypeError, der nichts darueber sagte, was fehlt (#313). Jetzt scheitert
+	 * der Bau vorher und benennt die Ursache. Kein Platzhalter-Absender.
+	 */
+	public function testXmlWithoutSellerNameIsRefusedWithATellingMessage(): void {
+		$settings = $this->settings();
+		$settings->setCompanyName(null);
+
+		$this->expectException(\RuntimeException::class);
+		$this->expectExceptionMessageMatches('/seller name/i');
+
+		$this->service->buildXml($this->invoice(), [$this->item(9500, 1900, 19000)], $settings);
+	}
+
 	public function testFreeTextUnitLabelMapsToGenericCodeInXml(): void {
 		// A free-text unit ("Personen") on top of a non-C62 standard code (HUR):
 		// the XML must fall back to the generic C62 so it stays EN16931-valid, and
@@ -418,6 +433,56 @@ class ZugferdServiceTest extends TestCase {
 			$html,
 			'Reihenfolge im Adressblock: Name, Zusatz, Strasse',
 		);
+	}
+
+	/**
+	 * **Der Ansprechpartner gehoert nicht in die Anschrift (#328).**
+	 *
+	 * Bis hierher setzte das PDF eine Zeile „z. Hd. <Person>" ueber den
+	 * Adresszusatz. Wer beide Felder pflegte — und der Platzhalter am
+	 * Adresszusatz lud ausdruecklich dazu ein —, bekam sie doppelt. Was in der
+	 * Anschrift steht, entscheidet jetzt allein der Adresszusatz.
+	 */
+	public function testAnsprechpartnerStehtNichtImAdressblock(): void {
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientContactPerson('Frau Meyer');
+		$invoice->setRecipientAddressAddition('z. Hd. Frau Meyer');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$html = $this->renderHtml($invoice, $items, $settings, false);
+
+		$this->assertSame(
+			1,
+			substr_count($html, 'z. Hd. Frau Meyer'),
+			'Die Zeile steht genau einmal — aus dem Adresszusatz, nicht zusaetzlich aus dem Ansprechpartner.',
+		);
+		$this->assertMatchesRegularExpression(
+			'#Kunde AG<br>z\. Hd\. Frau Meyer<br>Kundenweg 5#u',
+			$html,
+			'Reihenfolge: Name, Adresszusatz, Strasse',
+		);
+	}
+
+	/**
+	 * Und er ist deshalb nicht verloren: Die E-Rechnung fuehrt ihn weiter in
+	 * BT-56 (Kaeufer-Kontakt, BG-9) — dort war er immer richtig aufgehoben.
+	 */
+	public function testAnsprechpartnerBleibtImXmlErhalten(): void {
+		$settings = $this->settings();
+		$invoice = $this->invoice();
+		$invoice->setRecipientContactPerson('Frau Meyer');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $settings);
+
+		$this->assertStringContainsString('Frau Meyer', $xml, 'BT-56 traegt den Ansprechpartner weiterhin.');
 	}
 
 	private function renderHtml(Invoice $invoice, array $items, Settings $settings, bool $preview): string {

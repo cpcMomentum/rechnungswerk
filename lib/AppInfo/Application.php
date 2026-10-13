@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\AppInfo;
 
 use OCA\Rechnungswerk\BackgroundJob\DatevConfirmationJob;
 use OCA\Rechnungswerk\BackgroundJob\DocumentBackfillJob;
+use OCA\Rechnungswerk\BackgroundJob\EntitlementRefreshJob;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -44,5 +45,6 @@ class Application extends App implements IBootstrap {
 		// registriert: er faengt auch die seltenen Faelle ein, in denen das
 		// Einfrieren beim Festschreiben fehlschlaegt.
 		$jobList->add(DocumentBackfillJob::class);
+		$jobList->add(EntitlementRefreshJob::class);
 	}
 }

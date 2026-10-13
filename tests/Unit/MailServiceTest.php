@@ -100,8 +100,8 @@ class MailServiceTest extends TestCase {
 	public function testBuildPhpMailerMapsConfig(array $cfg, string $expectedSecure, bool $expectedAuth): void {
 		$konto = new MailAccount($cfg['host'], $cfg['port'], $cfg['security'], $cfg['user'], $cfg['password']);
 		$service = new MailService($this->createMock(IMailer::class), $this->l10nStub());
+		// Kein setAccessible(): seit PHP 8.1 wirkungslos, seit 8.5 deprecated.
 		$method = new \ReflectionMethod(MailService::class, 'buildPhpMailer');
-		$method->setAccessible(true);
 		/** @var PHPMailer $mail */
 		$mail = $method->invoke($service, $konto);
 

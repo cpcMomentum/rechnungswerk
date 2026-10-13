@@ -22,10 +22,10 @@ use OCP\Migration\SimpleMigrationStep;
  * Der normale Rechnungsversand bleibt unveraendert und die Vereinsfunktion
  * kann unabhaengig weiterentwickelt oder entfernt werden.
  */
-class Version002200Date20260827140000 extends SimpleMigrationStep {
+class Version002300Date20260827140000 extends SimpleMigrationStep {
 
 	public function name(): string {
-		return 'Schema v0.22.0 (Versandstatus Beitragsrechnungen)';
+		return 'Schema v0.23.0 (Versandstatus Beitragsrechnungen)';
 	}
 
 	public function description(): string {

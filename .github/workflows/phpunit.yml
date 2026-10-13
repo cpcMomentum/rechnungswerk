@@ -43,7 +43,12 @@ jobs:
       fail-fast: false
       matrix:
         # PHP-Raender des unterstuetzten Bereichs; NC/ocp kommt aus info.xml.
-        php-version: ['8.2', '8.4']
+        # 8.2 ist die Untergrenze der App (info.xml), 8.5 die Obergrenze des
+        # neuesten unterstuetzten NC. 8.4 bleibt stehen, weil "PHP 8.2" und
+        # "PHP 8.4" als Required Status Checks im develop-Ruleset haengen —
+        # ein Umbenennen liesse den Check lautlos verschwinden und wuerde jeden
+        # PR blockieren. Hinzufuegen ist gefahrlos, Umbenennen nicht.
+        php-version: ['8.2', '8.4', '8.5']
     name: PHP ${{ matrix.php-version }}
     steps:
       - uses: actions/checkout@v7
@@ -55,20 +60,17 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      # Leitet die zu testenden nextcloud/ocp-Versionen aus info.xml ab
-      # (<nextcloud min-version max-version/>). NC 32-34 -> "^32.0 ^33.0 ^34.0".
-      - name: NC-Versionen aus info.xml ableiten
+      # Leitet die zu testenden ocp-Versionen aus info.xml ab und filtert sie
+      # nach der PHP-Untergrenze der jeweiligen Version (NC 35 laesst PHP 8.2
+      # fallen). Lag als Inline-Bash in jeder App und liegt seit v1.16.0 im
+      # Tooling — Begruendung und Tests dort (nc-app-tooling#28).
+      # steps.derive.outputs.ocp bleibt wie gehabt; .uebersprungen kommt als
+      # Output neu dazu (die Inline-Fassung schrieb es nur ins Log) und wird
+      # hier nicht konsumiert — die Diagnosezeile steht weiter im Lauf.
+      - uses: cpcMomentum/nc-app-tooling/.github/actions/ocp-versionen@v1.16.0
         id: derive
-        run: |
-          line=$(grep -oE '<nextcloud[^>]*/>' appinfo/info.xml)
-          min=$(printf '%s' "$line" | grep -oE 'min-version="[0-9]+"' | grep -oE '[0-9]+')
-          max=$(printf '%s' "$line" | grep -oE 'max-version="[0-9]+"' | grep -oE '[0-9]+')
-          if [ -z "$min" ] || [ -z "$max" ]; then
-            echo "::error::Konnte min/max-version nicht aus info.xml lesen"; exit 1
-          fi
-          ocp=$(seq "$min" "$max" | sed 's/.*/^&.0/' | paste -sd' ' -)
-          echo "ocp=$ocp" >> "$GITHUB_OUTPUT"
-          echo "Abgeleitete ocp-Versionen: $ocp"
+        with:
+          php-version: ${{ matrix.php-version }}
 
       # Der abgeleitete Wert geht ueber env in die Shell, nicht per ${{ }}-
       # Interpolation ins Skript: info.xml ist in einem PR aenderbar, direkte
@@ -76,7 +78,14 @@ jobs:
       - name: Unit-Tests gegen alle ocp-Versionen
         env:
           OCP_VERSIONS: ${{ steps.derive.outputs.ocp }}
+          PHPV: ${{ matrix.php-version }}
         run: |
+          # composer.json pinnt config.platform.php auf die App-Untergrenze
+          # (8.2), damit das ausgelieferte vendor/ dort laeuft. Fuer den
+          # Testlauf gilt das PHP dieses Jobs — sonst lehnt composer eine
+          # ocp-Version ab, die auf diesem PHP sehr wohl laeuft. Nur im
+          # Arbeitsverzeichnis des Laufs, nichts davon wird committet.
+          composer config platform.php "$PHPV"
           failed=""
           for ocp in $OCP_VERSIONS; do
             echo "::group::ocp $ocp"

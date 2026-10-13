@@ -175,13 +175,15 @@ class InvoiceMapper extends QBMapper {
 	 * transaction holds it until commit. Serialises commit/cancel and prevents
 	 * gaps/duplicates in the sequential number on concurrent calls.
 	 *
+	 * On SQLite there is no row lock; RowLock explains why that is safe there.
+	 *
 	 * @throws DoesNotExistException
 	 */
 	public function findOneForUpdate(int $id): Invoice {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->tableName)
-			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
-			->forUpdate();
+			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		$qb = RowLock::apply($qb, $this->db);
 		return $this->findEntity($qb);
 	}
 }

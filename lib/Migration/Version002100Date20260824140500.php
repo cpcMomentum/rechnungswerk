@@ -32,10 +32,10 @@ use OCP\Migration\SimpleMigrationStep;
  *   membership_type / Vollmitglied / percent / 10000 bp
  *   membership_type / Ehrenmitglied / percent / 5000 bp
  */
-class Version002000Date20260824140500 extends SimpleMigrationStep {
+class Version002100Date20260824140500 extends SimpleMigrationStep {
 
 	public function name(): string {
-		return 'Schema v0.20.0 (Beitragslaeufe und Beitragsregeln)';
+		return 'Schema v0.21.0 (Beitragslaeufe und Beitragsregeln)';
 	}
 
 	public function description(): string {

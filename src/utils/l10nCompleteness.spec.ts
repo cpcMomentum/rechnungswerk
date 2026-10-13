@@ -211,7 +211,7 @@ describe('Übersetzungen sind vollständig', () => {
 		// vergessener Eintrag, deshalb steht die Liste hier ausdruecklich.
 		const GLEICH = new Set([
 			'BIC', 'Bank', 'Branding', 'Format', 'IBAN', 'Name', 'Port', 'Status',
-			'Text', 'Tonne', 'kWh', 'kg', 'm²',
+			'Text', 'Tonne', 'WerkPlus', 'kWh', 'kg', 'm²',
 			// „Version {version}" lautet im Englischen wortgleich (#308).
 			'Version {version}',
 		])
