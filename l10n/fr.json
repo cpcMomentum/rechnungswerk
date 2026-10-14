@@ -561,7 +561,29 @@
 		"— keine Vorgabe —": "— aucune valeur par défaut —",
 		"„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.": "« Valable jusqu'au » fixe un délai d'acceptation clair (§ 148 BGB). « Sans engagement » (§ 145 BGB) indique que le devis n'est pas contraignant – une mention correspondante apparaît sur le PDF.",
 		"„{name}“ wirklich löschen?": "Voulez-vous vraiment supprimer « {name} » ?",
-		"•••••••• (gespeichert, leer lassen)": "•••••••• (enregistré, laisser vide)"
+		"•••••••• (gespeichert, leer lassen)": "•••••••• (enregistré, laisser vide)",
+		"Anfragen pro Minute": "Demandes par minute",
+		"Standard (60)": "Standard (60)",
+		"Standard: 60": "Standard : 60",
+		"API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.": "Les clés API nécessitent une licence WerkPlus active.",
+		"Schlüssel nicht gefunden.": "Clé introuvable.",
+		"Nicht angemeldet.": "Non authentifié.",
+		"Zugriff verweigert.": "Accès refusé.",
+		"Bitte einen Namen mit höchstens 64 Zeichen angeben.": "Veuillez saisir un nom de 64 caractères au maximum.",
+		"Bitte mindestens einen Rechtebereich auswählen.": "Veuillez sélectionner au moins une autorisation.",
+		"Ungültiger Mandant.": "Client invalide.",
+		"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Les demandes par minute doivent être comprises entre 1 et %d."
 	},
-	"pluralForm": "nplurals=2; plural=(n > 1);"
+	"pluralForm": "nplurals=2; plural=(n > 1);",
+	"Anfragen pro Minute": "Demandes par minute",
+	"Standard (60)": "Standard (60)",
+	"Standard: 60": "Standard : 60",
+	"API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.": "Les clés API nécessitent une licence WerkPlus active.",
+	"Schlüssel nicht gefunden.": "Clé introuvable.",
+	"Nicht angemeldet.": "Non authentifié.",
+	"Zugriff verweigert.": "Accès refusé.",
+	"Bitte einen Namen mit höchstens 64 Zeichen angeben.": "Veuillez saisir un nom de 64 caractères au maximum.",
+	"Bitte mindestens einen Rechtebereich auswählen.": "Veuillez sélectionner au moins une autorisation.",
+	"Ungültiger Mandant.": "Client invalide.",
+	"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Les demandes par minute doivent être comprises entre 1 et %d."
 }

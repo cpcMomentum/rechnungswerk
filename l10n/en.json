@@ -561,7 +561,29 @@
 		"— keine Vorgabe —": "— no default —",
 		"„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.": "“Valid until” sets a clear acceptance deadline (§ 148 BGB). “Non-binding” (§ 145 BGB) marks the quote as non-committal – a corresponding note appears on the PDF.",
 		"„{name}“ wirklich löschen?": "Really delete “{name}”?",
-		"•••••••• (gespeichert, leer lassen)": "•••••••• (stored, leave blank)"
+		"•••••••• (gespeichert, leer lassen)": "•••••••• (stored, leave blank)",
+		"Anfragen pro Minute": "Requests per minute",
+		"Standard (60)": "Standard (60)",
+		"Standard: 60": "Standard: 60",
+		"API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.": "API keys require an active WerkPlus license.",
+		"Schlüssel nicht gefunden.": "Key not found.",
+		"Nicht angemeldet.": "Not authenticated.",
+		"Zugriff verweigert.": "Access denied.",
+		"Bitte einen Namen mit höchstens 64 Zeichen angeben.": "Please enter a name with at most 64 characters.",
+		"Bitte mindestens einen Rechtebereich auswählen.": "Please select at least one permission.",
+		"Ungültiger Mandant.": "Invalid tenant.",
+		"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Requests per minute must be between 1 and %d."
 	},
-	"pluralForm": "nplurals=2; plural=(n != 1);"
+	"pluralForm": "nplurals=2; plural=(n != 1);",
+	"Anfragen pro Minute": "Requests per minute",
+	"Standard (60)": "Standard (60)",
+	"Standard: 60": "Standard: 60",
+	"API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.": "API keys require an active WerkPlus license.",
+	"Schlüssel nicht gefunden.": "Key not found.",
+	"Nicht angemeldet.": "Not authenticated.",
+	"Zugriff verweigert.": "Access denied.",
+	"Bitte einen Namen mit höchstens 64 Zeichen angeben.": "Please enter a name with at most 64 characters.",
+	"Bitte mindestens einen Rechtebereich auswählen.": "Please select at least one permission.",
+	"Ungültiger Mandant.": "Invalid tenant.",
+	"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Requests per minute must be between 1 and %d."
 }

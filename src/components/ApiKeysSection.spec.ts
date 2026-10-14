@@ -8,12 +8,12 @@ import { flushPromises, mount } from '@vue/test-utils'
 import type { ApiKey, CreatedApiKey } from '@/api/apiKeys'
 
 const getApiKeys = vi.fn<() => Promise<ApiKey[]>>()
-const createApiKey = vi.fn<(name: string, scopes: string[]) => Promise<CreatedApiKey>>()
+const createApiKey = vi.fn<(name: string, scopes: string[], rateLimit: number | null) => Promise<CreatedApiKey>>()
 const revokeApiKey = vi.fn<(id: number) => Promise<void>>()
 
 vi.mock('@/api/apiKeys', () => ({
 	getApiKeys: () => getApiKeys(),
-	createApiKey: (name: string, scopes: string[]) => createApiKey(name, scopes),
+	createApiKey: (name: string, scopes: string[], rateLimit: number | null) => createApiKey(name, scopes, rateLimit),
 	revokeApiKey: (id: number) => revokeApiKey(id),
 }))
 
@@ -60,6 +60,7 @@ const KEY: ApiKey = {
 	createdAt: 1760000000,
 	lastUsedAt: null,
 	revokedAt: null,
+	rateLimit: null,
 }
 
 describe('ApiKeysSection', () => {
@@ -114,7 +115,35 @@ describe('ApiKeysSection', () => {
 		await wrapper.findAll('.stub-button')[2].trigger('click')
 		await flushPromises()
 
-		expect(createApiKey).toHaveBeenCalledWith('WerkPlus', ['invoices:create'])
+		expect(createApiKey).toHaveBeenCalledWith('WerkPlus', ['invoices:create'], null)
 		expect(wrapper.text()).toContain('rwrk_newplaintext')
+	})
+
+	it('übergibt ein gesetztes Rate-Limit', async () => {
+		getApiKeys.mockResolvedValue([])
+		createApiKey.mockResolvedValue({ ...KEY, plaintext: 'rwrk_newplaintext' })
+		const wrapper = mount(ApiKeysSection)
+		await flushPromises()
+
+		await wrapper.find('.stub-button').trigger('click')
+		await wrapper.find('input[type="text"]').setValue('WerkPlus')
+		await wrapper.find('input[type="checkbox"]').setValue(true)
+		await wrapper.find('input[type="number"]').setValue('500')
+		await wrapper.findAll('.stub-button')[2].trigger('click')
+		await flushPromises()
+
+		expect(createApiKey).toHaveBeenCalledWith('WerkPlus', ['invoices:create'], 500)
+	})
+
+	it('zeigt ein eigenes Rate-Limit und den Standard an', async () => {
+		getApiKeys.mockResolvedValue([
+			{ ...KEY, id: 1, rateLimit: 500 },
+			{ ...KEY, id: 2 },
+		])
+		const wrapper = mount(ApiKeysSection)
+		await flushPromises()
+
+		expect(wrapper.find('table').text()).toContain('500')
+		expect(wrapper.find('table').text()).toContain('Standard (60)')
 	})
 })
