@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class AuthContextTest extends TestCase {
 
-	private const PLAINTEXT = 'rwrk_' . str_repeat('a', 43);
+	private const PLAINTEXT = 'rwrk_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
 	public function testSessionUserIsNotAMachine(): void {
 		$context = $this->context('alice', '', $this->apiKeyService());
@@ -99,7 +99,7 @@ class AuthContextTest extends TestCase {
 	private function context(?string $sessionUserId, string $authorizationHeader, ApiKeyService $service): AuthContext {
 		$request = $this->createMock(IRequest::class);
 		$request->method('getHeader')->willReturn($authorizationHeader);
-		return new AuthContext($sessionUserId, $request, $service);
+		return new AuthContext($request, $service, $sessionUserId);
 	}
 
 	private function key(): ApiKey {

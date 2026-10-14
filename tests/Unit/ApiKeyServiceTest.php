@@ -75,9 +75,18 @@ class ApiKeyServiceTest extends TestCase {
 		$this->service($this->mapper())->create('alice', '  ', ['invoices:read']);
 	}
 
-	public function testCreateRejectsUnknownScopes(): void {
-		$this->expectException(ValidationException::class);
-		$this->service($this->mapper())->create('alice', 'WerkPlus', ['invoices:read', 'sepa:write']);
+	public function testCreateDropsUnknownScopes(): void {
+		$stored = null;
+		$mapper = $this->mapper();
+		$mapper->method('insert')->willReturnCallback(function (ApiKey $k) use (&$stored) {
+			$stored = $k;
+			$k->setId(1);
+			return $k;
+		});
+
+		$this->service($mapper)->create('alice', 'WerkPlus', ['invoices:read', 'sepa:write']);
+
+		$this->assertSame(['invoices:read'], $stored->scopeList());
 	}
 
 	public function testCreateRejectsEmptyScopes(): void {
@@ -126,6 +135,7 @@ class ApiKeyServiceTest extends TestCase {
 		$plaintext = 'rwrk_' . str_repeat('a', 43);
 		$key = $this->keyFor($plaintext);
 		$key->setRlHits(41);
+		$key->setRlWindowStart(self::NOW - 10);
 
 		$mapper = $this->mapper();
 		$mapper->method('findByPrefix')->willReturn([$key]);
@@ -141,7 +151,7 @@ class ApiKeyServiceTest extends TestCase {
 		$this->assertSame($key, $result['key']);
 		$this->assertSame(42, $updated->getRlHits());
 		$this->assertSame(self::NOW, $updated->getLastUsedAt());
-		$this->assertSame(self::NOW, $updated->getRlWindowStart());
+		$this->assertSame(self::NOW - 10, $updated->getRlWindowStart());
 	}
 
 	public function testAuthenticateRejectsBeyondTheRateLimit(): void {
