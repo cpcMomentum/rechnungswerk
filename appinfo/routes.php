@@ -41,6 +41,11 @@ return [
 		['name' => 'quote#preview',   'url' => '/api/v1/quotes/{id}/preview',   'verb' => 'GET'],
 		['name' => 'quote#send',      'url' => '/api/v1/quotes/{id}/send',      'verb' => 'POST'],
 
+		// Umsatzbericht (Jahr/Quartal/Monat/Woche), Anzeige und Export
+		['name' => 'report#show', 'url' => '/api/v1/reports',     'verb' => 'GET'],
+		['name' => 'report#csv',  'url' => '/api/v1/reports/csv', 'verb' => 'GET'],
+		['name' => 'report#pdf',  'url' => '/api/v1/reports/pdf', 'verb' => 'GET'],
+
 		// Products
 		['name' => 'product#index',   'url' => '/api/v1/products',      'verb' => 'GET'],
 		['name' => 'product#show',    'url' => '/api/v1/products/{id}', 'verb' => 'GET'],

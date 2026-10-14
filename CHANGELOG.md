@@ -5,6 +5,19 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Added
+- **Berichte.** Neuer Menüpunkt „Berichte" mit einem Umsatzbericht für Jahr,
+  Quartal, Monat, Kalenderwoche oder einen frei gewählten Zeitraum — wahlweise
+  nach Rechnungsdatum (Soll-Versteuerung) oder nach Zahlungseingang
+  (Ist-Versteuerung, EÜR). Der Bericht zeigt Netto, Umsatzsteuer und Brutto,
+  aufgeteilt nach Steuersatz und Steuerfall (Kleinunternehmer, Reverse Charge,
+  innergemeinschaftliche Lieferung, Ausfuhr), bei längeren Zeiträumen zusätzlich
+  je Monat, darunter die einzelnen Belege. Export als CSV (für Excel und den
+  Steuerberater) und als PDF. Stornos zählen mit ihrem eigenen Datum und
+  negativem Betrag; Entwürfe und Angebote bleiben außen vor
+
 ## [0.6.0] - 2026-09-27
 
 ### Changed

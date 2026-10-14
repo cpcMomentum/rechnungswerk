@@ -12,6 +12,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - Automatische DATEV-Übergabe per Upload Mail beim Festschreiben
 - Kundenversand: PDF-Download und In-App-Versand (Empfänger aus Nextcloud-Kontakten)
 - Produktkatalog für wiederkehrende Leistungen
+- Umsatzbericht für Jahr, Quartal, Monat oder Woche — nach Rechnungsdatum oder Zahlungseingang, mit Export als CSV und PDF
 - Stammdaten/Einstellungen (Nummernformat, Firmendaten, Logo, Standardtexte, §19)
 
 ## Entwicklung

@@ -32,6 +32,9 @@
 				<NcAppNavigationItem :name="t('rechnungswerk', 'Textbausteine')" :to="{ name: 'text-snippets' }">
 					<template #icon><TextBoxIcon :size="20" /></template>
 				</NcAppNavigationItem>
+				<NcAppNavigationItem :name="t('rechnungswerk', 'Berichte')" :to="{ name: 'reports' }">
+					<template #icon><ChartBarIcon :size="20" /></template>
+				</NcAppNavigationItem>
 				<template #footer>
 					<NcAppNavigationItem :name="t('rechnungswerk', 'Mein Kontakt')" :to="{ name: 'my-contact' }">
 						<template #icon><AccountIcon :size="20" /></template>
@@ -66,6 +69,7 @@ import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
 import AccountIcon from 'vue-material-design-icons/Account.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
+import ChartBarIcon from 'vue-material-design-icons/ChartBar.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import WhatsNewDialog from '@/components/WhatsNewDialog.vue'

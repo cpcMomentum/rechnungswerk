@@ -578,7 +578,15 @@ class ZugferdService {
 	 * @param InvoiceItem[] $items
 	 */
 	private function renderVisiblePdf(Invoice $invoice, array $items, Settings $settings, ?string $relatedNumber = null, ?\DateTimeInterface $relatedIssueDate = null, bool $preview = false): string {
-		$html = $this->renderHtml($invoice, $items, $settings, $relatedNumber, $relatedIssueDate, $preview);
+		return $this->renderHtmlToPdf($this->renderHtml($invoice, $items, $settings, $relatedNumber, $relatedIssueDate, $preview));
+	}
+
+	/**
+	 * Fertiges HTML ueber dompdf zu einer PDF machen. Eigene Methode, damit der
+	 * Umsatzbericht dieselbe Einstellung (Schrift, Font-Cache ausserhalb von
+	 * vendor/, keine Fremdzugriffe) nutzt wie die Belege.
+	 */
+	public function renderHtmlToPdf(string $html): string {
 		$options = new Options();
 		$options->set('defaultFont', 'DejaVu Sans');
 		$options->set('isRemoteEnabled', false);

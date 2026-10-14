@@ -322,3 +322,53 @@ export interface WhatsNewPayload {
 	version: string
 	entries: WhatsNewEntry[]
 }
+
+// --- Umsatzbericht -------------------------------------------------------
+
+/** Nach Rechnungsdatum (Soll) oder nach Zahlungseingang (Ist / EÜR). */
+export type ReportBasis = 'issue' | 'payment'
+
+export interface ReportRow {
+	id: number
+	number: string | null
+	invoiceType: InvoiceType
+	status: InvoiceStatus
+	recipientName: string | null
+	/** Das Datum, nach dem der Beleg in den Zeitraum fällt (Y-m-d). */
+	date: string
+	issueDate: string | null
+	paidAt: string | null
+	taxCategory: string
+	/** Steuerfreier Fall im Klartext, leer bei Regelbesteuerung. */
+	taxLabel: string
+	netCents: number
+	taxCents: number
+	grossCents: number
+}
+
+export interface ReportSums {
+	count: number
+	netCents: number
+	taxCents: number
+	grossCents: number
+}
+
+export interface ReportTaxGroup {
+	category: string
+	rateBp: number | null
+	label: string
+	netCents: number
+	taxCents: number
+}
+
+/** Antwort von `GET /reports`. */
+export interface Report {
+	from: string
+	to: string
+	basis: ReportBasis
+	rows: ReportRow[]
+	totals: ReportSums
+	taxGroups: ReportTaxGroup[]
+	/** Zwischensummen je Kalendermonat ("2026-03"), aufsteigend. */
+	months: (ReportSums & { month: string })[]
+}
