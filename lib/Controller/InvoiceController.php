@@ -295,7 +295,7 @@ class InvoiceController extends Controller {
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
 		}
 		if ($this->authContext->isMachine()) {
-			if ($scope !== null && $this->authContext->hasScope($scope)) {
+			if ($scope !== null && $this->authContext->hasScope($scope) && $this->permissionService->canEdit($userId)) {
 				return null;
 			}
 			return new DataResponse(['error' => 'Forbidden', 'code' => 'SCOPE_MISSING'], Http::STATUS_FORBIDDEN);
