@@ -561,7 +561,18 @@
 		"— keine Vorgabe —": "— keine Vorgabe —",
 		"„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.": "„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.",
 		"„{name}“ wirklich löschen?": "„{name}“ wirklich löschen?",
-		"•••••••• (gespeichert, leer lassen)": "•••••••• (gespeichert, leer lassen)"
+		"•••••••• (gespeichert, leer lassen)": "•••••••• (gespeichert, leer lassen)",
+		"Anfragen pro Minute": "Anfragen pro Minute",
+		"Standard (60)": "Standard (60)",
+		"Standard: 60": "Standard: 60",
+		"API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.": "API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.",
+		"Schlüssel nicht gefunden.": "Schlüssel nicht gefunden.",
+		"Nicht angemeldet.": "Nicht angemeldet.",
+		"Zugriff verweigert.": "Zugriff verweigert.",
+		"Bitte einen Namen mit höchstens 64 Zeichen angeben.": "Bitte einen Namen mit höchstens 64 Zeichen angeben.",
+		"Bitte mindestens einen Rechtebereich auswählen.": "Bitte mindestens einen Rechtebereich auswählen.",
+		"Ungültiger Mandant.": "Ungültiger Mandant.",
+		"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Anfragen pro Minute muss zwischen 1 und %d liegen."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

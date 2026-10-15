@@ -23,6 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 					<th>{{ t('rechnungswerk', 'Name') }}</th>
 					<th>{{ t('rechnungswerk', 'Schlüssel') }}</th>
 					<th>{{ t('rechnungswerk', 'Rechte') }}</th>
+					<th>{{ t('rechnungswerk', 'Anfragen pro Minute') }}</th>
 					<th>{{ t('rechnungswerk', 'Zuletzt verwendet') }}</th>
 					<th><span class="rw-api-keys__actions-head">{{ t('rechnungswerk', 'Aktionen') }}</span></th>
 				</tr>
@@ -34,6 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 					<td>
 						<span class="rw-api-keys__scopes">{{ scopeLabels(key.scopes).join(', ') }}</span>
 					</td>
+					<td>{{ key.rateLimit ?? t('rechnungswerk', 'Standard (60)') }}</td>
 					<td>
 						<template v-if="key.revokedAt !== null">{{ t('rechnungswerk', 'Widerrufen') }}</template>
 						<template v-else-if="key.lastUsedAt">{{ formatDate(key.lastUsedAt) }}</template>
@@ -72,6 +74,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 					</label>
 				</div>
 
+				<label class="field">
+					<span>{{ t('rechnungswerk', 'Anfragen pro Minute') }}</span>
+					<input v-model="newRateLimit" class="input" type="number" min="1" :max="RATE_LIMIT_MAX"
+						:placeholder="t('rechnungswerk', 'Standard: 60')" />
+				</label>
+
 				<NcNoteCard v-if="actionError" type="error" :text="actionError" />
 
 				<div class="rw-api-keys__actions">
@@ -103,6 +111,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { createApiKey, getApiKeys, revokeApiKey, type ApiKey } from '@/api/apiKeys'
 
 const SCOPES = ['invoices:create', 'invoices:commit', 'invoices:send', 'invoices:pay', 'invoices:cancel', 'invoices:read', 'invoices:pdf'] as const
+const RATE_LIMIT_MAX = 10000
 
 const SCOPE_LABELS: Record<string, string> = {
 	'invoices:create': t('rechnungswerk', 'Rechnungen anlegen'),
@@ -118,6 +127,7 @@ const keys = ref<ApiKey[]>([])
 const openCreate = ref(false)
 const newName = ref('')
 const newScopes = ref<string[]>([])
+const newRateLimit = ref('')
 const busy = ref(false)
 const loadError = ref('')
 const actionError = ref('')
@@ -153,12 +163,14 @@ async function onCreate(): Promise<void> {
 	busy.value = true
 	actionError.value = ''
 	try {
-		const created = await createApiKey(newName.value.trim(), [...newScopes.value])
+		const rateLimit = newRateLimit.value === '' ? null : Number(newRateLimit.value)
+		const created = await createApiKey(newName.value.trim(), [...newScopes.value], rateLimit)
 		createdKey.value = created.plaintext
 		copied.value = false
 		openCreate.value = false
 		newName.value = ''
 		newScopes.value = []
+		newRateLimit.value = ''
 		await load()
 	} catch (e) {
 		actionError.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Anlegen fehlgeschlagen.')

@@ -207,12 +207,12 @@ describe('Übersetzungen sind vollständig', () => {
 	})
 
 	it('übersetzt englisch, wo es einen Unterschied gibt', () => {
-		// Woerter, die in beiden Sprachen gleich sind. Alles andere waere ein
-		// vergessener Eintrag, deshalb steht die Liste hier ausdruecklich.
+		// Woerter, die in beiden Sprachen gleich sind; alles andere ist ein vergessener Eintrag.
 		const GLEICH = new Set([
 			'BIC', 'Bank', 'Branding', 'Format', 'IBAN', 'Name', 'Port', 'Status',
 			'Text', 'Tonne', 'WerkPlus', 'kWh', 'kg', 'm²',
-			// „Version {version}" lautet im Englischen wortgleich (#308).
+			'Standard (60)', 'Standard: 60',
+			// „Version {version}" lautet im Englischen wortgleich.
 			'Version {version}',
 		])
 		for (const name of ['en.json', 'en.js']) {

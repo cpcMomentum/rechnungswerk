@@ -13,6 +13,7 @@ use OCA\Rechnungswerk\Db\ApiKey;
 use OCA\Rechnungswerk\Db\ApiKeyMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\IL10N;
 
 /** Der Klartext exists only in create()'s return value; the database stores only the SHA-256 hash. */
 class ApiKeyService {
@@ -22,7 +23,8 @@ class ApiKeyService {
 		'invoices:cancel', 'invoices:read', 'invoices:pdf',
 	];
 
-	public const RATE_LIMIT = 60;
+	public const RATE_LIMIT_DEFAULT = 60;
+	public const RATE_LIMIT_MAX = 10000;
 	public const RATE_WINDOW = 60;
 
 	public const ERR_API_KEY_INVALID = 'API_KEY_INVALID';
@@ -35,21 +37,27 @@ class ApiKeyService {
 		private readonly EntitlementService $entitlementService,
 		private readonly PermissionService $permissionService,
 		private readonly ITimeFactory $timeFactory,
+		private readonly IL10N $l10n,
 	) {
 	}
 
 	/** @param string[] $scopes @return array{key: ApiKey, plaintext: string} @throws ValidationException */
-	public function create(string $ownerId, string $name, array $scopes): array {
+	public function create(string $ownerId, string $name, array $scopes, ?int $rateLimit = null): array {
 		$name = trim($name);
 		if ($name === '' || mb_strlen($name) > 64) {
-			throw new ValidationException('Bitte einen Namen mit höchstens 64 Zeichen angeben.');
+			throw new ValidationException($this->l10n->t('Bitte einen Namen mit höchstens 64 Zeichen angeben.'));
 		}
 		$scopes = array_values(array_unique(array_values(array_intersect($scopes, self::SCOPES))));
 		if ($scopes === []) {
-			throw new ValidationException('Bitte mindestens einen Rechtebereich auswählen.');
+			throw new ValidationException($this->l10n->t('Bitte mindestens einen Rechtebereich auswählen.'));
 		}
 		if ($ownerId === '') {
-			throw new ValidationException('Ungültiger Mandant.');
+			throw new ValidationException($this->l10n->t('Ungültiger Mandant.'));
+		}
+		if ($rateLimit === null) {
+			$rateLimit = self::RATE_LIMIT_DEFAULT;
+		} elseif ($rateLimit < 1 || $rateLimit > self::RATE_LIMIT_MAX) {
+			throw new ValidationException($this->l10n->t('Anfragen pro Minute muss zwischen 1 und %d liegen.', [self::RATE_LIMIT_MAX]));
 		}
 
 		$plaintext = 'rwrk_' . rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
@@ -62,6 +70,7 @@ class ApiKeyService {
 		$key->setKeyHash(hash('sha256', $plaintext));
 		$key->setScopes(json_encode($scopes));
 		$key->setCreatedAt($now);
+		$key->setRateLimit($rateLimit);
 		$key->setRlHits(0);
 		$this->mapper->insert($key);
 
@@ -93,11 +102,12 @@ class ApiKeyService {
 		}
 
 		$now = $this->timeFactory->getTime();
+		$rateLimit = $key->getRateLimit() ?? self::RATE_LIMIT_DEFAULT;
 		if ($key->getRlWindowStart() === null || $key->getRlWindowStart() <= $now - self::RATE_WINDOW) {
 			$key->setRlWindowStart($now);
 			$key->setRlHits(0);
 		}
-		if ($key->getRlHits() >= self::RATE_LIMIT) {
+		if ($key->getRlHits() >= $rateLimit) {
 			$retryAfter = $key->getRlWindowStart() + self::RATE_WINDOW - $now;
 			$this->mapper->update($key);
 			return ['key' => null, 'error' => self::ERR_RATE_LIMITED, 'retryAfter' => max(1, $retryAfter)];
