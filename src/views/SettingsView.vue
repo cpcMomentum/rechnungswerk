@@ -1,5 +1,5 @@
 <template>
-	<div class="rw-view">
+	<div class="rw-view rw-view--narrow">
 		<h2 class="rw-settings-title">{{ t('rechnungswerk', 'Einstellungen') }}</h2>
 
 		<div ref="errorAnchor">

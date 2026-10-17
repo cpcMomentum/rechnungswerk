@@ -49,7 +49,7 @@
 								<span class="rw-qstatus-text">{{ quoteStatusLabel(q.quoteStatus) }}</span>
 							</span>
 						</td>
-						<td>{{ q.number ?? t('rechnungswerk', '(Entwurf)') }}</td>
+						<td class="rw-nowrap">{{ q.number ?? t('rechnungswerk', '(Entwurf)') }}</td>
 						<td>{{ q.recipientName ?? '—' }}</td>
 						<td>{{ formatDate(q.issueDate ?? q.createdAt) }}</td>
 						<td>
