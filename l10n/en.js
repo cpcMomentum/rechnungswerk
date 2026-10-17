@@ -89,7 +89,6 @@ OC.L10N.register(
     "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern." : "With a yearly number circle the format must contain a year component ({YYYY} or {YY}), otherwise duplicate invoice numbers arise.",
     "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen." : "A yearly number range requires a year component ({YYYY} or {YY}) in the format. Otherwise choose “Continuous”.",
     "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus." : "With “Reset yearly” the format must contain a year component ({YYYY} or {YY}), otherwise invoice numbers repeat. “Continuous” works without a year.",
-    "Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet." : "When finalising, an e-invoice is automatically sent to DATEV ({mail}).",
     "Belege" : "Documents",
     "Benutzer" : "User",
     "Berechtigte Nutzer" : "Authorised users",
@@ -125,7 +124,6 @@ OC.L10N.register(
     "DATEV: bestätigt" : "DATEV: confirmed",
     "DATEV: gesendet" : "DATEV: sent",
     "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?" : "Future invoices will be issued without VAT (§19 UStG). Existing committed invoices remain unchanged. Continue?",
-    "Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?" : "The quote receives a final quote number and cannot be changed afterwards. Continue?",
     "Das Angebot wird als PDF angehängt." : "The quote is attached as a PDF.",
     "Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten." : "The quote number format must contain a counter placeholder such as {####}.",
     "Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten." : "The file name scheme must not contain path separators (/ or \\).",
@@ -163,7 +161,6 @@ OC.L10N.register(
     "Die Lizenz ist abgelaufen und konnte noch nicht erneuert werden. Die Funktionen bleiben bis {date} erhalten." : "The licence has expired and could not be renewed yet. The features remain available until {date}.",
     "Die Lizenz ist abgelaufen. RechnungsWerk arbeitet im freien Umfang weiter." : "The licence has expired. RechnungsWerk continues with the free feature set.",
     "Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter." : "The licence is checked on this server. If WerkPlus is unreachable, RechnungsWerk keeps working normally.",
-    "Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?" : "The invoice receives a final number and becomes immutable afterwards. Corrections only via cancellation. Continue?",
     "Die Telefonnummer darf höchstens 64 Zeichen lang sein." : "The phone number must not exceed 64 characters.",
     "Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden." : "The preview is only available for quote drafts. Committed quotes can be downloaded as a PDF.",
     "Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden." : "The preview is only available for drafts. Committed invoices can be downloaded as a PDF.",
@@ -573,6 +570,9 @@ OC.L10N.register(
     "Bitte einen Namen mit höchstens 64 Zeichen angeben." : "Please enter a name with at most 64 characters.",
     "Bitte mindestens einen Rechtebereich auswählen." : "Please select at least one permission.",
     "Ungültiger Mandant." : "Invalid tenant.",
-    "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Requests per minute must be between 1 and %d."
+    "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Requests per minute must be between 1 and %d.",
+    "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar." : "The quote receives its final number and cannot be changed afterwards.",
+    "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden." : "The invoice receives its final number and can only be cancelled afterwards.",
+    "Sie wird automatisch an DATEV übergeben." : "It will be sent to DATEV automatically."
 },
 "nplurals=2; plural=(n != 1);");

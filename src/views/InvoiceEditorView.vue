@@ -46,7 +46,8 @@
 			<p class="rw-hint">{{ isQuote
 				? t('rechnungswerk', 'Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.')
 				: t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
-			<details class="more">
+			<!-- Open on load when any field has a value (#365); toggling stays manual. -->
+			<details class="more" :open="moreOpen" @toggle="moreOpen = ($event.target as HTMLDetailsElement).open">
 				<summary>{{ isQuote
 					? t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)')
 					: t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)') }}</summary>
@@ -447,6 +448,9 @@ const sendDialogOpen = ref(false)
 const previewOpen = ref(false)
 const previewUrl = ref('')
 const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | null>(null)
+// "Weitere Felder" block: set once per load, not derived from the fields, so
+// typing into (or clearing) a field never collapses it under the cursor.
+const moreOpen = ref(false)
 
 const emptyForm = () => ({
 	customerId: null as number | null,
@@ -521,14 +525,13 @@ const typeTooltip = computed(() => {
 
 const finalizeMessage = computed(() => {
 	if (isQuote.value) {
-		return t('rechnungswerk', 'Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?')
+		return t('rechnungswerk', 'Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.')
 	}
-	let msg = t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')
+	const msg = t('rechnungswerk', 'Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden.')
 	const s = settingsStore.settings
-	if (s?.datevAutoSend && s.datevUploadMail) {
-		msg += '\n\n' + t('rechnungswerk', 'Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet.', { mail: s.datevUploadMail })
-	}
-	return msg
+	return s?.datevAutoSend && s.datevUploadMail
+		? msg + ' ' + t('rechnungswerk', 'Sie wird automatisch an DATEV übergeben.')
+		: msg
 })
 
 const defaultMailBody = computed(() => {
@@ -625,6 +628,7 @@ function resetEditor() {
 	previewOpen.value = false
 	previewUrl.value = ''
 	dialog.value = null
+	moreOpen.value = false
 	Object.assign(form, emptyForm())
 }
 
@@ -690,6 +694,9 @@ async function load(id: number, token: number = navToken) {
 	form.buyerReference = detail.buyerReference ?? ''
 	form.contractNumber = detail.contractNumber ?? ''
 	form.projectReference = detail.projectReference ?? ''
+	// Leitweg-ID is invoice-only; a quote never shows that field.
+	moreOpen.value = [form.referenceNumber, form.orderNumber, isQuote.value ? '' : form.buyerReference,
+		form.contractNumber, form.projectReference].some(v => v.trim() !== '')
 	notes.value = [...(detail.notes ?? [])]
 	form.specialTaxCase = detail.specialTaxCase ?? ''
 	form.greeting = detail.greeting ?? ''
