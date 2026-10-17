@@ -1,5 +1,5 @@
 <template>
-	<div class="rw-view">
+	<div class="rw-view rw-view--narrow">
 		<div class="rw-editor-head">
 			<NcBreadcrumbs>
 				<NcBreadcrumb :name="isQuote ? t('rechnungswerk', 'Angebote') : t('rechnungswerk', 'Rechnungen')" :to="{ name: listRoute }" />
