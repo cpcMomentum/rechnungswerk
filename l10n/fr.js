@@ -89,7 +89,6 @@ OC.L10N.register(
     "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern." : "Pour une numérotation annuelle, le format doit contenir une composante d'année ({YYYY} ou {YY}), sinon des numéros de facture en double apparaîtront.",
     "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen." : "Pour une numérotation annuelle, le format doit contenir une composante d'année ({YYYY} ou {YY}). Vous pouvez sinon choisir « Continu ».",
     "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus." : "Avec « Réinitialiser chaque année », le format doit contenir une composante d'année ({YYYY} ou {YY}), sinon des numéros de facture en double apparaîtront. « Continu » fonctionne sans année.",
-    "Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet." : "Lors de la validation définitive, une facture électronique est automatiquement envoyée à DATEV ({mail}).",
     "Belege" : "Documents",
     "Benutzer" : "Utilisateur",
     "Berechtigte Nutzer" : "Utilisateurs autorisés",
@@ -125,7 +124,6 @@ OC.L10N.register(
     "DATEV: bestätigt" : "DATEV : confirmée",
     "DATEV: gesendet" : "DATEV : envoyée",
     "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?" : "Les futures factures seront émises sans TVA (§19 UStG). Les factures déjà validées définitivement restent inchangées. Continuer ?",
-    "Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?" : "Le devis reçoit un numéro définitif et devient ensuite immuable. Continuer ?",
     "Das Angebot wird als PDF angehängt." : "Le devis est joint au format PDF.",
     "Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten." : "Le format de numérotation des devis doit contenir un espace réservé de compteur tel que {####}.",
     "Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten." : "Le schéma de nom de fichier ne doit pas contenir de séparateurs de chemin (/ ou \\).",
@@ -163,7 +161,6 @@ OC.L10N.register(
     "Die Lizenz ist abgelaufen und konnte noch nicht erneuert werden. Die Funktionen bleiben bis {date} erhalten." : "La licence a expiré et n’a pas encore pu être renouvelée. Les fonctions restent disponibles jusqu’au {date}.",
     "Die Lizenz ist abgelaufen. RechnungsWerk arbeitet im freien Umfang weiter." : "La licence a expiré. RechnungsWerk continue avec les fonctions gratuites.",
     "Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter." : "La licence est vérifiée sur ce serveur. Si WerkPlus est injoignable, RechnungsWerk continue de fonctionner normalement.",
-    "Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?" : "La facture reçoit un numéro définitif et devient ensuite immuable. Toute correction ne pourra se faire que par avoir. Continuer ?",
     "Die Telefonnummer darf höchstens 64 Zeichen lang sein." : "Le numéro de téléphone ne doit pas dépasser 64 caractères.",
     "Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden." : "L'aperçu n'est disponible que pour les brouillons de devis. Les devis validés définitivement peuvent être téléchargés au format PDF.",
     "Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden." : "L'aperçu n'est disponible que pour les brouillons. Les factures validées définitivement peuvent être téléchargées au format PDF.",
@@ -573,6 +570,9 @@ OC.L10N.register(
     "Bitte einen Namen mit höchstens 64 Zeichen angeben." : "Veuillez saisir un nom de 64 caractères au maximum.",
     "Bitte mindestens einen Rechtebereich auswählen." : "Veuillez sélectionner au moins une autorisation.",
     "Ungültiger Mandant." : "Client invalide.",
-    "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Les demandes par minute doivent être comprises entre 1 et %d."
+    "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Les demandes par minute doivent être comprises entre 1 et %d.",
+    "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar." : "Le devis reçoit son numéro définitif et ne peut plus être modifié ensuite.",
+    "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden." : "La facture reçoit son numéro définitif et ne peut ensuite qu'être annulée.",
+    "Sie wird automatisch an DATEV übergeben." : "Elle sera transmise automatiquement à DATEV."
 },
 "nplurals=2; plural=(n > 1);");

@@ -89,7 +89,6 @@ OC.L10N.register(
     "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern." : "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern.",
     "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen." : "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen.",
     "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus." : "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.",
-    "Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet." : "Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet.",
     "Belege" : "Belege",
     "Benutzer" : "Benutzer",
     "Berechtigte Nutzer" : "Berechtigte Nutzer",
@@ -125,7 +124,6 @@ OC.L10N.register(
     "DATEV: bestätigt" : "DATEV: bestätigt",
     "DATEV: gesendet" : "DATEV: gesendet",
     "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?" : "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?",
-    "Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?" : "Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?",
     "Das Angebot wird als PDF angehängt." : "Das Angebot wird als PDF angehängt.",
     "Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten." : "Das Angebots-Nummernformat muss einen Zählerplatzhalter wie {####} enthalten.",
     "Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten." : "Das Dateinamen-Schema darf keine Pfadtrenner (/ oder \\) enthalten.",
@@ -163,7 +161,6 @@ OC.L10N.register(
     "Die Lizenz ist abgelaufen und konnte noch nicht erneuert werden. Die Funktionen bleiben bis {date} erhalten." : "Die Lizenz ist abgelaufen und konnte noch nicht erneuert werden. Die Funktionen bleiben bis {date} erhalten.",
     "Die Lizenz ist abgelaufen. RechnungsWerk arbeitet im freien Umfang weiter." : "Die Lizenz ist abgelaufen. RechnungsWerk arbeitet im freien Umfang weiter.",
     "Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter." : "Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter.",
-    "Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?" : "Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?",
     "Die Telefonnummer darf höchstens 64 Zeichen lang sein." : "Die Telefonnummer darf höchstens 64 Zeichen lang sein.",
     "Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden." : "Die Vorschau ist nur für Angebots-Entwürfe verfügbar. Festgeschriebene Angebote können als PDF heruntergeladen werden.",
     "Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden." : "Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.",
@@ -573,6 +570,9 @@ OC.L10N.register(
     "Bitte einen Namen mit höchstens 64 Zeichen angeben." : "Bitte einen Namen mit höchstens 64 Zeichen angeben.",
     "Bitte mindestens einen Rechtebereich auswählen." : "Bitte mindestens einen Rechtebereich auswählen.",
     "Ungültiger Mandant." : "Ungültiger Mandant.",
-    "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Anfragen pro Minute muss zwischen 1 und %d liegen."
+    "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Anfragen pro Minute muss zwischen 1 und %d liegen.",
+    "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar." : "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.",
+    "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden." : "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden.",
+    "Sie wird automatisch an DATEV übergeben." : "Sie wird automatisch an DATEV übergeben."
 },
 "nplurals=2; plural=(n != 1);");
