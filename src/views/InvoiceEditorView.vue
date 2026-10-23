@@ -332,6 +332,12 @@
 			:message="t('rechnungswerk', 'Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?')"
 			:confirmLabel="t('rechnungswerk', 'Revision erstellen')"
 			@close="dialog = null" @confirm="doRevise" />
+		<ConfirmDialog :open="dialog === 'leave'"
+			:name="t('rechnungswerk', 'Ungespeicherte Änderungen')"
+			:message="t('rechnungswerk', 'Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren.')"
+			:cancelLabel="t('rechnungswerk', 'Weiter bearbeiten')"
+			:confirmLabel="t('rechnungswerk', 'Verwerfen')" destructive
+			@close="answerLeave(false)" @confirm="answerLeave(true)" />
 
 		<SendInvoiceDialog
 			:open="sendDialogOpen"
@@ -355,8 +361,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -447,10 +453,12 @@ const sending = ref(false)
 const sendDialogOpen = ref(false)
 const previewOpen = ref(false)
 const previewUrl = ref('')
-const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | null>(null)
+const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | 'leave' | null>(null)
 // "Weitere Felder" block: set once per load, not derived from the fields, so
 // typing into (or clearing) a field never collapses it under the cursor.
 const moreOpen = ref(false)
+// Form as last loaded or saved; null while loading, so there is nothing to lose.
+let savedState: string | null = null
 
 const emptyForm = () => ({
 	customerId: null as number | null,
@@ -630,6 +638,7 @@ function resetEditor() {
 	dialog.value = null
 	moreOpen.value = false
 	Object.assign(form, emptyForm())
+	savedState = null
 }
 
 /** Defaults for a new invoice: text templates + seller-contact cascade. */
@@ -661,6 +670,8 @@ async function initNew(token: number = navToken) {
 	form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
 	form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
 	form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
+	// Defaults are not changes: an untouched new document can be left silently.
+	markSaved()
 }
 
 async function load(id: number, token: number = navToken) {
@@ -706,6 +717,7 @@ async function load(id: number, token: number = navToken) {
 	form.validUntil = detail.validUntil ?? ''
 	form.offerFreeform = detail.offerFreeform ?? false
 	items.value = detail.items.length > 0 ? detail.items.map(itemFromInvoiceItem) : [emptyItem()]
+	markSaved()
 }
 
 function addNote() {
@@ -799,18 +811,64 @@ function buildInput(): InvoiceInput {
 	return input
 }
 
+let leaveTarget: string | null = null
+
+function markSaved(state: string = JSON.stringify(buildInput())) {
+	savedState = state
+}
+
+function hasUnsavedChanges(): boolean {
+	return !readonly.value && savedState !== null && JSON.stringify(buildInput()) !== savedState
+}
+
+// Cancel at once and navigate again on discard: a guard left pending desyncs the URL on repeated back.
+function confirmLeave(to: RouteLocationNormalized): boolean {
+	if (!hasUnsavedChanges()) {
+		return true
+	}
+	leaveTarget = to.fullPath
+	dialog.value = 'leave'
+	return false
+}
+
+function answerLeave(leave: boolean) {
+	dialog.value = null
+	const target = leaveTarget
+	leaveTarget = null
+	if (leave && target !== null) {
+		savedState = null
+		router.push(target)
+	}
+}
+
+// Update covers switching documents within the same route record.
+onBeforeRouteLeave(confirmLeave)
+onBeforeRouteUpdate(confirmLeave)
+
+// Reload and closing the tab only allow the browser's own prompt.
+function onBeforeUnload(event: BeforeUnloadEvent) {
+	if (hasUnsavedChanges()) {
+		event.preventDefault()
+	}
+}
+onMounted(() => window.addEventListener('beforeunload', onBeforeUnload))
+onUnmounted(() => window.removeEventListener('beforeunload', onBeforeUnload))
+
 async function save(): Promise<InvoiceDetail | null> {
 	error.value = ''
 	saving.value = true
 	try {
-		let detail: InvoiceDetail
-		if (invoice.value) {
-			detail = await docStore.value.update(invoice.value.id, buildInput())
-		} else {
-			detail = await docStore.value.create(buildInput())
+		const input = buildInput()
+		const created = !invoice.value
+		const detail: InvoiceDetail = invoice.value
+			? await docStore.value.update(invoice.value.id, input)
+			: await docStore.value.create(input)
+		invoice.value = detail
+		// Before the replace below, so switching to the detail route does not ask.
+		markSaved(JSON.stringify(input))
+		if (created) {
 			router.replace({ name: detailRoute.value, params: { id: String(detail.id) } })
 		}
-		invoice.value = detail
 		return detail
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Speichern fehlgeschlagen'))
@@ -1009,6 +1067,8 @@ async function doDelete() {
 	saving.value = true
 	try {
 		await docStore.value.remove(invoice.value.id)
+		// The deletion was confirmed already; nothing is left to lose.
+		savedState = null
 		backToList()
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Löschen fehlgeschlagen'))
