@@ -572,7 +572,11 @@
 		"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Requests per minute must be between 1 and %d.",
 		"Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.": "The quote receives its final number and cannot be changed afterwards.",
 		"Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden.": "The invoice receives its final number and can only be cancelled afterwards.",
-		"Sie wird automatisch an DATEV übergeben.": "It will be sent to DATEV automatically."
+		"Sie wird automatisch an DATEV übergeben.": "It will be sent to DATEV automatically.",
+		"Ungespeicherte Änderungen": "Unsaved changes",
+		"Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren.": "Your changes have not been saved yet. If you leave this page, they will be lost.",
+		"Weiter bearbeiten": "Keep editing",
+		"Verwerfen": "Discard"
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

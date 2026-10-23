@@ -573,6 +573,10 @@ OC.L10N.register(
     "Anfragen pro Minute muss zwischen 1 und %d liegen." : "Anfragen pro Minute muss zwischen 1 und %d liegen.",
     "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar." : "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.",
     "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden." : "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden.",
-    "Sie wird automatisch an DATEV übergeben." : "Sie wird automatisch an DATEV übergeben."
+    "Sie wird automatisch an DATEV übergeben." : "Sie wird automatisch an DATEV übergeben.",
+    "Ungespeicherte Änderungen" : "Ungespeicherte Änderungen",
+    "Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren." : "Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren.",
+    "Weiter bearbeiten" : "Weiter bearbeiten",
+    "Verwerfen" : "Verwerfen"
 },
 "nplurals=2; plural=(n != 1);");

@@ -572,7 +572,11 @@
 		"Anfragen pro Minute muss zwischen 1 und %d liegen.": "Les demandes par minute doivent être comprises entre 1 et %d.",
 		"Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.": "Le devis reçoit son numéro définitif et ne peut plus être modifié ensuite.",
 		"Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden.": "La facture reçoit son numéro définitif et ne peut ensuite qu'être annulée.",
-		"Sie wird automatisch an DATEV übergeben.": "Elle sera transmise automatiquement à DATEV."
+		"Sie wird automatisch an DATEV übergeben.": "Elle sera transmise automatiquement à DATEV.",
+		"Ungespeicherte Änderungen": "Modifications non enregistrées",
+		"Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren.": "Vos modifications ne sont pas encore enregistrées. Si vous quittez la page, elles seront perdues.",
+		"Weiter bearbeiten": "Continuer l'édition",
+		"Verwerfen": "Abandonner"
 	},
 	"pluralForm": "nplurals=2; plural=(n > 1);"
 }
