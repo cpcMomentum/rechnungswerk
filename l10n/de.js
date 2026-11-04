@@ -577,6 +577,9 @@ OC.L10N.register(
     "Ungespeicherte Änderungen" : "Ungespeicherte Änderungen",
     "Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren." : "Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren.",
     "Weiter bearbeiten" : "Weiter bearbeiten",
-    "Verwerfen" : "Verwerfen"
+    "Verwerfen" : "Verwerfen",
+    "Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich." : "Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich.",
+    "Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren)." : "Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).",
+    "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich." : "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich."
 },
 "nplurals=2; plural=(n != 1);");

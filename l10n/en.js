@@ -577,6 +577,9 @@ OC.L10N.register(
     "Ungespeicherte Änderungen" : "Unsaved changes",
     "Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren." : "Your changes have not been saved yet. If you leave this page, they will be lost.",
     "Weiter bearbeiten" : "Keep editing",
-    "Verwerfen" : "Discard"
+    "Verwerfen" : "Discard",
+    "Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich." : "An intra-community supply requires a date of supply or a service period.",
+    "Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren)." : "An intra-community supply requires your own VAT ID. You can set it under Settings (administrators only).",
+    "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich." : "An intra-community supply requires the customer's VAT ID."
 },
 "nplurals=2; plural=(n != 1);");

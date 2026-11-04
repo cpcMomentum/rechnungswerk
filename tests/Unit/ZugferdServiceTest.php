@@ -256,6 +256,32 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringNotContainsString('<ram:CategoryCode>S</ram:CategoryCode>', $xml);
 	}
 
+	public function testIntraCommunityCarriesTheBuyerAddressAsDeliverTo(): void {
+		$invoice = $this->invoice();
+		$invoice->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$invoice->setRecipientCountry('AT');
+		$invoice->setRecipientVatId('ATU12345678');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(20000);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 0]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		$this->assertMatchesRegularExpression('#<ram:ShipToTradeParty>.*<ram:CountryID>AT</ram:CountryID>.*</ram:ShipToTradeParty>#s', $xml);
+	}
+
+	public function testDomesticInvoiceHasNoDeliverToParty(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+
+		$xml = $this->service->buildXml($invoice, [$this->item(1000000, 1900, 20000)], $this->settings());
+
+		$this->assertStringNotContainsString('ShipToTradeParty', $xml);
+	}
+
 	public function testReferencesAndPerformanceDateInXml(): void {
 		$invoice = $this->invoice();
 		$invoice->setPerformanceDate(new DateTime('2026-06-10'));
