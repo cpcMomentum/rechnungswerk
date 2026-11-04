@@ -1,0 +1,79 @@
+name: einvoice
+
+# Kein paths-Filter: als Required-Check muss er auf jedem PR melden.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  MUSTANG_VERSION: '2.26.0'
+  MUSTANG_SHA256: '42d7868cb68264874a7b8cab4c3587b03b23ccc7cd72373da917f66758bb9736'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: EN 16931 (Mustang)
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+
+      - name: Musterrechnungen erzeugen
+        env:
+          RW_EINVOICE_SAMPLES_DIR: ${{ github.workspace }}/build/einvoice
+        run: |
+          composer config platform.php 8.4
+          composer update --no-interaction --no-progress --prefer-dist
+          vendor/bin/phpunit -c tests/phpunit.xml --filter EInvoiceSamplesTest
+          ls build/einvoice/*.pdf
+
+      - name: Mustang laden
+        run: |
+          curl -fsSL -o mustang.jar "https://github.com/ZUGFeRD/mustangproject/releases/download/core-${MUSTANG_VERSION}/Mustang-CLI-${MUSTANG_VERSION}.jar"
+          echo "${MUSTANG_SHA256}  mustang.jar" | sha256sum -c -
+
+      - name: Validieren
+        run: |
+          mkdir -p build/reports
+          failed=""
+          for pdf in build/einvoice/*.pdf; do
+            name=$(basename "$pdf" .pdf)
+            "$JAVA_HOME_21_X64/bin/java" -jar mustang.jar --action validate --no-notices --source "$pdf" > "build/reports/$name.xml" 2> "build/reports/$name.log" || true
+            # The last summary is the overall verdict for PDF and XML together.
+            status=$(grep -o '<summary status="[a-z]*"/>' "build/reports/$name.xml" | tail -1 | sed 's/.*status="\([a-z]*\)".*/\1/')
+            if [ "$status" = "valid" ]; then
+              echo "$name: gueltig"
+            else
+              echo "::error title=E-Rechnung ungueltig::$name ($status)"
+              grep -o '<error[^>]*>[^<]*' "build/reports/$name.xml" | sed 's/<error[^>]*>/  /' || true
+              failed="$failed $name"
+            fi
+          done
+          if [ -n "$failed" ]; then
+            echo "::error::Ungueltige Musterrechnungen:$failed"
+            exit 1
+          fi
+
+      - name: Berichte anhaengen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: einvoice-reports
+          path: |
+            build/einvoice
+            build/reports
+          if-no-files-found: ignore

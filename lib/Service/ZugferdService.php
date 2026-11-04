@@ -332,14 +332,20 @@ class ZugferdService {
 		// wie bisher, damit die Belege unveraendert aussehen (#304).
 		$zusatz = trim((string)$invoice->getRecipientAddressAddition());
 		$strasse = (string)($invoice->getRecipientAddress() ?? '');
-		$builder->setDocumentBuyerAddress(
+		$address = [
 			$zusatz !== '' ? $zusatz : $strasse,
 			$zusatz !== '' ? $strasse : null,
 			null,
 			$invoice->getRecipientPostalCode() ?? '',
 			$invoice->getRecipientCity() ?? '',
 			$invoice->getRecipientCountry() ?: ZugferdCountryCodes::GERMANY,
-		);
+		];
+		$builder->setDocumentBuyerAddress(...$address);
+		// BR-IC-12 requires a deliver-to country; the app has no separate delivery address, so it is the buyer's.
+		if ($invoice->getSpecialTaxCase() === Invoice::SPECIAL_TAX_INTRA_COMMUNITY) {
+			$builder->setDocumentShipTo($invoice->getRecipientName() ?? '');
+			$builder->setDocumentShipToAddress(...$address);
+		}
 		// BT-10: Leitweg-ID / buyer reference (B2G).
 		if (($invoice->getBuyerReference() ?? '') !== '') {
 			$builder->setDocumentBuyerReference($invoice->getBuyerReference());

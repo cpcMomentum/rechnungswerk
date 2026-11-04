@@ -220,6 +220,7 @@ class InvoiceService {
 		// otherwise abort the commit transaction on PostgreSQL.
 		$settings = $this->settingsService->getCompany();
 		$this->assertSellerNameSet($settings);
+		$this->assertIntraCommunityComplete($invoice, $settings);
 
 		$now = new DateTime();
 
@@ -476,6 +477,10 @@ class InvoiceService {
 			$storno->setSellerContactPhone($original->getSellerContactPhone());
 			$storno->setSellerContactEmail($original->getSellerContactEmail());
 			$storno->setSpecialTaxCase($original->getSpecialTaxCase());
+			// Same supply as the original; an intra-community storno is invalid without it (BR-IC-11).
+			$storno->setPerformanceDate($original->getPerformanceDate());
+			$storno->setPerformancePeriodStart($original->getPerformancePeriodStart());
+			$storno->setPerformancePeriodEnd($original->getPerformancePeriodEnd());
 			$storno->setGreeting($original->getGreeting());
 			$storno->setCustomFields($original->getCustomFields());
 			// The storno corrects the original, so it carries the same business
@@ -769,6 +774,23 @@ class InvoiceService {
 			return $this->invoiceMapper->findOneForUpdate($id);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
+		}
+	}
+
+	/** Without these the e-invoice breaks BR-IC-02/BR-IC-11 and is no valid EN 16931 invoice. */
+	private function assertIntraCommunityComplete(Invoice $invoice, Settings $settings): void {
+		if ($invoice->getSpecialTaxCase() !== Invoice::SPECIAL_TAX_INTRA_COMMUNITY) {
+			return;
+		}
+		if (trim((string)$settings->getVatId()) === '') {
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).'));
+		}
+		if (trim((string)$invoice->getRecipientVatId()) === '') {
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.'));
+		}
+		if ($invoice->getPerformanceDate() === null
+			&& ($invoice->getPerformancePeriodStart() === null || $invoice->getPerformancePeriodEnd() === null)) {
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich.'));
 		}
 	}
 
