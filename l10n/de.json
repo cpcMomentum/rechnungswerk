@@ -579,7 +579,13 @@
 		"Verwerfen": "Verwerfen",
 		"Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich.": "Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich.",
 		"Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).": "Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).",
-		"Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.": "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich."
+		"Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.": "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.",
+		"Hinweis zur E-Rechnung": "Hinweis zur E-Rechnung",
+		"Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen.": "Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen.",
+		"Registernummer": "Registernummer",
+		"z. B. HRB 12345, Amtsgericht Stuttgart": "z. B. HRB 12345, Amtsgericht Stuttgart",
+		"Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus.": "Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus.",
+		"Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer.": "Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

@@ -1,5 +1,5 @@
 import { c as e, d as t, g as n, l as r, m as i, t as a, u as o } from "./logger-Dmvqkkgn.chunk.mjs";
-import { $n as s, $t as c, A as l, An as u, Bn as d, Bt as f, D as p, E as m, En as h, F as ee, Fn as te, Gn as g, Gt as ne, Hn as _, I as v, In as y, J as b, Jt as x, Kn as S, Kt as re, L as ie, Mn as C, Nn as w, O as T, On as E, Pn as D, Q as O, Qn as ae, Qt as k, R as oe, Rn as se, Sn as A, Tn as ce, Tt as j, Un as M, V as le, Vn as ue, Vt as de, Wn as N, X as fe, Xn as pe, Xt as P, Yn as F, Yt as me, Z as I, Zn as he, _ as ge, _n as _e, _t as ve, a as ye, an as L, at as be, bn as xe, c as Se, cn as R, ct as Ce, dn as z, dr as B, dt as we, er as Te, et as Ee, fn as De, fr as V, ft as Oe, g as ke, gn as Ae, gt as je, hn as Me, hr as H, ht as Ne, in as U, ir as Pe, it as Fe, ln as W, lr as Ie, lt as Le, mn as Re, mr as ze, mt as Be, nn as G, nt as K, o as Ve, on as q, or as He, ot as Ue, pn as We, pr as Ge, pt as Ke, qt as J, rn as Y, rr as X, rt as qe, sr as Je, st as Ye, t as Xe, tr as Ze, tt as Qe, ut as $e, v as et, vn as Z, wn as tt, xn as nt, yn as rt, z as it, zn as at } from "./createElementId-BhyzukIw.chunk.mjs";
+import { $n as s, $t as c, A as l, An as u, Bn as d, Bt as f, D as p, E as m, En as h, F as ee, Fn as te, Gn as g, Gt as ne, Hn as _, I as re, In as v, J as y, Jt as b, Kn as x, Kt as ie, L as ae, Mn as S, Nn as C, O as w, On as T, Pn as E, Q as D, Qn as oe, Qt as O, R as se, Rn as ce, Sn as k, Tn as A, Tt as j, Un as M, V as le, Vn as ue, Vt as de, Wn as N, X as fe, Xn as pe, Xt as P, Yn as F, Yt as me, Z as I, Zn as he, _ as ge, _n as _e, _t as ve, a as ye, an as L, at as be, bn as xe, c as Se, cn as R, ct as Ce, dn as z, dr as B, dt as we, er as Te, et as Ee, fn as De, fr as V, ft as Oe, g as ke, gn as Ae, gt as je, hn as Me, hr as H, ht as Ne, in as U, ir as Pe, it as Fe, ln as W, lr as Ie, lt as Le, mn as Re, mr as ze, mt as Be, nn as G, nt as K, o as Ve, on as q, or as He, ot as Ue, pn as We, pr as Ge, pt as Ke, qt as J, rn as Y, rr as X, rt as qe, sr as Je, st as Ye, t as Xe, tr as Ze, tt as Qe, ut as $e, v as et, vn as Z, wn as tt, xn as nt, yn as rt, z as it, zn as at } from "./createElementId-BhyzukIw.chunk.mjs";
 import { a as ot, i as st, n as ct, o as lt, t as ut } from "./NcPopover-BZDxBRj1.chunk.mjs";
 import { A as dt, E as ft, L as pt, M as mt, N as ht, T as Q, j as gt, k as _t, r as vt, t as yt, w as bt } from "./chunks-DROf82q0.chunk.mjs";
 import { n as xt, r as St, t as Ct } from "./NcSelect-C6R5-Zbo.chunk.mjs";
@@ -127,7 +127,7 @@ function tn(e, t) {
 	for (let n in t) {
 		if (!Object.hasOwn(t, n)) continue;
 		let r = t[n], i = e[n];
-		e[n] = Ft(i) && Ft(r) && Object.hasOwn(e, n) && !ae(r) && !he(r) ? tn(i, r) : r;
+		e[n] = Ft(i) && Ft(r) && Object.hasOwn(e, n) && !oe(r) && !he(r) ? tn(i, r) : r;
 	}
 	return e;
 }
@@ -137,7 +137,7 @@ function rn(e) {
 }
 var { assign: an } = Object;
 function on(e) {
-	return !!(ae(e) && e.effect);
+	return !!(oe(e) && e.effect);
 }
 function sn(e, t, n, r) {
 	let { state: i, actions: a, getters: o } = t, c = n.state.value[e], l;
@@ -198,13 +198,13 @@ function cn(e, t, n = {}, r, i, a) {
 			Zt(f, {
 				args: n,
 				name: i[en],
-				store: v,
+				store: re,
 				after: s,
 				onError: c
 			});
 			let l;
 			try {
-				l = t.apply(this && this.$id === e ? this : v, n);
+				l = t.apply(this && this.$id === e ? this : re, n);
 			} catch (e) {
 				throw Zt(o, e), e;
 			}
@@ -229,14 +229,14 @@ function cn(e, t, n = {}, r, i, a) {
 			return i;
 		},
 		$dispose: g
-	}, v = Ze(_);
-	r._s.set(e, v);
-	let y = (r._a && r._a.runWithContext || Qt)(() => r._e.run(() => (o = F()).run(() => t({ action: ne }))));
-	for (let t in y) {
-		let n = y[t];
-		ae(n) && !on(n) || he(n) ? a || (m && rn(n) && (ae(n) ? n.value = m[t] : ((n instanceof Set || n instanceof Map) && n.clear(), tn(n, m[t]))), r.state.value[e][t] = n) : typeof n == "function" && (y[t] = ne(n, t), s.actions[t] = n);
+	}, re = Ze(_);
+	r._s.set(e, re);
+	let v = (r._a && r._a.runWithContext || Qt)(() => r._e.run(() => (o = F()).run(() => t({ action: ne }))));
+	for (let t in v) {
+		let n = v[t];
+		oe(n) && !on(n) || he(n) ? a || (m && rn(n) && (oe(n) ? n.value = m[t] : ((n instanceof Set || n instanceof Map) && n.clear(), tn(n, m[t]))), r.state.value[e][t] = n) : typeof n == "function" && (v[t] = ne(n, t), s.actions[t] = n);
 	}
-	return an(v, y), an(Je(v), y), Object.defineProperty(v, "$state", {
+	return an(re, v), an(Je(re), v), Object.defineProperty(re, "$state", {
 		get: () => r.state.value[e],
 		set: (e) => {
 			ee((t) => {
@@ -245,13 +245,13 @@ function cn(e, t, n = {}, r, i, a) {
 		}
 	}), r._p.forEach((e) => {
 		let t = o.run(() => e({
-			store: v,
+			store: re,
 			app: r._a,
 			pinia: r,
 			options: s
 		}));
-		an(v, t);
-	}), m && a && n.hydrate && n.hydrate(v.$state, m), l = !0, u = !0, v;
+		an(re, t);
+	}), m && a && n.hydrate && n.hydrate(re.$state, m), l = !0, u = !0, re;
 }
 function ln(e, t, n) {
 	let r, i = typeof t == "function";
@@ -1151,19 +1151,19 @@ function Xr(e) {
 	function _(e) {
 		return typeof e == "string" ? Pn(n, e, c.value.path) : K({}, e);
 	}
-	function v(e, t) {
+	function re(e, t) {
 		if (u !== e) return qe(8, {
 			from: t,
 			to: e
 		});
 	}
+	function v(e) {
+		return x(e);
+	}
 	function y(e) {
-		return S(e);
+		return v(K(_(e), { replace: !0 }));
 	}
-	function b(e) {
-		return y(K(_(e), { replace: !0 }));
-	}
-	function x(e, t) {
+	function b(e, t) {
 		let n = e.matched[e.matched.length - 1];
 		if (n && n.redirect) {
 			let { redirect: r } = n, i = typeof r == "function" ? r(e, t) : r;
@@ -1174,9 +1174,9 @@ function Xr(e) {
 			}, i);
 		}
 	}
-	function S(e, t) {
-		let n = u = ne(e), i = c.value, a = e.state, o = e.force, s = e.replace === !0, l = x(n, i);
-		if (l) return S(K(_(l), {
+	function x(e, t) {
+		let n = u = ne(e), i = c.value, a = e.state, o = e.force, s = e.replace === !0, l = b(n, i);
+		if (l) return x(K(_(l), {
 			state: typeof l == "object" ? K({}, a, l.state) : a,
 			force: o,
 			replace: s
@@ -1187,31 +1187,31 @@ function Xr(e) {
 		return !o && Ln(r, i, n) && (f = qe(16, {
 			to: d,
 			from: i
-		}), ce(i, i, !0, !1)), (f ? Promise.resolve(f) : C(d, i)).catch((e) => Ye(e) ? Ye(e, 2) ? e : A(e) : oe(e, d, i)).then((e) => {
+		}), A(i, i, !0, !1)), (f ? Promise.resolve(f) : S(d, i)).catch((e) => Ye(e) ? Ye(e, 2) ? e : k(e) : se(e, d, i)).then((e) => {
 			if (e) {
-				if (Ye(e, 2)) return S(K({ replace: s }, _(e.to), {
+				if (Ye(e, 2)) return x(K({ replace: s }, _(e.to), {
 					state: typeof e.to == "object" ? K({}, a, e.to.state) : a,
 					force: o
 				}), t || d);
-			} else e = T(d, i, !0, s, a);
-			return w(d, i, e), e;
+			} else e = w(d, i, !0, s, a);
+			return C(d, i, e), e;
 		});
 	}
-	function re(e, t) {
-		let n = v(e, t);
+	function ie(e, t) {
+		let n = re(e, t);
 		return n ? Promise.reject(n) : Promise.resolve();
 	}
-	function ie(e) {
+	function ae(e) {
 		let t = le.values().next().value;
 		return t && typeof t.runWithContext == "function" ? t.runWithContext(e) : e();
 	}
-	function C(e, t) {
+	function S(e, t) {
 		let n, [r, i, s] = dr(e, t);
 		n = ur(r.reverse(), "beforeRouteLeave", e, t);
 		for (let i of r) i.leaveGuards.forEach((r) => {
 			n.push(lr(r, e, t));
 		});
-		let c = re.bind(null, e, t);
+		let c = ie.bind(null, e, t);
 		return n.push(c), de(n).then(() => {
 			n = [];
 			for (let r of a.list()) n.push(lr(r, e, t));
@@ -1229,28 +1229,28 @@ function Xr(e) {
 				else n.push(lr(r.beforeEnter, e, t));
 			}
 			return n.push(c), de(n);
-		}).then(() => (e.matched.forEach((e) => e.enterCallbacks = {}), n = ur(s, "beforeRouteEnter", e, t, ie), n.push(c), de(n))).then(() => {
+		}).then(() => (e.matched.forEach((e) => e.enterCallbacks = {}), n = ur(s, "beforeRouteEnter", e, t, ae), n.push(c), de(n))).then(() => {
 			n = [];
 			for (let r of o.list()) n.push(lr(r, e, t));
 			return n.push(c), de(n);
 		}).catch((e) => Ye(e, 8) ? e : Promise.reject(e));
 	}
-	function w(e, t, n) {
-		s.list().forEach((r) => ie(() => r(e, t, n)));
+	function C(e, t, n) {
+		s.list().forEach((r) => ae(() => r(e, t, n)));
 	}
-	function T(e, t, n, r, a) {
-		let o = v(e, t);
+	function w(e, t, n, r, a) {
+		let o = re(e, t);
 		if (o) return o;
 		let s = t === Un, l = un ? history.state : {};
-		n && (r || s ? i.replace(e.fullPath, K({ scroll: s && l && l.scroll }, a)) : i.push(e.fullPath, a)), c.value = e, ce(e, t, n, s), A();
+		n && (r || s ? i.replace(e.fullPath, K({ scroll: s && l && l.scroll }, a)) : i.push(e.fullPath, a)), c.value = e, A(e, t, n, s), k();
 	}
-	let E;
-	function D() {
-		E ||= i.listen((e, t, n) => {
+	let T;
+	function E() {
+		T ||= i.listen((e, t, n) => {
 			if (!ue.listening) return;
-			let r = ne(e), a = x(r, ue.currentRoute.value);
+			let r = ne(e), a = b(r, ue.currentRoute.value);
 			if (a) {
-				S(K(a, {
+				x(K(a, {
 					replace: !0,
 					force: !0
 				}), r).catch(we);
@@ -1258,32 +1258,32 @@ function Xr(e) {
 			}
 			u = r;
 			let o = c.value;
-			un && n.delta && Qn(Xn(o.fullPath, n.delta)), C(r, o).catch((e) => Ye(e, 12) ? e : Ye(e, 2) ? (S(K(_(e.to), { force: !0 }), r).then((e) => {
+			un && n.delta && Qn(Xn(o.fullPath, n.delta)), S(r, o).catch((e) => Ye(e, 12) ? e : Ye(e, 2) ? (x(K(_(e.to), { force: !0 }), r).then((e) => {
 				Ye(e, 20) && !n.delta && n.type === "pop" && i.go(-1, !1);
-			}).catch(we), Promise.reject()) : (n.delta && i.go(-n.delta, !1), oe(e, r, o))).then((e) => {
-				e ||= T(r, o, !1), e && (n.delta && !Ye(e, 8) ? i.go(-n.delta, !1) : n.type === "pop" && Ye(e, 20) && i.go(-1, !1)), w(r, o, e);
+			}).catch(we), Promise.reject()) : (n.delta && i.go(-n.delta, !1), se(e, r, o))).then((e) => {
+				e ||= w(r, o, !1), e && (n.delta && !Ye(e, 8) ? i.go(-n.delta, !1) : n.type === "pop" && Ye(e, 20) && i.go(-1, !1)), C(r, o, e);
 			}).catch(we);
 		});
 	}
-	let O = ar(), ae = ar(), k;
-	function oe(e, t, n) {
-		A(e);
-		let r = ae.list();
+	let D = ar(), oe = ar(), O;
+	function se(e, t, n) {
+		k(e);
+		let r = oe.list();
 		return r.length ? r.forEach((r) => r(e, t, n)) : console.error(e), Promise.reject(e);
 	}
-	function se() {
-		return k && c.value !== Un ? Promise.resolve() : new Promise((e, t) => {
-			O.add([e, t]);
+	function ce() {
+		return O && c.value !== Un ? Promise.resolve() : new Promise((e, t) => {
+			D.add([e, t]);
 		});
 	}
-	function A(e) {
-		return k || (k = !e, D(), O.list().forEach(([t, n]) => e ? n(e) : t()), O.reset()), e;
+	function k(e) {
+		return O || (O = !e, E(), D.list().forEach(([t, n]) => e ? n(e) : t()), D.reset()), e;
 	}
-	function ce(t, n, r, i) {
+	function A(t, n, r, i) {
 		let { scrollBehavior: a } = e;
 		if (!un || !a) return Promise.resolve();
 		let o = !r && $n(Xn(t.fullPath, 0)) || (i || !r) && history.state && history.state.scroll || null;
-		return rt().then(() => a(t, n, o)).then((e) => t === c.value && e && Yn(e)).catch((e) => t === c.value && oe(e, t, n));
+		return rt().then(() => a(t, n, o)).then((e) => t === c.value && e && Yn(e)).catch((e) => t === c.value && se(e, t, n));
 	}
 	let j = (e) => i.go(e), M, le = /* @__PURE__ */ new Set(), ue = {
 		currentRoute: c,
@@ -1295,21 +1295,21 @@ function Xr(e) {
 		getRoutes: te,
 		resolve: ne,
 		options: e,
-		push: y,
-		replace: b,
+		push: v,
+		replace: y,
 		go: j,
 		back: () => j(-1),
 		forward: () => j(1),
 		beforeEach: a.add,
 		beforeResolve: o.add,
 		afterEach: s.add,
-		onError: ae.add,
-		isReady: se,
+		onError: oe.add,
+		isReady: ce,
 		install(e) {
 			e.component("RouterLink", Hr), e.component("RouterView", Yr), e.config.globalProperties.$router = ue, Object.defineProperty(e.config.globalProperties, "$route", {
 				enumerable: !0,
 				get: () => B(c)
-			}), un && !M && c.value === Un && (M = !0, y(i.location).catch((e) => {}));
+			}), un && !M && c.value === Un && (M = !0, v(i.location).catch((e) => {}));
 			let t = {};
 			for (let e in Un) Object.defineProperty(t, e, {
 				get: () => c.value[e],
@@ -1318,12 +1318,12 @@ function Xr(e) {
 			e.provide(Ke, ue), e.provide(Oe, Pe(t)), e.provide(Be, c);
 			let n = e.unmount;
 			le.add(e), e.unmount = function() {
-				le.delete(e), le.size < 1 && (u = Un, E && E(), E = null, c.value = Un, M = !1, k = !1), n();
+				le.delete(e), le.size < 1 && (u = Un, T && T(), T = null, c.value = Un, M = !1, O = !1), n();
 			};
 		}
 	};
 	function de(e) {
-		return e.reduce((e, t) => e.then(() => ie(t)), Promise.resolve());
+		return e.reduce((e, t) => e.then(() => ae(t)), Promise.resolve());
 	}
 	return ue;
 }
@@ -1333,7 +1333,7 @@ var Zr = /* @__PURE__ */ Symbol.for("NcContent:setHasAppNavigation"), Qr = /* @_
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/NcContent.mjs
 m(le);
-var $r = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors\n  - SPDX-License-Identifier: AGPL-3.0-or-later\n-->\n<svg width=\"395\" height=\"314\" viewBox=\"0 0 395 314\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"395\" height=\"314\" rx=\"11\" fill=\"#439DCD\"/>\n<rect x=\"13\" y=\"51\" width=\"366\" height=\"248\" rx=\"8\" fill=\"white\"/>\n<rect x=\"22\" y=\"111\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"127\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"63\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"191\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"143\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"79\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"159\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"95\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"175\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<path d=\"M288 145C277.56 147.8 265.32 149 254 149C242.68 149 230.44 147.8 220 145L218 153C225.44 155 234 156.32 242 157V209H250V185H258V209H266V157C274 156.32 282.56 155 290 153L288 145ZM254 145C258.4 145 262 141.4 262 137C262 132.6 258.4 129 254 129C249.6 129 246 132.6 246 137C246 141.4 249.6 145 254 145Z\" fill=\"#DEDEDE\"/>\n<path d=\"M43.5358 13C38.6641 13 34.535 16.2415 33.2552 20.6333C32.143 18.3038 29.7327 16.6718 26.9564 16.6718C23.1385 16.6718 20 19.7521 20 23.4993C20 27.2465 23.1385 30.3282 26.9564 30.3282C29.7327 30.3282 32.1429 28.6952 33.2552 26.3653C34.535 30.7575 38.6641 34 43.5358 34C48.3715 34 52.4796 30.8064 53.7921 26.4637C54.9249 28.7407 57.3053 30.3282 60.0421 30.3282C63.8601 30.3282 67 27.2465 67 23.4993C67 19.7521 63.8601 16.6718 60.0421 16.6718C57.3053 16.6718 54.9249 18.2583 53.7921 20.5349C52.4796 16.1926 48.3715 13 43.5358 13ZM43.5358 17.0079C47.2134 17.0079 50.1512 19.8899 50.1512 23.4993C50.1512 27.1087 47.2134 29.9921 43.5358 29.9921C39.8583 29.9921 36.9218 27.1087 36.9218 23.4993C36.9218 19.8899 39.8583 17.0079 43.5358 17.0079ZM26.9564 20.6797C28.5677 20.6797 29.8307 21.9179 29.8307 23.4993C29.8307 25.0807 28.5677 26.3203 26.9564 26.3203C25.3452 26.3203 24.0836 25.0807 24.0836 23.4993C24.0836 21.9179 25.3452 20.6797 26.9564 20.6797ZM60.0421 20.6797C61.6534 20.6797 62.9164 21.9179 62.9164 23.4993C62.9164 25.0807 61.6534 26.3203 60.0421 26.3203C58.4309 26.3203 57.1693 25.0807 57.1693 23.4993C57.1693 21.9179 58.4309 20.6797 60.0421 20.6797Z\" fill=\"white\"/>\n<rect x=\"79\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"99\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"119\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"139\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"159\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"179\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M12 0C5.37258 0 0 5.37259 0 12V302C0 308.627 5.37259 314 12 314H383C389.627 314 395 308.627 395 302V12C395 5.37258 389.627 0 383 0H12ZM140 44C132.268 44 126 50.268 126 58V292C126 299.732 132.268 306 140 306H372C379.732 306 386 299.732 386 292V58C386 50.268 379.732 44 372 44H140Z\" fill=\"black\" fill-opacity=\"0.35\"/>\n</svg>\n", ei = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors\n  - SPDX-License-Identifier: AGPL-3.0-or-later\n-->\n<svg width=\"395\" height=\"314\" viewBox=\"0 0 395 314\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"395\" height=\"314\" rx=\"11\" fill=\"#439DCD\"/>\n<rect x=\"13\" y=\"51\" width=\"366\" height=\"248\" rx=\"8\" fill=\"white\"/>\n<rect x=\"22\" y=\"111\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"127\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"63\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"191\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"143\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"79\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"159\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"95\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"175\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<path d=\"M288 145C277.56 147.8 265.32 149 254 149C242.68 149 230.44 147.8 220 145L218 153C225.44 155 234 156.32 242 157V209H250V185H258V209H266V157C274 156.32 282.56 155 290 153L288 145ZM254 145C258.4 145 262 141.4 262 137C262 132.6 258.4 129 254 129C249.6 129 246 132.6 246 137C246 141.4 249.6 145 254 145Z\" fill=\"#DEDEDE\"/>\n<path d=\"M43.5358 13C38.6641 13 34.535 16.2415 33.2552 20.6333C32.143 18.3038 29.7327 16.6718 26.9564 16.6718C23.1385 16.6718 20 19.7521 20 23.4993C20 27.2465 23.1385 30.3282 26.9564 30.3282C29.7327 30.3282 32.1429 28.6952 33.2552 26.3653C34.535 30.7575 38.6641 34 43.5358 34C48.3715 34 52.4796 30.8064 53.7921 26.4637C54.9249 28.7407 57.3053 30.3282 60.0421 30.3282C63.8601 30.3282 67 27.2465 67 23.4993C67 19.7521 63.8601 16.6718 60.0421 16.6718C57.3053 16.6718 54.9249 18.2583 53.7921 20.5349C52.4796 16.1926 48.3715 13 43.5358 13ZM43.5358 17.0079C47.2134 17.0079 50.1512 19.8899 50.1512 23.4993C50.1512 27.1087 47.2134 29.9921 43.5358 29.9921C39.8583 29.9921 36.9218 27.1087 36.9218 23.4993C36.9218 19.8899 39.8583 17.0079 43.5358 17.0079ZM26.9564 20.6797C28.5677 20.6797 29.8307 21.9179 29.8307 23.4993C29.8307 25.0807 28.5677 26.3203 26.9564 26.3203C25.3452 26.3203 24.0836 25.0807 24.0836 23.4993C24.0836 21.9179 25.3452 20.6797 26.9564 20.6797ZM60.0421 20.6797C61.6534 20.6797 62.9164 21.9179 62.9164 23.4993C62.9164 25.0807 61.6534 26.3203 60.0421 26.3203C58.4309 26.3203 57.1693 25.0807 57.1693 23.4993C57.1693 21.9179 58.4309 20.6797 60.0421 20.6797Z\" fill=\"white\"/>\n<rect x=\"79\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"99\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"119\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"139\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"159\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"179\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M12 0C5.37258 0 0 5.37259 0 12V302C0 308.627 5.37259 314 12 314H383C389.627 314 395 308.627 395 302V12C395 5.37258 389.627 0 383 0H12ZM112 44C119.732 44 126 50.268 126 58V292C126 299.732 119.732 306 112 306H20C12.268 306 6 299.732 6 292V58C6 50.268 12.268 44 20 44H112Z\" fill=\"black\" fill-opacity=\"0.35\"/>\n</svg>\n", ti = { class: "vue-skip-actions__container" }, ni = { class: "vue-skip-actions__headline" }, ri = { class: "vue-skip-actions__buttons" }, ii = /* @__PURE__ */ O(/* @__PURE__ */ z({
+var $r = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors\n  - SPDX-License-Identifier: AGPL-3.0-or-later\n-->\n<svg width=\"395\" height=\"314\" viewBox=\"0 0 395 314\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"395\" height=\"314\" rx=\"11\" fill=\"#439DCD\"/>\n<rect x=\"13\" y=\"51\" width=\"366\" height=\"248\" rx=\"8\" fill=\"white\"/>\n<rect x=\"22\" y=\"111\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"127\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"63\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"191\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"143\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"79\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"159\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"95\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"175\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<path d=\"M288 145C277.56 147.8 265.32 149 254 149C242.68 149 230.44 147.8 220 145L218 153C225.44 155 234 156.32 242 157V209H250V185H258V209H266V157C274 156.32 282.56 155 290 153L288 145ZM254 145C258.4 145 262 141.4 262 137C262 132.6 258.4 129 254 129C249.6 129 246 132.6 246 137C246 141.4 249.6 145 254 145Z\" fill=\"#DEDEDE\"/>\n<path d=\"M43.5358 13C38.6641 13 34.535 16.2415 33.2552 20.6333C32.143 18.3038 29.7327 16.6718 26.9564 16.6718C23.1385 16.6718 20 19.7521 20 23.4993C20 27.2465 23.1385 30.3282 26.9564 30.3282C29.7327 30.3282 32.1429 28.6952 33.2552 26.3653C34.535 30.7575 38.6641 34 43.5358 34C48.3715 34 52.4796 30.8064 53.7921 26.4637C54.9249 28.7407 57.3053 30.3282 60.0421 30.3282C63.8601 30.3282 67 27.2465 67 23.4993C67 19.7521 63.8601 16.6718 60.0421 16.6718C57.3053 16.6718 54.9249 18.2583 53.7921 20.5349C52.4796 16.1926 48.3715 13 43.5358 13ZM43.5358 17.0079C47.2134 17.0079 50.1512 19.8899 50.1512 23.4993C50.1512 27.1087 47.2134 29.9921 43.5358 29.9921C39.8583 29.9921 36.9218 27.1087 36.9218 23.4993C36.9218 19.8899 39.8583 17.0079 43.5358 17.0079ZM26.9564 20.6797C28.5677 20.6797 29.8307 21.9179 29.8307 23.4993C29.8307 25.0807 28.5677 26.3203 26.9564 26.3203C25.3452 26.3203 24.0836 25.0807 24.0836 23.4993C24.0836 21.9179 25.3452 20.6797 26.9564 20.6797ZM60.0421 20.6797C61.6534 20.6797 62.9164 21.9179 62.9164 23.4993C62.9164 25.0807 61.6534 26.3203 60.0421 26.3203C58.4309 26.3203 57.1693 25.0807 57.1693 23.4993C57.1693 21.9179 58.4309 20.6797 60.0421 20.6797Z\" fill=\"white\"/>\n<rect x=\"79\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"99\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"119\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"139\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"159\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"179\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M12 0C5.37258 0 0 5.37259 0 12V302C0 308.627 5.37259 314 12 314H383C389.627 314 395 308.627 395 302V12C395 5.37258 389.627 0 383 0H12ZM140 44C132.268 44 126 50.268 126 58V292C126 299.732 132.268 306 140 306H372C379.732 306 386 299.732 386 292V58C386 50.268 379.732 44 372 44H140Z\" fill=\"black\" fill-opacity=\"0.35\"/>\n</svg>\n", ei = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors\n  - SPDX-License-Identifier: AGPL-3.0-or-later\n-->\n<svg width=\"395\" height=\"314\" viewBox=\"0 0 395 314\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect width=\"395\" height=\"314\" rx=\"11\" fill=\"#439DCD\"/>\n<rect x=\"13\" y=\"51\" width=\"366\" height=\"248\" rx=\"8\" fill=\"white\"/>\n<rect x=\"22\" y=\"111\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"127\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"63\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"191\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"143\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"79\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"159\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"95\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<rect x=\"22\" y=\"175\" width=\"92\" height=\"12\" rx=\"6\" fill=\"#DEDEDE\"/>\n<path d=\"M288 145C277.56 147.8 265.32 149 254 149C242.68 149 230.44 147.8 220 145L218 153C225.44 155 234 156.32 242 157V209H250V185H258V209H266V157C274 156.32 282.56 155 290 153L288 145ZM254 145C258.4 145 262 141.4 262 137C262 132.6 258.4 129 254 129C249.6 129 246 132.6 246 137C246 141.4 249.6 145 254 145Z\" fill=\"#DEDEDE\"/>\n<path d=\"M43.5358 13C38.6641 13 34.535 16.2415 33.2552 20.6333C32.143 18.3038 29.7327 16.6718 26.9564 16.6718C23.1385 16.6718 20 19.7521 20 23.4993C20 27.2465 23.1385 30.3282 26.9564 30.3282C29.7327 30.3282 32.1429 28.6952 33.2552 26.3653C34.535 30.7575 38.6641 34 43.5358 34C48.3715 34 52.4796 30.8064 53.7921 26.4637C54.9249 28.7407 57.3053 30.3282 60.0421 30.3282C63.8601 30.3282 67 27.2465 67 23.4993C67 19.7521 63.8601 16.6718 60.0421 16.6718C57.3053 16.6718 54.9249 18.2583 53.7921 20.5349C52.4796 16.1926 48.3715 13 43.5358 13ZM43.5358 17.0079C47.2134 17.0079 50.1512 19.8899 50.1512 23.4993C50.1512 27.1087 47.2134 29.9921 43.5358 29.9921C39.8583 29.9921 36.9218 27.1087 36.9218 23.4993C36.9218 19.8899 39.8583 17.0079 43.5358 17.0079ZM26.9564 20.6797C28.5677 20.6797 29.8307 21.9179 29.8307 23.4993C29.8307 25.0807 28.5677 26.3203 26.9564 26.3203C25.3452 26.3203 24.0836 25.0807 24.0836 23.4993C24.0836 21.9179 25.3452 20.6797 26.9564 20.6797ZM60.0421 20.6797C61.6534 20.6797 62.9164 21.9179 62.9164 23.4993C62.9164 25.0807 61.6534 26.3203 60.0421 26.3203C58.4309 26.3203 57.1693 25.0807 57.1693 23.4993C57.1693 21.9179 58.4309 20.6797 60.0421 20.6797Z\" fill=\"white\"/>\n<rect x=\"79\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"99\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"119\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"139\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"159\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<rect x=\"179\" y=\"20\" width=\"8\" height=\"8\" rx=\"4\" fill=\"white\"/>\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M12 0C5.37258 0 0 5.37259 0 12V302C0 308.627 5.37259 314 12 314H383C389.627 314 395 308.627 395 302V12C395 5.37258 389.627 0 383 0H12ZM112 44C119.732 44 126 50.268 126 58V292C126 299.732 119.732 306 112 306H20C12.268 306 6 299.732 6 292V58C6 50.268 12.268 44 20 44H112Z\" fill=\"black\" fill-opacity=\"0.35\"/>\n</svg>\n", ti = { class: "vue-skip-actions__container" }, ni = { class: "vue-skip-actions__headline" }, ri = { class: "vue-skip-actions__buttons" }, ii = /* @__PURE__ */ D(/* @__PURE__ */ z({
 	__name: "NcContent",
 	props: { appName: {} },
 	setup(e) {
@@ -1352,12 +1352,12 @@ var $r = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud co
 		function l(e) {
 			i.value = e, a.value ||= "navigation";
 		}
-		return (t, r) => (E(), q("div", {
+		return (t, r) => (T(), q("div", {
 			id: "content-vue",
 			class: V(["content", [`app-${e.appName.toLowerCase()}`, { "content--legacy": B(Ee) }]])
-		}, [(E(), U(c, { to: "#skip-actions" }, [Y("div", ti, [
+		}, [(T(), U(c, { to: "#skip-actions" }, [Y("div", ti, [
 			Y("div", ni, H(B(p)("Keyboard navigation help")), 1),
-			Y("div", ri, [S(W(I, {
+			Y("div", ri, [x(W(I, {
 				href: "#app-navigation-vue",
 				variant: "tertiary",
 				onClick: P(s, ["prevent"]),
@@ -1366,7 +1366,7 @@ var $r = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud co
 			}, {
 				default: g(() => [R(H(B(p)("Skip to app navigation")), 1)]),
 				_: 1
-			}, 512), [[x, i.value]]), W(I, {
+			}, 512), [[b, i.value]]), W(I, {
 				href: "#app-content-vue",
 				variant: "tertiary",
 				onFocusin: r[2] ||= (e) => a.value = "content",
@@ -1375,22 +1375,22 @@ var $r = "<!--\n  - SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud co
 				default: g(() => [R(H(B(p)("Skip to main content")), 1)]),
 				_: 1
 			})]),
-			S(W(fe, {
+			x(W(fe, {
 				class: "vue-skip-actions__image",
 				svg: o.value,
 				size: "auto"
-			}, null, 8, ["svg"]), [[x, !B(n)]])
-		])])), w(t.$slots, "default", {}, void 0, !0)], 2));
+			}, null, 8, ["svg"]), [[b, !B(n)]])
+		])])), C(t.$slots, "default", {}, void 0, !0)], 2));
 	}
 }), [["__scopeId", "data-v-d13dcb98"]]), ai = { name: "NcAppNavigationList" }, oi = { class: "app-navigation-list" };
 function si(e, t, n, r, i, a) {
-	return E(), q("ul", oi, [w(e.$slots, "default", {}, void 0, !0)]);
+	return T(), q("ul", oi, [C(e.$slots, "default", {}, void 0, !0)]);
 }
-var ci = /* @__PURE__ */ O(ai, [["render", si], ["__scopeId", "data-v-d72957ed"]]);
+var ci = /* @__PURE__ */ D(ai, [["render", si], ["__scopeId", "data-v-d72957ed"]]);
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/NcAppNavigation.mjs
 m(ee);
-var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @__PURE__ */ z({
+var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ D(/* @__PURE__ */ z({
 	__name: "NcAppNavigationToggle",
 	props: {
 		open: {
@@ -1402,7 +1402,7 @@ var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @
 	emits: ["update:open"],
 	setup(e) {
 		let t = at(e, "open"), n = G(() => t.value ? p("Close navigation") : p("Open navigation"));
-		return (e, r) => (E(), q("div", li, [W(B(I), {
+		return (e, r) => (T(), q("div", li, [W(B(I), {
 			class: "app-navigation-toggle",
 			"aria-controls": "app-navigation-vue",
 			"aria-expanded": t.value ? "true" : "false",
@@ -1427,7 +1427,7 @@ var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @
 	"aria-label",
 	"aria-labelledby",
 	"inert"
-], fi = { class: "app-navigation__search" }, pi = /* @__PURE__ */ O(/* @__PURE__ */ z({
+], fi = { class: "app-navigation__search" }, pi = /* @__PURE__ */ D(/* @__PURE__ */ z({
 	__name: "NcAppNavigation",
 	props: {
 		ariaLabel: {},
@@ -1441,7 +1441,7 @@ var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @
 			l.value = !e, r("navigation-toggled", { open: l.value });
 		}), M(u, () => {
 			p();
-		}), ce(() => {
+		}), A(() => {
 			a(!0), o("toggle-navigation", f), r("navigation-toggled", { open: l.value }), i = ot(s.value, {
 				allowOutsideClick: !0,
 				clickOutsideDeactivates: () => (c.value && (i.deactivate({ returnFocus: !1 }), d(!1)), !1),
@@ -1472,7 +1472,7 @@ var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @
 		function m() {
 			c.value && d(!1);
 		}
-		return (t, n) => (E(), q("div", {
+		return (t, n) => (T(), q("div", {
 			ref: "appNavigationContainer",
 			class: V(["app-navigation", {
 				"app-navigation--closed": !l.value,
@@ -1487,16 +1487,16 @@ var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @
 			inert: !l.value || void 0,
 			onKeydown: me(m, ["esc"])
 		}, [
-			Y("div", fi, [w(t.$slots, "search", {}, void 0, !0)]),
-			Y("div", { class: V(["app-navigation__body", { "app-navigation__body--no-list": !t.$slots.list }]) }, [w(t.$slots, "default", {}, void 0, !0)], 2),
-			t.$slots.list ? (E(), U(ci, {
+			Y("div", fi, [C(t.$slots, "search", {}, void 0, !0)]),
+			Y("div", { class: V(["app-navigation__body", { "app-navigation__body--no-list": !t.$slots.list }]) }, [C(t.$slots, "default", {}, void 0, !0)], 2),
+			t.$slots.list ? (T(), U(ci, {
 				key: 0,
 				class: "app-navigation__list"
 			}, {
-				default: g(() => [w(t.$slots, "list", {}, void 0, !0)]),
+				default: g(() => [C(t.$slots, "list", {}, void 0, !0)]),
 				_: 3
 			})) : L("", !0),
-			w(t.$slots, "footer", {}, void 0, !0)
+			C(t.$slots, "footer", {}, void 0, !0)
 		], 40, di), W(ui, {
 			open: l.value,
 			"onUpdate:open": d
@@ -1522,21 +1522,21 @@ var li = { class: "app-navigation-toggle-wrapper" }, ui = /* @__PURE__ */ O(/* @
 	"height"
 ], _i = { d: "M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" }, vi = { key: 0 };
 function yi(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon chevron-up-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", _i, [n.title ? (E(), q("title", vi, H(n.title), 1)) : L("", !0)])], 8, gi))], 16, hi);
+	}, [Y("path", _i, [n.title ? (T(), q("title", vi, H(n.title), 1)) : L("", !0)])], 8, gi))], 16, hi);
 }
-var bi = /* @__PURE__ */ O(mi, [["render", yi]]), xi = {
+var bi = /* @__PURE__ */ D(mi, [["render", yi]]), xi = {
 	name: "ArrowRightIcon",
 	emits: ["click"],
 	props: {
@@ -1556,21 +1556,21 @@ var bi = /* @__PURE__ */ O(mi, [["render", yi]]), xi = {
 	"height"
 ], wi = { d: "M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" }, Ti = { key: 0 };
 function Ei(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon arrow-right-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", wi, [n.title ? (E(), q("title", Ti, H(n.title), 1)) : L("", !0)])], 8, Ci))], 16, Si);
+	}, [Y("path", wi, [n.title ? (T(), q("title", Ti, H(n.title), 1)) : L("", !0)])], 8, Ci))], 16, Si);
 }
-var Di = /* @__PURE__ */ O(xi, [["render", Ei]]);
+var Di = /* @__PURE__ */ D(xi, [["render", Ei]]);
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/NcInputConfirmCancel.mjs
 m(l);
@@ -1630,8 +1630,8 @@ var Oi = {
 	}
 }, ki = ["placeholder"];
 function Ai(e, t, n, r, i, a) {
-	let o = D("IconArrowRight"), s = D("NcButton"), c = D("IconClose");
-	return E(), q("div", { class: V(["app-navigation-input-confirm", { "app-navigation-input-confirm--legacy": r.isLegacy34 }]) }, [Y("form", {
+	let o = E("IconArrowRight"), s = E("NcButton"), c = E("IconClose");
+	return T(), q("div", { class: V(["app-navigation-input-confirm", { "app-navigation-input-confirm--legacy": r.isLegacy34 }]) }, [Y("form", {
 		onSubmit: t[1] ||= P((...e) => a.confirm && a.confirm(...e), ["prevent"]),
 		onKeydown: t[2] ||= me(P((...e) => a.cancel && a.cancel(...e), [
 			"exact",
@@ -1640,7 +1640,7 @@ function Ai(e, t, n, r, i, a) {
 		]), ["esc"]),
 		onClick: t[3] ||= P(() => {}, ["stop", "prevent"])
 	}, [
-		S(Y("input", {
+		x(Y("input", {
 			ref: "input",
 			"onUpdate:modelValue": t[0] ||= (e) => a.valueModel = e,
 			type: "text",
@@ -1671,7 +1671,7 @@ function Ai(e, t, n, r, i, a) {
 		])
 	], 32)], 2);
 }
-var ji = /* @__PURE__ */ O(Oi, [["render", Ai], ["__scopeId", "data-v-6926a0b8"]]), Mi = z({
+var ji = /* @__PURE__ */ D(Oi, [["render", Ai], ["__scopeId", "data-v-6926a0b8"]]), Mi = z({
 	name: "NcVNodes",
 	props: { vnodes: {
 		type: [Array, Object],
@@ -1700,21 +1700,21 @@ var ji = /* @__PURE__ */ O(Oi, [["render", Ai], ["__scopeId", "data-v-6926a0b8"]
 	"height"
 ], Ii = { d: "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" }, Li = { key: 0 };
 function Ri(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon pencil-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Ii, [n.title ? (E(), q("title", Li, H(n.title), 1)) : L("", !0)])], 8, Fi))], 16, Pi);
+	}, [Y("path", Ii, [n.title ? (T(), q("title", Li, H(n.title), 1)) : L("", !0)])], 8, Fi))], 16, Pi);
 }
-var zi = /* @__PURE__ */ O(Ni, [["render", Ri]]), Bi = {
+var zi = /* @__PURE__ */ D(Ni, [["render", Ri]]), Bi = {
 	name: "UndoIcon",
 	emits: ["click"],
 	props: {
@@ -1734,22 +1734,22 @@ var zi = /* @__PURE__ */ O(Ni, [["render", Ri]]), Bi = {
 	"height"
 ], Ui = { d: "M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z" }, Wi = { key: 0 };
 function Gi(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon undo-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Ui, [n.title ? (E(), q("title", Wi, H(n.title), 1)) : L("", !0)])], 8, Hi))], 16, Vi);
+	}, [Y("path", Ui, [n.title ? (T(), q("title", Wi, H(n.title), 1)) : L("", !0)])], 8, Hi))], 16, Vi);
 }
-var Ki = /* @__PURE__ */ O(Bi, [["render", Gi]]);
-m(v);
+var Ki = /* @__PURE__ */ D(Bi, [["render", Gi]]);
+m(re);
 var qi = {
 	name: "NcAppNavigationIconCollapsible",
 	components: {
@@ -1779,8 +1779,8 @@ var qi = {
 	} }
 };
 function Ji(e, t, n, r, i, a) {
-	let o = D("ChevronUp"), s = D("ChevronDown"), c = D("NcButton");
-	return E(), U(c, {
+	let o = E("ChevronUp"), s = E("ChevronDown"), c = E("NcButton");
+	return T(), U(c, {
 		class: V(["icon-collapse", {
 			"icon-collapse--active": n.active,
 			"icon-collapse--open": n.open
@@ -1789,10 +1789,10 @@ function Ji(e, t, n, r, i, a) {
 		variant: n.active && r.isLegacy34 ? "tertiary-on-primary" : "tertiary",
 		onClick: a.onClick
 	}, {
-		icon: g(() => [n.open ? (E(), U(o, {
+		icon: g(() => [n.open ? (T(), U(o, {
 			key: 0,
 			size: 20
-		})) : (E(), U(s, {
+		})) : (T(), U(s, {
 			key: 1,
 			size: 20
 		}))]),
@@ -1804,8 +1804,8 @@ function Ji(e, t, n, r, i, a) {
 		"onClick"
 	]);
 }
-var Yi = /* @__PURE__ */ O(qi, [["render", Ji], ["__scopeId", "data-v-cfbd3794"]]);
-m(ie, b);
+var Yi = /* @__PURE__ */ D(qi, [["render", Ji], ["__scopeId", "data-v-cfbd3794"]]);
+m(ae, y);
 var Xi = {
 	name: "NcAppNavigationItem",
 	components: {
@@ -2015,15 +2015,15 @@ var Xi = {
 	class: "app-navigation-entry__children"
 };
 function ia(e, t, n, r, i, a) {
-	let o = D("NcLoadingIcon"), s = D("NcInputConfirmCancel"), c = D("Pencil"), l = D("NcActionButton"), u = D("Undo"), d = D("NcActions"), f = D("NcAppNavigationIconCollapsible");
-	return E(), q("li", {
+	let o = E("NcLoadingIcon"), s = E("NcInputConfirmCancel"), c = E("Pencil"), l = E("NcActionButton"), u = E("Undo"), d = E("NcActions"), f = E("NcAppNavigationIconCollapsible");
+	return T(), q("li", {
 		id: n.id,
 		class: V([{
 			"app-navigation-entry--opened": i.opened,
 			"app-navigation-entry--pinned": n.pinned,
 			"app-navigation-entry--collapsible": n.allowCollapse && !!e.$slots.default
 		}, "app-navigation-entry-wrapper"])
-	}, [(E(), U(y(a.isRouterLink ? "router-link" : "NcVNodes"), Ge(We({ ...a.isRouterLink && {
+	}, [(T(), U(v(a.isRouterLink ? "router-link" : "NcVNodes"), Ge(We({ ...a.isRouterLink && {
 		custom: !0,
 		to: n.to
 	} })), {
@@ -2033,7 +2033,7 @@ function ia(e, t, n, r, i, a) {
 			"app-navigation-entry--legacy": r.isLegacy34,
 			active: n.to && h || n.active
 		}]) }, [
-			n.undo ? L("", !0) : (E(), q("a", {
+			n.undo ? L("", !0) : (T(), q("a", {
 				key: 0,
 				class: "app-navigation-entry-link",
 				"aria-current": n.active || n.to && h ? "page" : void 0,
@@ -2047,9 +2047,9 @@ function ia(e, t, n, r, i, a) {
 				onFocus: t[2] ||= (...e) => a.handleFocus && a.handleFocus(...e),
 				onKeydown: t[3] ||= me(P((...e) => a.handleTab && a.handleTab(...e), ["exact"]), ["tab"])
 			}, [
-				Y("div", { class: V(["app-navigation-entry-icon", { [n.icon]: n.icon }]) }, [n.loading ? (E(), U(o, { key: 0 })) : w(e.$slots, "icon", { active: n.active || n.to && h }, void 0, !0, 1)], 2),
+				Y("div", { class: V(["app-navigation-entry-icon", { [n.icon]: n.icon }]) }, [n.loading ? (T(), U(o, { key: 0 })) : C(e.$slots, "icon", { active: n.active || n.to && h }, void 0, !0, 1)], 2),
 				Y("span", { class: V(["app-navigation-entry__name", { "hidden-visually": i.editingActive }]) }, H(n.name), 3),
-				i.editingActive ? (E(), q("div", $i, [W(s, {
+				i.editingActive ? (T(), q("div", $i, [W(s, {
 					ref: "editingInput",
 					modelValue: i.editingValue,
 					"onUpdate:modelValue": t[0] ||= (e) => i.editingValue = e,
@@ -2065,11 +2065,11 @@ function ia(e, t, n, r, i, a) {
 					"onConfirm"
 				])])) : L("", !0)
 			], 40, Qi)),
-			n.undo ? (E(), q("div", ea, [Y("div", ta, H(n.name), 1)])) : L("", !0),
-			(e.$slots.actions || e.$slots.counter || n.editable || n.undo) && !i.editingActive ? (E(), q("div", {
+			n.undo ? (T(), q("div", ea, [Y("div", ta, H(n.name), 1)])) : L("", !0),
+			(e.$slots.actions || e.$slots.counter || n.editable || n.undo) && !i.editingActive ? (T(), q("div", {
 				key: 2,
 				class: V(["app-navigation-entry__utils", { "app-navigation-entry__utils--display-actions": n.forceDisplayActions || i.menuOpenLocalValue || n.menuOpen }])
-			}, [e.$slots.counter ? (E(), q("div", na, [w(e.$slots, "counter", {}, void 0, !0)])) : L("", !0), e.$slots.actions || n.editable && !i.editingActive || n.undo ? (E(), U(d, {
+			}, [e.$slots.counter ? (T(), q("div", na, [C(e.$slots, "counter", {}, void 0, !0)])) : L("", !0), e.$slots.actions || n.editable && !i.editingActive || n.undo ? (T(), U(d, {
 				key: 1,
 				ref: "actions",
 				class: "app-navigation-entry__actions",
@@ -2083,9 +2083,9 @@ function ia(e, t, n, r, i, a) {
 				variant: "tertiary",
 				"onUpdate:open": a.onMenuToggle
 			}, {
-				icon: g(() => [w(e.$slots, "menu-icon", {}, void 0, !0)]),
+				icon: g(() => [C(e.$slots, "menu-icon", {}, void 0, !0)]),
 				default: g(() => [
-					n.editable && !i.editingActive ? (E(), U(l, {
+					n.editable && !i.editingActive ? (T(), U(l, {
 						key: 0,
 						"aria-label": a.editButtonAriaLabel,
 						onClick: a.handleEdit
@@ -2094,7 +2094,7 @@ function ia(e, t, n, r, i, a) {
 						default: g(() => [R(" " + H(n.editLabel), 1)]),
 						_: 1
 					}, 8, ["aria-label", "onClick"])) : L("", !0),
-					n.undo ? (E(), U(l, {
+					n.undo ? (T(), U(l, {
 						key: 1,
 						"aria-label": a.undoButtonAriaLabel,
 						onClick: a.handleUndo
@@ -2102,7 +2102,7 @@ function ia(e, t, n, r, i, a) {
 						icon: g(() => [W(u, { size: 20 })]),
 						_: 1
 					}, 8, ["aria-label", "onClick"])) : L("", !0),
-					w(e.$slots, "actions", {}, void 0, !0)
+					C(e.$slots, "actions", {}, void 0, !0)
 				]),
 				_: 3
 			}, 8, [
@@ -2114,7 +2114,7 @@ function ia(e, t, n, r, i, a) {
 				"defaultIcon",
 				"onUpdate:open"
 			])) : L("", !0)], 2)) : L("", !0),
-			n.allowCollapse && e.$slots.default ? (E(), U(f, {
+			n.allowCollapse && e.$slots.default ? (T(), U(f, {
 				key: 3,
 				active: n.to && h || n.active,
 				open: i.opened,
@@ -2124,12 +2124,12 @@ function ia(e, t, n, r, i, a) {
 				"open",
 				"onClick"
 			])) : L("", !0),
-			w(e.$slots, "extra", {}, void 0, !0)
+			C(e.$slots, "extra", {}, void 0, !0)
 		], 2)]),
 		_: 3
-	}, 16)), a.canHaveChildren && e.$slots.default ? (E(), q("ul", ra, [w(e.$slots, "default", {}, void 0, !0)])) : L("", !0)], 10, Zi);
+	}, 16)), a.canHaveChildren && e.$slots.default ? (T(), q("ul", ra, [C(e.$slots, "default", {}, void 0, !0)])) : L("", !0)], 10, Zi);
 }
-var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]]), oa = /* @__PURE__ */ Object.assign({ inheritAttrs: !1 }, {
+var aa = /* @__PURE__ */ D(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]]), oa = /* @__PURE__ */ Object.assign({ inheritAttrs: !1 }, {
 	__name: "splitpanes",
 	props: {
 		horizontal: {
@@ -2170,7 +2170,7 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 		"direction-changed"
 	],
 	setup(e, { emit: t }) {
-		let n = t, r = e, i = se(), a = d(), o = X([]), s = G(() => o.value.reduce((e, t) => (e[~~t.id] = t) && e, {})), c = G(() => o.value.length), l = X(null), f = X(!1), p = X({
+		let n = t, r = e, i = ce(), a = d(), o = X([]), s = G(() => o.value.reduce((e, t) => (e[~~t.id] = t) && e, {})), c = G(() => o.value.length), l = X(null), f = X(!1), p = X({
 			mouseDown: !1,
 			dragging: !1,
 			activeSplitter: null,
@@ -2195,18 +2195,18 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 			ee(), p.value.mouseDown = !0, p.value.activeSplitter = t, document.documentElement.style.cursor = r.horizontal ? "row-resize" : "col-resize";
 		}, ne = (e) => {
 			p.value.mouseDown && (e.preventDefault(), p.value.dragging || (window.getSelection()?.removeAllRanges(), p.value.dragging = !0), requestAnimationFrame(() => {
-				C(re(e)), ge("resize", { event: e }, !0);
+				S(ie(e)), ge("resize", { event: e }, !0);
 			}));
 		}, _ = (e) => {
 			p.value.dragging && (window.getSelection()?.removeAllRanges(), ge("resized", { event: e }, !0)), p.value.mouseDown = !1, p.value.activeSplitter = null, setTimeout(() => {
 				p.value.dragging = !1, te(), document.documentElement.style.cursor = "";
 			}, 100);
-		}, v = (e, t) => {
-			"ontouchstart" in window && (e.preventDefault(), m.value.splitter === t ? (clearTimeout(m.value.timeoutId), m.value.timeoutId = null, b(e, t), m.value.splitter = null) : (m.value.splitter = t, m.value.timeoutId = setTimeout(() => m.value.splitter = null, 500))), p.value.dragging || ge("splitter-click", {
+		}, re = (e, t) => {
+			"ontouchstart" in window && (e.preventDefault(), m.value.splitter === t ? (clearTimeout(m.value.timeoutId), m.value.timeoutId = null, y(e, t), m.value.splitter = null) : (m.value.splitter = t, m.value.timeoutId = setTimeout(() => m.value.splitter = null, 500))), p.value.dragging || ge("splitter-click", {
 				event: e,
 				index: t
 			}, !0);
-		}, b = (e, t) => {
+		}, y = (e, t) => {
 			if (ge("splitter-dblclick", {
 				event: e,
 				index: t
@@ -2221,72 +2221,72 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 					index: t
 				}, !0);
 			}
-		}, x = (e, t) => {
+		}, b = (e, t) => {
 			if (!r.keyboardStep) return;
 			let n = r.horizontal ? e.key === "ArrowDown" : e.key === "ArrowRight", i = r.horizontal ? e.key === "ArrowUp" : e.key === "ArrowLeft";
 			if (!n && !i) return;
 			e.preventDefault(), p.value.activeSplitter = t;
-			let a = (n ? 1 : -1) * (r.rtl && !r.horizontal ? -1 : 1), s = D(t) + o.value[t].size;
-			w(Math.min(Math.max(s + a * r.keyboardStep, 0), 100)), ge("resize", { event: e }, !0), ge("resized", { event: e }, !0), p.value.activeSplitter = null;
-		}, S = (e, t) => {
+			let a = (n ? 1 : -1) * (r.rtl && !r.horizontal ? -1 : 1), s = E(t) + o.value[t].size;
+			C(Math.min(Math.max(s + a * r.keyboardStep, 0), 100)), ge("resize", { event: e }, !0), ge("resized", { event: e }, !0), p.value.activeSplitter = null;
+		}, x = (e, t) => {
 			let n = s.value[t];
 			n && ge("pane-click", {
 				event: e,
 				index: n.index,
 				pane: n
 			});
-		}, re = (e) => {
+		}, ie = (e) => {
 			let t = l.value.getBoundingClientRect(), { clientX: n, clientY: i } = "ontouchstart" in window && e.touches ? e.touches[0] : e;
 			return {
 				x: n - (r.horizontal ? 0 : p.value.cursorOffset) - t.left,
 				y: i - (r.horizontal ? p.value.cursorOffset : 0) - t.top
 			};
-		}, ie = (e) => {
+		}, ae = (e) => {
 			e = e[r.horizontal ? "y" : "x"];
 			let t = l.value[r.horizontal ? "clientHeight" : "clientWidth"];
 			return r.rtl && !r.horizontal && (e = t - e), e * 100 / t;
+		}, S = (e) => {
+			C(ae(e));
 		}, C = (e) => {
-			w(ie(e));
-		}, w = (e) => {
 			let t = p.value.activeSplitter;
 			if (t === null || t >= o.value.length - 1) return;
 			let n = {
-				prevPanesSize: D(t),
-				nextPanesSize: O(t),
+				prevPanesSize: E(t),
+				nextPanesSize: D(t),
 				prevReachedMinPanes: 0,
 				nextReachedMinPanes: 0
 			}, i = 0 + (r.pushOtherPanes ? 0 : n.prevPanesSize), a = 100 - (r.pushOtherPanes ? 0 : n.nextPanesSize);
 			e = Math.max(Math.min(e, a), i);
-			let s = [t, t + 1], c = o.value[s[0]] || null, l = o.value[s[1]] || null, u = c !== null && c.max < 100 && e >= c.max + n.prevPanesSize, d = l !== null && l.max < 100 && e <= 100 - (l.max + O(t + 1));
+			let s = [t, t + 1], c = o.value[s[0]] || null, l = o.value[s[1]] || null, u = c !== null && c.max < 100 && e >= c.max + n.prevPanesSize, d = l !== null && l.max < 100 && e <= 100 - (l.max + D(t + 1));
 			if (u || d) {
-				u ? (c.size = c.max, l.size = Math.min(Math.max(100 - c.max - n.prevPanesSize - n.nextPanesSize, l.min), l.max)) : (c.size = Math.min(Math.max(100 - l.max - n.prevPanesSize - O(t + 1), c.min), c.max), l.size = l.max);
+				u ? (c.size = c.max, l.size = Math.min(Math.max(100 - c.max - n.prevPanesSize - n.nextPanesSize, l.min), l.max)) : (c.size = Math.min(Math.max(100 - l.max - n.prevPanesSize - D(t + 1), c.min), c.max), l.size = l.max);
 				return;
 			}
 			if (r.pushOtherPanes) {
-				let t = T(n, e);
+				let t = w(n, e);
 				if (!t) return;
 				({sums: n, panesToResize: s} = t), c = o.value[s[0]] || null, l = o.value[s[1]] || null;
 			}
 			c !== null && (c.size = Math.min(Math.max(e - n.prevPanesSize - n.prevReachedMinPanes, c.min), c.max)), l !== null && (l.size = Math.min(Math.max(100 - e - n.nextPanesSize - n.nextReachedMinPanes, l.min), l.max));
-		}, T = (e, t) => {
+		}, w = (e, t) => {
 			let n = p.value.activeSplitter, r = [n, n + 1];
 			if (t < e.prevPanesSize + o.value[r[0]].min) {
-				if (r[0] = ae(n).index, e.prevReachedMinPanes = 0, r[0] < n && o.value.forEach((t, i) => {
+				if (r[0] = oe(n).index, e.prevReachedMinPanes = 0, r[0] < n && o.value.forEach((t, i) => {
 					i > r[0] && i <= n && (t.size = t.min, e.prevReachedMinPanes += t.min);
 				}), r[0] === void 0) return e.prevReachedMinPanes = 0, o.value[0].size = o.value[0].min, o.value.forEach((t, r) => {
 					r > 0 && r <= n && (t.size = t.min, e.prevReachedMinPanes += t.min);
 				}), o.value[r[1]].size = 100 - e.prevReachedMinPanes - o.value[0].min - e.prevPanesSize - e.nextPanesSize, null;
-				e.prevPanesSize = D(r[0]);
+				e.prevPanesSize = E(r[0]);
 			}
-			return t > 100 - e.nextPanesSize - o.value[r[1]].min && (r[1] = k(n).index, e.nextReachedMinPanes = 0, r[1] > n + 1 && o.value.forEach((t, i) => {
+			return t > 100 - e.nextPanesSize - o.value[r[1]].min && (r[1] = O(n).index, e.nextReachedMinPanes = 0, r[1] > n + 1 && o.value.forEach((t, i) => {
 				i > n && i < r[1] && (t.size = t.min, e.nextReachedMinPanes += t.min);
-			}), e.nextPanesSize = r[1] === void 0 ? 0 : O(r[1] - 1), r[1] === void 0) ? (e.nextReachedMinPanes = 0, o.value.forEach((t, r) => {
+			}), e.nextPanesSize = r[1] === void 0 ? 0 : D(r[1] - 1), r[1] === void 0) ? (e.nextReachedMinPanes = 0, o.value.forEach((t, r) => {
 				r >= n + 1 && (t.size = t.min, e.nextReachedMinPanes += t.min);
-			}), r[0] !== void 0 && (o.value[r[0]].size = 100 - e.prevPanesSize - O(r[0] - 1)), null) : {
+			}), r[0] !== void 0 && (o.value[r[0]].size = 100 - e.prevPanesSize - D(r[0] - 1)), null) : {
 				sums: e,
 				panesToResize: r
 			};
-		}, D = (e) => o.value.reduce((t, n, r) => t + (r < e ? n.size : 0), 0), O = (e) => o.value.reduce((t, n, r) => t + (r > e + 1 ? n.size : 0), 0), ae = (e) => [...o.value].reverse().find((t) => t.index < e && t.size > t.min) || {}, k = (e) => o.value.find((t) => t.index > e + 1 && t.size > t.min) || {}, oe = () => {
+		}, E = (e) => o.value.reduce((t, n, r) => t + (r < e ? n.size : 0), 0), D = (e) => o.value.reduce((t, n, r) => t + (r > e + 1 ? n.size : 0), 0), oe = (e) => [...o.value].reverse().find((t) => t.index < e && t.size > t.min) || {}, O = (e) => o.value.find((t) => t.index > e + 1 && t.size > t.min) || {}, se = () => {
 			let e = Array.from(l.value?.children || []);
 			for (let t of e) {
 				let e = t.classList.contains("splitpanes__pane"), n = t.classList.contains("splitpanes__splitter");
@@ -2294,7 +2294,7 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 			}
 		}, j = (e, t, n = !1) => {
 			let i = e - 1, a = document.createElement("div");
-			a.classList.add("splitpanes__splitter"), n || (a.onmousedown = (e) => g(e, i), typeof window < "u" && "ontouchstart" in window && (a.ontouchstart = (e) => g(e, i)), a.onclick = (e) => v(e, i + 1), r.keyboardStep && (a.setAttribute("tabindex", "0"), a.setAttribute("role", "separator"), a.setAttribute("aria-orientation", r.horizontal ? "horizontal" : "vertical"), a.onkeydown = (e) => x(e, i))), a.ondblclick = (e) => b(e, i + 1), t.parentNode.insertBefore(a, t);
+			a.classList.add("splitpanes__splitter"), n || (a.onmousedown = (e) => g(e, i), typeof window < "u" && "ontouchstart" in window && (a.ontouchstart = (e) => g(e, i)), a.onclick = (e) => re(e, i + 1), r.keyboardStep && (a.setAttribute("tabindex", "0"), a.setAttribute("role", "separator"), a.setAttribute("aria-orientation", r.horizontal ? "horizontal" : "vertical"), a.onkeydown = (e) => b(e, i))), a.ondblclick = (e) => y(e, i + 1), t.parentNode.insertBefore(a, t);
 		}, le = (e) => {
 			e.onmousedown = null, e.onclick = null, e.ondblclick = null, e.onkeydown = null, e.remove();
 		}, ue = () => {
@@ -2381,9 +2381,9 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 					size: e.size
 				}))
 			});
-		})), ce(() => {
-			oe(), ue(), P(), ge("ready"), f.value = !0;
-		}), A(() => f.value = !1);
+		})), A(() => {
+			se(), ue(), P(), ge("ready"), f.value = !0;
+		}), k(() => f.value = !1);
 		let _e = () => {
 			let { class: e, ...t } = i;
 			return Re("div", {
@@ -2392,7 +2392,7 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 				...t
 			}, a.default?.());
 		};
-		return u("panes", o), u("indexedPanes", s), u("horizontal", G(() => r.horizontal)), u("requestUpdate", de), u("onPaneAdd", fe), u("onPaneRemove", pe), u("onPaneClick", S), (e, t) => (E(), U(y(_e)));
+		return u("panes", o), u("indexedPanes", s), u("horizontal", G(() => r.horizontal)), u("requestUpdate", de), u("onPaneAdd", fe), u("onPaneRemove", pe), u("onPaneClick", x), (e, t) => (T(), U(v(_e)));
 	}
 }), sa = {
 	__name: "pane",
@@ -2430,7 +2430,7 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 		})), M(() => p.value, (e) => n({
 			uid: s,
 			max: e
-		})), ce(() => {
+		})), A(() => {
 			r({
 				id: s,
 				el: u.value,
@@ -2439,13 +2439,13 @@ var aa = /* @__PURE__ */ O(Xi, [["render", ia], ["__scopeId", "data-v-6cae7342"]
 				givenSize: t.size === void 0 ? null : d.value,
 				size: d.value
 			});
-		}), A(() => a(s)), (e, t) => (E(), q("div", {
+		}), k(() => a(s)), (e, t) => (T(), q("div", {
 			ref_key: "paneEl",
 			ref: u,
 			class: "splitpanes__pane",
 			onClick: t[0] ||= (t) => B(o)(t, e._.uid),
 			style: ze(m.value)
-		}, [w(e.$slots, "default")], 4));
+		}, [C(e.$slots, "default")], 4));
 	}
 };
 //#endregion
@@ -2470,21 +2470,21 @@ var fa = ca(() => {
 });
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/NcAppContent.mjs
-m(oe);
-var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
+m(se);
+var pa = /* @__PURE__ */ D(/* @__PURE__ */ z({
 	__name: "NcAppContentDetailsToggle",
 	setup(e) {
 		let t = pt();
-		M(t, n), ce(() => {
+		M(t, n), A(() => {
 			n(t.value);
-		}), A(() => {
+		}), k(() => {
 			t.value && n(!1);
 		});
 		function n(e = !0) {
 			let t = document.querySelector(".app-navigation .app-navigation-toggle");
 			t && (t.style.display = e ? "none" : "", e === !0 && r("toggle-navigation", { open: !1 }));
 		}
-		return (e, n) => (E(), U(B(I), {
+		return (e, n) => (T(), U(B(I), {
 			"aria-label": B(p)("Go back to the list"),
 			class: V(["app-details-toggle", { "app-details-toggle--mobile": B(t) }]),
 			title: B(p)("Go back to the list"),
@@ -2507,7 +2507,7 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 }, ha = { class: "app-content-wrapper__list" }, ga = {
 	key: 1,
 	class: "app-content-wrapper"
-}, _a = e("nextcloud").persist().build(), va = _t().theming?.name ?? "Nextcloud", ya = /* @__PURE__ */ O(/* @__PURE__ */ z({
+}, _a = e("nextcloud").persist().build(), va = _t().theming?.name ?? "Nextcloud", ya = /* @__PURE__ */ D(/* @__PURE__ */ z({
 	__name: "NcAppContent",
 	props: /* @__PURE__ */ _e({
 		disableSwipe: {
@@ -2554,7 +2554,7 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 		});
 		M(h, () => {
 			h.value !== null && (document.title = h.value);
-		}, { immediate: !0 }), M(() => e.paneConfigKey, te, { immediate: !0 }), ce(te);
+		}, { immediate: !0 }), M(() => e.paneConfigKey, te, { immediate: !0 }), A(te);
 		function ee(e) {
 			let t = Math.trunc(e.panes[0].size);
 			_a.setItem(f.value, JSON.stringify(t)), d.value = t, i("resizeList", { size: t }), a.debug("[NcAppContent] pane config", { listPaneSize: t });
@@ -2563,12 +2563,12 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 			let e = parseInt(_a.getItem(f.value) ?? "", 10);
 			!isNaN(e) && e !== d.value && (a.debug("[NcAppContent] pane config", { listPaneSize: e }), d.value = e);
 		}
-		return (t, r) => (E(), q("main", {
+		return (t, r) => (T(), q("main", {
 			id: "app-content-vue",
 			class: V(["app-content no-snapper", { "app-content--has-list": !!t.$slots.list }])
 		}, [
-			e.pageHeading ? (E(), q("h1", ma, H(e.pageHeading), 1)) : L("", !0),
-			t.$slots.list ? (E(), q(k, { key: 1 }, [B(c) || e.layout === "no-split" ? (E(), q("div", {
+			e.pageHeading ? (T(), q("h1", ma, H(e.pageHeading), 1)) : L("", !0),
+			t.$slots.list ? (T(), q(O, { key: 1 }, [B(c) || e.layout === "no-split" ? (T(), q("div", {
 				key: 0,
 				class: V(["app-content-wrapper app-content-wrapper--no-split", {
 					"app-content-wrapper--show-details": n.value,
@@ -2576,13 +2576,13 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 					"app-content-wrapper--mobile": B(c)
 				}])
 			}, [
-				n.value ? (E(), U(pa, {
+				n.value ? (T(), U(pa, {
 					key: 0,
 					onClick: r[0] ||= P((e) => n.value = !1, ["stop", "prevent"])
 				})) : L("", !0),
-				S(Y("div", ha, [w(t.$slots, "list", {}, void 0, !0)], 512), [[x, !n.value]]),
-				n.value ? w(t.$slots, "default", {}, void 0, !0, 1) : L("", !0)
-			], 2)) : e.layout === "vertical-split" || e.layout === "horizontal-split" ? (E(), q("div", ga, [W(B(oa), {
+				x(Y("div", ha, [C(t.$slots, "list", {}, void 0, !0)], 512), [[b, !n.value]]),
+				n.value ? C(t.$slots, "default", {}, void 0, !0, 1) : L("", !0)
+			], 2)) : e.layout === "vertical-split" || e.layout === "horizontal-split" ? (T(), q("div", ga, [W(B(oa), {
 				horizontal: e.layout === "horizontal-split",
 				class: V(["default-theme", {
 					"splitpanes--horizontal": e.layout === "horizontal-split",
@@ -2597,7 +2597,7 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 					minSize: p.value.list.min,
 					maxSize: p.value.list.max
 				}, {
-					default: g(() => [w(t.$slots, "list", {}, void 0, !0)]),
+					default: g(() => [C(t.$slots, "list", {}, void 0, !0)]),
 					_: 3
 				}, 8, [
 					"size",
@@ -2609,7 +2609,7 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 					minSize: p.value.details.min,
 					maxSize: p.value.details.max
 				}, {
-					default: g(() => [w(t.$slots, "default", {}, void 0, !0)]),
+					default: g(() => [C(t.$slots, "default", {}, void 0, !0)]),
 					_: 3
 				}, 8, [
 					"size",
@@ -2622,7 +2622,7 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 				"class",
 				"rtl"
 			])])) : L("", !0)], 64)) : L("", !0),
-			t.$slots.list ? L("", !0) : w(t.$slots, "default", {}, void 0, !0, 2)
+			t.$slots.list ? L("", !0) : C(t.$slots, "default", {}, void 0, !0, 2)
 		], 2));
 	}
 }), [["__scopeId", "data-v-5de09463"]]), $ = (e, t) => {
@@ -2649,19 +2649,19 @@ var pa = /* @__PURE__ */ O(/* @__PURE__ */ z({
 	"height"
 ], Ca = { d: "M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z" }, wa = { key: 0 };
 function Ta(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon file-document-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Ca, [n.title ? (E(), q("title", wa, H(n.title), 1)) : L("", !0)])], 8, Sa))], 16, xa);
+	}, [Y("path", Ca, [n.title ? (T(), q("title", wa, H(n.title), 1)) : L("", !0)])], 8, Sa))], 16, xa);
 }
 var Ea = /*#__PURE__*/ $(ba, [["render", Ta]]), Da = {
 	name: "FileDocumentOutlineIcon",
@@ -2683,19 +2683,19 @@ var Ea = /*#__PURE__*/ $(ba, [["render", Ta]]), Da = {
 	"height"
 ], Aa = { d: "M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6M6,4H13V9H18V20H6V4M8,12V14H16V12H8M8,16V18H13V16H8Z" }, ja = { key: 0 };
 function Ma(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon file-document-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Aa, [n.title ? (E(), q("title", ja, H(n.title), 1)) : L("", !0)])], 8, ka))], 16, Oa);
+	}, [Y("path", Aa, [n.title ? (T(), q("title", ja, H(n.title), 1)) : L("", !0)])], 8, ka))], 16, Oa);
 }
 var Na = /*#__PURE__*/ $(Da, [["render", Ma]]), Pa = {
 	name: "AccountGroupIcon",
@@ -2717,19 +2717,19 @@ var Na = /*#__PURE__*/ $(Da, [["render", Ma]]), Pa = {
 	"height"
 ], La = { d: "M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z" }, Ra = { key: 0 };
 function za(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon account-group-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", La, [n.title ? (E(), q("title", Ra, H(n.title), 1)) : L("", !0)])], 8, Ia))], 16, Fa);
+	}, [Y("path", La, [n.title ? (T(), q("title", Ra, H(n.title), 1)) : L("", !0)])], 8, Ia))], 16, Fa);
 }
 var Ba = /*#__PURE__*/ $(Pa, [["render", za]]), Va = {
 	name: "AccountIcon",
@@ -2751,19 +2751,19 @@ var Ba = /*#__PURE__*/ $(Pa, [["render", za]]), Va = {
 	"height"
 ], Wa = { d: "M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" }, Ga = { key: 0 };
 function Ka(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon account-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Wa, [n.title ? (E(), q("title", Ga, H(n.title), 1)) : L("", !0)])], 8, Ua))], 16, Ha);
+	}, [Y("path", Wa, [n.title ? (T(), q("title", Ga, H(n.title), 1)) : L("", !0)])], 8, Ua))], 16, Ha);
 }
 var qa = /*#__PURE__*/ $(Va, [["render", Ka]]), Ja = {
 	name: "PackageVariantIcon",
@@ -2785,19 +2785,19 @@ var qa = /*#__PURE__*/ $(Va, [["render", Ka]]), Ja = {
 	"height"
 ], Za = { d: "M2,10.96C1.5,10.68 1.35,10.07 1.63,9.59L3.13,7C3.24,6.8 3.41,6.66 3.6,6.58L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.66,6.72 20.82,6.88 20.91,7.08L22.36,9.6C22.64,10.08 22.47,10.69 22,10.96L21,11.54V16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V10.96C2.7,11.13 2.32,11.14 2,10.96M12,4.15V4.15L12,10.85V10.85L17.96,7.5L12,4.15M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V12.69L14,15.59C13.67,15.77 13.3,15.76 13,15.6V19.29L19,15.91M13.85,13.36L20.13,9.73L19.55,8.72L13.27,12.35L13.85,13.36Z" }, Qa = { key: 0 };
 function $a(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon package-variant-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Za, [n.title ? (E(), q("title", Qa, H(n.title), 1)) : L("", !0)])], 8, Xa))], 16, Ya);
+	}, [Y("path", Za, [n.title ? (T(), q("title", Qa, H(n.title), 1)) : L("", !0)])], 8, Xa))], 16, Ya);
 }
 var eo = /*#__PURE__*/ $(Ja, [["render", $a]]), to = {
 	name: "TextBoxIcon",
@@ -2819,19 +2819,19 @@ var eo = /*#__PURE__*/ $(Ja, [["render", $a]]), to = {
 	"height"
 ], io = { d: "M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" }, ao = { key: 0 };
 function oo(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon text-box-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", io, [n.title ? (E(), q("title", ao, H(n.title), 1)) : L("", !0)])], 8, ro))], 16, no);
+	}, [Y("path", io, [n.title ? (T(), q("title", ao, H(n.title), 1)) : L("", !0)])], 8, ro))], 16, no);
 }
 var so = /*#__PURE__*/ $(to, [["render", oo]]), co = {
 	name: "CogIcon",
@@ -2853,19 +2853,19 @@ var so = /*#__PURE__*/ $(to, [["render", oo]]), co = {
 	"height"
 ], fo = { d: "M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" }, po = { key: 0 };
 function mo(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon cog-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", fo, [n.title ? (E(), q("title", po, H(n.title), 1)) : L("", !0)])], 8, uo))], 16, lo);
+	}, [Y("path", fo, [n.title ? (T(), q("title", po, H(n.title), 1)) : L("", !0)])], 8, uo))], 16, lo);
 }
 var ho = /*#__PURE__*/ $(co, [["render", mo]]), go = {
 	name: "LockIcon",
@@ -2887,19 +2887,19 @@ var ho = /*#__PURE__*/ $(co, [["render", mo]]), go = {
 	"height"
 ], yo = { d: "M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" }, bo = { key: 0 };
 function xo(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon lock-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", yo, [n.title ? (E(), q("title", bo, H(n.title), 1)) : L("", !0)])], 8, vo))], 16, _o);
+	}, [Y("path", yo, [n.title ? (T(), q("title", bo, H(n.title), 1)) : L("", !0)])], 8, vo))], 16, _o);
 }
 var So = /*#__PURE__*/ $(go, [["render", xo]]), Co = {
 	name: "ChartBarIcon",
@@ -2921,19 +2921,19 @@ var So = /*#__PURE__*/ $(go, [["render", xo]]), Co = {
 	"height"
 ], Eo = { d: "M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z" }, Do = { key: 0 };
 function Oo(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon chart-bar-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Eo, [n.title ? (E(), q("title", Do, H(n.title), 1)) : L("", !0)])], 8, To))], 16, wo);
+	}, [Y("path", Eo, [n.title ? (T(), q("title", Do, H(n.title), 1)) : L("", !0)])], 8, To))], 16, wo);
 }
 var ko = /*#__PURE__*/ $(Co, [["render", Oo]]), Ao = {
 	name: "CounterIcon",
@@ -2955,19 +2955,19 @@ var ko = /*#__PURE__*/ $(Co, [["render", Oo]]), Ao = {
 	"height"
 ], No = { d: "M4,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M4,6V18H11V6H4M20,18V6H18.76C19,6.54 18.95,7.07 18.95,7.13C18.88,7.8 18.41,8.5 18.24,8.75L15.91,11.3L19.23,11.28L19.24,12.5L14.04,12.47L14,11.47C14,11.47 17.05,8.24 17.2,7.95C17.34,7.67 17.91,6 16.5,6C15.27,6.05 15.41,7.3 15.41,7.3L13.87,7.31C13.87,7.31 13.88,6.65 14.25,6H13V18H15.58L15.57,17.14L16.54,17.13C16.54,17.13 17.45,16.97 17.46,16.08C17.5,15.08 16.65,15.08 16.5,15.08C16.37,15.08 15.43,15.13 15.43,15.95H13.91C13.91,15.95 13.95,13.89 16.5,13.89C19.1,13.89 18.96,15.91 18.96,15.91C18.96,15.91 19,17.16 17.85,17.63L18.37,18H20M8.92,16H7.42V10.2L5.62,10.76V9.53L8.76,8.41H8.92V16Z" }, Po = { key: 0 };
 function Fo(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon counter-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", No, [n.title ? (E(), q("title", Po, H(n.title), 1)) : L("", !0)])], 8, Mo))], 16, jo);
+	}, [Y("path", No, [n.title ? (T(), q("title", Po, H(n.title), 1)) : L("", !0)])], 8, Mo))], 16, jo);
 }
 var Io = /*#__PURE__*/ $(Ao, [["render", Fo]]), Lo = {
 	name: "EmailIcon",
@@ -2989,19 +2989,19 @@ var Io = /*#__PURE__*/ $(Ao, [["render", Fo]]), Lo = {
 	"height"
 ], Bo = { d: "M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" }, Vo = { key: 0 };
 function Ho(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon email-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Bo, [n.title ? (E(), q("title", Vo, H(n.title), 1)) : L("", !0)])], 8, zo))], 16, Ro);
+	}, [Y("path", Bo, [n.title ? (T(), q("title", Vo, H(n.title), 1)) : L("", !0)])], 8, zo))], 16, Ro);
 }
 var Uo = /*#__PURE__*/ $(Lo, [["render", Ho]]), Wo = {
 	name: "FolderIcon",
@@ -3023,19 +3023,19 @@ var Uo = /*#__PURE__*/ $(Lo, [["render", Ho]]), Wo = {
 	"height"
 ], qo = { d: "M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" }, Jo = { key: 0 };
 function Yo(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon folder-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", qo, [n.title ? (E(), q("title", Jo, H(n.title), 1)) : L("", !0)])], 8, Ko))], 16, Go);
+	}, [Y("path", qo, [n.title ? (T(), q("title", Jo, H(n.title), 1)) : L("", !0)])], 8, Ko))], 16, Go);
 }
 var Xo = /*#__PURE__*/ $(Wo, [["render", Yo]]), Zo = {
 	name: "MagnifyIcon",
@@ -3057,19 +3057,19 @@ var Xo = /*#__PURE__*/ $(Wo, [["render", Yo]]), Zo = {
 	"height"
 ], es = { d: "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" }, ts = { key: 0 };
 function ns(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon magnify-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", es, [n.title ? (E(), q("title", ts, H(n.title), 1)) : L("", !0)])], 8, $o))], 16, Qo);
+	}, [Y("path", es, [n.title ? (T(), q("title", ts, H(n.title), 1)) : L("", !0)])], 8, $o))], 16, Qo);
 }
 var rs = /*#__PURE__*/ $(Zo, [["render", ns]]), is = {
 	name: "StarIcon",
@@ -3091,19 +3091,19 @@ var rs = /*#__PURE__*/ $(Zo, [["render", ns]]), is = {
 	"height"
 ], ss = { d: "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" }, cs = { key: 0 };
 function ls(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon star-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", ss, [n.title ? (E(), q("title", cs, H(n.title), 1)) : L("", !0)])], 8, os))], 16, as);
+	}, [Y("path", ss, [n.title ? (T(), q("title", cs, H(n.title), 1)) : L("", !0)])], 8, os))], 16, as);
 }
 var us = /*#__PURE__*/ $(is, [["render", ls]]), ds = {
 	name: "TranslateIcon",
@@ -3125,19 +3125,19 @@ var us = /*#__PURE__*/ $(is, [["render", ls]]), ds = {
 	"height"
 ], ms = { d: "M12.87,15.07L10.33,12.56L10.36,12.53C12.1,10.59 13.34,8.36 14.07,6H17V4H10V2H8V4H1V6H12.17C11.5,7.92 10.44,9.75 9,11.35C8.07,10.32 7.3,9.19 6.69,8H4.69C5.42,9.63 6.42,11.17 7.67,12.56L2.58,17.58L4,19L9,14L12.11,17.11L12.87,15.07M18.5,10H16.5L12,22H14L15.12,19H19.87L21,22H23L18.5,10M15.88,17L17.5,12.67L19.12,17H15.88Z" }, hs = { key: 0 };
 function gs(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon translate-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", ms, [n.title ? (E(), q("title", hs, H(n.title), 1)) : L("", !0)])], 8, ps))], 16, fs);
+	}, [Y("path", ms, [n.title ? (T(), q("title", hs, H(n.title), 1)) : L("", !0)])], 8, ps))], 16, fs);
 }
 var _s = /*#__PURE__*/ $(ds, [["render", gs]]);
 //#endregion
@@ -3230,7 +3230,7 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 		function o(e) {
 			return t[e] ?? us;
 		}
-		ce(async () => {
+		A(async () => {
 			try {
 				let e = await Ts();
 				e.entries.length > 0 && (r.value = e.version, i.value = e.entries, n.value = !0);
@@ -3242,7 +3242,7 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 				await Es();
 			} catch {}
 		}
-		return (e, t) => n.value ? (E(), U(B(ft), {
+		return (e, t) => n.value ? (T(), U(B(ft), {
 			key: 0,
 			labelId: zs,
 			onKeydown: t[0] ||= me((e) => B(Ds)(e, s), ["esc"]),
@@ -3251,18 +3251,18 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 			default: g(() => [Y("div", Os, [
 				Y("h2", { id: zs }, H(B(a)), 1),
 				Y("p", ks, H(B(j)("rechnungswerk", "Version {version}", { version: r.value })), 1),
-				(E(!0), q(k, null, C(i.value, (e, t) => (E(), q("div", {
+				(T(!0), q(O, null, S(i.value, (e, t) => (T(), q("div", {
 					key: t,
 					class: "whatsnew__entry"
-				}, [Y("div", As, [(E(), U(y(o(e.icon)), { size: 22 }))]), Y("div", js, [
-					Y("h3", Ms, [R(H(e.title) + " ", 1), e.plus ? (E(), q("span", Ns, "WerkPlus")) : L("", !0)]),
+				}, [Y("div", As, [(T(), U(v(o(e.icon)), { size: 22 }))]), Y("div", js, [
+					Y("h3", Ms, [R(H(e.title) + " ", 1), e.plus ? (T(), q("span", Ns, "WerkPlus")) : L("", !0)]),
 					Y("p", Ps, H(e.text), 1),
-					e.where ? (E(), q("p", Fs, [
+					e.where ? (T(), q("p", Fs, [
 						R(H(B(j)("rechnungswerk", "Zu finden unter")) + " ", 1),
 						Y("b", null, H(e.where), 1),
-						e.adminOnly ? (E(), q("span", Is, H(" " + B(j)("rechnungswerk", "(nur für Administratoren)")), 1)) : L("", !0)
+						e.adminOnly ? (T(), q("span", Is, H(" " + B(j)("rechnungswerk", "(nur für Administratoren)")), 1)) : L("", !0)
 					])) : L("", !0),
-					e.plus ? (E(), q("a", {
+					e.plus ? (T(), q("a", {
 						key: 1,
 						class: "whatsnew__link",
 						href: Rs,
@@ -3305,12 +3305,12 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 	__name: "App",
 	setup(e) {
 		let t = Gs(), n = G(() => t.info?.hasAccess ?? !1), r = G(() => t.info?.isAdmin ?? !1);
-		return ce(() => {
+		return A(() => {
 			t.fetch();
 		}), (e, i) => {
-			let a = D("router-view");
-			return E(), U(B(ii), { appName: "rechnungswerk" }, {
-				default: g(() => [B(t).loaded ? n.value ? (E(), q(k, { key: 2 }, [
+			let a = E("router-view");
+			return T(), U(B(ii), { appName: "rechnungswerk" }, {
+				default: g(() => [B(t).loaded ? n.value ? (T(), q(O, { key: 2 }, [
 					W(B(pi), null, {
 						footer: g(() => [W(B(aa), {
 							name: B(j)("rechnungswerk", "Mein Kontakt"),
@@ -3318,7 +3318,7 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 						}, {
 							icon: g(() => [W(qa, { size: 20 })]),
 							_: 1
-						}, 8, ["name"]), r.value ? (E(), U(B(aa), {
+						}, 8, ["name"]), r.value ? (T(), U(B(aa), {
 							key: 0,
 							name: B(j)("rechnungswerk", "Einstellungen"),
 							to: { name: "settings" }
@@ -3370,7 +3370,7 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 						_: 1
 					}),
 					W(Bs)
-				], 64)) : (E(), U(B(ya), { key: 1 }, {
+				], 64)) : (T(), U(B(ya), { key: 1 }, {
 					default: g(() => [W(B(wt), {
 						name: B(j)("rechnungswerk", "Kein Zugriff"),
 						description: B(j)("rechnungswerk", "Du bist für RechnungsWerk nicht freigeschaltet. Wende dich an einen Administrator.")
@@ -3379,7 +3379,7 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 						_: 1
 					}, 8, ["name", "description"])]),
 					_: 1
-				})) : (E(), U(B(ya), { key: 0 }, {
+				})) : (T(), U(B(ya), { key: 0 }, {
 					default: g(() => [W(B(kt), {
 						class: "rw-app-loading",
 						size: 44
@@ -3410,19 +3410,19 @@ var Os = { class: "whatsnew" }, ks = { class: "whatsnew__version" }, As = { clas
 	"height"
 ], Xs = { d: "M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" }, Zs = { key: 0 };
 function Qs(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon information-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Xs, [n.title ? (E(), q("title", Zs, H(n.title), 1)) : L("", !0)])], 8, Ys))], 16, Js);
+	}, [Y("path", Xs, [n.title ? (T(), q("title", Zs, H(n.title), 1)) : L("", !0)])], 8, Ys))], 16, Js);
 }
 var $s = /*#__PURE__*/ $(qs, [["render", Qs]]), ec = { class: "info-icon-wrapper" }, tc = {
 	class: "info-popup",
@@ -3430,7 +3430,7 @@ var $s = /*#__PURE__*/ $(qs, [["render", Qs]]), ec = { class: "info-icon-wrapper
 }, nc = /*#__PURE__*/ $(/* @__PURE__ */ z({
 	__name: "InfoIcon",
 	setup(e) {
-		return (e, t) => (E(), q("span", ec, [W(B(ut), {
+		return (e, t) => (T(), q("span", ec, [W(B(ut), {
 			popupRole: "tooltip",
 			noFocusTrap: ""
 		}, {
@@ -3439,7 +3439,7 @@ var $s = /*#__PURE__*/ $(qs, [["render", Qs]]), ec = { class: "info-icon-wrapper
 				size: 14,
 				tabindex: "0"
 			})]),
-			default: g(() => [Y("div", tc, [w(e.$slots, "default", {}, void 0, !0)])]),
+			default: g(() => [Y("div", tc, [C(e.$slots, "default", {}, void 0, !0)])]),
 			_: 3
 		})]));
 	}
@@ -3463,19 +3463,19 @@ var $s = /*#__PURE__*/ $(qs, [["render", Qs]]), ec = { class: "info-icon-wrapper
 	"height"
 ], oc = { d: "M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" }, sc = { key: 0 };
 function cc(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon plus-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", oc, [n.title ? (E(), q("title", sc, H(n.title), 1)) : L("", !0)])], 8, ac))], 16, ic);
+	}, [Y("path", oc, [n.title ? (T(), q("title", sc, H(n.title), 1)) : L("", !0)])], 8, ac))], 16, ic);
 }
 var lc = /*#__PURE__*/ $(rc, [["render", cc]]), uc = {
 	name: "DownloadIcon",
@@ -3497,19 +3497,19 @@ var lc = /*#__PURE__*/ $(rc, [["render", cc]]), uc = {
 	"height"
 ], pc = { d: "M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" }, mc = { key: 0 };
 function hc(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon download-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", pc, [n.title ? (E(), q("title", mc, H(n.title), 1)) : L("", !0)])], 8, fc))], 16, dc);
+	}, [Y("path", pc, [n.title ? (T(), q("title", mc, H(n.title), 1)) : L("", !0)])], 8, fc))], 16, dc);
 }
 var gc = /*#__PURE__*/ $(uc, [["render", hc]]), _c = {
 	name: "ContentCopyIcon",
@@ -3531,19 +3531,19 @@ var gc = /*#__PURE__*/ $(uc, [["render", hc]]), _c = {
 	"height"
 ], bc = { d: "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" }, xc = { key: 0 };
 function Sc(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon content-copy-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", bc, [n.title ? (E(), q("title", xc, H(n.title), 1)) : L("", !0)])], 8, yc))], 16, vc);
+	}, [Y("path", bc, [n.title ? (T(), q("title", xc, H(n.title), 1)) : L("", !0)])], 8, yc))], 16, vc);
 }
 var Cc = /*#__PURE__*/ $(_c, [["render", Sc]]), wc = {
 	name: "PencilOutlineIcon",
@@ -3565,19 +3565,19 @@ var Cc = /*#__PURE__*/ $(_c, [["render", Sc]]), wc = {
 	"height"
 ], Dc = { d: "M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z" }, Oc = { key: 0 };
 function kc(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon pencil-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Dc, [n.title ? (E(), q("title", Oc, H(n.title), 1)) : L("", !0)])], 8, Ec))], 16, Tc);
+	}, [Y("path", Dc, [n.title ? (T(), q("title", Oc, H(n.title), 1)) : L("", !0)])], 8, Ec))], 16, Tc);
 }
 var Ac = /*#__PURE__*/ $(wc, [["render", kc]]), jc = {
 	name: "CloseCircleIcon",
@@ -3599,19 +3599,19 @@ var Ac = /*#__PURE__*/ $(wc, [["render", kc]]), jc = {
 	"height"
 ], Pc = { d: "M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" }, Fc = { key: 0 };
 function Ic(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon close-circle-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Pc, [n.title ? (E(), q("title", Fc, H(n.title), 1)) : L("", !0)])], 8, Nc))], 16, Mc);
+	}, [Y("path", Pc, [n.title ? (T(), q("title", Fc, H(n.title), 1)) : L("", !0)])], 8, Nc))], 16, Mc);
 }
 var Lc = /*#__PURE__*/ $(jc, [["render", Ic]]), Rc = {
 	name: "CheckCircleIcon",
@@ -3633,19 +3633,19 @@ var Lc = /*#__PURE__*/ $(jc, [["render", Ic]]), Rc = {
 	"height"
 ], Vc = { d: "M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" }, Hc = { key: 0 };
 function Uc(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon check-circle-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Vc, [n.title ? (E(), q("title", Hc, H(n.title), 1)) : L("", !0)])], 8, Bc))], 16, zc);
+	}, [Y("path", Vc, [n.title ? (T(), q("title", Hc, H(n.title), 1)) : L("", !0)])], 8, Bc))], 16, zc);
 }
 var Wc = /*#__PURE__*/ $(Rc, [["render", Uc]]), Gc = {
 	name: "ClockOutlineIcon",
@@ -3667,19 +3667,19 @@ var Wc = /*#__PURE__*/ $(Rc, [["render", Uc]]), Gc = {
 	"height"
 ], Jc = { d: "M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" }, Yc = { key: 0 };
 function Xc(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon clock-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Jc, [n.title ? (E(), q("title", Yc, H(n.title), 1)) : L("", !0)])], 8, qc))], 16, Kc);
+	}, [Y("path", Jc, [n.title ? (T(), q("title", Yc, H(n.title), 1)) : L("", !0)])], 8, qc))], 16, Kc);
 }
 var Zc = /*#__PURE__*/ $(Gc, [["render", Xc]]), Qc = {
 	name: "HelpCircleOutlineIcon",
@@ -3701,19 +3701,19 @@ var Zc = /*#__PURE__*/ $(Gc, [["render", Xc]]), Qc = {
 	"height"
 ], tl = { d: "M11,18H13V16H11V18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,6A4,4 0 0,0 8,10H10A2,2 0 0,1 12,8A2,2 0 0,1 14,10C14,12 11,11.75 11,15H13C13,12.75 16,12.5 16,10A4,4 0 0,0 12,6Z" }, nl = { key: 0 };
 function rl(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon help-circle-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", tl, [n.title ? (E(), q("title", nl, H(n.title), 1)) : L("", !0)])], 8, el))], 16, $c);
+	}, [Y("path", tl, [n.title ? (T(), q("title", nl, H(n.title), 1)) : L("", !0)])], 8, el))], 16, $c);
 }
 var il = /*#__PURE__*/ $(Qc, [["render", rl]]), al = {
 	name: "CheckboxBlankOutlineIcon",
@@ -3735,19 +3735,19 @@ var il = /*#__PURE__*/ $(Qc, [["render", rl]]), al = {
 	"height"
 ], cl = { d: "M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z" }, ll = { key: 0 };
 function ul(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon checkbox-blank-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", cl, [n.title ? (E(), q("title", ll, H(n.title), 1)) : L("", !0)])], 8, sl))], 16, ol);
+	}, [Y("path", cl, [n.title ? (T(), q("title", ll, H(n.title), 1)) : L("", !0)])], 8, sl))], 16, ol);
 }
 var dl = /*#__PURE__*/ $(al, [["render", ul]]), fl = {
 	name: "CheckboxMarkedIcon",
@@ -3769,19 +3769,19 @@ var dl = /*#__PURE__*/ $(al, [["render", ul]]), fl = {
 	"height"
 ], hl = { d: "M10,17L5,12L6.41,10.58L10,14.17L17.59,6.58L19,8M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" }, gl = { key: 0 };
 function _l(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon checkbox-marked-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", hl, [n.title ? (E(), q("title", gl, H(n.title), 1)) : L("", !0)])], 8, ml))], 16, pl);
+	}, [Y("path", hl, [n.title ? (T(), q("title", gl, H(n.title), 1)) : L("", !0)])], 8, ml))], 16, pl);
 }
 var vl = /*#__PURE__*/ $(fl, [["render", _l]]), yl = {
 	name: "CheckIcon",
@@ -3803,19 +3803,19 @@ var vl = /*#__PURE__*/ $(fl, [["render", _l]]), yl = {
 	"height"
 ], Sl = { d: "M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" }, Cl = { key: 0 };
 function wl(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon check-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Sl, [n.title ? (E(), q("title", Cl, H(n.title), 1)) : L("", !0)])], 8, xl))], 16, bl);
+	}, [Y("path", Sl, [n.title ? (T(), q("title", Cl, H(n.title), 1)) : L("", !0)])], 8, xl))], 16, bl);
 }
 var Tl = /*#__PURE__*/ $(yl, [["render", wl]]), El = {
 	name: "CloseIcon",
@@ -3837,19 +3837,19 @@ var Tl = /*#__PURE__*/ $(yl, [["render", wl]]), El = {
 	"height"
 ], kl = { d: "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" }, Al = { key: 0 };
 function jl(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon close-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", kl, [n.title ? (E(), q("title", Al, H(n.title), 1)) : L("", !0)])], 8, Ol))], 16, Dl);
+	}, [Y("path", kl, [n.title ? (T(), q("title", Al, H(n.title), 1)) : L("", !0)])], 8, Ol))], 16, Dl);
 }
 var Ml = /*#__PURE__*/ $(El, [["render", jl]]), Nl = () => bs("/invoices"), Pl = (e) => bs(`/invoices/${e}`), Fl = (e) => xs("/invoices", { data: e }), Il = (e, t) => Ss(`/invoices/${e}`, { data: t }), Ll = (e) => ws(`/invoices/${e}`), Rl = (e) => xs(`/invoices/${e}/commit`, {}), zl = (e) => xs(`/invoices/${e}/cancel`, {}), Bl = (e) => xs(`/invoices/${e}/duplicate`, {}), Vl = (e, t) => xs(`/invoices/${e}/pay`, t ? { date: t } : {}), Hl = (e) => xs(`/invoices/${e}/unpay`, {}), Ul = (e) => vs(`/invoices/${e}/pdf`), Wl = (e) => vs(`/invoices/${e}/preview`) + "?t=" + Date.now(), Gl = (e) => {
 	let t = document.createElement("a");
@@ -4138,11 +4138,11 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 				date: ee(e.dueDate)
 			}) : "";
 		}
-		let v = (e) => e.paymentStatus === "paid" ? j("rechnungswerk", "Als unbezahlt markieren") : j("rechnungswerk", "Als bezahlt markieren");
-		function b(e) {
+		let re = (e) => e.paymentStatus === "paid" ? j("rechnungswerk", "Als unbezahlt markieren") : j("rechnungswerk", "Als bezahlt markieren");
+		function y(e) {
 			return e.paymentStatus === "paid" ? e.paidAt ? j("rechnungswerk", "Bezahlt am {date} – klicken, um die Zahlung zurückzunehmen", { date: ee(e.paidAt) }) : j("rechnungswerk", "Bezahlt – klicken, um die Zahlung zurückzunehmen") : j("rechnungswerk", "Als bezahlt markieren");
 		}
-		async function x(e) {
+		async function b(e) {
 			i.value = "";
 			try {
 				e.paymentStatus === "paid" ? await n.markUnpaid(e.id) : await n.markPaid(e.id);
@@ -4150,39 +4150,39 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 				i.value = e.message ?? j("rechnungswerk", "Zahlungsstatus konnte nicht geändert werden");
 			}
 		}
-		let re = X(null), ie = X("");
-		function w(e) {
+		let ie = X(null), ae = X("");
+		function C(e) {
 			let t = e ? m(e) : /* @__PURE__ */ new Date(), n = String(t.getMonth() + 1).padStart(2, "0"), r = String(t.getDate()).padStart(2, "0");
 			return `${t.getFullYear()}-${n}-${r}`;
 		}
-		function T(e) {
-			i.value = "", ie.value = w(e.paidAt), re.value = e.id;
+		function w(e) {
+			i.value = "", ae.value = C(e.paidAt), ie.value = e.id;
 		}
-		function D() {
-			re.value = null;
+		function E() {
+			ie.value = null;
 		}
-		async function O(e) {
-			if (!ie.value) {
-				D();
+		async function D(e) {
+			if (!ae.value) {
+				E();
 				return;
 			}
 			i.value = "";
 			try {
-				await n.markPaid(e.id, ie.value), re.value = null;
+				await n.markPaid(e.id, ae.value), ie.value = null;
 			} catch (e) {
 				i.value = e.message ?? j("rechnungswerk", "Zahldatum konnte nicht geändert werden");
 			}
 		}
-		let ae = {
+		let oe = {
 			draft: Ac,
 			committed: So,
 			cancelled: Lc
-		}, oe = {
+		}, se = {
 			pending: Zc,
 			confirmed: Wc,
 			unknown: il,
 			failed: Lc
-		}, se = (e) => ae[e] ?? Ea, A = (e) => e ? oe[e] ?? null : null, M = {
+		}, ce = (e) => oe[e] ?? Ea, k = (e) => e ? se[e] ?? null : null, M = {
 			pending: j("rechnungswerk", "An DATEV gesendet – Bestätigung ausstehend"),
 			confirmed: j("rechnungswerk", "Von DATEV bestätigt (Beleg angenommen)"),
 			unknown: j("rechnungswerk", "DATEV-Antwort prüfen"),
@@ -4194,7 +4194,7 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 		function fe(e) {
 			return e ? new Date(e).toLocaleDateString() : "—";
 		}
-		ce(() => {
+		A(() => {
 			n.fetchAll().catch((e) => {
 				i.value = e.message ?? j("rechnungswerk", "Laden fehlgeschlagen");
 			}), r.fetch().catch(() => {});
@@ -4225,7 +4225,7 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 		}
 		return (e, t) => {
 			let r = te("tooltip");
-			return E(), q("div", Cu, [
+			return T(), q("div", Cu, [
 				Y("div", wu, [Y("h2", null, H(B(j)("rechnungswerk", "Rechnungen")), 1), W(B(I), {
 					variant: "primary",
 					onClick: pe
@@ -4234,26 +4234,26 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 					default: g(() => [R(" " + H(B(j)("rechnungswerk", "Neue Rechnung")), 1)]),
 					_: 1
 				})]),
-				i.value ? (E(), U(B(Q), {
+				i.value ? (T(), U(B(Q), {
 					key: 0,
 					type: "error",
 					text: i.value
 				}, null, 8, ["text"])) : L("", !0),
-				!B(n).loading && B(n).invoices.length === 0 ? (E(), U(B(wt), {
+				!B(n).loading && B(n).invoices.length === 0 ? (T(), U(B(wt), {
 					key: 1,
 					name: B(j)("rechnungswerk", "Noch keine Rechnungen"),
 					description: B(j)("rechnungswerk", "Lege deine erste Rechnung an.")
 				}, {
 					icon: g(() => [W(Ea, { size: 20 })]),
 					_: 1
-				}, 8, ["name", "description"])) : B(n).invoices.length > 0 ? (E(), q("div", Tu, [Y("div", Eu, [(E(), q(k, null, C(c, (e) => Y("button", {
+				}, 8, ["name", "description"])) : B(n).invoices.length > 0 ? (T(), q("div", Tu, [Y("div", Eu, [(T(), q(O, null, S(c, (e) => Y("button", {
 					key: e.key,
 					class: V(["rw-chip", {
 						"rw-chip--active": l.value === e.key,
 						"rw-chip--overdue": e.key === "overdue"
 					}]),
 					onClick: (t) => l.value = e.key
-				}, [R(H(B(j)("rechnungswerk", e.label)) + " ", 1), Y("span", Ou, H(d.value[e.key]), 1)], 10, Du)), 64)), f.value > 0 ? (E(), q("span", ku, [R(H(B(j)("rechnungswerk", "Offen gesamt:")) + " ", 1), Y("strong", null, H(B(xu)(f.value)), 1)])) : L("", !0)]), Y("div", Au, [Y("table", ju, [Y("thead", null, [Y("tr", null, [
+				}, [R(H(B(j)("rechnungswerk", e.label)) + " ", 1), Y("span", Ou, H(d.value[e.key]), 1)], 10, Du)), 64)), f.value > 0 ? (T(), q("span", ku, [R(H(B(j)("rechnungswerk", "Offen gesamt:")) + " ", 1), Y("strong", null, H(B(xu)(f.value)), 1)])) : L("", !0)]), Y("div", Au, [Y("table", ju, [Y("thead", null, [Y("tr", null, [
 					Y("th", null, [Y("span", Mu, [R(H(B(j)("rechnungswerk", "Status")) + " ", 1), W(nc, null, {
 						default: g(() => [Y("div", Nu, [
 							Y("p", Pu, H(B(j)("rechnungswerk", "Pro Zeile: links der Rechnungsstatus, rechts (falls vorhanden) der DATEV-Status.")), 1),
@@ -4272,7 +4272,7 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 									class: "rw-sicon rw-sicon--cancelled"
 								}), R(" " + H(B(j)("rechnungswerk", "Storniert")), 1)])
 							]),
-							s.value ? (E(), q("div", Bu, [
+							s.value ? (T(), q("div", Bu, [
 								Y("span", Vu, H(B(j)("rechnungswerk", "DATEV-Übergabe")), 1),
 								Y("span", Hu, [W(Wc, {
 									size: 16,
@@ -4296,41 +4296,41 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 					Y("th", Gu, H(B(j)("rechnungswerk", "Brutto")), 1),
 					Y("th", Ku, H(B(j)("rechnungswerk", "Bezahlt")), 1),
 					t[2] ||= Y("th", { class: "rw-col-actions" }, null, -1)
-				])]), Y("tbody", null, [(E(!0), q(k, null, C(p.value, (e) => (E(), q("tr", {
+				])]), Y("tbody", null, [(T(!0), q(O, null, S(p.value, (e) => (T(), q("tr", {
 					key: e.id,
 					class: V(["rw-row-clickable", { "rw-row--overdue": e.paymentStatus === "overdue" }]),
 					onClick: (t) => F(e.id)
 				}, [
-					Y("td", null, [Y("span", Ju, [(E(), U(y(se(e.status)), {
+					Y("td", null, [Y("span", Ju, [(T(), U(v(ce(e.status)), {
 						size: 20,
 						class: V(["rw-sicon", `rw-sicon--${e.status}`]),
 						title: ue(e.status)
-					}, null, 8, ["class", "title"])), s.value && e.datevStatus && A(e.datevStatus) ? (E(), U(y(A(e.datevStatus)), {
+					}, null, 8, ["class", "title"])), s.value && e.datevStatus && k(e.datevStatus) ? (T(), U(v(k(e.datevStatus)), {
 						key: 0,
 						size: 18,
 						class: V(["rw-sicon", `rw-sicon--datev-${e.datevStatus}`]),
 						title: le(e.datevStatus)
 					}, null, 8, ["class", "title"])) : L("", !0)])]),
-					Y("td", Yu, [R(H(e.number ?? B(j)("rechnungswerk", "(Entwurf)")) + " ", 1), e.invoiceType === "invoice" ? L("", !0) : S((E(), q("span", Xu, [R(H(de(e.invoiceType)), 1)])), [[r, N(e)]])]),
+					Y("td", Yu, [R(H(e.number ?? B(j)("rechnungswerk", "(Entwurf)")) + " ", 1), e.invoiceType === "invoice" ? L("", !0) : x((T(), q("span", Xu, [R(H(de(e.invoiceType)), 1)])), [[r, N(e)]])]),
 					Y("td", null, H(e.recipientName ?? "—"), 1),
 					Y("td", null, H(fe(e.issueDate ?? e.createdAt)), 1),
-					Y("td", Zu, [Y("span", { class: V(ne(e)) }, H(B(xu)(e.totalCents)), 3), re.value === e.id ? (E(), q("div", {
+					Y("td", Zu, [Y("span", { class: V(ne(e)) }, H(B(xu)(e.totalCents)), 3), ie.value === e.id ? (T(), q("div", {
 						key: 0,
 						class: "rw-paid-edit",
 						onClick: t[1] ||= P(() => {}, ["stop"])
 					}, [
-						S(Y("input", {
-							"onUpdate:modelValue": t[0] ||= (e) => ie.value = e,
+						x(Y("input", {
+							"onUpdate:modelValue": t[0] ||= (e) => ae.value = e,
 							type: "date",
 							class: "rw-input rw-paid-input",
 							"aria-label": B(j)("rechnungswerk", "Zahldatum"),
-							onKeyup: [me((t) => O(e), ["enter"]), me(D, ["esc"])]
-						}, null, 40, Qu), [[J, ie.value]]),
+							onKeyup: [me((t) => D(e), ["enter"]), me(E, ["esc"])]
+						}, null, 40, Qu), [[J, ae.value]]),
 						W(B(I), {
 							variant: "primary",
 							"aria-label": B(j)("rechnungswerk", "Zahldatum speichern"),
 							title: B(j)("rechnungswerk", "Zahldatum speichern"),
-							onClick: P((t) => O(e), ["stop"])
+							onClick: P((t) => D(e), ["stop"])
 						}, {
 							icon: g(() => [W(Tl, { size: 18 })]),
 							_: 1
@@ -4343,29 +4343,29 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 							variant: "tertiary",
 							"aria-label": B(j)("rechnungswerk", "Abbrechen"),
 							title: B(j)("rechnungswerk", "Abbrechen"),
-							onClick: P(D, ["stop"])
+							onClick: P(E, ["stop"])
 						}, {
 							icon: g(() => [W(Ml, { size: 18 })]),
 							_: 1
 						}, 8, ["aria-label", "title"])
-					])) : e.paymentStatus === "paid" ? (E(), q("button", {
+					])) : e.paymentStatus === "paid" ? (T(), q("button", {
 						key: 1,
 						type: "button",
 						class: "rw-subline rw-subline--editable",
 						title: B(j)("rechnungswerk", "Zahldatum ändern"),
-						onClick: P((t) => T(e), ["stop"])
-					}, H(_(e)), 9, $u)) : _(e) ? (E(), q("div", {
+						onClick: P((t) => w(e), ["stop"])
+					}, H(_(e)), 9, $u)) : _(e) ? (T(), q("div", {
 						key: 2,
 						class: V(["rw-subline", { "rw-subline--overdue": e.paymentStatus === "overdue" }])
 					}, H(_(e)), 3)) : L("", !0)]),
-					Y("td", ed, [e.paymentStatus ? (E(), q("button", {
+					Y("td", ed, [e.paymentStatus ? (T(), q("button", {
 						key: 0,
 						class: V(["rw-paybox", e.paymentStatus === "paid" ? "rw-paybox--paid" : "rw-paybox--open"]),
-						"aria-label": v(e),
-						title: b(e),
-						onClick: P((t) => x(e), ["stop"])
-					}, [(E(), U(y(e.paymentStatus === "paid" ? vl : dl), { size: 22 }))], 10, td)) : L("", !0)]),
-					Y("td", nd, [Y("div", rd, [e.invoiceType === "cancellation" ? L("", !0) : (E(), U(B(I), {
+						"aria-label": re(e),
+						title: y(e),
+						onClick: P((t) => b(e), ["stop"])
+					}, [(T(), U(v(e.paymentStatus === "paid" ? vl : dl), { size: 22 }))], 10, td)) : L("", !0)]),
+					Y("td", nd, [Y("div", rd, [e.invoiceType === "cancellation" ? L("", !0) : (T(), U(B(I), {
 						key: 0,
 						variant: "tertiary",
 						"aria-label": B(j)("rechnungswerk", "Duplizieren"),
@@ -4378,7 +4378,7 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 						"aria-label",
 						"title",
 						"onClick"
-					])), e.status === "draft" ? L("", !0) : (E(), U(B(I), {
+					])), e.status === "draft" ? L("", !0) : (T(), U(B(I), {
 						key: 1,
 						variant: "tertiary",
 						"aria-label": B(j)("rechnungswerk", "PDF herunterladen"),
@@ -4416,19 +4416,19 @@ var Cu = { class: "rw-view" }, wu = { class: "rw-view__head" }, Tu = { key: 2 },
 	"height"
 ], ld = { d: "M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" }, ud = { key: 0 };
 function dd(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon delete-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", ld, [n.title ? (E(), q("title", ud, H(n.title), 1)) : L("", !0)])], 8, cd))], 16, sd);
+	}, [Y("path", ld, [n.title ? (T(), q("title", ud, H(n.title), 1)) : L("", !0)])], 8, cd))], 16, sd);
 }
 var fd = /*#__PURE__*/ $(od, [["render", dd]]), pd = {
 	name: "SendIcon",
@@ -4450,19 +4450,19 @@ var fd = /*#__PURE__*/ $(od, [["render", dd]]), pd = {
 	"height"
 ], gd = { d: "M2,21L23,12L2,3V10L17,12L2,14V21Z" }, _d = { key: 0 };
 function vd(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon send-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", gd, [n.title ? (E(), q("title", _d, H(n.title), 1)) : L("", !0)])], 8, hd))], 16, md);
+	}, [Y("path", gd, [n.title ? (T(), q("title", _d, H(n.title), 1)) : L("", !0)])], 8, hd))], 16, md);
 }
 var yd = /*#__PURE__*/ $(pd, [["render", vd]]), bd = {
 	name: "EyeOutlineIcon",
@@ -4484,19 +4484,19 @@ var yd = /*#__PURE__*/ $(pd, [["render", vd]]), bd = {
 	"height"
 ], Cd = { d: "M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C17,4.5 21.27,7.61 23,12C21.27,16.39 17,19.5 12,19.5C7,19.5 2.73,16.39 1,12C2.73,7.61 7,4.5 12,4.5M3.18,12C4.83,15.36 8.24,17.5 12,17.5C15.76,17.5 19.17,15.36 20.82,12C19.17,8.64 15.76,6.5 12,6.5C8.24,6.5 4.83,8.64 3.18,12Z" }, wd = { key: 0 };
 function Td(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon eye-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Cd, [n.title ? (E(), q("title", wd, H(n.title), 1)) : L("", !0)])], 8, Sd))], 16, xd);
+	}, [Y("path", Cd, [n.title ? (T(), q("title", wd, H(n.title), 1)) : L("", !0)])], 8, Sd))], 16, xd);
 }
 var Ed = /*#__PURE__*/ $(bd, [["render", Td]]), Dd = {
 	name: "FileMoveOutlineIcon",
@@ -4518,19 +4518,19 @@ var Ed = /*#__PURE__*/ $(bd, [["render", Td]]), Dd = {
 	"height"
 ], Ad = { d: "M14 2H6C4.9 2 4 2.9 4 4V20C4 20.41 4.12 20.8 4.34 21.12C4.41 21.23 4.5 21.33 4.59 21.41C4.95 21.78 5.45 22 6 22H13.53C13 21.42 12.61 20.75 12.35 20H6V4H13V9H18V12C18.7 12 19.37 12.12 20 12.34V8L14 2M18 23L23 18.5L20 15.8L18 14V17H14V20H18V23Z" }, jd = { key: 0 };
 function Md(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon file-move-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Ad, [n.title ? (E(), q("title", jd, H(n.title), 1)) : L("", !0)])], 8, kd))], 16, Od);
+	}, [Y("path", Ad, [n.title ? (T(), q("title", jd, H(n.title), 1)) : L("", !0)])], 8, kd))], 16, Od);
 }
 var Nd = /*#__PURE__*/ $(Dd, [["render", Md]]), Pd = {
 	name: "FileEditOutlineIcon",
@@ -4552,19 +4552,19 @@ var Nd = /*#__PURE__*/ $(Dd, [["render", Md]]), Pd = {
 	"height"
 ], Ld = { d: "M10 20H6V4H13V9H18V12.1L20 10.1V8L14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H10V20M20.2 13C20.3 13 20.5 13.1 20.6 13.2L21.9 14.5C22.1 14.7 22.1 15.1 21.9 15.3L20.9 16.3L18.8 14.2L19.8 13.2C19.9 13.1 20 13 20.2 13M20.2 16.9L14.1 23H12V20.9L18.1 14.8L20.2 16.9Z" }, Rd = { key: 0 };
 function zd(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon file-edit-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Ld, [n.title ? (E(), q("title", Rd, H(n.title), 1)) : L("", !0)])], 8, Id))], 16, Fd);
+	}, [Y("path", Ld, [n.title ? (T(), q("title", Rd, H(n.title), 1)) : L("", !0)])], 8, Id))], 16, Fd);
 }
 var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search?q=${encodeURIComponent(e)}`), Hd = () => bs("/me"), Ud = { class: "contact-picker" }, Wd = ["value", "placeholder"], Gd = {
 	key: 0,
@@ -4599,9 +4599,9 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 				i.value = !1;
 			}, 150);
 		}
-		return A(() => {
+		return k(() => {
 			a && clearTimeout(a);
-		}), (t, n) => (E(), q("div", Ud, [Y("input", {
+		}), (t, n) => (T(), q("div", Ud, [Y("input", {
 			value: e.modelValue,
 			class: "input",
 			type: "text",
@@ -4610,11 +4610,11 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 			onInput: n[0] ||= (e) => o(e.target.value),
 			onFocus: n[1] ||= (e) => i.value = r.value.length > 0,
 			onBlur: c
-		}, null, 40, Wd), i.value && r.value.length > 0 ? (E(), q("ul", Gd, [(E(!0), q(k, null, C(r.value, (e, t) => (E(), q("li", {
+		}, null, 40, Wd), i.value && r.value.length > 0 ? (T(), q("ul", Gd, [(T(!0), q(O, null, S(r.value, (e, t) => (T(), q("li", {
 			key: t,
 			class: "contact-picker__item",
 			onMousedown: P((t) => s(e), ["prevent"])
-		}, [Y("strong", null, H(e.name), 1), e.email ? (E(), q("span", qd, H(e.email), 1)) : L("", !0)], 40, Kd))), 128))])) : L("", !0)]));
+		}, [Y("strong", null, H(e.name), 1), e.email ? (T(), q("span", qd, H(e.email), 1)) : L("", !0)], 40, Kd))), 128))])) : L("", !0)]));
 	}
 }), [["__scopeId", "data-v-23f7f625"]]), Yd = null, Xd = () => (Yd === null && (Yd = bs("/countries").catch((e) => {
 	throw Yd = null, e;
@@ -4639,24 +4639,24 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 			let e = t.value ?? "";
 			return e === "" || n.value.length === 0 ? e : n.value.some((t) => t.code === e) ? "" : e;
 		});
-		return ce(async () => {
+		return A(async () => {
 			try {
 				n.value = await Xd();
 			} catch {
 				n.value = [];
 			}
-		}), (a, o) => S((E(), q("select", {
+		}), (a, o) => x((T(), q("select", {
 			"onUpdate:modelValue": o[0] ||= (e) => t.value = e,
 			class: V(e.selectClass),
 			disabled: e.disabled,
 			title: r.value
-		}, [i.value === "" ? L("", !0) : (E(), q("option", {
+		}, [i.value === "" ? L("", !0) : (T(), q("option", {
 			key: 0,
 			value: i.value
-		}, H(i.value), 9, Qd)), (E(!0), q(k, null, C(n.value, (e) => (E(), q("option", {
+		}, H(i.value), 9, Qd)), (T(!0), q(O, null, S(n.value, (e) => (T(), q("option", {
 			key: e.code,
 			value: e.code
-		}, H(e.label) + " (" + H(e.code) + ")", 9, $d))), 128))], 10, Zd)), [[re, t.value]]);
+		}, H(e.label) + " (" + H(e.code) + ")", 9, $d))), 128))], 10, Zd)), [[ie, t.value]]);
 	}
 }), tf = () => bs("/customers"), nf = (e) => xs("/customers", { data: e }), rf = (e, t) => Ss(`/customers/${e}`, { data: t }), af = (e) => ws(`/customers/${e}`), of = ln("customer", () => {
 	let e = X([]), t = X(!1);
@@ -4704,7 +4704,7 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 	emits: ["select"],
 	setup(e, { emit: t }) {
 		let n = t, r = of(), i = X(""), a = X([]), o = X(!1);
-		ce(() => {
+		A(() => {
 			r.customers.length === 0 && r.fetchAll().catch((e) => console.error("[rechnungswerk] customer picker:", e));
 		});
 		function s(e) {
@@ -4724,7 +4724,7 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 				o.value = !1;
 			}, 150);
 		}
-		return (e, t) => (E(), q("div", sf, [Y("input", {
+		return (e, t) => (T(), q("div", sf, [Y("input", {
 			value: i.value,
 			class: "input",
 			type: "text",
@@ -4733,7 +4733,7 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 			onInput: t[0] ||= (e) => s(e.target.value),
 			onFocus: t[1] ||= (e) => o.value = a.value.length > 0,
 			onBlur: l
-		}, null, 40, cf), o.value && a.value.length > 0 ? (E(), q("ul", lf, [(E(!0), q(k, null, C(a.value, (e) => (E(), q("li", {
+		}, null, 40, cf), o.value && a.value.length > 0 ? (T(), q("ul", lf, [(T(!0), q(O, null, S(a.value, (e) => (T(), q("li", {
 			key: e.id,
 			class: "customer-picker__item",
 			onMousedown: P((t) => c(e), ["prevent"])
@@ -4773,7 +4773,7 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 				o.value = !1, s = null;
 			}, 150);
 		}
-		return (e, t) => (E(), q("div", pf, [Y("input", {
+		return (e, t) => (T(), q("div", pf, [Y("input", {
 			value: i.value,
 			class: "input",
 			type: "text",
@@ -4783,7 +4783,7 @@ var Bd = /*#__PURE__*/ $(Pd, [["render", zd]]), Vd = (e) => bs(`/contacts/search
 			onFocus: f,
 			onClick: f,
 			onBlur: m
-		}, null, 40, mf), o.value && a.value.length > 0 ? (E(), q("div", hf, [Y("div", gf, H(c.value), 1), Y("ul", _f, [(E(!0), q(k, null, C(a.value, (e) => (E(), q("li", {
+		}, null, 40, mf), o.value && a.value.length > 0 ? (T(), q("div", hf, [Y("div", gf, H(c.value), 1), Y("ul", _f, [(T(!0), q(O, null, S(a.value, (e) => (T(), q("li", {
 			key: e.id,
 			class: "product-picker__item",
 			onMousedown: P((t) => p(e), ["prevent"])
@@ -4937,7 +4937,7 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 		function f(e) {
 			t.value.splice(e, 1);
 		}
-		return (n, o) => (E(), q("div", null, [Y("div", Ef, [Y("table", Df, [
+		return (n, o) => (T(), q("div", null, [Y("div", Ef, [Y("table", Df, [
 			Y("colgroup", null, [
 				o[0] ||= Y("col", null, null, -1),
 				o[1] ||= Y("col", { class: "rw-col-qty" }, null, -1),
@@ -4945,7 +4945,7 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 				o[3] ||= Y("col", { class: "rw-col-price" }, null, -1),
 				o[4] ||= Y("col", { class: "rw-col-tax" }, null, -1),
 				o[5] ||= Y("col", { class: "rw-col-sum" }, null, -1),
-				e.readonly ? L("", !0) : (E(), q("col", Of))
+				e.readonly ? L("", !0) : (T(), q("col", Of))
 			]),
 			Y("thead", null, [Y("tr", null, [
 				Y("th", null, H(B(j)("rechnungswerk", "Bezeichnung")), 1),
@@ -4954,17 +4954,17 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 				Y("th", Af, H(B(j)("rechnungswerk", "Einzelpreis (€)")), 1),
 				Y("th", jf, H(B(j)("rechnungswerk", "USt")), 1),
 				Y("th", Mf, H(B(j)("rechnungswerk", "Summe netto")), 1),
-				e.readonly ? L("", !0) : (E(), q("th", Nf))
+				e.readonly ? L("", !0) : (T(), q("th", Nf))
 			])]),
-			Y("tbody", null, [(E(!0), q(k, null, C(t.value, (t, n) => (E(), q(k, { key: n }, [Y("tr", Pf, [
-				Y("td", null, [S(Y("input", {
+			Y("tbody", null, [(T(!0), q(O, null, S(t.value, (t, n) => (T(), q(O, { key: n }, [Y("tr", Pf, [
+				Y("td", null, [x(Y("input", {
 					"onUpdate:modelValue": (e) => t.name = e,
 					class: "rw-input",
 					type: "text",
 					readonly: e.readonly,
 					placeholder: B(j)("rechnungswerk", "Leistung")
 				}, null, 8, Ff), [[J, t.name]])]),
-				Y("td", If, [S(Y("input", {
+				Y("td", If, [x(Y("input", {
 					"onUpdate:modelValue": (e) => t.quantity = e,
 					class: "rw-input num",
 					type: "text",
@@ -4972,15 +4972,15 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 					readonly: e.readonly,
 					onBlur: (e) => i(t)
 				}, null, 40, Lf), [[J, t.quantity]])]),
-				Y("td", null, [S(Y("select", {
+				Y("td", null, [x(Y("select", {
 					"onUpdate:modelValue": (e) => t.unitCode = e,
 					class: "rw-input",
 					disabled: e.readonly
-				}, [(E(!0), q(k, null, C(B(ru), (e) => (E(), q("option", {
+				}, [(T(!0), q(O, null, S(B(ru), (e) => (T(), q("option", {
 					key: e,
 					value: e
-				}, H(B(j)("rechnungswerk", B(iu)[e])), 9, zf))), 128))], 8, Rf), [[re, t.unitCode]])]),
-				Y("td", Bf, [S(Y("input", {
+				}, H(B(j)("rechnungswerk", B(iu)[e])), 9, zf))), 128))], 8, Rf), [[ie, t.unitCode]])]),
+				Y("td", Bf, [x(Y("input", {
 					"onUpdate:modelValue": (e) => t.priceInput = e,
 					class: "rw-input num",
 					type: "text",
@@ -4988,21 +4988,21 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 					readonly: e.readonly,
 					onBlur: (e) => a(t)
 				}, null, 40, Vf), [[J, t.priceInput]])]),
-				Y("td", Hf, [S(Y("select", {
+				Y("td", Hf, [x(Y("select", {
 					"onUpdate:modelValue": (e) => t.taxRateBp = e,
 					class: "rw-input",
 					disabled: e.readonly || e.smallBusiness
-				}, [(E(!0), q(k, null, C(B(au), (e) => (E(), q("option", {
+				}, [(T(!0), q(O, null, S(B(au), (e) => (T(), q("option", {
 					key: e,
 					value: e
 				}, H(B(Su)(e)), 9, Wf))), 128))], 8, Uf), [[
-					re,
+					ie,
 					t.taxRateBp,
 					void 0,
 					{ number: !0 }
 				]])]),
 				Y("td", Gf, H(B(xu)(r(t))), 1),
-				e.readonly ? L("", !0) : (E(), q("td", Kf, [W(B(I), {
+				e.readonly ? L("", !0) : (T(), q("td", Kf, [W(B(I), {
 					variant: "tertiary",
 					"aria-label": B(j)("rechnungswerk", "Position entfernen"),
 					onClick: (e) => f(n)
@@ -5010,7 +5010,7 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 					icon: g(() => [W(fd, { size: 20 })]),
 					_: 1
 				}, 8, ["aria-label", "onClick"])]))
-			]), !e.readonly || t.description || t.unitLabel ? (E(), q("tr", qf, [Y("td", { colspan: e.readonly ? 6 : 7 }, [Y("div", Yf, [!e.readonly || t.unitLabel ? S((E(), q("input", {
+			]), !e.readonly || t.description || t.unitLabel ? (T(), q("tr", qf, [Y("td", { colspan: e.readonly ? 6 : 7 }, [Y("div", Yf, [!e.readonly || t.unitLabel ? x((T(), q("input", {
 				key: 0,
 				"onUpdate:modelValue": (e) => t.unitLabel = e,
 				class: "rw-input rw-input--sub rw-unit-label",
@@ -5019,26 +5019,26 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 				readonly: e.readonly,
 				placeholder: B(j)("rechnungswerk", "eigene Einheit"),
 				title: B(j)("rechnungswerk", "Freie Bezeichnung – erscheint auf dem PDF; in der E-Rechnung wird die Einheit generisch (Stück) abgebildet.")
-			}, null, 8, Xf)), [[J, t.unitLabel]]) : L("", !0), !e.readonly || t.description ? S((E(), q("input", {
+			}, null, 8, Xf)), [[J, t.unitLabel]]) : L("", !0), !e.readonly || t.description ? x((T(), q("input", {
 				key: 1,
 				"onUpdate:modelValue": (e) => t.description = e,
 				class: "rw-input rw-input--sub rw-desc",
 				type: "text",
 				readonly: e.readonly,
 				placeholder: B(j)("rechnungswerk", "Beschreibung (optional)")
-			}, null, 8, Zf)), [[J, t.description]]) : L("", !0)])], 8, Jf)])) : L("", !0)], 64))), 128)), t.value.length === 0 ? (E(), q("tr", Qf, [Y("td", {
+			}, null, 8, Zf)), [[J, t.description]]) : L("", !0)])], 8, Jf)])) : L("", !0)], 64))), 128)), t.value.length === 0 ? (T(), q("tr", Qf, [Y("td", {
 				colspan: e.readonly ? 6 : 7,
 				class: "rw-muted empty-row"
 			}, H(B(j)("rechnungswerk", "Noch keine Positionen.")), 9, $f)])) : L("", !0)])
-		])]), e.readonly ? L("", !0) : (E(), q("div", ep, [W(B(I), { onClick: u }, {
+		])]), e.readonly ? L("", !0) : (T(), q("div", ep, [W(B(I), { onClick: u }, {
 			icon: g(() => [W(lc, { size: 20 })]),
 			default: g(() => [R(" " + H(B(j)("rechnungswerk", "Position hinzufügen")), 1)]),
 			_: 1
-		}), e.products.length > 0 ? (E(), U(bf, {
+		}), e.products.length > 0 ? (T(), U(bf, {
 			key: 0,
 			products: e.products,
 			onSelect: d
-		}, null, 8, ["products"])) : (E(), U(B(I), {
+		}, null, 8, ["products"])) : (T(), U(B(I), {
 			key: 1,
 			variant: "tertiary",
 			onClick: s
@@ -5064,7 +5064,7 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 		function r(e) {
 			e || n("close");
 		}
-		return (t, n) => (E(), U(B(bt), {
+		return (t, n) => (T(), U(B(bt), {
 			open: e.open,
 			name: e.name,
 			"onUpdate:open": r
@@ -5082,11 +5082,11 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 				default: g(() => [R(H(e.confirmLabel || B(j)("rechnungswerk", "Bestätigen")), 1)]),
 				_: 1
 			}, 8, ["variant"])]),
-			default: g(() => [Y("div", np, [Y("p", rp, H(e.message), 1)])]),
-			_: 1
+			default: g(() => [Y("div", np, [Y("p", rp, H(e.message), 1), C(t.$slots, "default", {}, void 0, !0)])]),
+			_: 3
 		}, 8, ["open", "name"]));
 	}
-}), [["__scopeId", "data-v-54981555"]]), ap = { class: "send-modal" }, op = { class: "send-modal__hint" }, sp = { class: "field" }, cp = { class: "field" }, lp = { class: "field" }, up = { class: "actions" }, dp = /*#__PURE__*/ $(/* @__PURE__ */ z({
+}), [["__scopeId", "data-v-aa305e87"]]), ap = { class: "send-modal" }, op = { class: "send-modal__hint" }, sp = { class: "field" }, cp = { class: "field" }, lp = { class: "field" }, up = { class: "actions" }, dp = /*#__PURE__*/ $(/* @__PURE__ */ z({
 	__name: "SendInvoiceDialog",
 	props: {
 		open: { type: Boolean },
@@ -5114,7 +5114,7 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 				body: c.body
 			});
 		}
-		return (t, n) => e.open ? (E(), U(B(ft), {
+		return (t, n) => e.open ? (T(), U(B(ft), {
 			key: 0,
 			name: i.value,
 			onKeydown: n[4] ||= me((e) => B(Ds)(e, () => t.$emit("close")), ["esc"]),
@@ -5123,19 +5123,19 @@ var Ef = { class: "rw-table-wrap" }, Df = { class: "rw-table rw-table--positions
 			default: g(() => [Y("div", ap, [
 				Y("h2", null, H(i.value), 1),
 				Y("p", op, H(a.value), 1),
-				Y("label", sp, [Y("span", null, H(B(j)("rechnungswerk", "Empfänger-E-Mail")) + " *", 1), S(Y("input", {
+				Y("label", sp, [Y("span", null, H(B(j)("rechnungswerk", "Empfänger-E-Mail")) + " *", 1), x(Y("input", {
 					ref_key: "toInput",
 					ref: s,
 					"onUpdate:modelValue": n[0] ||= (e) => c.to = e,
 					class: "input",
 					type: "email"
 				}, null, 512), [[J, c.to]])]),
-				Y("label", cp, [Y("span", null, H(B(j)("rechnungswerk", "Betreff")) + " *", 1), S(Y("input", {
+				Y("label", cp, [Y("span", null, H(B(j)("rechnungswerk", "Betreff")) + " *", 1), x(Y("input", {
 					"onUpdate:modelValue": n[1] ||= (e) => c.subject = e,
 					class: "input",
 					type: "text"
 				}, null, 512), [[J, c.subject]])]),
-				Y("label", lp, [Y("span", null, H(B(j)("rechnungswerk", "Nachricht")), 1), S(Y("textarea", {
+				Y("label", lp, [Y("span", null, H(B(j)("rechnungswerk", "Nachricht")), 1), x(Y("textarea", {
 					"onUpdate:modelValue": n[2] ||= (e) => c.body = e,
 					class: "input",
 					rows: "6"
@@ -5350,7 +5350,7 @@ var Lp = ln("textSnippet", () => {
 		function ee(e) {
 			N.extraText = e.content ?? "";
 		}
-		let _ = G(() => l.value ? "quotes" : "invoices"), v = G(() => l.value ? "quote-detail" : "invoice-detail"), b = X(null), x = X([xf()]), ie = X([]), w = X(""), T = X(""), D = X(!1), O = X(!1), ae = X(!1), oe = X(!1), se = X(""), A = X(null), le = X(!1), ue = null, de = () => ({
+		let _ = G(() => l.value ? "quotes" : "invoices"), re = G(() => l.value ? "quote-detail" : "invoice-detail"), y = X(null), b = X([xf()]), ae = X([]), C = X(""), w = X(""), E = X(!1), D = X(!1), oe = X(!1), se = X(!1), ce = X(""), k = X(null), le = X(!1), ue = null, de = () => ({
 			customerId: null,
 			recipientName: "",
 			recipientEmail: "",
@@ -5389,10 +5389,10 @@ var Lp = ln("textSnippet", () => {
 			let e = Number.parseInt(String(N.paymentTermDays), 10);
 			if (Number.isNaN(e)) return "";
 			let t = (e) => /* @__PURE__ */ new Date(`${e}T12:00:00`);
-			if (b.value?.dueDate) return t(b.value.dueDate).toLocaleDateString();
-			let n = b.value?.issueDate ? t(b.value.issueDate) : /* @__PURE__ */ new Date();
+			if (y.value?.dueDate) return t(y.value.dueDate).toLocaleDateString();
+			let n = y.value?.issueDate ? t(y.value.issueDate) : /* @__PURE__ */ new Date();
 			return n.setDate(n.getDate() + e), n.toLocaleDateString();
-		}), F = G(() => b.value !== null && b.value.status !== "draft"), me = {
+		}), F = G(() => y.value !== null && y.value.status !== "draft"), me = {
 			draft: Ac,
 			committed: So,
 			cancelled: Lc
@@ -5401,56 +5401,59 @@ var Lp = ln("textSnippet", () => {
 			confirmed: Wc,
 			unknown: il,
 			failed: Lc
-		}, ge = (e) => me[e] ?? Ac, _e = (e) => he[e] ?? il, ve = G(() => b.value ? l.value && b.value.quoteStatus ? j("rechnungswerk", du[b.value.quoteStatus] ?? b.value.status) : j("rechnungswerk", lu[b.value.status]) : ""), ye = G(() => b.value ? j("rechnungswerk", uu[b.value.invoiceType]) : ""), be = G(() => {
+		}, ge = (e) => me[e] ?? Ac, _e = (e) => he[e] ?? il, ve = G(() => y.value ? l.value && y.value.quoteStatus ? j("rechnungswerk", du[y.value.quoteStatus] ?? y.value.status) : j("rechnungswerk", lu[y.value.status]) : ""), ye = G(() => y.value ? j("rechnungswerk", uu[y.value.invoiceType]) : ""), be = G(() => {
 			let e = {
 				pending: j("rechnungswerk", "DATEV: gesendet"),
 				confirmed: j("rechnungswerk", "DATEV: bestätigt"),
 				failed: j("rechnungswerk", "DATEV: abgelehnt"),
 				unknown: j("rechnungswerk", "DATEV: Antwort prüfen")
-			}, t = b.value?.datevStatus;
+			}, t = y.value?.datevStatus;
 			return t ? e[t] ?? "" : "";
-		}), xe = G(() => b.value ? b.value.relatedNumber ? j("rechnungswerk", "{type} zu Rechnung {number}", {
+		}), xe = G(() => y.value ? y.value.relatedNumber ? j("rechnungswerk", "{type} zu Rechnung {number}", {
 			type: ye.value,
-			number: b.value.relatedNumber
+			number: y.value.relatedNumber
 		}) : ye.value : ""), Se = G(() => {
+			let e = s.settings;
+			return !l.value && !!e && !e.vatId?.trim() && !e.registerNumber?.trim();
+		}), Ce = G(() => {
 			if (l.value) return j("rechnungswerk", "Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.");
 			let e = j("rechnungswerk", "Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden."), t = s.settings;
 			return t?.datevAutoSend && t.datevUploadMail ? e + " " + j("rechnungswerk", "Sie wird automatisch an DATEV übergeben.") : e;
-		}), Ce = G(() => {
-			let e = (b.value?.greeting ?? c.defaultContent(d.value, "opening")).trim(), t = (b.value?.extraText ?? c.defaultContent(d.value, "closing")).trim(), n = l.value ? j("rechnungswerk", "anbei erhalten Sie unser Angebot als PDF.") : j("rechnungswerk", "anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).");
+		}), z = G(() => {
+			let e = (y.value?.greeting ?? c.defaultContent(d.value, "opening")).trim(), t = (y.value?.extraText ?? c.defaultContent(d.value, "closing")).trim(), n = l.value ? j("rechnungswerk", "anbei erhalten Sie unser Angebot als PDF.") : j("rechnungswerk", "anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).");
 			return [e === "" ? n : e, t].filter((e) => e !== "").join("\n\n");
-		}), z = G(() => b.value ? b.value.number ?? j("rechnungswerk", "Entwurf") : l.value ? j("rechnungswerk", "Neues Angebot") : j("rechnungswerk", "Neue Rechnung")), we = G(() => Tf(x.value.map((e) => ({
+		}), we = G(() => y.value ? y.value.number ?? j("rechnungswerk", "Entwurf") : l.value ? j("rechnungswerk", "Neues Angebot") : j("rechnungswerk", "Neue Rechnung")), Te = G(() => Tf(b.value.map((e) => ({
 			taxRateBp: e.taxRateBp,
 			lineTotalCents: wf(e.quantity, yu(e.priceInput))
-		})), pe.value)), Te = 0;
-		ce(async () => {
-			let e = ++Te;
+		})), pe.value)), Ee = 0;
+		A(async () => {
+			let e = ++Ee;
 			try {
 				if (await Promise.all([
 					o.fetchAll(),
 					s.fetch(),
 					c.ensureLoaded()
-				]), e !== Te) return;
-				t.id ? await Oe(Number(t.id), e) : await De(e);
+				]), e !== Ee) return;
+				t.id ? await ke(Number(t.id), e) : await Oe(e);
 			} catch (e) {
-				ct(e, j("rechnungswerk", "Laden fehlgeschlagen"));
+				lt(e, j("rechnungswerk", "Laden fehlgeschlagen"));
 			}
 		}), M(() => [n.name, t.id], async ([, e]) => {
-			let t = ++Te;
+			let t = ++Ee;
 			try {
-				if (!e) Ee(), await De(t);
+				if (!e) De(), await Oe(t);
 				else {
-					let n = b.value !== null && b.value.invoiceType === "quote" !== l.value;
-					(b.value?.id !== Number(e) || n) && (Ee(), await Oe(Number(e), t));
+					let n = y.value !== null && y.value.invoiceType === "quote" !== l.value;
+					(y.value?.id !== Number(e) || n) && (De(), await ke(Number(e), t));
 				}
 			} catch (e) {
-				ct(e, j("rechnungswerk", "Laden fehlgeschlagen"));
+				lt(e, j("rechnungswerk", "Laden fehlgeschlagen"));
 			}
 		});
-		function Ee() {
-			b.value = null, x.value = [xf()], ie.value = [], w.value = "", T.value = "", ae.value = !1, oe.value = !1, se.value = "", A.value = null, le.value = !1, Object.assign(N, de()), ue = null;
+		function De() {
+			y.value = null, b.value = [xf()], ae.value = [], C.value = "", w.value = "", oe.value = !1, se.value = !1, ce.value = "", k.value = null, le.value = !1, Object.assign(N, de()), ue = null;
 		}
-		async function De(e = Te) {
+		async function Oe(e = Ee) {
 			let t = s.settings;
 			N.greeting = c.defaultContent(d.value, "opening"), N.extraText = c.defaultContent(d.value, "closing"), N.paymentTermDays = l.value ? "" : t?.defaultPaymentTermDays ?? "";
 			let n = {
@@ -5461,31 +5464,31 @@ var Lp = ln("textSnippet", () => {
 			try {
 				n = await Rp();
 			} catch {}
-			e === Te && (N.sellerContactPerson = n.person || (t?.contactPerson ?? ""), N.sellerContactPhone = n.phone || (t?.contactPhone ?? ""), N.sellerContactEmail = n.email || (t?.contactEmail ?? ""), Le());
+			e === Ee && (N.sellerContactPerson = n.person || (t?.contactPerson ?? ""), N.sellerContactPhone = n.phone || (t?.contactPhone ?? ""), N.sellerContactEmail = n.email || (t?.contactEmail ?? ""), Re());
 		}
-		async function Oe(e, t = Te) {
+		async function ke(e, t = Ee) {
 			let n = await u.value.get(e);
-			t === Te && (b.value = n, N.customerId = n.customerId ?? null, N.recipientName = n.recipientName ?? "", N.recipientEmail = n.recipientEmail ?? "", N.recipientAddressAddition = n.recipientAddressAddition ?? "", N.recipientAddress = n.recipientAddress ?? "", N.recipientPostalCode = n.recipientPostalCode ?? "", N.recipientCity = n.recipientCity ?? "", N.recipientCountry = n.recipientCountry ?? "DE", N.recipientVatId = n.recipientVatId ?? "", N.recipientContactId = n.recipientContactId ?? "", N.recipientContactPerson = n.recipientContactPerson ?? "", N.recipientPhone = n.recipientPhone ?? "", N.sellerContactPerson = n.sellerContactPerson ?? "", N.sellerContactPhone = n.sellerContactPhone ?? "", N.sellerContactEmail = n.sellerContactEmail ?? "", N.performancePeriodStart = n.performancePeriodStart ?? n.performanceDate ?? "", N.performancePeriodEnd = n.performancePeriodEnd ?? "", N.referenceNumber = n.referenceNumber ?? "", N.orderNumber = n.orderNumber ?? "", N.buyerReference = n.buyerReference ?? "", N.contractNumber = n.contractNumber ?? "", N.projectReference = n.projectReference ?? "", le.value = [
+			t === Ee && (y.value = n, N.customerId = n.customerId ?? null, N.recipientName = n.recipientName ?? "", N.recipientEmail = n.recipientEmail ?? "", N.recipientAddressAddition = n.recipientAddressAddition ?? "", N.recipientAddress = n.recipientAddress ?? "", N.recipientPostalCode = n.recipientPostalCode ?? "", N.recipientCity = n.recipientCity ?? "", N.recipientCountry = n.recipientCountry ?? "DE", N.recipientVatId = n.recipientVatId ?? "", N.recipientContactId = n.recipientContactId ?? "", N.recipientContactPerson = n.recipientContactPerson ?? "", N.recipientPhone = n.recipientPhone ?? "", N.sellerContactPerson = n.sellerContactPerson ?? "", N.sellerContactPhone = n.sellerContactPhone ?? "", N.sellerContactEmail = n.sellerContactEmail ?? "", N.performancePeriodStart = n.performancePeriodStart ?? n.performanceDate ?? "", N.performancePeriodEnd = n.performancePeriodEnd ?? "", N.referenceNumber = n.referenceNumber ?? "", N.orderNumber = n.orderNumber ?? "", N.buyerReference = n.buyerReference ?? "", N.contractNumber = n.contractNumber ?? "", N.projectReference = n.projectReference ?? "", le.value = [
 				N.referenceNumber,
 				N.orderNumber,
 				l.value ? "" : N.buyerReference,
 				N.contractNumber,
 				N.projectReference
-			].some((e) => e.trim() !== ""), ie.value = [...n.notes ?? []], N.specialTaxCase = n.specialTaxCase ?? "", N.greeting = n.greeting ?? "", N.extraText = n.extraText ?? "", N.paymentTermDays = n.paymentTermDays ?? "", N.discountTerms = n.discountTerms ?? "", N.validUntil = n.validUntil ?? "", N.offerFreeform = n.offerFreeform ?? !1, x.value = n.items.length > 0 ? n.items.map(Cf) : [xf()], Le());
+			].some((e) => e.trim() !== ""), ae.value = [...n.notes ?? []], N.specialTaxCase = n.specialTaxCase ?? "", N.greeting = n.greeting ?? "", N.extraText = n.extraText ?? "", N.paymentTermDays = n.paymentTermDays ?? "", N.discountTerms = n.discountTerms ?? "", N.validUntil = n.validUntil ?? "", N.offerFreeform = n.offerFreeform ?? !1, b.value = n.items.length > 0 ? n.items.map(Cf) : [xf()], Re());
 		}
-		function ke() {
-			ie.value.push("");
-		}
-		function Ae(e) {
-			ie.value.splice(e, 1);
+		function Ae() {
+			ae.value.push("");
 		}
 		function Me(e) {
-			N.customerId = e.id, N.recipientName = e.name, N.recipientContactId = "", N.recipientEmail = e.email ?? "", N.recipientAddressAddition = e.addressAddition ?? "", N.recipientAddress = e.address ?? "", N.recipientPostalCode = e.postalCode ?? "", N.recipientCity = e.city ?? "", N.recipientCountry = e.country ?? "DE", N.recipientVatId = e.vatId ?? "", N.recipientContactPerson = e.contactPerson ?? "", N.recipientPhone = e.phone ?? "", e.defaultPaymentTermDays != null && (N.paymentTermDays = e.defaultPaymentTermDays);
+			ae.value.splice(e, 1);
 		}
 		function Pe(e) {
+			N.customerId = e.id, N.recipientName = e.name, N.recipientContactId = "", N.recipientEmail = e.email ?? "", N.recipientAddressAddition = e.addressAddition ?? "", N.recipientAddress = e.address ?? "", N.recipientPostalCode = e.postalCode ?? "", N.recipientCity = e.city ?? "", N.recipientCountry = e.country ?? "DE", N.recipientVatId = e.vatId ?? "", N.recipientContactPerson = e.contactPerson ?? "", N.recipientPhone = e.phone ?? "", e.defaultPaymentTermDays != null && (N.paymentTermDays = e.defaultPaymentTermDays);
+		}
+		function Fe(e) {
 			N.customerId = null, N.recipientName = e.name, N.recipientEmail = e.email, e.phone && (N.recipientPhone = e.phone), N.recipientAddressAddition = "", N.recipientAddress = e.address, N.recipientPostalCode = e.postalCode, N.recipientCity = e.city, e.country && (N.recipientCountry = e.country);
 		}
-		function Fe() {
+		function Ie() {
 			let e = N.performancePeriodStart, t = N.performancePeriodEnd, n = e && t ? {
 				performanceDate: "",
 				performancePeriodStart: e,
@@ -5498,8 +5501,8 @@ var Lp = ln("textSnippet", () => {
 				...N,
 				...n,
 				paymentTermDays: N.paymentTermDays === "" ? null : Number(N.paymentTermDays),
-				notes: ie.value.map((e) => e.trim()).filter((e) => e !== ""),
-				items: x.value.filter((e) => e.name.trim() !== "").map((e) => ({
+				notes: ae.value.map((e) => e.trim()).filter((e) => e !== ""),
+				items: b.value.filter((e) => e.name.trim() !== "").map((e) => ({
 					productId: e.productId,
 					name: e.name.trim(),
 					description: e.description.trim() === "" ? null : e.description.trim(),
@@ -5512,231 +5515,231 @@ var Lp = ln("textSnippet", () => {
 			};
 			return l.value ? (r.validUntil = N.validUntil === "" ? null : N.validUntil, r.offerFreeform = N.offerFreeform, r.paymentTermDays = null, r.discountTerms = null) : (delete r.validUntil, delete r.offerFreeform), r;
 		}
-		let Ie = null;
-		function Le(e = JSON.stringify(Fe())) {
+		let Le = null;
+		function Re(e = JSON.stringify(Ie())) {
 			ue = e;
 		}
-		function Re() {
-			return !F.value && ue !== null && JSON.stringify(Fe()) !== ue;
-		}
-		function ze(e) {
-			return !Re() || (Ie = e.fullPath, A.value = "leave", !1);
+		function ze() {
+			return !F.value && ue !== null && JSON.stringify(Ie()) !== ue;
 		}
 		function Be(e) {
-			A.value = null;
-			let t = Ie;
-			Ie = null, e && t !== null && (ue = null, r.push(t));
+			return !ze() || (Le = e.fullPath, k.value = "leave", !1);
 		}
-		sr(ze), cr(ze);
 		function K(e) {
-			Re() && e.preventDefault();
+			k.value = null;
+			let t = Le;
+			Le = null, e && t !== null && (ue = null, r.push(t));
 		}
-		ce(() => window.addEventListener("beforeunload", K)), h(() => window.removeEventListener("beforeunload", K));
-		async function Ve() {
-			w.value = "", D.value = !0;
+		sr(Be), cr(Be);
+		function Ve(e) {
+			ze() && e.preventDefault();
+		}
+		A(() => window.addEventListener("beforeunload", Ve)), h(() => window.removeEventListener("beforeunload", Ve));
+		async function He() {
+			C.value = "", E.value = !0;
 			try {
-				let e = Fe(), t = !b.value, n = b.value ? await u.value.update(b.value.id, e) : await u.value.create(e);
-				return b.value = n, Le(JSON.stringify(e)), t && r.replace({
-					name: v.value,
+				let e = Ie(), t = !y.value, n = y.value ? await u.value.update(y.value.id, e) : await u.value.create(e);
+				return y.value = n, Re(JSON.stringify(e)), t && r.replace({
+					name: re.value,
 					params: { id: String(n.id) }
 				}), n;
 			} catch (e) {
-				return ct(e, j("rechnungswerk", "Speichern fehlgeschlagen")), null;
+				return lt(e, j("rechnungswerk", "Speichern fehlgeschlagen")), null;
 			} finally {
-				D.value = !1;
+				E.value = !1;
 			}
 		}
-		async function He() {
-			let e = await Ve();
-			e && (se.value = l.value ? Cp(e.id) : Wl(e.id), oe.value = !0);
+		async function Ue() {
+			let e = await He();
+			e && (ce.value = l.value ? Cp(e.id) : Wl(e.id), se.value = !0);
 		}
-		function Ue(e) {
-			e || (oe.value = !1, se.value = "");
-		}
-		function We() {
-			A.value = "finalize";
+		function We(e) {
+			e || (se.value = !1, ce.value = "");
 		}
 		function Ge() {
-			A.value = "delete";
+			k.value = "finalize";
 		}
 		function Ke() {
-			A.value = "cancel";
+			k.value = "delete";
 		}
 		function qe() {
-			A.value = "convert";
+			k.value = "cancel";
 		}
 		function Je() {
-			A.value = "revise";
+			k.value = "convert";
 		}
-		let Ye = G(() => l.value && b.value?.status === "committed" && !["converted", "superseded"].includes(b.value?.quoteStatus ?? "")), Xe = G(() => l.value && b.value?.status === "committed" && [
+		function Ye() {
+			k.value = "revise";
+		}
+		let Xe = G(() => l.value && y.value?.status === "committed" && !["converted", "superseded"].includes(y.value?.quoteStatus ?? "")), Qe = G(() => l.value && y.value?.status === "committed" && [
 			"open",
 			"expired",
 			"accepted"
-		].includes(b.value?.quoteStatus ?? "")), Qe = G(() => l.value && b.value?.status === "committed" && ["open", "expired"].includes(b.value?.quoteStatus ?? ""));
-		function $e() {
-			b.value && (l.value ? wp(b.value.id) : Gl(b.value.id));
-		}
-		async function et() {
-			A.value = null;
-			let e = await Ve();
-			if (e) {
-				D.value = !0;
-				try {
-					let t = await u.value.commit(e.id);
-					if (b.value = t, T.value = "", l.value) T.value = j("rechnungswerk", "Angebot festgeschrieben.");
-					else {
-						let e = t.datevMailSent;
-						e === !0 ? T.value = j("rechnungswerk", "Festgeschrieben. E-Rechnung wurde automatisch an DATEV gesendet.") : e === null && (w.value = j("rechnungswerk", "Rechnung festgeschrieben, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden."));
-					}
-				} catch (e) {
-					ct(e, j("rechnungswerk", "Festschreiben fehlgeschlagen"));
-				} finally {
-					D.value = !1;
-				}
-			}
+		].includes(y.value?.quoteStatus ?? "")), $e = G(() => l.value && y.value?.status === "committed" && ["open", "expired"].includes(y.value?.quoteStatus ?? ""));
+		function et() {
+			y.value && (l.value ? wp(y.value.id) : Gl(y.value.id));
 		}
 		async function Z() {
-			if (b.value) {
-				D.value = !0, w.value = "";
+			k.value = null;
+			let e = await He();
+			if (e) {
+				E.value = !0;
 				try {
-					b.value = await a.accept(b.value.id), T.value = j("rechnungswerk", "Angebot als angenommen markiert.");
+					let t = await u.value.commit(e.id);
+					if (y.value = t, w.value = "", l.value) w.value = j("rechnungswerk", "Angebot festgeschrieben.");
+					else {
+						let e = t.datevMailSent;
+						e === !0 ? w.value = j("rechnungswerk", "Festgeschrieben. E-Rechnung wurde automatisch an DATEV gesendet.") : e === null && (C.value = j("rechnungswerk", "Rechnung festgeschrieben, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden."));
+					}
 				} catch (e) {
-					ct(e, j("rechnungswerk", "Aktion fehlgeschlagen"));
+					lt(e, j("rechnungswerk", "Festschreiben fehlgeschlagen"));
 				} finally {
-					D.value = !1;
+					E.value = !1;
 				}
 			}
 		}
 		async function tt() {
-			if (b.value) {
-				D.value = !0, w.value = "";
+			if (y.value) {
+				E.value = !0, C.value = "";
 				try {
-					b.value = await a.reject(b.value.id), T.value = j("rechnungswerk", "Angebot als abgelehnt markiert.");
+					y.value = await a.accept(y.value.id), w.value = j("rechnungswerk", "Angebot als angenommen markiert.");
 				} catch (e) {
-					ct(e, j("rechnungswerk", "Aktion fehlgeschlagen"));
+					lt(e, j("rechnungswerk", "Aktion fehlgeschlagen"));
 				} finally {
-					D.value = !1;
+					E.value = !1;
 				}
 			}
 		}
 		async function nt() {
-			if (A.value = null, b.value) {
-				D.value = !0, w.value = "";
+			if (y.value) {
+				E.value = !0, C.value = "";
 				try {
-					let e = await a.convert(b.value.id);
+					y.value = await a.reject(y.value.id), w.value = j("rechnungswerk", "Angebot als abgelehnt markiert.");
+				} catch (e) {
+					lt(e, j("rechnungswerk", "Aktion fehlgeschlagen"));
+				} finally {
+					E.value = !1;
+				}
+			}
+		}
+		async function rt() {
+			if (k.value = null, y.value) {
+				E.value = !0, C.value = "";
+				try {
+					let e = await a.convert(y.value.id);
 					r.push({
 						name: "invoice-detail",
 						params: { id: String(e.id) }
 					});
 				} catch (e) {
-					ct(e, j("rechnungswerk", "Übernahme fehlgeschlagen"));
+					lt(e, j("rechnungswerk", "Übernahme fehlgeschlagen"));
 				} finally {
-					D.value = !1;
+					E.value = !1;
 				}
 			}
 		}
-		async function rt() {
-			if (A.value = null, b.value) {
-				D.value = !0, w.value = "";
+		async function it() {
+			if (k.value = null, y.value) {
+				E.value = !0, C.value = "";
 				try {
-					let e = await a.revise(b.value.id);
+					let e = await a.revise(y.value.id);
 					r.push({
 						name: "quote-detail",
 						params: { id: String(e.id) }
 					});
 				} catch (e) {
-					ct(e, j("rechnungswerk", "Revidieren fehlgeschlagen"));
+					lt(e, j("rechnungswerk", "Revidieren fehlgeschlagen"));
+				} finally {
+					E.value = !1;
+				}
+			}
+		}
+		async function at(e) {
+			if (y.value) {
+				D.value = !0, C.value = "";
+				try {
+					l.value ? (await Tp(y.value.id, e), oe.value = !1, w.value = j("rechnungswerk", "Angebot an {to} gesendet.", { to: e.to })) : (await Kl(y.value.id, e), oe.value = !1, w.value = j("rechnungswerk", "Rechnung an {to} gesendet.", { to: e.to }));
+				} catch (e) {
+					lt(e, j("rechnungswerk", "Versand fehlgeschlagen"));
 				} finally {
 					D.value = !1;
 				}
-			}
-		}
-		async function it(e) {
-			if (b.value) {
-				O.value = !0, w.value = "";
-				try {
-					l.value ? (await Tp(b.value.id, e), ae.value = !1, T.value = j("rechnungswerk", "Angebot an {to} gesendet.", { to: e.to })) : (await Kl(b.value.id, e), ae.value = !1, T.value = j("rechnungswerk", "Rechnung an {to} gesendet.", { to: e.to }));
-				} catch (e) {
-					ct(e, j("rechnungswerk", "Versand fehlgeschlagen"));
-				} finally {
-					O.value = !1;
-				}
-			}
-		}
-		async function at() {
-			if (A.value = null, !b.value) {
-				st();
-				return;
-			}
-			D.value = !0;
-			try {
-				await u.value.remove(b.value.id), ue = null, st();
-			} catch (e) {
-				ct(e, j("rechnungswerk", "Löschen fehlgeschlagen"));
-			} finally {
-				D.value = !1;
 			}
 		}
 		async function ot() {
-			if (A.value = null, b.value) {
-				D.value = !0;
+			if (k.value = null, !y.value) {
+				ct();
+				return;
+			}
+			E.value = !0;
+			try {
+				await u.value.remove(y.value.id), ue = null, ct();
+			} catch (e) {
+				lt(e, j("rechnungswerk", "Löschen fehlgeschlagen"));
+			} finally {
+				E.value = !1;
+			}
+		}
+		async function st() {
+			if (k.value = null, y.value) {
+				E.value = !0;
 				try {
-					let e = await i.cancel(b.value.id), t = e.datevMailSent;
-					await Oe(e.id), T.value = "", t === !0 ? T.value = j("rechnungswerk", "Storniert. Der Stornobeleg wurde automatisch an DATEV gesendet.") : t === null && (w.value = j("rechnungswerk", "Storno erstellt, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden."));
+					let e = await i.cancel(y.value.id), t = e.datevMailSent;
+					await ke(e.id), w.value = "", t === !0 ? w.value = j("rechnungswerk", "Storniert. Der Stornobeleg wurde automatisch an DATEV gesendet.") : t === null && (C.value = j("rechnungswerk", "Storno erstellt, aber der automatische DATEV-Versand ist fehlgeschlagen. Bitte manuell senden."));
 				} catch (e) {
-					ct(e, j("rechnungswerk", "Stornieren fehlgeschlagen"));
+					lt(e, j("rechnungswerk", "Stornieren fehlgeschlagen"));
 				} finally {
-					D.value = !1;
+					E.value = !1;
 				}
 			}
 		}
-		function st() {
+		function ct() {
 			r.push({ name: _.value });
 		}
-		function ct(e, t) {
-			w.value = e.message ?? t, console.error("[rechnungswerk] editor:", e);
+		function lt(e, t) {
+			C.value = e.message ?? t, console.error("[rechnungswerk] editor:", e);
 		}
 		return (e, t) => {
 			let n = te("tooltip");
-			return E(), q("div", Bp, [
+			return T(), q("div", Bp, [
 				Y("div", Vp, [W(B(Ot), null, {
 					default: g(() => [W(B(Et), {
 						name: l.value ? B(j)("rechnungswerk", "Angebote") : B(j)("rechnungswerk", "Rechnungen"),
 						to: { name: _.value }
-					}, null, 8, ["name", "to"]), W(B(Et), { name: z.value }, null, 8, ["name"])]),
+					}, null, 8, ["name", "to"]), W(B(Et), { name: we.value }, null, 8, ["name"])]),
 					_: 1
-				}), b.value ? (E(), q("span", Hp, [
-					Y("span", Up, [(E(), U(y(ge(b.value.status)), {
+				}), y.value ? (T(), q("span", Hp, [
+					Y("span", Up, [(T(), U(v(ge(y.value.status)), {
 						size: 18,
-						class: V(["rw-sicon", `rw-sicon--${b.value.status}`])
+						class: V(["rw-sicon", `rw-sicon--${y.value.status}`])
 					}, null, 8, ["class"])), R(" " + H(ve.value), 1)]),
-					!l.value && b.value.invoiceType !== "invoice" ? S((E(), q("span", Wp, [R(H(ye.value), 1)])), [[n, xe.value]]) : L("", !0),
-					l.value && b.value.relatedQuoteNumber ? (E(), q("span", Gp, H(B(j)("rechnungswerk", "Revision von {number}", { number: b.value.relatedQuoteNumber })), 1)) : L("", !0),
-					b.value.datevStatus && be.value ? (E(), q("span", {
+					!l.value && y.value.invoiceType !== "invoice" ? x((T(), q("span", Wp, [R(H(ye.value), 1)])), [[n, xe.value]]) : L("", !0),
+					l.value && y.value.relatedQuoteNumber ? (T(), q("span", Gp, H(B(j)("rechnungswerk", "Revision von {number}", { number: y.value.relatedQuoteNumber })), 1)) : L("", !0),
+					y.value.datevStatus && be.value ? (T(), q("span", {
 						key: 2,
 						class: "rw-status-tag",
 						title: B(j)("rechnungswerk", "DATEV-Übergabe")
-					}, [(E(), U(y(_e(b.value.datevStatus)), {
+					}, [(T(), U(v(_e(y.value.datevStatus)), {
 						size: 18,
-						class: V(["rw-sicon", `rw-sicon--datev-${b.value.datevStatus}`])
+						class: V(["rw-sicon", `rw-sicon--datev-${y.value.datevStatus}`])
 					}, null, 8, ["class"])), R(" " + H(be.value), 1)], 8, Kp)) : L("", !0)
 				])) : L("", !0)]),
-				w.value ? (E(), U(B(Q), {
+				C.value ? (T(), U(B(Q), {
 					key: 0,
 					type: "error",
-					text: w.value
+					text: C.value
 				}, null, 8, ["text"])) : L("", !0),
-				T.value ? (E(), U(B(Q), {
+				w.value ? (T(), U(B(Q), {
 					key: 1,
 					type: "success",
-					text: T.value
+					text: w.value
 				}, null, 8, ["text"])) : L("", !0),
-				F.value ? (E(), U(B(Q), {
+				F.value ? (T(), U(B(Q), {
 					key: 2,
 					type: "info",
 					text: l.value ? B(j)("rechnungswerk", "Dieses Angebot ist festgeschrieben und kann nicht mehr geändert werden.") : B(j)("rechnungswerk", "Diese Rechnung ist festgeschrieben und kann nicht mehr geändert werden.")
 				}, null, 8, ["text"])) : L("", !0),
-				!l.value && b.value?.documentBackfilled ? (E(), U(B(Q), {
+				!l.value && y.value?.documentBackfilled ? (T(), U(B(Q), {
 					key: 3,
 					type: "info",
 					text: B(j)("rechnungswerk", "Dieser Beleg wurde nicht beim Festschreiben abgelegt, sondern später aus dem Datensatz erzeugt. Beträge, Positionen und Steuerausweis stimmen; Firmendaten und Layout entsprechen dem heutigen Stand, nicht dem von damals.")
@@ -5748,15 +5751,15 @@ var Lp = ln("textSnippet", () => {
 							class: "rw-input",
 							type: "text",
 							readonly: "",
-							value: b.value?.number ?? B(j)("rechnungswerk", "(wird vergeben)")
+							value: y.value?.number ?? B(j)("rechnungswerk", "(wird vergeben)")
 						}, null, 8, Xp)]),
-						Y("label", Zp, [Y("span", null, H(l.value ? B(j)("rechnungswerk", "Geplanter Leistungszeitraum (optional)") : B(j)("rechnungswerk", "Leistungsdatum /-zeitraum")), 1), S(Y("input", {
+						Y("label", Zp, [Y("span", null, H(l.value ? B(j)("rechnungswerk", "Geplanter Leistungszeitraum (optional)") : B(j)("rechnungswerk", "Leistungsdatum /-zeitraum")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[0] ||= (e) => N.performancePeriodStart = e,
 							class: "rw-input",
 							type: "date",
 							readonly: F.value
 						}, null, 8, Qp), [[J, N.performancePeriodStart]])]),
-						Y("label", $p, [Y("span", null, H(B(j)("rechnungswerk", "bis (optional)")), 1), S(Y("input", {
+						Y("label", $p, [Y("span", null, H(B(j)("rechnungswerk", "bis (optional)")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[1] ||= (e) => N.performancePeriodEnd = e,
 							class: "rw-input",
 							type: "date",
@@ -5771,19 +5774,19 @@ var Lp = ln("textSnippet", () => {
 					}, [
 						Y("summary", null, H(l.value ? B(j)("rechnungswerk", "Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)") : B(j)("rechnungswerk", "Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)")), 1),
 						Y("div", rm, [
-							Y("label", im, [Y("span", null, H(B(j)("rechnungswerk", "Referenznummer")), 1), S(Y("input", {
+							Y("label", im, [Y("span", null, H(B(j)("rechnungswerk", "Referenznummer")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[2] ||= (e) => N.referenceNumber = e,
 								class: "rw-input",
 								type: "text",
 								readonly: F.value
 							}, null, 8, am), [[J, N.referenceNumber]])]),
-							Y("label", om, [Y("span", null, H(B(j)("rechnungswerk", "Bestellnummer")), 1), S(Y("input", {
+							Y("label", om, [Y("span", null, H(B(j)("rechnungswerk", "Bestellnummer")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[3] ||= (e) => N.orderNumber = e,
 								class: "rw-input",
 								type: "text",
 								readonly: F.value
 							}, null, 8, sm), [[J, N.orderNumber]])]),
-							l.value ? (E(), q("span", um)) : (E(), q("label", cm, [Y("span", null, H(B(j)("rechnungswerk", "Käuferreferenz / Leitweg-ID (BT-10)")), 1), S(Y("input", {
+							l.value ? (T(), q("span", um)) : (T(), q("label", cm, [Y("span", null, H(B(j)("rechnungswerk", "Käuferreferenz / Leitweg-ID (BT-10)")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[4] ||= (e) => N.buyerReference = e,
 								class: "rw-input",
 								type: "text",
@@ -5792,13 +5795,13 @@ var Lp = ln("textSnippet", () => {
 							}, null, 8, lm), [[J, N.buyerReference]])]))
 						]),
 						Y("div", dm, [
-							Y("label", fm, [Y("span", null, H(B(j)("rechnungswerk", "Vertragsnummer (BT-12)")), 1), S(Y("input", {
+							Y("label", fm, [Y("span", null, H(B(j)("rechnungswerk", "Vertragsnummer (BT-12)")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[5] ||= (e) => N.contractNumber = e,
 								class: "rw-input",
 								type: "text",
 								readonly: F.value
 							}, null, 8, pm), [[J, N.contractNumber]])]),
-							Y("label", mm, [Y("span", null, H(B(j)("rechnungswerk", "Objekt-/Projektkennung (BT-18)")), 1), S(Y("input", {
+							Y("label", mm, [Y("span", null, H(B(j)("rechnungswerk", "Objekt-/Projektkennung (BT-18)")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[6] ||= (e) => N.projectReference = e,
 								class: "rw-input",
 								type: "text",
@@ -5813,23 +5816,23 @@ var Lp = ln("textSnippet", () => {
 				]),
 				Y("section", gm, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Empfänger")), 1),
-					F.value ? L("", !0) : (E(), q("div", _m, [Y("label", vm, [
+					F.value ? L("", !0) : (T(), q("div", _m, [Y("label", vm, [
 						Y("span", null, H(B(j)("rechnungswerk", "Kunde übernehmen")), 1),
-						W(ff, { onSelect: Me }),
+						W(ff, { onSelect: Pe }),
 						Y("span", ym, H(B(j)("rechnungswerk", "Kunde auswählen, um die Empfängerdaten automatisch zu übernehmen.")), 1)
 					])])),
-					Y("div", bm, [Y("label", xm, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), F.value ? (E(), q("input", {
+					Y("div", bm, [Y("label", xm, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), F.value ? (T(), q("input", {
 						key: 1,
 						class: "rw-input",
 						type: "text",
 						readonly: "",
 						value: N.recipientName
-					}, null, 8, Sm)) : (E(), U(Jd, {
+					}, null, 8, Sm)) : (T(), U(Jd, {
 						key: 0,
 						modelValue: N.recipientName,
 						"onUpdate:modelValue": t[8] ||= (e) => N.recipientName = e,
-						onSelect: Pe
-					}, null, 8, ["modelValue"]))]), Y("label", Cm, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail")), 1), S(Y("input", {
+						onSelect: Fe
+					}, null, 8, ["modelValue"]))]), Y("label", Cm, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail")), 1), x(Y("input", {
 						"onUpdate:modelValue": t[9] ||= (e) => N.recipientEmail = e,
 						class: "rw-input",
 						type: "email",
@@ -5837,7 +5840,7 @@ var Lp = ln("textSnippet", () => {
 					}, null, 8, wm), [[J, N.recipientEmail]])])]),
 					Y("div", Tm, [Y("label", Em, [
 						Y("span", null, H(B(j)("rechnungswerk", "Adresszusatz")), 1),
-						S(Y("input", {
+						x(Y("input", {
 							"onUpdate:modelValue": t[10] ||= (e) => N.recipientAddressAddition = e,
 							class: "rw-input",
 							type: "text",
@@ -5846,19 +5849,19 @@ var Lp = ln("textSnippet", () => {
 						Y("span", Om, H(B(j)("rechnungswerk", "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.")), 1)
 					])]),
 					Y("div", km, [
-						Y("label", Am, [Y("span", null, H(B(j)("rechnungswerk", "Straße")), 1), S(Y("input", {
+						Y("label", Am, [Y("span", null, H(B(j)("rechnungswerk", "Straße")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[11] ||= (e) => N.recipientAddress = e,
 							class: "rw-input",
 							type: "text",
 							readonly: F.value
 						}, null, 8, jm), [[J, N.recipientAddress]])]),
-						Y("label", Mm, [Y("span", null, H(B(j)("rechnungswerk", "PLZ")), 1), S(Y("input", {
+						Y("label", Mm, [Y("span", null, H(B(j)("rechnungswerk", "PLZ")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[12] ||= (e) => N.recipientPostalCode = e,
 							class: "rw-input",
 							type: "text",
 							readonly: F.value
 						}, null, 8, Nm), [[J, N.recipientPostalCode]])]),
-						Y("label", Pm, [Y("span", null, H(B(j)("rechnungswerk", "Ort")), 1), S(Y("input", {
+						Y("label", Pm, [Y("span", null, H(B(j)("rechnungswerk", "Ort")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[13] ||= (e) => N.recipientCity = e,
 							class: "rw-input",
 							type: "text",
@@ -5871,19 +5874,19 @@ var Lp = ln("textSnippet", () => {
 						}, null, 8, ["modelValue", "disabled"])])
 					]),
 					Y("div", Lm, [
-						Y("label", Rm, [Y("span", null, H(B(j)("rechnungswerk", "USt-IdNr. (optional)")), 1), S(Y("input", {
+						Y("label", Rm, [Y("span", null, H(B(j)("rechnungswerk", "USt-IdNr. (optional)")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[15] ||= (e) => N.recipientVatId = e,
 							class: "rw-input",
 							type: "text",
 							readonly: F.value
 						}, null, 8, zm), [[J, N.recipientVatId]])]),
-						Y("label", Bm, [Y("span", null, H(B(j)("rechnungswerk", "Ansprechpartner (optional)")), 1), S(Y("input", {
+						Y("label", Bm, [Y("span", null, H(B(j)("rechnungswerk", "Ansprechpartner (optional)")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[16] ||= (e) => N.recipientContactPerson = e,
 							class: "rw-input",
 							type: "text",
 							readonly: F.value
 						}, null, 8, Vm), [[J, N.recipientContactPerson]])]),
-						Y("label", Hm, [Y("span", null, H(B(j)("rechnungswerk", "Telefon (optional)")), 1), S(Y("input", {
+						Y("label", Hm, [Y("span", null, H(B(j)("rechnungswerk", "Telefon (optional)")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[17] ||= (e) => N.recipientPhone = e,
 							class: "rw-input",
 							type: "text",
@@ -5894,19 +5897,19 @@ var Lp = ln("textSnippet", () => {
 				Y("section", Wm, [
 					Y("h3", null, H(l.value ? B(j)("rechnungswerk", "Ansprechpartner (für dieses Angebot)") : B(j)("rechnungswerk", "Ansprechpartner (für diese Rechnung)")), 1),
 					Y("div", Gm, [
-						Y("label", Km, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), S(Y("input", {
+						Y("label", Km, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[18] ||= (e) => N.sellerContactPerson = e,
 							class: "rw-input",
 							type: "text",
 							readonly: F.value
 						}, null, 8, qm), [[J, N.sellerContactPerson]])]),
-						Y("label", Jm, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), S(Y("input", {
+						Y("label", Jm, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[19] ||= (e) => N.sellerContactPhone = e,
 							class: "rw-input",
 							type: "text",
 							readonly: F.value
 						}, null, 8, Ym), [[J, N.sellerContactPhone]])]),
-						Y("label", Xm, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail")), 1), S(Y("input", {
+						Y("label", Xm, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail")), 1), x(Y("input", {
 							"onUpdate:modelValue": t[20] ||= (e) => N.sellerContactEmail = e,
 							class: "rw-input",
 							type: "email",
@@ -5915,12 +5918,12 @@ var Lp = ln("textSnippet", () => {
 					]),
 					Y("p", Qm, H(l.value ? B(j)("rechnungswerk", "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.") : B(j)("rechnungswerk", "Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.")), 1)
 				]),
-				Y("section", $m, [Y("div", eh, [Y("h3", null, H(B(j)("rechnungswerk", "Anrede & Einleitung")), 1), !F.value && f.value.length > 0 ? (E(), U(B(ht), {
+				Y("section", $m, [Y("div", eh, [Y("h3", null, H(B(j)("rechnungswerk", "Anrede & Einleitung")), 1), !F.value && f.value.length > 0 ? (T(), U(B(ht), {
 					key: 0,
 					menuName: B(j)("rechnungswerk", "Vorlage einfügen")
 				}, {
 					icon: g(() => [W(so, { size: 18 })]),
-					default: g(() => [(E(!0), q(k, null, C(f.value, (e) => (E(), U(B(Dt), {
+					default: g(() => [(T(!0), q(O, null, S(f.value, (e) => (T(), U(B(Dt), {
 						key: e.id,
 						onClick: (t) => m(e)
 					}, {
@@ -5928,7 +5931,7 @@ var Lp = ln("textSnippet", () => {
 						_: 2
 					}, 1032, ["onClick"]))), 128))]),
 					_: 1
-				}, 8, ["menuName"])) : L("", !0)]), Y("label", th, [Y("span", null, H(B(j)("rechnungswerk", "Anrede & Einleitung")), 1), S(Y("textarea", {
+				}, 8, ["menuName"])) : L("", !0)]), Y("label", th, [Y("span", null, H(B(j)("rechnungswerk", "Anrede & Einleitung")), 1), x(Y("textarea", {
 					"onUpdate:modelValue": t[21] ||= (e) => N.greeting = e,
 					class: "rw-input",
 					rows: "3",
@@ -5936,8 +5939,8 @@ var Lp = ln("textSnippet", () => {
 					placeholder: B(j)("rechnungswerk", "Anrede und Einleitung – Vorgabe aus den Textbausteinen")
 				}, null, 8, nh), [[J, N.greeting]])])]),
 				Y("section", rh, [Y("h3", null, H(B(j)("rechnungswerk", "Positionen")), 1), W(tp, {
-					items: x.value,
-					"onUpdate:items": t[22] ||= (e) => x.value = e,
+					items: b.value,
+					"onUpdate:items": t[22] ||= (e) => b.value = e,
 					products: B(o).products,
 					readonly: F.value,
 					smallBusiness: B(s).settings?.smallBusiness ?? !1,
@@ -5951,7 +5954,7 @@ var Lp = ln("textSnippet", () => {
 				])]),
 				Y("section", ih, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Steuer & Summen")), 1),
-					Y("div", ah, [Y("label", oh, [Y("span", null, H(B(j)("rechnungswerk", "Steuerfall")), 1), S(Y("select", {
+					Y("div", ah, [Y("label", oh, [Y("span", null, H(B(j)("rechnungswerk", "Steuerfall")), 1), x(Y("select", {
 						"onUpdate:modelValue": t[23] ||= (e) => N.specialTaxCase = e,
 						class: "rw-input",
 						disabled: F.value
@@ -5960,39 +5963,39 @@ var Lp = ln("textSnippet", () => {
 						Y("option", lh, H(B(j)("rechnungswerk", "Reverse Charge (§ 13b – Steuerschuldnerschaft des Leistungsempfängers)")), 1),
 						Y("option", uh, H(B(j)("rechnungswerk", "Innergemeinschaftliche Lieferung (steuerfrei)")), 1),
 						Y("option", dh, H(B(j)("rechnungswerk", "Ausfuhrlieferung Drittland (steuerfrei)")), 1)
-					], 8, sh), [[re, N.specialTaxCase]])]), t[40] ||= Y("span", {
+					], 8, sh), [[ie, N.specialTaxCase]])]), t[40] ||= Y("span", {
 						class: "rw-field",
 						"aria-hidden": "true"
 					}, null, -1)]),
-					N.specialTaxCase === "" ? L("", !0) : (E(), U(B(Q), {
+					N.specialTaxCase === "" ? L("", !0) : (T(), U(B(Q), {
 						key: 0,
 						type: "info",
 						text: B(j)("rechnungswerk", "Für diesen Steuerfall wird keine Umsatzsteuer berechnet (0 %). Ein entsprechender Hinweis erscheint auf der Rechnung.")
 					}, null, 8, ["text"])),
 					Y("div", fh, [Y("div", ph, [
-						Y("div", mh, [Y("span", null, H(B(j)("rechnungswerk", "Zwischensumme (netto)")), 1), Y("strong", null, H(B(xu)(we.value.subtotalCents)), 1)]),
-						(E(!0), q(k, null, C(we.value.taxBreakdown, (e) => (E(), q("div", {
+						Y("div", mh, [Y("span", null, H(B(j)("rechnungswerk", "Zwischensumme (netto)")), 1), Y("strong", null, H(B(xu)(Te.value.subtotalCents)), 1)]),
+						(T(!0), q(O, null, S(Te.value.taxBreakdown, (e) => (T(), q("div", {
 							key: e.rateBp,
 							class: "rw-kpi-row rw-kpi-row--muted"
 						}, [Y("span", null, H(B(j)("rechnungswerk", "USt {rate}", { rate: B(Su)(e.rateBp) })) + " (" + H(B(xu)(e.netCents)) + ")", 1), Y("span", null, H(B(xu)(e.taxCents)), 1)]))), 128)),
-						Y("div", hh, [Y("span", null, H(B(j)("rechnungswerk", "Gesamt (brutto)")), 1), Y("strong", null, H(B(xu)(we.value.totalCents)), 1)])
+						Y("div", hh, [Y("span", null, H(B(j)("rechnungswerk", "Gesamt (brutto)")), 1), Y("strong", null, H(B(xu)(Te.value.totalCents)), 1)])
 					])])
 				]),
-				l.value ? (E(), q("section", wh, [
+				l.value ? (T(), q("section", wh, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Gültigkeit")), 1),
-					Y("div", Th, [Y("label", Eh, [Y("span", null, H(B(j)("rechnungswerk", "Gültig bis")), 1), S(Y("input", {
+					Y("div", Th, [Y("label", Eh, [Y("span", null, H(B(j)("rechnungswerk", "Gültig bis")), 1), x(Y("input", {
 						"onUpdate:modelValue": t[26] ||= (e) => N.validUntil = e,
 						class: "rw-input",
 						type: "date",
 						readonly: F.value
-					}, null, 8, Dh), [[J, N.validUntil]])]), Y("label", Oh, [Y("span", kh, [S(Y("input", {
+					}, null, 8, Dh), [[J, N.validUntil]])]), Y("label", Oh, [Y("span", kh, [x(Y("input", {
 						"onUpdate:modelValue": t[27] ||= (e) => N.offerFreeform = e,
 						type: "checkbox",
 						disabled: F.value
 					}, null, 8, Ah), [[ne, N.offerFreeform]]), R(" " + H(B(j)("rechnungswerk", "Freibleibendes Angebot (unverbindlich)")), 1)])])]),
 					Y("p", jh, H(B(j)("rechnungswerk", "„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.")), 1)
-				])) : (E(), q("section", gh, [Y("h3", null, H(B(j)("rechnungswerk", "Zahlungsbedingungen")), 1), Y("div", _h, [
-					Y("label", vh, [Y("span", null, H(B(j)("rechnungswerk", "Zahlungsziel (Tage)")), 1), S(Y("input", {
+				])) : (T(), q("section", gh, [Y("h3", null, H(B(j)("rechnungswerk", "Zahlungsbedingungen")), 1), Y("div", _h, [
+					Y("label", vh, [Y("span", null, H(B(j)("rechnungswerk", "Zahlungsziel (Tage)")), 1), x(Y("input", {
 						"onUpdate:modelValue": t[24] ||= (e) => N.paymentTermDays = e,
 						class: "rw-input",
 						type: "number",
@@ -6006,7 +6009,7 @@ var Lp = ln("textSnippet", () => {
 						readonly: "",
 						value: P.value || "—"
 					}, null, 8, xh)]),
-					Y("label", Sh, [Y("span", null, H(B(j)("rechnungswerk", "Skonto")), 1), S(Y("input", {
+					Y("label", Sh, [Y("span", null, H(B(j)("rechnungswerk", "Skonto")), 1), x(Y("input", {
 						"onUpdate:modelValue": t[25] ||= (e) => N.discountTerms = e,
 						class: "rw-input",
 						type: "text",
@@ -6014,12 +6017,12 @@ var Lp = ln("textSnippet", () => {
 						placeholder: B(j)("rechnungswerk", "z. B. 2 % bei Zahlung bis\xA0…")
 					}, null, 8, Ch), [[J, N.discountTerms]])])
 				])])),
-				Y("section", Mh, [Y("div", Nh, [Y("h3", null, H(B(j)("rechnungswerk", "Schlusstext")), 1), !F.value && p.value.length > 0 ? (E(), U(B(ht), {
+				Y("section", Mh, [Y("div", Nh, [Y("h3", null, H(B(j)("rechnungswerk", "Schlusstext")), 1), !F.value && p.value.length > 0 ? (T(), U(B(ht), {
 					key: 0,
 					menuName: B(j)("rechnungswerk", "Vorlage einfügen")
 				}, {
 					icon: g(() => [W(so, { size: 18 })]),
-					default: g(() => [(E(!0), q(k, null, C(p.value, (e) => (E(), U(B(Dt), {
+					default: g(() => [(T(!0), q(O, null, S(p.value, (e) => (T(), U(B(Dt), {
 						key: e.id,
 						onClick: (t) => ee(e)
 					}, {
@@ -6027,37 +6030,37 @@ var Lp = ln("textSnippet", () => {
 						_: 2
 					}, 1032, ["onClick"]))), 128))]),
 					_: 1
-				}, 8, ["menuName"])) : L("", !0)]), Y("label", Ph, [Y("span", null, H(B(j)("rechnungswerk", "Schlusstext / Anmerkungen")), 1), S(Y("textarea", {
+				}, 8, ["menuName"])) : L("", !0)]), Y("label", Ph, [Y("span", null, H(B(j)("rechnungswerk", "Schlusstext / Anmerkungen")), 1), x(Y("textarea", {
 					"onUpdate:modelValue": t[28] ||= (e) => N.extraText = e,
 					class: "rw-input",
 					rows: "3",
 					readonly: F.value,
 					placeholder: B(j)("rechnungswerk", "Schlusstext – Vorgabe aus den Textbausteinen")
 				}, null, 8, Fh), [[J, N.extraText]])])]),
-				!F.value || ie.value.length > 0 ? (E(), q("section", Ih, [
+				!F.value || ae.value.length > 0 ? (T(), q("section", Ih, [
 					Y("h3", null, H(l.value ? B(j)("rechnungswerk", "Notizen / Hinweise auf dem Angebot") : B(j)("rechnungswerk", "Notizen / Hinweise auf der Rechnung")), 1),
-					(E(!0), q(k, null, C(ie.value, (e, t) => (E(), q("div", {
+					(T(!0), q(O, null, S(ae.value, (e, t) => (T(), q("div", {
 						key: t,
 						class: "rw-note-row"
-					}, [S(Y("input", {
-						"onUpdate:modelValue": (e) => ie.value[t] = e,
+					}, [x(Y("input", {
+						"onUpdate:modelValue": (e) => ae.value[t] = e,
 						class: "rw-input",
 						type: "text",
 						readonly: F.value,
 						"aria-label": B(j)("rechnungswerk", "Notiz {index}", { index: t + 1 })
-					}, null, 8, Lh), [[J, ie.value[t]]]), F.value ? L("", !0) : (E(), U(B(I), {
+					}, null, 8, Lh), [[J, ae.value[t]]]), F.value ? L("", !0) : (T(), U(B(I), {
 						key: 0,
 						variant: "tertiary",
 						"aria-label": B(j)("rechnungswerk", "Notiz entfernen"),
-						onClick: (e) => Ae(t)
+						onClick: (e) => Me(t)
 					}, {
 						icon: g(() => [W(fd, { size: 20 })]),
 						_: 1
 					}, 8, ["aria-label", "onClick"]))]))), 128)),
-					F.value ? L("", !0) : (E(), U(B(I), {
+					F.value ? L("", !0) : (T(), U(B(I), {
 						key: 0,
 						variant: "tertiary",
-						onClick: ke
+						onClick: Ae
 					}, {
 						icon: g(() => [W(lc, { size: 20 })]),
 						default: g(() => [R(" " + H(B(j)("rechnungswerk", "Notiz hinzufügen")), 1)]),
@@ -6065,80 +6068,80 @@ var Lp = ln("textSnippet", () => {
 					})),
 					Y("p", Rh, H(l.value ? B(j)("rechnungswerk", "Erscheint als Freitext auf dem Angebot – kein strukturiertes Datenfeld.") : B(j)("rechnungswerk", "Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.")), 1)
 				])) : L("", !0),
-				Y("div", zh, [F.value ? b.value ? (E(), q(k, { key: 1 }, [
-					W(B(I), { onClick: $e }, {
+				Y("div", zh, [F.value ? y.value ? (T(), q(O, { key: 1 }, [
+					W(B(I), { onClick: et }, {
 						icon: g(() => [W(gc, { size: 20 })]),
 						default: g(() => [R(" " + H(B(j)("rechnungswerk", "PDF herunterladen")), 1)]),
 						_: 1
 					}),
 					W(B(I), {
 						variant: l.value ? "secondary" : "primary",
-						disabled: O.value,
-						onClick: t[30] ||= (e) => ae.value = !0
+						disabled: D.value,
+						onClick: t[30] ||= (e) => oe.value = !0
 					}, {
 						icon: g(() => [W(yd, { size: 20 })]),
 						default: g(() => [R(" " + H(B(j)("rechnungswerk", "An Kunde senden")), 1)]),
 						_: 1
 					}, 8, ["variant", "disabled"]),
-					!l.value && b.value.status === "committed" ? (E(), U(B(I), {
+					!l.value && y.value.status === "committed" ? (T(), U(B(I), {
 						key: 0,
 						variant: "error",
-						disabled: D.value,
-						onClick: Ke
+						disabled: E.value,
+						onClick: qe
 					}, {
 						default: g(() => [R(H(B(j)("rechnungswerk", "Stornieren")), 1)]),
 						_: 1
 					}, 8, ["disabled"])) : L("", !0),
-					l.value ? (E(), q(k, { key: 1 }, [
-						Qe.value ? (E(), U(B(I), {
+					l.value ? (T(), q(O, { key: 1 }, [
+						$e.value ? (T(), U(B(I), {
 							key: 0,
-							disabled: D.value,
-							onClick: Z
+							disabled: E.value,
+							onClick: tt
 						}, {
 							icon: g(() => [W(Tl, { size: 20 })]),
 							default: g(() => [R(" " + H(B(j)("rechnungswerk", "Annehmen")), 1)]),
 							_: 1
 						}, 8, ["disabled"])) : L("", !0),
-						Qe.value ? (E(), U(B(I), {
+						$e.value ? (T(), U(B(I), {
 							key: 1,
-							disabled: D.value,
-							onClick: tt
+							disabled: E.value,
+							onClick: nt
 						}, {
 							icon: g(() => [W(Ml, { size: 20 })]),
 							default: g(() => [R(" " + H(B(j)("rechnungswerk", "Ablehnen")), 1)]),
 							_: 1
 						}, 8, ["disabled"])) : L("", !0),
-						Ye.value ? (E(), U(B(I), {
+						Xe.value ? (T(), U(B(I), {
 							key: 2,
-							disabled: D.value,
-							onClick: Je
+							disabled: E.value,
+							onClick: Ye
 						}, {
 							icon: g(() => [W(Bd, { size: 20 })]),
 							default: g(() => [R(" " + H(B(j)("rechnungswerk", "Revidieren")), 1)]),
 							_: 1
 						}, 8, ["disabled"])) : L("", !0),
-						Xe.value ? (E(), U(B(I), {
+						Qe.value ? (T(), U(B(I), {
 							key: 3,
 							variant: "primary",
-							disabled: D.value,
-							onClick: qe
+							disabled: E.value,
+							onClick: Je
 						}, {
 							icon: g(() => [W(Nd, { size: 20 })]),
 							default: g(() => [R(" " + H(B(j)("rechnungswerk", "In Rechnung übernehmen")), 1)]),
 							_: 1
 						}, 8, ["disabled"])) : L("", !0)
 					], 64)) : L("", !0)
-				], 64)) : L("", !0) : (E(), q(k, { key: 0 }, [
+				], 64)) : L("", !0) : (T(), q(O, { key: 0 }, [
 					W(B(I), {
-						disabled: D.value,
-						onClick: t[29] ||= (e) => Ve()
+						disabled: E.value,
+						onClick: t[29] ||= (e) => He()
 					}, {
 						default: g(() => [R(H(B(j)("rechnungswerk", "Speichern")), 1)]),
 						_: 1
 					}, 8, ["disabled"]),
 					W(B(I), {
-						disabled: D.value,
-						onClick: He
+						disabled: E.value,
+						onClick: Ue
 					}, {
 						icon: g(() => [W(Ed, { size: 20 })]),
 						default: g(() => [R(" " + H(B(j)("rechnungswerk", "Vorschau")), 1)]),
@@ -6146,57 +6149,51 @@ var Lp = ln("textSnippet", () => {
 					}, 8, ["disabled"]),
 					W(B(I), {
 						variant: "primary",
-						disabled: D.value,
-						onClick: We
+						disabled: E.value,
+						onClick: Ge
 					}, {
 						icon: g(() => [W(So, { size: 20 })]),
 						default: g(() => [R(" " + H(B(j)("rechnungswerk", "Festschreiben")), 1)]),
 						_: 1
 					}, 8, ["disabled"]),
-					b.value ? (E(), U(B(I), {
+					y.value ? (T(), U(B(I), {
 						key: 0,
 						variant: "error",
-						disabled: D.value,
-						onClick: Ge
+						disabled: E.value,
+						onClick: Ke
 					}, {
 						default: g(() => [R(H(B(j)("rechnungswerk", "Löschen")), 1)]),
 						_: 1
 					}, 8, ["disabled"])) : L("", !0)
 				], 64))]),
 				W(ip, {
-					open: A.value === "finalize",
+					open: k.value === "finalize",
 					name: l.value ? B(j)("rechnungswerk", "Angebot festschreiben") : B(j)("rechnungswerk", "Rechnung festschreiben"),
-					message: Se.value,
+					message: Ce.value,
 					confirmLabel: B(j)("rechnungswerk", "Festschreiben"),
-					onClose: t[31] ||= (e) => A.value = null,
-					onConfirm: et
-				}, null, 8, [
+					onClose: t[31] ||= (e) => k.value = null,
+					onConfirm: Z
+				}, {
+					default: g(() => [Se.value ? (T(), U(B(Q), {
+						key: 0,
+						type: "warning",
+						heading: B(j)("rechnungswerk", "Hinweis zur E-Rechnung"),
+						text: B(j)("rechnungswerk", "Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen.")
+					}, null, 8, ["heading", "text"])) : L("", !0)]),
+					_: 1
+				}, 8, [
 					"open",
 					"name",
 					"message",
 					"confirmLabel"
 				]),
 				W(ip, {
-					open: A.value === "delete",
+					open: k.value === "delete",
 					name: l.value ? B(j)("rechnungswerk", "Angebot löschen") : B(j)("rechnungswerk", "Entwurf löschen"),
 					message: l.value ? B(j)("rechnungswerk", "Diesen Angebots-Entwurf wirklich löschen?") : B(j)("rechnungswerk", "Diesen Entwurf wirklich löschen?"),
 					confirmLabel: B(j)("rechnungswerk", "Löschen"),
 					destructive: "",
-					onClose: t[32] ||= (e) => A.value = null,
-					onConfirm: at
-				}, null, 8, [
-					"open",
-					"name",
-					"message",
-					"confirmLabel"
-				]),
-				W(ip, {
-					open: A.value === "cancel",
-					name: B(j)("rechnungswerk", "Rechnung stornieren"),
-					message: B(j)("rechnungswerk", "Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?"),
-					confirmLabel: B(j)("rechnungswerk", "Stornorechnung erstellen"),
-					destructive: "",
-					onClose: t[33] ||= (e) => A.value = null,
+					onClose: t[32] ||= (e) => k.value = null,
 					onConfirm: ot
 				}, null, 8, [
 					"open",
@@ -6205,12 +6202,13 @@ var Lp = ln("textSnippet", () => {
 					"confirmLabel"
 				]),
 				W(ip, {
-					open: A.value === "convert",
-					name: B(j)("rechnungswerk", "In Rechnung übernehmen"),
-					message: B(j)("rechnungswerk", "Aus diesem Angebot wird ein neuer Rechnungs-Entwurf mit denselben Positionen erstellt. Das Angebot wird als „übernommen“ markiert. Fortfahren?"),
-					confirmLabel: B(j)("rechnungswerk", "Rechnung erstellen"),
-					onClose: t[34] ||= (e) => A.value = null,
-					onConfirm: nt
+					open: k.value === "cancel",
+					name: B(j)("rechnungswerk", "Rechnung stornieren"),
+					message: B(j)("rechnungswerk", "Es wird ein Stornobeleg erstellt und diese Rechnung als storniert markiert. Fortfahren?"),
+					confirmLabel: B(j)("rechnungswerk", "Stornorechnung erstellen"),
+					destructive: "",
+					onClose: t[33] ||= (e) => k.value = null,
+					onConfirm: st
 				}, null, 8, [
 					"open",
 					"name",
@@ -6218,11 +6216,11 @@ var Lp = ln("textSnippet", () => {
 					"confirmLabel"
 				]),
 				W(ip, {
-					open: A.value === "revise",
-					name: B(j)("rechnungswerk", "Angebot revidieren"),
-					message: B(j)("rechnungswerk", "Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?"),
-					confirmLabel: B(j)("rechnungswerk", "Revision erstellen"),
-					onClose: t[35] ||= (e) => A.value = null,
+					open: k.value === "convert",
+					name: B(j)("rechnungswerk", "In Rechnung übernehmen"),
+					message: B(j)("rechnungswerk", "Aus diesem Angebot wird ein neuer Rechnungs-Entwurf mit denselben Positionen erstellt. Das Angebot wird als „übernommen“ markiert. Fortfahren?"),
+					confirmLabel: B(j)("rechnungswerk", "Rechnung erstellen"),
+					onClose: t[34] ||= (e) => k.value = null,
 					onConfirm: rt
 				}, null, 8, [
 					"open",
@@ -6231,14 +6229,27 @@ var Lp = ln("textSnippet", () => {
 					"confirmLabel"
 				]),
 				W(ip, {
-					open: A.value === "leave",
+					open: k.value === "revise",
+					name: B(j)("rechnungswerk", "Angebot revidieren"),
+					message: B(j)("rechnungswerk", "Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?"),
+					confirmLabel: B(j)("rechnungswerk", "Revision erstellen"),
+					onClose: t[35] ||= (e) => k.value = null,
+					onConfirm: it
+				}, null, 8, [
+					"open",
+					"name",
+					"message",
+					"confirmLabel"
+				]),
+				W(ip, {
+					open: k.value === "leave",
 					name: B(j)("rechnungswerk", "Ungespeicherte Änderungen"),
 					message: B(j)("rechnungswerk", "Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren."),
 					cancelLabel: B(j)("rechnungswerk", "Weiter bearbeiten"),
 					confirmLabel: B(j)("rechnungswerk", "Verwerfen"),
 					destructive: "",
-					onClose: t[36] ||= (e) => Be(!1),
-					onConfirm: t[37] ||= (e) => Be(!0)
+					onClose: t[36] ||= (e) => K(!1),
+					onConfirm: t[37] ||= (e) => K(!0)
 				}, null, 8, [
 					"open",
 					"name",
@@ -6247,13 +6258,13 @@ var Lp = ln("textSnippet", () => {
 					"confirmLabel"
 				]),
 				W(dp, {
-					open: ae.value,
-					invoice: b.value,
-					defaultBody: Ce.value,
-					saving: O.value,
+					open: oe.value,
+					invoice: y.value,
+					defaultBody: z.value,
+					saving: D.value,
 					kind: l.value ? "quote" : "invoice",
-					onClose: t[38] ||= (e) => ae.value = !1,
-					onSend: it
+					onClose: t[38] ||= (e) => oe.value = !1,
+					onSend: at
 				}, null, 8, [
 					"open",
 					"invoice",
@@ -6262,14 +6273,14 @@ var Lp = ln("textSnippet", () => {
 					"kind"
 				]),
 				W(B(bt), {
-					open: oe.value,
+					open: se.value,
 					name: B(j)("rechnungswerk", "Vorschau (Entwurf)"),
 					size: "large",
-					"onUpdate:open": Ue
+					"onUpdate:open": We
 				}, {
-					default: g(() => [se.value ? (E(), q("iframe", {
+					default: g(() => [ce.value ? (T(), q("iframe", {
 						key: 0,
-						src: se.value,
+						src: ce.value,
 						class: "preview-frame",
 						title: B(j)("rechnungswerk", "Vorschau (Entwurf)")
 					}, null, 8, Bh)) : L("", !0)]),
@@ -6278,7 +6289,7 @@ var Lp = ln("textSnippet", () => {
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-199a5627"]]), Hh = {
+}), [["__scopeId", "data-v-54fc456f"]]), Hh = {
 	name: "AlertCircleOutlineIcon",
 	emits: ["click"],
 	props: {
@@ -6298,19 +6309,19 @@ var Lp = ln("textSnippet", () => {
 	"height"
 ], Gh = { d: "M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" }, Kh = { key: 0 };
 function qh(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon alert-circle-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Gh, [n.title ? (E(), q("title", Kh, H(n.title), 1)) : L("", !0)])], 8, Wh))], 16, Uh);
+	}, [Y("path", Gh, [n.title ? (T(), q("title", Kh, H(n.title), 1)) : L("", !0)])], 8, Wh))], 16, Uh);
 }
 var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = { class: "rw-view__head" }, Zh = { key: 2 }, Qh = { class: "rw-filterbar" }, $h = ["onClick"], eg = { class: "rw-chip__n" }, tg = { class: "rw-table-wrap" }, ng = { class: "rw-table" }, rg = { class: "num" }, ig = ["onClick"], ag = { class: "rw-status-cell" }, og = { class: "rw-qstatus-text" }, sg = { class: "rw-nowrap" }, cg = { class: "num" }, lg = { class: "rw-col-actions" }, ug = { class: "rw-actions" }, dg = /*#__PURE__*/ $(/* @__PURE__ */ z({
 	__name: "QuotesView",
@@ -6366,7 +6377,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 		function p(e) {
 			return e ? (e.length === 10 ? /* @__PURE__ */ new Date(`${e}T12:00:00`) : new Date(e)).toLocaleDateString() : "—";
 		}
-		ce(() => {
+		A(() => {
 			n.fetchAll().catch((e) => {
 				r.value = e.message ?? j("rechnungswerk", "Laden fehlgeschlagen");
 			});
@@ -6395,7 +6406,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				r.value = e.message ?? j("rechnungswerk", "Übernahme fehlgeschlagen");
 			}
 		}
-		return (e, t) => (E(), q("div", Yh, [
+		return (e, t) => (T(), q("div", Yh, [
 			Y("div", Xh, [Y("h2", null, H(B(j)("rechnungswerk", "Angebote")), 1), W(B(I), {
 				variant: "primary",
 				onClick: m
@@ -6404,19 +6415,19 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				default: g(() => [R(" " + H(B(j)("rechnungswerk", "Neues Angebot")), 1)]),
 				_: 1
 			})]),
-			r.value ? (E(), U(B(Q), {
+			r.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: r.value
 			}, null, 8, ["text"])) : L("", !0),
-			!B(n).loading && B(n).quotes.length === 0 ? (E(), U(B(wt), {
+			!B(n).loading && B(n).quotes.length === 0 ? (T(), U(B(wt), {
 				key: 1,
 				name: B(j)("rechnungswerk", "Noch keine Angebote"),
 				description: B(j)("rechnungswerk", "Lege dein erstes Angebot an.")
 			}, {
 				icon: g(() => [W(Na, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : B(n).quotes.length > 0 ? (E(), q("div", Zh, [Y("div", Qh, [(E(), q(k, null, C(i, (e) => Y("button", {
+			}, 8, ["name", "description"])) : B(n).quotes.length > 0 ? (T(), q("div", Zh, [Y("div", Qh, [(T(), q(O, null, S(i, (e) => Y("button", {
 				key: e.key,
 				class: V(["rw-chip", { "rw-chip--active": a.value === e.key }]),
 				onClick: (t) => a.value = e.key
@@ -6428,12 +6439,12 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				Y("th", null, H(B(j)("rechnungswerk", "Gültig bis")), 1),
 				Y("th", rg, H(B(j)("rechnungswerk", "Brutto")), 1),
 				t[0] ||= Y("th", { class: "rw-col-actions" }, null, -1)
-			])]), Y("tbody", null, [(E(!0), q(k, null, C(c.value, (e) => (E(), q("tr", {
+			])]), Y("tbody", null, [(T(!0), q(O, null, S(c.value, (e) => (T(), q("tr", {
 				key: e.id,
 				class: V(["rw-row-clickable", { "rw-row--overdue": e.quoteStatus === "expired" }]),
 				onClick: (t) => h(e.id)
 			}, [
-				Y("td", null, [Y("span", ag, [(E(), U(y(d(e.quoteStatus)), {
+				Y("td", null, [Y("span", ag, [(T(), U(v(d(e.quoteStatus)), {
 					size: 20,
 					class: V(["rw-sicon", `rw-qsicon--${e.quoteStatus}`]),
 					title: f(e.quoteStatus)
@@ -6443,7 +6454,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				Y("td", null, H(p(e.issueDate ?? e.createdAt)), 1),
 				Y("td", null, [Y("span", { class: V({ "rw-amt-overdue": e.quoteStatus === "expired" }) }, H(p(e.validUntil)), 3)]),
 				Y("td", cg, H(B(xu)(e.totalCents)), 1),
-				Y("td", lg, [Y("div", ug, [l(e) ? (E(), U(B(I), {
+				Y("td", lg, [Y("div", ug, [l(e) ? (T(), U(B(I), {
 					key: 0,
 					variant: "tertiary",
 					"aria-label": B(j)("rechnungswerk", "In Rechnung übernehmen"),
@@ -6456,7 +6467,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 					"aria-label",
 					"title",
 					"onClick"
-				])) : L("", !0), e.status === "draft" ? L("", !0) : (E(), U(B(I), {
+				])) : L("", !0), e.status === "draft" ? L("", !0) : (T(), U(B(I), {
 					key: 1,
 					variant: "tertiary",
 					"aria-label": B(j)("rechnungswerk", "PDF herunterladen"),
@@ -6508,7 +6519,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				defaultTaxRateBp: a.defaultTaxRateBp
 			});
 		}
-		return (t, n) => e.open ? (E(), U(B(ft), {
+		return (t, n) => e.open ? (T(), U(B(ft), {
 			key: 0,
 			name: c.value,
 			onKeydown: n[7] ||= me((e) => B(Ds)(e, () => t.$emit("close")), ["esc"]),
@@ -6516,41 +6527,41 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 		}, {
 			default: g(() => [Y("div", fg, [
 				Y("h2", null, H(c.value), 1),
-				Y("label", pg, [Y("span", null, H(B(j)("rechnungswerk", "Name")) + " *", 1), S(Y("input", {
+				Y("label", pg, [Y("span", null, H(B(j)("rechnungswerk", "Name")) + " *", 1), x(Y("input", {
 					ref_key: "nameInput",
 					ref: i,
 					"onUpdate:modelValue": n[0] ||= (e) => a.name = e,
 					class: "input",
 					type: "text"
 				}, null, 512), [[J, a.name]])]),
-				Y("label", mg, [Y("span", null, H(B(j)("rechnungswerk", "Beschreibung")), 1), S(Y("textarea", {
+				Y("label", mg, [Y("span", null, H(B(j)("rechnungswerk", "Beschreibung")), 1), x(Y("textarea", {
 					"onUpdate:modelValue": n[1] ||= (e) => a.description = e,
 					class: "input",
 					rows: "2"
 				}, null, 512), [[J, a.description]])]),
 				Y("div", hg, [
-					Y("label", gg, [Y("span", null, H(B(j)("rechnungswerk", "Einheit")), 1), S(Y("select", {
+					Y("label", gg, [Y("span", null, H(B(j)("rechnungswerk", "Einheit")), 1), x(Y("select", {
 						"onUpdate:modelValue": n[2] ||= (e) => a.defaultUnitCode = e,
 						class: "input"
-					}, [(E(!0), q(k, null, C(B(ru), (e) => (E(), q("option", {
+					}, [(T(!0), q(O, null, S(B(ru), (e) => (T(), q("option", {
 						key: e,
 						value: e
-					}, H(B(j)("rechnungswerk", B(iu)[e])), 9, _g))), 128))], 512), [[re, a.defaultUnitCode]])]),
-					Y("label", vg, [Y("span", null, H(B(j)("rechnungswerk", "Standard-Preis (€)")), 1), S(Y("input", {
+					}, H(B(j)("rechnungswerk", B(iu)[e])), 9, _g))), 128))], 512), [[ie, a.defaultUnitCode]])]),
+					Y("label", vg, [Y("span", null, H(B(j)("rechnungswerk", "Standard-Preis (€)")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[3] ||= (e) => o.value = e,
 						class: "input",
 						type: "text",
 						inputmode: "decimal",
 						onBlur: s
 					}, null, 544), [[J, o.value]])]),
-					Y("label", yg, [Y("span", null, H(B(j)("rechnungswerk", "USt-Satz")), 1), S(Y("select", {
+					Y("label", yg, [Y("span", null, H(B(j)("rechnungswerk", "USt-Satz")), 1), x(Y("select", {
 						"onUpdate:modelValue": n[4] ||= (e) => a.defaultTaxRateBp = e,
 						class: "input"
-					}, [(E(!0), q(k, null, C(B(au), (e) => (E(), q("option", {
+					}, [(T(!0), q(O, null, S(B(au), (e) => (T(), q("option", {
 						key: e,
 						value: e
 					}, H(B(Su)(e)), 9, bg))), 128))], 512), [[
-						re,
+						ie,
 						a.defaultTaxRateBp,
 						void 0,
 						{ number: !0 }
@@ -6558,7 +6569,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				]),
 				Y("label", xg, [
 					Y("span", null, H(B(j)("rechnungswerk", "Eigene Einheit (optional)")), 1),
-					S(Y("input", {
+					x(Y("input", {
 						"onUpdate:modelValue": n[5] ||= (e) => a.defaultUnitLabel = e,
 						class: "input",
 						type: "text",
@@ -6596,7 +6607,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 			let n = e.message ?? t;
 			a.value = n, console.error("[rechnungswerk] products:", e);
 		}
-		ce(() => {
+		A(() => {
 			t.fetchAll().catch((e) => s(e, j("rechnungswerk", "Laden fehlgeschlagen")));
 		});
 		function c() {
@@ -6627,7 +6638,7 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				}
 			}
 		}
-		return (e, s) => (E(), q("div", Eg, [
+		return (e, s) => (T(), q("div", Eg, [
 			Y("div", Dg, [Y("h2", null, H(B(j)("rechnungswerk", "Produkte")), 1), W(B(I), {
 				variant: "primary",
 				onClick: c
@@ -6636,30 +6647,30 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 				default: g(() => [R(" " + H(B(j)("rechnungswerk", "Produkt anlegen")), 1)]),
 				_: 1
 			})]),
-			a.value ? (E(), U(B(Q), {
+			a.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: a.value
 			}, null, 8, ["text"])) : L("", !0),
-			!B(t).loading && B(t).products.length === 0 ? (E(), U(B(wt), {
+			!B(t).loading && B(t).products.length === 0 ? (T(), U(B(wt), {
 				key: 1,
 				name: B(j)("rechnungswerk", "Noch keine Produkte"),
 				description: B(j)("rechnungswerk", "Pflege wiederkehrende Leistungen, um sie schnell in Rechnungen zu übernehmen.")
 			}, {
 				icon: g(() => [W(eo, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : B(t).products.length > 0 ? (E(), q("div", Og, [Y("table", kg, [Y("thead", null, [Y("tr", null, [
+			}, 8, ["name", "description"])) : B(t).products.length > 0 ? (T(), q("div", Og, [Y("table", kg, [Y("thead", null, [Y("tr", null, [
 				Y("th", null, H(B(j)("rechnungswerk", "Name")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Einheit")), 1),
 				Y("th", Ag, H(B(j)("rechnungswerk", "Preis")), 1),
 				Y("th", jg, H(B(j)("rechnungswerk", "USt")), 1),
 				s[2] ||= Y("th", { class: "num" }, null, -1)
-			])]), Y("tbody", null, [(E(!0), q(k, null, C(B(t).products, (e) => (E(), q("tr", {
+			])]), Y("tbody", null, [(T(!0), q(O, null, S(B(t).products, (e) => (T(), q("tr", {
 				key: e.id,
 				class: "rw-row-clickable",
 				onClick: (t) => l(e)
 			}, [
-				Y("td", null, [R(H(e.name) + " ", 1), e.description ? (E(), q("div", Ng, H(e.description), 1)) : L("", !0)]),
+				Y("td", null, [R(H(e.name) + " ", 1), e.description ? (T(), q("div", Ng, H(e.description), 1)) : L("", !0)]),
 				Y("td", null, H(e.defaultUnitLabel || B(j)("rechnungswerk", o(e.defaultUnitCode))), 1),
 				Y("td", Pg, H(B(bu)(e.defaultPriceE4)), 1),
 				Y("td", Fg, H(B(Su)(e.defaultTaxRateBp)), 1),
@@ -6724,19 +6735,19 @@ var Jh = /*#__PURE__*/ $(Hh, [["render", qh]]), Yh = { class: "rw-view" }, Xh = 
 	"height"
 ], Hg = { d: "M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z" }, Ug = { key: 0 };
 function Wg(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon star-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Hg, [n.title ? (E(), q("title", Ug, H(n.title), 1)) : L("", !0)])], 8, Vg))], 16, Bg);
+	}, [Y("path", Hg, [n.title ? (T(), q("title", Ug, H(n.title), 1)) : L("", !0)])], 8, Vg))], 16, Bg);
 }
 var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" }, qg = { class: "field" }, Jg = ["placeholder"], Yg = { class: "field-row" }, Xg = { class: "field" }, Zg = ["value"], Qg = { class: "field" }, $g = ["value"], e_ = { class: "field" }, t_ = { class: "hint" }, n_ = { class: "actions" }, r_ = /*#__PURE__*/ $(/* @__PURE__ */ z({
 	__name: "TextSnippetEditModal",
@@ -6768,7 +6779,7 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 				isDefault: s.isDefault
 			});
 		}
-		return (t, i) => e.open ? (E(), U(B(ft), {
+		return (t, i) => e.open ? (T(), U(B(ft), {
 			key: 0,
 			name: c.value,
 			onKeydown: i[6] ||= me((e) => B(Ds)(e, () => t.$emit("close")), ["esc"]),
@@ -6776,7 +6787,7 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 		}, {
 			default: g(() => [Y("div", Kg, [
 				Y("h2", null, H(c.value), 1),
-				Y("label", qg, [Y("span", null, H(B(j)("rechnungswerk", "Name")) + " *", 1), S(Y("input", {
+				Y("label", qg, [Y("span", null, H(B(j)("rechnungswerk", "Name")) + " *", 1), x(Y("input", {
 					ref_key: "nameInput",
 					ref: o,
 					"onUpdate:modelValue": i[0] ||= (e) => s.label = e,
@@ -6784,20 +6795,20 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 					type: "text",
 					placeholder: B(j)("rechnungswerk", "z. B. Neukunde, Mahnfreundlich")
 				}, null, 8, Jg), [[J, s.label]])]),
-				Y("div", Yg, [Y("label", Xg, [Y("span", null, H(B(j)("rechnungswerk", "Dokument")), 1), S(Y("select", {
+				Y("div", Yg, [Y("label", Xg, [Y("span", null, H(B(j)("rechnungswerk", "Dokument")), 1), x(Y("select", {
 					"onUpdate:modelValue": i[1] ||= (e) => s.docType = e,
 					class: "input"
-				}, [(E(), q(k, null, C(n, (e) => Y("option", {
+				}, [(T(), q(O, null, S(n, (e) => Y("option", {
 					key: e,
 					value: e
-				}, H(B(j)("rechnungswerk", B(su)[e])), 9, Zg)), 64))], 512), [[re, s.docType]])]), Y("label", Qg, [Y("span", null, H(B(j)("rechnungswerk", "Textbereich")), 1), S(Y("select", {
+				}, H(B(j)("rechnungswerk", B(su)[e])), 9, Zg)), 64))], 512), [[ie, s.docType]])]), Y("label", Qg, [Y("span", null, H(B(j)("rechnungswerk", "Textbereich")), 1), x(Y("select", {
 					"onUpdate:modelValue": i[2] ||= (e) => s.slot = e,
 					class: "input"
-				}, [(E(), q(k, null, C(r, (e) => Y("option", {
+				}, [(T(), q(O, null, S(r, (e) => Y("option", {
 					key: e,
 					value: e
-				}, H(B(j)("rechnungswerk", B(cu)[e])), 9, $g)), 64))], 512), [[re, s.slot]])])]),
-				Y("label", e_, [Y("span", null, H(B(j)("rechnungswerk", "Text")), 1), S(Y("textarea", {
+				}, H(B(j)("rechnungswerk", B(cu)[e])), 9, $g)), 64))], 512), [[ie, s.slot]])])]),
+				Y("label", e_, [Y("span", null, H(B(j)("rechnungswerk", "Text")), 1), x(Y("textarea", {
 					"onUpdate:modelValue": i[3] ||= (e) => s.content = e,
 					class: "input",
 					rows: "6"
@@ -6851,7 +6862,7 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 			let n = e.message ?? t;
 			c.value = n, console.error("[rechnungswerk] text-snippets:", e);
 		}
-		ce(() => {
+		A(() => {
 			t.fetchAll().catch((e) => l(e, j("rechnungswerk", "Laden fehlgeschlagen")));
 		});
 		function u() {
@@ -6892,7 +6903,7 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 				}
 			}
 		}
-		return (e, n) => (E(), q("div", i_, [
+		return (e, n) => (T(), q("div", i_, [
 			Y("div", a_, [Y("h2", null, H(B(j)("rechnungswerk", "Textbausteine")), 1), W(B(I), {
 				variant: "primary",
 				onClick: u
@@ -6902,40 +6913,40 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 				_: 1
 			})]),
 			Y("p", o_, H(B(j)("rechnungswerk", "Pflege wiederverwendbare Anrede-/Einleitungs- und Schlusstexte – getrennt für Rechnungen und Angebote. Beim Anlegen eines Dokuments füllt der jeweilige Standard-Baustein die Texte vor; weitere Bausteine lassen sich im Editor per Klick einfügen.")), 1),
-			c.value ? (E(), U(B(Q), {
+			c.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: c.value
 			}, null, 8, ["text"])) : L("", !0),
-			!B(t).loading && B(t).snippets.length === 0 ? (E(), U(B(wt), {
+			!B(t).loading && B(t).snippets.length === 0 ? (T(), U(B(wt), {
 				key: 1,
 				name: B(j)("rechnungswerk", "Noch keine Textbausteine"),
 				description: B(j)("rechnungswerk", "Lege wiederkehrende Einleitungs- und Schlusstexte an, um sie schnell in Dokumente zu übernehmen.")
 			}, {
 				icon: g(() => [W(so, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : B(t).snippets.length > 0 ? (E(), q("div", s_, [(E(!0), q(k, null, C(i.value, (e) => (E(), q("section", {
+			}, 8, ["name", "description"])) : B(t).snippets.length > 0 ? (T(), q("div", s_, [(T(!0), q(O, null, S(i.value, (e) => (T(), q("section", {
 				key: e.key,
 				class: "rw-snippet-group"
 			}, [Y("h3", c_, [
 				R(H(B(j)("rechnungswerk", B(su)[e.docType])) + " ", 1),
 				n[2] ||= Y("span", { class: "rw-snippet-group__sep" }, "–", -1),
 				R(" " + H(B(j)("rechnungswerk", B(cu)[e.slot])), 1)
-			]), Y("div", l_, [Y("table", u_, [Y("tbody", null, [(E(!0), q(k, null, C(e.items, (e) => (E(), q("tr", {
+			]), Y("div", l_, [Y("table", u_, [Y("tbody", null, [(T(!0), q(O, null, S(e.items, (e) => (T(), q("tr", {
 				key: e.id,
 				class: "rw-row-clickable rw-snippet-row",
 				onClick: (t) => d(e)
-			}, [Y("td", null, [Y("strong", null, H(e.label), 1), e.content ? (E(), q("div", f_, H(e.content), 1)) : L("", !0)]), Y("td", p_, [Y("div", m_, [W(B(I), {
+			}, [Y("td", null, [Y("strong", null, H(e.label), 1), e.content ? (T(), q("div", f_, H(e.content), 1)) : L("", !0)]), Y("td", p_, [Y("div", m_, [W(B(I), {
 				variant: "tertiary",
 				"aria-label": e.isDefault ? B(j)("rechnungswerk", "Standard-Vorlage") : B(j)("rechnungswerk", "Als Standard festlegen"),
 				title: e.isDefault ? B(j)("rechnungswerk", "Standard-Vorlage") : B(j)("rechnungswerk", "Als Standard festlegen"),
 				onClick: P((t) => f(e), ["stop"])
 			}, {
-				icon: g(() => [e.isDefault ? (E(), U(us, {
+				icon: g(() => [e.isDefault ? (T(), U(us, {
 					key: 0,
 					size: 20,
 					class: "rw-star rw-star--active"
-				})) : (E(), U(Gg, {
+				})) : (T(), U(Gg, {
 					key: 1,
 					size: 20,
 					class: "rw-star"
@@ -7005,19 +7016,19 @@ var Gg = /*#__PURE__*/ $(zg, [["render", Wg]]), Kg = { class: "snippet-modal" },
 	"height"
 ], y_ = { d: "M18 16H14V18H18V20L21 17L18 14V16M11 4C8.8 4 7 5.8 7 8S8.8 12 11 12 15 10.2 15 8 13.2 4 11 4M11 14C6.6 14 3 15.8 3 18V20H12.5C12.2 19.2 12 18.4 12 17.5C12 16.3 12.3 15.2 12.9 14.1C12.3 14.1 11.7 14 11 14" }, b_ = { key: 0 };
 function x_(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon account-arrow-right-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", y_, [n.title ? (E(), q("title", b_, H(n.title), 1)) : L("", !0)])], 8, v_))], 16, __);
+	}, [Y("path", y_, [n.title ? (T(), q("title", b_, H(n.title), 1)) : L("", !0)])], 8, v_))], 16, __);
 }
 var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }, w_ = { class: "form-section" }, T_ = { class: "row" }, E_ = { class: "field" }, D_ = { class: "field" }, O_ = { class: "row" }, k_ = { class: "field" }, A_ = { class: "form-section" }, j_ = { class: "field" }, M_ = ["placeholder"], N_ = { class: "hint" }, P_ = { class: "field" }, F_ = { class: "row" }, I_ = { class: "field" }, L_ = { class: "field" }, R_ = { class: "row" }, z_ = { class: "field" }, B_ = { class: "form-section" }, V_ = { class: "row" }, H_ = { class: "field" }, U_ = { class: "field" }, W_ = { class: "field" }, G_ = { class: "form-section" }, K_ = { class: "field" }, q_ = { class: "row" }, J_ = { class: "field" }, Y_ = { class: "field" }, X_ = { class: "field" }, Z_ = { class: "form-section" }, Q_ = { class: "row" }, $_ = { class: "field" }, ev = { class: "field" }, tv = { value: "" }, nv = ["value"], rv = { class: "field" }, iv = { class: "actions" }, av = /*#__PURE__*/ $(/* @__PURE__ */ z({
 	__name: "CustomerEditModal",
@@ -7090,7 +7101,7 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				note: p(o.note)
 			});
 		}
-		return (t, n) => e.open ? (E(), U(B(ft), {
+		return (t, n) => e.open ? (T(), U(B(ft), {
 			key: 0,
 			name: l.value,
 			onKeydown: n[19] ||= me((e) => B(Ds)(e, () => t.$emit("close")), ["esc"]),
@@ -7100,23 +7111,23 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				Y("h2", null, H(l.value), 1),
 				Y("div", w_, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Stammdaten")), 1),
-					Y("div", T_, [Y("label", E_, [Y("span", null, H(B(j)("rechnungswerk", "Kundennr.")) + " *", 1), S(Y("input", {
+					Y("div", T_, [Y("label", E_, [Y("span", null, H(B(j)("rechnungswerk", "Kundennr.")) + " *", 1), x(Y("input", {
 						ref_key: "numberInput",
 						ref: i,
 						"onUpdate:modelValue": n[0] ||= (e) => o.customerNumber = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[J, o.customerNumber]])]), Y("label", D_, [Y("span", null, H(B(j)("rechnungswerk", "Name / Firma")) + " *", 1), S(Y("input", {
+					}, null, 512), [[J, o.customerNumber]])]), Y("label", D_, [Y("span", null, H(B(j)("rechnungswerk", "Name / Firma")) + " *", 1), x(Y("input", {
 						"onUpdate:modelValue": n[1] ||= (e) => o.name = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[J, o.name]])])]),
-					u.value ? (E(), U(B(Q), {
+					u.value ? (T(), U(B(Q), {
 						key: 0,
 						type: "error",
 						text: B(j)("rechnungswerk", "Die Kundennummer {number} ist bereits vergeben. Bitte eine andere wählen.", { number: o.customerNumber.trim() })
 					}, null, 8, ["text"])) : L("", !0),
-					Y("div", O_, [Y("label", k_, [Y("span", null, H(B(j)("rechnungswerk", "USt-IdNr.")), 1), S(Y("input", {
+					Y("div", O_, [Y("label", k_, [Y("span", null, H(B(j)("rechnungswerk", "USt-IdNr.")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[2] ||= (e) => o.vatId = e,
 						class: "input",
 						type: "text"
@@ -7126,7 +7137,7 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 					Y("h3", null, H(B(j)("rechnungswerk", "Anschrift")), 1),
 					Y("label", j_, [
 						Y("span", null, H(B(j)("rechnungswerk", "Adresszusatz")), 1),
-						S(Y("input", {
+						x(Y("input", {
 							"onUpdate:modelValue": n[3] ||= (e) => o.addressAddition = e,
 							class: "input",
 							type: "text",
@@ -7134,16 +7145,16 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 						}, null, 8, M_), [[J, o.addressAddition]]),
 						Y("span", N_, H(B(j)("rechnungswerk", "Erscheint im Beleg direkt unter dem Firmennamen. Hier kann auch „z. Hd. Frau Meyer“ stehen — der Ansprechpartner erscheint nur in der E-Rechnung, nicht in der Anschrift.")), 1)
 					]),
-					Y("label", P_, [Y("span", null, H(B(j)("rechnungswerk", "Straße & Hausnummer")), 1), S(Y("input", {
+					Y("label", P_, [Y("span", null, H(B(j)("rechnungswerk", "Straße & Hausnummer")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[4] ||= (e) => o.address = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[J, o.address]])]),
-					Y("div", F_, [Y("label", I_, [Y("span", null, H(B(j)("rechnungswerk", "PLZ")), 1), S(Y("input", {
+					Y("div", F_, [Y("label", I_, [Y("span", null, H(B(j)("rechnungswerk", "PLZ")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[5] ||= (e) => o.postalCode = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[J, o.postalCode]])]), Y("label", L_, [Y("span", null, H(B(j)("rechnungswerk", "Ort")), 1), S(Y("input", {
+					}, null, 512), [[J, o.postalCode]])]), Y("label", L_, [Y("span", null, H(B(j)("rechnungswerk", "Ort")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[6] ||= (e) => o.city = e,
 						class: "input",
 						type: "text"
@@ -7156,16 +7167,16 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				]),
 				Y("div", B_, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Ansprechpartner & Kontakt")), 1),
-					Y("div", V_, [Y("label", H_, [Y("span", null, H(B(j)("rechnungswerk", "Ansprechpartner")), 1), S(Y("input", {
+					Y("div", V_, [Y("label", H_, [Y("span", null, H(B(j)("rechnungswerk", "Ansprechpartner")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[8] ||= (e) => o.contactPerson = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[J, o.contactPerson]])]), Y("label", U_, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), S(Y("input", {
+					}, null, 512), [[J, o.contactPerson]])]), Y("label", U_, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[9] ||= (e) => o.phone = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[J, o.phone]])])]),
-					Y("label", W_, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail (für Rechnungsversand)")), 1), S(Y("input", {
+					Y("label", W_, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail (für Rechnungsversand)")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[10] ||= (e) => o.email = e,
 						class: "input",
 						type: "email"
@@ -7173,21 +7184,21 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				]),
 				Y("div", G_, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Bankverbindung")), 1),
-					Y("label", K_, [Y("span", null, H(B(j)("rechnungswerk", "Kontoinhaber")), 1), S(Y("input", {
+					Y("label", K_, [Y("span", null, H(B(j)("rechnungswerk", "Kontoinhaber")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[11] ||= (e) => o.bankAccountHolder = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[J, o.bankAccountHolder]])]),
-					Y("div", q_, [Y("label", J_, [Y("span", null, H(B(j)("rechnungswerk", "IBAN")), 1), S(Y("input", {
+					Y("div", q_, [Y("label", J_, [Y("span", null, H(B(j)("rechnungswerk", "IBAN")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[12] ||= (e) => o.iban = e,
 						class: "input",
 						type: "text"
-					}, null, 512), [[J, o.iban]])]), Y("label", Y_, [Y("span", null, H(B(j)("rechnungswerk", "BIC")), 1), S(Y("input", {
+					}, null, 512), [[J, o.iban]])]), Y("label", Y_, [Y("span", null, H(B(j)("rechnungswerk", "BIC")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[13] ||= (e) => o.bic = e,
 						class: "input",
 						type: "text"
 					}, null, 512), [[J, o.bic]])])]),
-					Y("label", X_, [Y("span", null, H(B(j)("rechnungswerk", "Bank")), 1), S(Y("input", {
+					Y("label", X_, [Y("span", null, H(B(j)("rechnungswerk", "Bank")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[14] ||= (e) => o.bankName = e,
 						class: "input",
 						type: "text"
@@ -7195,20 +7206,20 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				]),
 				Y("div", Z_, [
 					Y("h3", null, H(B(j)("rechnungswerk", "Vorgaben für neue Rechnungen")), 1),
-					Y("div", Q_, [Y("label", $_, [Y("span", null, H(B(j)("rechnungswerk", "Zahlungsziel (Tage)")), 1), S(Y("input", {
+					Y("div", Q_, [Y("label", $_, [Y("span", null, H(B(j)("rechnungswerk", "Zahlungsziel (Tage)")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[15] ||= (e) => s.value = e,
 						class: "input",
 						type: "number",
 						min: "0",
 						inputmode: "numeric"
-					}, null, 512), [[J, s.value]])]), Y("label", ev, [Y("span", null, H(B(j)("rechnungswerk", "Standard-Steuersatz")), 1), S(Y("select", {
+					}, null, 512), [[J, s.value]])]), Y("label", ev, [Y("span", null, H(B(j)("rechnungswerk", "Standard-Steuersatz")), 1), x(Y("select", {
 						"onUpdate:modelValue": n[16] ||= (e) => c.value = e,
 						class: "input"
-					}, [Y("option", tv, H(B(j)("rechnungswerk", "— keine Vorgabe —")), 1), (E(!0), q(k, null, C(B(au), (e) => (E(), q("option", {
+					}, [Y("option", tv, H(B(j)("rechnungswerk", "— keine Vorgabe —")), 1), (T(!0), q(O, null, S(B(au), (e) => (T(), q("option", {
 						key: e,
 						value: String(e)
-					}, H(B(Su)(e)), 9, nv))), 128))], 512), [[re, c.value]])])]),
-					Y("label", rv, [Y("span", null, H(B(j)("rechnungswerk", "Notiz (intern, nicht auf der Rechnung)")), 1), S(Y("textarea", {
+					}, H(B(Su)(e)), 9, nv))), 128))], 512), [[ie, c.value]])])]),
+					Y("label", rv, [Y("span", null, H(B(j)("rechnungswerk", "Notiz (intern, nicht auf der Rechnung)")), 1), x(Y("textarea", {
 						"onUpdate:modelValue": n[17] ||= (e) => o.note = e,
 						class: "input",
 						rows: "2"
@@ -7242,7 +7253,7 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 		function d(e, t) {
 			c.value = e.message ?? t, console.error("[rechnungswerk] customers:", e);
 		}
-		ce(() => {
+		A(() => {
 			t.fetchAll().catch((e) => d(e, j("rechnungswerk", "Laden fehlgeschlagen")));
 		});
 		function f() {
@@ -7289,7 +7300,7 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				}
 			}
 		}
-		return (e, d) => (E(), q("div", ov, [
+		return (e, d) => (T(), q("div", ov, [
 			Y("div", sv, [Y("h2", null, H(B(j)("rechnungswerk", "Kunden")), 1), Y("div", cv, [W(B(I), { onClick: m }, {
 				icon: g(() => [W(S_, { size: 20 })]),
 				default: g(() => [R(" " + H(B(j)("rechnungswerk", "Aus Kontakten importieren")), 1)]),
@@ -7302,30 +7313,30 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				default: g(() => [R(" " + H(B(j)("rechnungswerk", "Neuer Kunde")), 1)]),
 				_: 1
 			})])]),
-			c.value ? (E(), U(B(Q), {
+			c.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: c.value
 			}, null, 8, ["text"])) : L("", !0),
-			!B(t).loading && B(t).customers.length === 0 ? (E(), U(B(wt), {
+			!B(t).loading && B(t).customers.length === 0 ? (T(), U(B(wt), {
 				key: 1,
 				name: B(j)("rechnungswerk", "Noch keine Kunden"),
 				description: B(j)("rechnungswerk", "Lege Kunden an oder übernimm sie aus deinen Nextcloud-Kontakten, um sie schnell in Rechnungen auszuwählen.")
 			}, {
 				icon: g(() => [W(Ba, { size: 20 })]),
 				_: 1
-			}, 8, ["name", "description"])) : B(t).customers.length > 0 ? (E(), q("div", lv, [Y("table", uv, [Y("thead", null, [Y("tr", null, [
+			}, 8, ["name", "description"])) : B(t).customers.length > 0 ? (T(), q("div", lv, [Y("table", uv, [Y("thead", null, [Y("tr", null, [
 				Y("th", null, H(B(j)("rechnungswerk", "Kundennr.")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Kunde")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Ort")), 1),
 				d[5] ||= Y("th", { class: "num" }, null, -1)
-			])]), Y("tbody", null, [(E(!0), q(k, null, C(B(t).customers, (e) => (E(), q("tr", {
+			])]), Y("tbody", null, [(T(!0), q(O, null, S(B(t).customers, (e) => (T(), q("tr", {
 				key: e.id,
 				class: "rw-row-clickable",
 				onClick: (t) => p(e)
 			}, [
 				Y("td", fv, H(e.customerNumber), 1),
-				Y("td", null, [R(H(e.name) + " ", 1), e.contactPerson || e.vatId ? (E(), q("div", pv, H([e.contactPerson, e.vatId].filter(Boolean).join(" · ")), 1)) : L("", !0)]),
+				Y("td", null, [R(H(e.name) + " ", 1), e.contactPerson || e.vatId ? (T(), q("div", pv, H([e.contactPerson, e.vatId].filter(Boolean).join(" · ")), 1)) : L("", !0)]),
 				Y("td", null, H([e.postalCode, e.city].filter(Boolean).join(" ")), 1),
 				Y("td", mv, [Y("div", hv, [W(B(I), {
 					variant: "tertiary",
@@ -7356,7 +7367,7 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 				"takenNumbers",
 				"prefill"
 			]),
-			o.value ? (E(), U(B(ft), {
+			o.value ? (T(), U(B(ft), {
 				key: 3,
 				name: B(j)("rechnungswerk", "Aus Nextcloud-Kontakten übernehmen"),
 				onKeydown: d[2] ||= me((e) => B(Ds)(e, () => o.value = !1), ["esc"]),
@@ -7405,19 +7416,19 @@ var S_ = /*#__PURE__*/ $(g_, [["render", x_]]), C_ = { class: "customer-modal" }
 	"height"
 ], Sv = { d: "M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" }, Cv = { key: 0 };
 function wv(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon content-save-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Sv, [n.title ? (E(), q("title", Cv, H(n.title), 1)) : L("", !0)])], 8, xv))], 16, bv);
+	}, [Y("path", Sv, [n.title ? (T(), q("title", Cv, H(n.title), 1)) : L("", !0)])], 8, xv))], 16, bv);
 }
 var Tv = /*#__PURE__*/ $(yv, [["render", wv]]), Ev = { class: "rw-view rw-view--narrow" }, Dv = {
 	key: 2,
@@ -7429,7 +7440,7 @@ var Tv = /*#__PURE__*/ $(yv, [["render", wv]]), Ev = { class: "rw-view rw-view--
 	__name: "MyContactView",
 	setup(e) {
 		let t = X(null), n = X(""), r = X(""), i = X(!1);
-		ce(async () => {
+		A(async () => {
 			try {
 				t.value = await Rp();
 			} catch (e) {
@@ -7461,33 +7472,33 @@ var Tv = /*#__PURE__*/ $(yv, [["render", wv]]), Ev = { class: "rw-view rw-view--
 				}
 			}
 		}
-		return (e, s) => (E(), q("div", Ev, [
+		return (e, s) => (T(), q("div", Ev, [
 			Y("h2", null, H(B(j)("rechnungswerk", "Mein Kontakt")), 1),
-			n.value ? (E(), U(B(Q), {
+			n.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: n.value
 			}, null, 8, ["text"])) : L("", !0),
-			r.value ? (E(), U(B(Q), {
+			r.value ? (T(), U(B(Q), {
 				key: 1,
 				type: "success",
 				text: r.value
 			}, null, 8, ["text"])) : L("", !0),
-			t.value ? (E(), q("section", Dv, [
+			t.value ? (T(), q("section", Dv, [
 				Y("h3", null, H(B(j)("rechnungswerk", "Mein Verkäufer-Ansprechpartner")), 1),
 				Y("p", Ov, H(B(j)("rechnungswerk", "Diese Kontaktdaten füllen deine neuen Rechnungen automatisch vor (nur für dich). Ohne Angabe greift der zentrale Firmenkontakt. Pro Rechnung bleibt eine Änderung möglich.")), 1),
 				Y("div", kv, [
-					Y("label", Av, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), S(Y("input", {
+					Y("label", Av, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), x(Y("input", {
 						"onUpdate:modelValue": s[0] ||= (e) => t.value.person = e,
 						class: "rw-input",
 						type: "text"
 					}, null, 512), [[J, t.value.person]])]),
-					Y("label", jv, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), S(Y("input", {
+					Y("label", jv, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), x(Y("input", {
 						"onUpdate:modelValue": s[1] ||= (e) => t.value.phone = e,
 						class: "rw-input",
 						type: "text"
 					}, null, 512), [[J, t.value.phone]])]),
-					Y("label", Mv, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail")), 1), S(Y("input", {
+					Y("label", Mv, [Y("span", null, H(B(j)("rechnungswerk", "E-Mail")), 1), x(Y("input", {
 						"onUpdate:modelValue": s[2] ||= (e) => t.value.email = e,
 						class: "rw-input",
 						type: "email"
@@ -7502,7 +7513,7 @@ var Tv = /*#__PURE__*/ $(yv, [["render", wv]]), Ev = { class: "rw-view rw-view--
 					_: 1
 				})
 			])) : L("", !0),
-			t.value ? (E(), q("div", Nv, [W(B(I), {
+			t.value ? (T(), q("div", Nv, [W(B(I), {
 				variant: "primary",
 				disabled: i.value,
 				onClick: o
@@ -7563,7 +7574,7 @@ function Vv(e, t, n) {
 	return Rv[r] = i, i;
 }
 function Hv(e, t, n, r, i, a) {
-	return E(), q("div", {
+	return T(), q("div", {
 		class: "vc-checkerboard",
 		style: ze(a.bgStyle)
 	}, null, 4);
@@ -7617,8 +7628,8 @@ var Uv = {
 	}
 }, Wv = { class: "vc-alpha" }, Gv = { class: "vc-alpha-checkboard-wrap" }, Kv = [/* @__PURE__ */ Y("div", { class: "vc-alpha-picker" }, null, -1)];
 function qv(e, t, n, r, i, a) {
-	let o = D("Checkboard");
-	return E(), q("div", Wv, [
+	let o = E("Checkboard");
+	return T(), q("div", Wv, [
 		Y("div", Gv, [W(o)]),
 		Y("div", {
 			class: "vc-alpha-gradient",
@@ -8354,8 +8365,8 @@ var wy = {
 	}
 }, Ey = { class: "vc-editable-input" }, Dy = ["aria-labelledby"], Oy = ["id", "for"], ky = { class: "vc-input__desc" };
 function Ay(e, t, n, r, i, a) {
-	return E(), q("div", Ey, [
-		S(Y("input", {
+	return T(), q("div", Ey, [
+		x(Y("input", {
 			ref: "input",
 			"onUpdate:modelValue": t[0] ||= (e) => a.val = e,
 			"aria-labelledby": a.labelId,
@@ -8425,7 +8436,7 @@ var My = {
 	}
 }, Ny = /*#__PURE__*/ Y("div", { class: "vc-saturation--white" }, null, -1), Py = /*#__PURE__*/ Y("div", { class: "vc-saturation--black" }, null, -1), Fy = [/* @__PURE__ */ Y("div", { class: "vc-saturation-circle" }, null, -1)];
 function Iy(e, t, n, r, i, a) {
-	return E(), q("div", {
+	return T(), q("div", {
 		ref: "container",
 		class: "vc-saturation",
 		style: ze({ background: a.bgColor }),
@@ -8519,7 +8530,7 @@ var Ly = {
 	}
 }, Ry = ["aria-valuenow"], zy = [/* @__PURE__ */ Y("div", { class: "vc-hue-picker" }, null, -1)];
 function By(e, t, n, r, i, a) {
-	return E(), q("div", { class: V(["vc-hue", [a.directionClass]]) }, [Y("div", {
+	return T(), q("div", { class: V(["vc-hue", [a.directionClass]]) }, [Y("div", {
 		ref: "container",
 		class: "vc-hue-container",
 		role: "slider",
@@ -8664,8 +8675,8 @@ var Vy = {
 	d: "M12,18.17L8.83,15L7.42,16.41L12,21L16.59,16.41L15.17,15M12,5.83L15.17,9L16.58,7.59L12,3L7.41,7.59L8.83,9L12,5.83Z"
 }, null, -1)], db = { class: "vc-chrome-toggle-icon-highlight" };
 function fb(e, t, n, r, i, a) {
-	let o = D("Saturation"), s = D("Checkboard"), c = D("Hue"), l = D("Alpha"), u = D("EdIn");
-	return E(), q("div", {
+	let o = E("Saturation"), s = E("Checkboard"), c = E("Hue"), l = E("Alpha"), u = E("EdIn");
+	return T(), q("div", {
 		role: "application",
 		"aria-label": "Chrome color picker",
 		class: V(["vc-chrome", [n.disableAlpha ? "vc-chrome__disable-alpha" : ""]])
@@ -8676,25 +8687,25 @@ function fb(e, t, n, r, i, a) {
 		"aria-label": `current color is ${e.colors.hex}`,
 		class: "vc-chrome-active-color",
 		style: ze({ background: a.activeColor })
-	}, null, 12, Ky), n.disableAlpha ? L("v-if", !0) : (E(), U(s, { key: 0 }))]), Y("div", qy, [Y("div", Jy, [W(c, {
+	}, null, 12, Ky), n.disableAlpha ? L("v-if", !0) : (T(), U(s, { key: 0 }))]), Y("div", qy, [Y("div", Jy, [W(c, {
 		value: e.colors,
 		onChange: a.childChange
-	}, null, 8, ["value", "onChange"])]), n.disableAlpha ? L("v-if", !0) : (E(), q("div", Yy, [W(l, {
+	}, null, 8, ["value", "onChange"])]), n.disableAlpha ? L("v-if", !0) : (T(), q("div", Yy, [W(l, {
 		value: e.colors,
 		onChange: a.childChange
-	}, null, 8, ["value", "onChange"])]))])]), n.disableFields ? L("v-if", !0) : (E(), q("div", Xy, [
-		S(Y("div", Zy, [L(" hex "), Y("div", Qy, [a.hasAlpha ? L("v-if", !0) : (E(), U(u, {
+	}, null, 8, ["value", "onChange"])]))])]), n.disableFields ? L("v-if", !0) : (T(), q("div", Xy, [
+		x(Y("div", Zy, [L(" hex "), Y("div", Qy, [a.hasAlpha ? L("v-if", !0) : (T(), U(u, {
 			key: 0,
 			label: "hex",
 			value: e.colors.hex,
 			onChange: a.inputChange
-		}, null, 8, ["value", "onChange"])), a.hasAlpha ? (E(), U(u, {
+		}, null, 8, ["value", "onChange"])), a.hasAlpha ? (T(), U(u, {
 			key: 1,
 			label: "hex",
 			value: e.colors.hex8,
 			onChange: a.inputChange
-		}, null, 8, ["value", "onChange"])) : L("v-if", !0)])], 512), [[x, i.fieldsIndex === "hex"]]),
-		S(Y("div", $y, [
+		}, null, 8, ["value", "onChange"])) : L("v-if", !0)])], 512), [[b, i.fieldsIndex === "hex"]]),
+		x(Y("div", $y, [
 			L(" rgba "),
 			Y("div", eb, [W(u, {
 				label: "r",
@@ -8711,7 +8722,7 @@ function fb(e, t, n, r, i, a) {
 				value: e.colors.rgba.b,
 				onChange: a.inputChange
 			}, null, 8, ["value", "onChange"])]),
-			n.disableAlpha ? L("v-if", !0) : (E(), q("div", rb, [W(u, {
+			n.disableAlpha ? L("v-if", !0) : (T(), q("div", rb, [W(u, {
 				label: "a",
 				value: e.colors.a,
 				"arrow-offset": .01,
@@ -8722,8 +8733,8 @@ function fb(e, t, n, r, i, a) {
 				"arrow-offset",
 				"onChange"
 			])]))
-		], 512), [[x, ["rgb", "rgba"].includes(i.fieldsIndex)]]),
-		S(Y("div", ib, [
+		], 512), [[b, ["rgb", "rgba"].includes(i.fieldsIndex)]]),
+		x(Y("div", ib, [
 			L(" hsla "),
 			Y("div", ab, [W(u, {
 				label: "h",
@@ -8740,7 +8751,7 @@ function fb(e, t, n, r, i, a) {
 				value: a.hsl.l,
 				onChange: a.inputChange
 			}, null, 8, ["value", "onChange"])]),
-			n.disableAlpha ? L("v-if", !0) : (E(), q("div", cb, [W(u, {
+			n.disableAlpha ? L("v-if", !0) : (T(), q("div", cb, [W(u, {
 				label: "a",
 				value: e.colors.a,
 				"arrow-offset": .01,
@@ -8751,14 +8762,14 @@ function fb(e, t, n, r, i, a) {
 				"arrow-offset",
 				"onChange"
 			])]))
-		], 512), [[x, ["hsl", "hsla"].includes(i.fieldsIndex)]]),
+		], 512), [[b, ["hsl", "hsla"].includes(i.fieldsIndex)]]),
 		L(" btn "),
 		Y("div", {
 			class: "vc-chrome-toggle-btn",
 			role: "button",
 			"aria-label": "Change another color definition",
 			onClick: t[3] ||= (...e) => a.toggleViews && a.toggleViews(...e)
-		}, [Y("div", lb, [(E(), q("svg", {
+		}, [Y("div", lb, [(T(), q("svg", {
 			style: {
 				width: "24px",
 				height: "24px"
@@ -8767,7 +8778,7 @@ function fb(e, t, n, r, i, a) {
 			onMouseover: t[0] ||= (...e) => a.showHighlight && a.showHighlight(...e),
 			onMouseenter: t[1] ||= (...e) => a.showHighlight && a.showHighlight(...e),
 			onMouseout: t[2] ||= (...e) => a.hideHighlight && a.hideHighlight(...e)
-		}, ub, 32))]), S(Y("div", db, null, 512), [[x, i.highlight]])]),
+		}, ub, 32))]), x(Y("div", db, null, 512), [[b, i.highlight]])]),
 		L(" btn ")
 	]))])], 2);
 }
@@ -8802,7 +8813,7 @@ var pb = class {
 ];
 //#endregion
 //#region node_modules/@nextcloud/vue/dist/chunks/NcColorPicker.mjs
-m(T);
+m(w);
 var bb = ["aria-label"], xb = {
 	key: 0,
 	class: "color-picker__simple"
@@ -8818,7 +8829,7 @@ var bb = ["aria-label"], xb = {
 ], Tb = {
 	key: 0,
 	class: "color-picker__navigation"
-}, Eb = /* @__PURE__ */ O(/* @__PURE__ */ z({
+}, Eb = /* @__PURE__ */ D(/* @__PURE__ */ z({
 	__name: "NcColorPicker",
 	props: /* @__PURE__ */ _e({
 		advancedFields: { type: Boolean },
@@ -8877,14 +8888,14 @@ var bb = ["aria-label"], xb = {
 				0
 			];
 		}
-		return (t, i) => (E(), U(B(ut), {
+		return (t, i) => (T(), U(B(ut), {
 			shown: r.value,
 			"onUpdate:shown": i[3] ||= (e) => r.value = e,
 			container: e.container,
 			popupRole: "dialog",
 			onApplyHide: i[4] ||= (e) => o("closed")
 		}, {
-			trigger: g((e) => [w(t.$slots, "default", Ge(We(e)), void 0, !0)]),
+			trigger: g((e) => [C(t.$slots, "default", Ge(We(e)), void 0, !0)]),
 			default: g((t) => [Y("div", {
 				role: "dialog",
 				class: V(["color-picker", {
@@ -8897,21 +8908,21 @@ var bb = ["aria-label"], xb = {
 				name: "slide",
 				mode: "out-in"
 			}, {
-				default: g(() => [l.value ? (E(), U(B(Vy), {
+				default: g(() => [l.value ? (T(), U(B(Vy), {
 					key: 1,
 					class: "color-picker__advanced",
 					disableAlpha: "",
 					disableFields: !e.advancedFields,
 					modelValue: n.value ?? "#000000",
 					"onUpdate:modelValue": h
-				}, null, 8, ["disableFields", "modelValue"])) : (E(), q("div", xb, [(E(!0), q(k, null, C(u.value, ({ color: e, name: t }, r) => (E(), q("label", {
+				}, null, 8, ["disableFields", "modelValue"])) : (T(), q("div", xb, [(T(!0), q(O, null, S(u.value, ({ color: e, name: t }, r) => (T(), q("label", {
 					key: r,
 					class: V(["color-picker__simple-color-circle", { "color-picker__simple-color-circle--active": e === n.value }]),
 					style: ze({
 						backgroundColor: e,
 						color: ee(e)
 					})
-				}, [e === n.value ? (E(), U(B(fe), {
+				}, [e === n.value ? (T(), U(B(fe), {
 					key: 0,
 					path: B(Se)
 				}, null, 8, ["path"])) : L("", !0), Y("input", {
@@ -8921,7 +8932,7 @@ var bb = ["aria-label"], xb = {
 					name: `color-picker-${B(c)}`,
 					checked: e === n.value,
 					onClick: (t) => m(e)
-				}, null, 8, Sb)], 6))), 128)), e.clearable ? (E(), q("label", {
+				}, null, 8, Sb)], 6))), 128)), e.clearable ? (T(), q("label", {
 					key: 0,
 					class: "color-picker__clear",
 					title: B(p)("No color")
@@ -8937,7 +8948,7 @@ var bb = ["aria-label"], xb = {
 					onClick: i[0] ||= (e) => n.value = void 0
 				}, null, 8, wb)], 8, Cb)) : L("", !0)]))]),
 				_: 1
-			}), e.paletteOnly ? L("", !0) : (E(), q("div", Tb, [l.value ? (E(), U(B(I), {
+			}), e.paletteOnly ? L("", !0) : (T(), q("div", Tb, [l.value ? (T(), U(B(I), {
 				key: 0,
 				"aria-label": B(p)("Back"),
 				title: B(p)("Back"),
@@ -8949,7 +8960,7 @@ var bb = ["aria-label"], xb = {
 					path: B(ye)
 				}, null, 8, ["path"])]),
 				_: 1
-			}, 8, ["aria-label", "title"])) : (E(), U(B(I), {
+			}, 8, ["aria-label", "title"])) : (T(), U(B(I), {
 				key: 1,
 				"aria-label": B(p)("More options"),
 				title: B(p)("More options"),
@@ -8978,16 +8989,16 @@ var bb = ["aria-label"], xb = {
 	emits: ["update:modelValue"],
 	setup(e, { emit: t }) {
 		let n = t;
-		return (t, r) => (E(), q("nav", {
+		return (t, r) => (T(), q("nav", {
 			class: "rw-subnav",
 			"aria-label": e.ariaLabel || B(j)("rechnungswerk", "Bereiche")
-		}, [(E(!0), q(k, null, C(e.groups, (t) => (E(), q(k, { key: t.label }, [Y("div", kb, H(t.label), 1), (E(!0), q(k, null, C(t.items, (t) => (E(), q("button", {
+		}, [(T(!0), q(O, null, S(e.groups, (t) => (T(), q(O, { key: t.label }, [Y("div", kb, H(t.label), 1), (T(!0), q(O, null, S(t.items, (t) => (T(), q("button", {
 			key: t.key,
 			type: "button",
 			class: V(["rw-subnav__item", { "rw-subnav__item--active": e.modelValue === t.key }]),
 			"aria-current": e.modelValue === t.key ? "page" : void 0,
 			onClick: (e) => n("update:modelValue", t.key)
-		}, [(E(), U(y(t.icon), { size: 18 })), R(" " + H(t.label), 1)], 10, Ab))), 128))], 64))), 128))], 8, Ob));
+		}, [(T(), U(v(t.icon), { size: 18 })), R(" " + H(t.label), 1)], 10, Ab))), 128))], 64))), 128))], 8, Ob));
 	}
 }), Mb = {
 	name: "OfficeBuildingIcon",
@@ -9009,19 +9020,19 @@ var bb = ["aria-label"], xb = {
 	"height"
 ], Fb = { d: "M5,3V21H11V17.5H13V21H19V3H5M7,5H9V7H7V5M11,5H13V7H11V5M15,5H17V7H15V5M7,9H9V11H7V9M11,9H13V11H11V9M15,9H17V11H15V9M7,13H9V15H7V13M11,13H13V15H11V13M15,13H17V15H15V13M7,17H9V19H7V17M15,17H17V19H15V17Z" }, Ib = { key: 0 };
 function Lb(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon office-building-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Fb, [n.title ? (E(), q("title", Ib, H(n.title), 1)) : L("", !0)])], 8, Pb))], 16, Nb);
+	}, [Y("path", Fb, [n.title ? (T(), q("title", Ib, H(n.title), 1)) : L("", !0)])], 8, Pb))], 16, Nb);
 }
 var Rb = /*#__PURE__*/ $(Mb, [["render", Lb]]), zb = {
 	name: "BankIcon",
@@ -9043,19 +9054,19 @@ var Rb = /*#__PURE__*/ $(Mb, [["render", Lb]]), zb = {
 	"height"
 ], Hb = { d: "M11.5,1L2,6V8H21V6M16,10V17H19V10M2,22H21V19H2M10,10V17H13V10M4,10V17H7V10H4Z" }, Ub = { key: 0 };
 function Wb(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon bank-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Hb, [n.title ? (E(), q("title", Ub, H(n.title), 1)) : L("", !0)])], 8, Vb))], 16, Bb);
+	}, [Y("path", Hb, [n.title ? (T(), q("title", Ub, H(n.title), 1)) : L("", !0)])], 8, Vb))], 16, Bb);
 }
 var Gb = /*#__PURE__*/ $(zb, [["render", Wb]]), Kb = {
 	name: "PaletteIcon",
@@ -9077,19 +9088,19 @@ var Gb = /*#__PURE__*/ $(zb, [["render", Wb]]), Kb = {
 	"height"
 ], Yb = { d: "M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z" }, Xb = { key: 0 };
 function Zb(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon palette-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Yb, [n.title ? (E(), q("title", Xb, H(n.title), 1)) : L("", !0)])], 8, Jb))], 16, qb);
+	}, [Y("path", Yb, [n.title ? (T(), q("title", Xb, H(n.title), 1)) : L("", !0)])], 8, Jb))], 16, qb);
 }
 var Qb = /*#__PURE__*/ $(Kb, [["render", Zb]]), $b = {
 	name: "FileSignIcon",
@@ -9111,19 +9122,19 @@ var Qb = /*#__PURE__*/ $(Kb, [["render", Zb]]), $b = {
 	"height"
 ], nx = { d: "M19.7 12.9L14 18.6H11.7V16.3L17.4 10.6L19.7 12.9M23.1 12.1C23.1 12.4 22.8 12.7 22.5 13L20 15.5L19.1 14.6L21.7 12L21.1 11.4L20.4 12.1L18.1 9.8L20.3 7.7C20.5 7.5 20.9 7.5 21.2 7.7L22.6 9.1C22.8 9.3 22.8 9.7 22.6 10C22.4 10.2 22.2 10.4 22.2 10.6C22.2 10.8 22.4 11 22.6 11.2C22.9 11.5 23.2 11.8 23.1 12.1M3 20V4H10V9H15V10.5L17 8.5V8L11 2H3C1.9 2 1 2.9 1 4V20C1 21.1 1.9 22 3 22H15C16.1 22 17 21.1 17 20H3M11 17.1C10.8 17.1 10.6 17.2 10.5 17.2L10 15H8.5L6.4 16.7L7 14H5.5L4.5 19H6L8.9 16.4L9.5 18.7H10.5L11 18.6V17.1Z" }, rx = { key: 0 };
 function ix(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon file-sign-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", nx, [n.title ? (E(), q("title", rx, H(n.title), 1)) : L("", !0)])], 8, tx))], 16, ex);
+	}, [Y("path", nx, [n.title ? (T(), q("title", rx, H(n.title), 1)) : L("", !0)])], 8, tx))], 16, ex);
 }
 var ax = /*#__PURE__*/ $($b, [["render", ix]]), ox = {
 	name: "TextBoxOutlineIcon",
@@ -9145,19 +9156,19 @@ var ax = /*#__PURE__*/ $($b, [["render", ix]]), ox = {
 	"height"
 ], lx = { d: "M5,3C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3H5M5,5H19V19H5V5M7,7V9H17V7H7M7,11V13H17V11H7M7,15V17H14V15H7Z" }, ux = { key: 0 };
 function dx(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon text-box-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", lx, [n.title ? (E(), q("title", ux, H(n.title), 1)) : L("", !0)])], 8, cx))], 16, sx);
+	}, [Y("path", lx, [n.title ? (T(), q("title", ux, H(n.title), 1)) : L("", !0)])], 8, cx))], 16, sx);
 }
 var fx = /*#__PURE__*/ $(ox, [["render", dx]]), px = {
 	name: "PercentIcon",
@@ -9179,19 +9190,19 @@ var fx = /*#__PURE__*/ $(ox, [["render", dx]]), px = {
 	"height"
 ], gx = { d: "M18.5,3.5L3.5,18.5L5.5,20.5L20.5,5.5M7,4A3,3 0 0,0 4,7A3,3 0 0,0 7,10A3,3 0 0,0 10,7A3,3 0 0,0 7,4M17,14A3,3 0 0,0 14,17A3,3 0 0,0 17,20A3,3 0 0,0 20,17A3,3 0 0,0 17,14Z" }, _x = { key: 0 };
 function vx(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon percent-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", gx, [n.title ? (E(), q("title", _x, H(n.title), 1)) : L("", !0)])], 8, hx))], 16, mx);
+	}, [Y("path", gx, [n.title ? (T(), q("title", _x, H(n.title), 1)) : L("", !0)])], 8, hx))], 16, mx);
 }
 var yx = /*#__PURE__*/ $(px, [["render", vx]]), bx = {
 	name: "CreditCardOutlineIcon",
@@ -9213,19 +9224,19 @@ var yx = /*#__PURE__*/ $(px, [["render", vx]]), bx = {
 	"height"
 ], Cx = { d: "M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" }, wx = { key: 0 };
 function Tx(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon credit-card-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Cx, [n.title ? (E(), q("title", wx, H(n.title), 1)) : L("", !0)])], 8, Sx))], 16, xx);
+	}, [Y("path", Cx, [n.title ? (T(), q("title", wx, H(n.title), 1)) : L("", !0)])], 8, Sx))], 16, xx);
 }
 var Ex = /*#__PURE__*/ $(bx, [["render", Tx]]), Dx = {
 	name: "EmailOutlineIcon",
@@ -9247,19 +9258,19 @@ var Ex = /*#__PURE__*/ $(bx, [["render", Tx]]), Dx = {
 	"height"
 ], Ax = { d: "M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6M20 6L12 11L4 6H20M20 18H4V8L12 13L20 8V18Z" }, jx = { key: 0 };
 function Mx(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon email-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Ax, [n.title ? (E(), q("title", jx, H(n.title), 1)) : L("", !0)])], 8, kx))], 16, Ox);
+	}, [Y("path", Ax, [n.title ? (T(), q("title", jx, H(n.title), 1)) : L("", !0)])], 8, kx))], 16, Ox);
 }
 var Nx = /*#__PURE__*/ $(Dx, [["render", Mx]]), Px = {
 	name: "ServerNetworkIcon",
@@ -9281,19 +9292,19 @@ var Nx = /*#__PURE__*/ $(Dx, [["render", Mx]]), Px = {
 	"height"
 ], Lx = { d: "M13,19H14A1,1 0 0,1 15,20H22V22H15A1,1 0 0,1 14,23H10A1,1 0 0,1 9,22H2V20H9A1,1 0 0,1 10,19H11V17H4A1,1 0 0,1 3,16V12A1,1 0 0,1 4,11H20A1,1 0 0,1 21,12V16A1,1 0 0,1 20,17H13V19M4,3H20A1,1 0 0,1 21,4V8A1,1 0 0,1 20,9H4A1,1 0 0,1 3,8V4A1,1 0 0,1 4,3M9,7H10V5H9V7M9,15H10V13H9V15M5,5V7H7V5H5M5,13V15H7V13H5Z" }, Rx = { key: 0 };
 function zx(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon server-network-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Lx, [n.title ? (E(), q("title", Rx, H(n.title), 1)) : L("", !0)])], 8, Ix))], 16, Fx);
+	}, [Y("path", Lx, [n.title ? (T(), q("title", Rx, H(n.title), 1)) : L("", !0)])], 8, Ix))], 16, Fx);
 }
 var Bx = /*#__PURE__*/ $(Px, [["render", zx]]), Vx = {
 	name: "EmailSyncOutlineIcon",
@@ -9315,19 +9326,19 @@ var Bx = /*#__PURE__*/ $(Px, [["render", zx]]), Vx = {
 	"height"
 ], Wx = { d: "M3 4C1.9 4 1 4.9 1 6V18C1 19.1 1.9 20 3 20H13.5A6.5 6.5 0 0 1 13 18H3V8L11 13L19 8V11A6.5 6.5 0 0 1 19.5 11A6.5 6.5 0 0 1 21 11.18V6C21 4.9 20.1 4 19 4H3M3 6H19L11 11L3 6M19 12L16.75 14.25L19 16.5V15C20.38 15 21.5 16.12 21.5 17.5C21.5 17.9 21.41 18.28 21.24 18.62L22.33 19.71C22.75 19.08 23 18.32 23 17.5C23 15.29 21.21 13.5 19 13.5V12M15.67 15.29C15.25 15.92 15 16.68 15 17.5C15 19.71 16.79 21.5 19 21.5V23L21.25 20.75L19 18.5V20C17.62 20 16.5 18.88 16.5 17.5C16.5 17.1 16.59 16.72 16.76 16.38L15.67 15.29Z" }, Gx = { key: 0 };
 function Kx(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon email-sync-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Wx, [n.title ? (E(), q("title", Gx, H(n.title), 1)) : L("", !0)])], 8, Ux))], 16, Hx);
+	}, [Y("path", Wx, [n.title ? (T(), q("title", Gx, H(n.title), 1)) : L("", !0)])], 8, Ux))], 16, Hx);
 }
 var qx = /*#__PURE__*/ $(Vx, [["render", Kx]]), Jx = {
 	name: "FolderOutlineIcon",
@@ -9349,19 +9360,19 @@ var qx = /*#__PURE__*/ $(Vx, [["render", Kx]]), Jx = {
 	"height"
 ], Zx = { d: "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z" }, Qx = { key: 0 };
 function $x(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon folder-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", Zx, [n.title ? (E(), q("title", Qx, H(n.title), 1)) : L("", !0)])], 8, Xx))], 16, Yx);
+	}, [Y("path", Zx, [n.title ? (T(), q("title", Qx, H(n.title), 1)) : L("", !0)])], 8, Xx))], 16, Yx);
 }
 var eS = /*#__PURE__*/ $(Jx, [["render", $x]]), tS = {
 	name: "ShieldAccountOutlineIcon",
@@ -9383,19 +9394,19 @@ var eS = /*#__PURE__*/ $(Jx, [["render", $x]]), tS = {
 	"height"
 ], iS = { d: "M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,3.18L19,6.3V11.22C19,12.92 18.5,14.65 17.65,16.17C16,14.94 13.26,14.5 12,14.5C10.74,14.5 8,14.94 6.35,16.17C5.5,14.65 5,12.92 5,11.22V6.3L12,3.18M12,6A3.5,3.5 0 0,0 8.5,9.5A3.5,3.5 0 0,0 12,13A3.5,3.5 0 0,0 15.5,9.5A3.5,3.5 0 0,0 12,6M12,8A1.5,1.5 0 0,1 13.5,9.5A1.5,1.5 0 0,1 12,11A1.5,1.5 0 0,1 10.5,9.5A1.5,1.5 0 0,1 12,8M12,16.5C13.57,16.5 15.64,17.11 16.53,17.84C15.29,19.38 13.7,20.55 12,21C10.3,20.55 8.71,19.38 7.47,17.84C8.37,17.11 10.43,16.5 12,16.5Z" }, aS = { key: 0 };
 function oS(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon shield-account-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", iS, [n.title ? (E(), q("title", aS, H(n.title), 1)) : L("", !0)])], 8, rS))], 16, nS);
+	}, [Y("path", iS, [n.title ? (T(), q("title", aS, H(n.title), 1)) : L("", !0)])], 8, rS))], 16, nS);
 }
 var sS = /*#__PURE__*/ $(tS, [["render", oS]]), cS = {
 	name: "KeyOutlineIcon",
@@ -9417,19 +9428,19 @@ var sS = /*#__PURE__*/ $(tS, [["render", oS]]), cS = {
 	"height"
 ], dS = { d: "M21 18H15V15H13.3C12.2 17.4 9.7 19 7 19C3.1 19 0 15.9 0 12S3.1 5 7 5C9.7 5 12.2 6.6 13.3 9H24V15H21V18M17 16H19V13H22V11H11.9L11.7 10.3C11 8.3 9.1 7 7 7C4.2 7 2 9.2 2 12S4.2 17 7 17C9.1 17 11 15.7 11.7 13.7L11.9 13H17V16M7 15C5.3 15 4 13.7 4 12S5.3 9 7 9 10 10.3 10 12 8.7 15 7 15M7 11C6.4 11 6 11.4 6 12S6.4 13 7 13 8 12.6 8 12 7.6 11 7 11Z" }, fS = { key: 0 };
 function pS(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon key-outline-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", dS, [n.title ? (E(), q("title", fS, H(n.title), 1)) : L("", !0)])], 8, uS))], 16, lS);
+	}, [Y("path", dS, [n.title ? (T(), q("title", fS, H(n.title), 1)) : L("", !0)])], 8, uS))], 16, lS);
 }
 var mS = /*#__PURE__*/ $(cS, [["render", pS]]), hS = {
 	name: "RobotIcon",
@@ -9451,19 +9462,19 @@ var mS = /*#__PURE__*/ $(cS, [["render", pS]]), hS = {
 	"height"
 ], vS = { d: "M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" }, yS = { key: 0 };
 function bS(e, t, n, r, i, a) {
-	return E(), q("span", Z(e.$attrs, {
+	return T(), q("span", Z(e.$attrs, {
 		"aria-hidden": n.title ? null : "true",
 		"aria-label": n.title,
 		class: "material-design-icon robot-icon",
 		role: "img",
 		onClick: t[0] ||= (t) => e.$emit("click", t)
-	}), [(E(), q("svg", {
+	}), [(T(), q("svg", {
 		fill: n.fillColor,
 		class: "material-design-icon__svg",
 		width: n.size,
 		height: n.size,
 		viewBox: "0 0 24 24"
-	}, [Y("path", vS, [n.title ? (E(), q("title", yS, H(n.title), 1)) : L("", !0)])], 8, _S))], 16, gS);
+	}, [Y("path", vS, [n.title ? (T(), q("title", yS, H(n.title), 1)) : L("", !0)])], 8, _S))], 16, gS);
 }
 var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS = (e, t, n = null) => xs("/api-keys", { data: {
 	name: e,
@@ -9504,30 +9515,30 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 		function _(e) {
 			return (/* @__PURE__ */ new Date(e * 1e3)).toLocaleDateString();
 		}
-		async function v() {
+		async function re() {
 			try {
 				r.value = await SS(), l.value = "";
 			} catch (e) {
 				l.value = e.message ?? j("rechnungswerk", "API-Schlüssel konnten nicht geladen werden.");
 			}
 		}
-		async function y() {
+		async function v() {
 			c.value = !0, u.value = "";
 			try {
 				let e = s.value === "" ? null : Number(s.value), t = await CS(a.value.trim(), [...o.value], e);
-				d.value = t.plaintext, f.value = !1, i.value = !1, a.value = "", o.value = [], s.value = "", await v();
+				d.value = t.plaintext, f.value = !1, i.value = !1, a.value = "", o.value = [], s.value = "", await re();
 			} catch (e) {
 				u.value = e.message ?? j("rechnungswerk", "Anlegen fehlgeschlagen.");
 			} finally {
 				c.value = !1;
 			}
 		}
-		async function b() {
+		async function y() {
 			let e = p.value;
 			if (p.value = null, e !== null) {
 				c.value = !0;
 				try {
-					await wS(e), await v();
+					await wS(e), await re();
 				} catch (e) {
 					l.value = e.message ?? j("rechnungswerk", "Widerrufen fehlgeschlagen.");
 				} finally {
@@ -9535,20 +9546,20 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				}
 			}
 		}
-		async function x() {
+		async function b() {
 			try {
 				await navigator.clipboard.writeText(d.value);
 			} catch {}
 			f.value = !0;
 		}
-		return ce(v), (e, n) => (E(), q("div", TS, [
+		return A(re), (e, n) => (T(), q("div", TS, [
 			Y("p", ES, H(B(j)("rechnungswerk", "Ein API-Schlüssel erlaubt anderen Programmen Zugriff auf diese RechnungsWerk-Instanz, ohne eine Anmeldung. Der Schlüssel wird nur einmalig angezeigt.")), 1),
-			l.value ? (E(), U(B(Q), {
+			l.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: l.value
 			}, null, 8, ["text"])) : L("", !0),
-			d.value ? (E(), U(B(Q), {
+			d.value ? (T(), U(B(Q), {
 				key: 1,
 				type: "success"
 			}, {
@@ -9556,21 +9567,21 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 					Y("p", null, H(B(j)("rechnungswerk", "Das ist dein neuer API-Schlüssel:")), 1),
 					Y("p", null, [Y("code", DS, H(d.value), 1)]),
 					Y("p", null, H(B(j)("rechnungswerk", "Bitte bewahre ihn sicher auf. Er wird nie wieder angezeigt.")), 1),
-					W(B(I), { onClick: x }, {
+					W(B(I), { onClick: b }, {
 						default: g(() => [R(H(f.value ? B(j)("rechnungswerk", "Kopiert") : B(j)("rechnungswerk", "Kopieren")), 1)]),
 						_: 1
 					})
 				]),
 				_: 1
 			})) : L("", !0),
-			r.value.length > 0 ? (E(), q("table", OS, [Y("thead", null, [Y("tr", null, [
+			r.value.length > 0 ? (T(), q("table", OS, [Y("thead", null, [Y("tr", null, [
 				Y("th", null, H(B(j)("rechnungswerk", "Name")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Schlüssel")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Rechte")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Anfragen pro Minute")), 1),
 				Y("th", null, H(B(j)("rechnungswerk", "Zuletzt verwendet")), 1),
 				Y("th", null, [Y("span", kS, H(B(j)("rechnungswerk", "Aktionen")), 1)])
-			])]), Y("tbody", null, [(E(!0), q(k, null, C(r.value, (e) => (E(), q("tr", {
+			])]), Y("tbody", null, [(T(!0), q(O, null, S(r.value, (e) => (T(), q("tr", {
 				key: e.id,
 				class: V({ "rw-api-keys__row--revoked": e.revokedAt !== null })
 			}, [
@@ -9578,8 +9589,8 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				Y("td", null, [Y("code", null, H(e.keyPrefix) + "…", 1)]),
 				Y("td", null, [Y("span", AS, H(te(e.scopes).join(", ")), 1)]),
 				Y("td", null, H(e.rateLimit ?? B(j)("rechnungswerk", "Standard (60)")), 1),
-				Y("td", null, [e.revokedAt === null ? e.lastUsedAt ? (E(), q(k, { key: 1 }, [R(H(_(e.lastUsedAt)), 1)], 64)) : (E(), q(k, { key: 2 }, [R(H(B(j)("rechnungswerk", "nie")), 1)], 64)) : (E(), q(k, { key: 0 }, [R(H(B(j)("rechnungswerk", "Widerrufen")), 1)], 64))]),
-				Y("td", null, [e.revokedAt === null ? (E(), U(B(I), {
+				Y("td", null, [e.revokedAt === null ? e.lastUsedAt ? (T(), q(O, { key: 1 }, [R(H(_(e.lastUsedAt)), 1)], 64)) : (T(), q(O, { key: 2 }, [R(H(B(j)("rechnungswerk", "nie")), 1)], 64)) : (T(), q(O, { key: 0 }, [R(H(B(j)("rechnungswerk", "Widerrufen")), 1)], 64))]),
+				Y("td", null, [e.revokedAt === null ? (T(), U(B(I), {
 					key: 0,
 					variant: "tertiary",
 					disabled: c.value,
@@ -9588,7 +9599,7 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 					default: g(() => [R(H(B(j)("rechnungswerk", "Widerrufen")), 1)]),
 					_: 1
 				}, 8, ["disabled", "onClick"])) : L("", !0)])
-			], 2))), 128))])])) : (E(), q("p", jS, H(B(j)("rechnungswerk", "Noch kein API-Schlüssel angelegt.")), 1)),
+			], 2))), 128))])])) : (T(), q("p", jS, H(B(j)("rechnungswerk", "Noch kein API-Schlüssel angelegt.")), 1)),
 			W(B(I), {
 				variant: "primary",
 				disabled: c.value,
@@ -9597,14 +9608,14 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				default: g(() => [R(H(B(j)("rechnungswerk", "API-Schlüssel anlegen")), 1)]),
 				_: 1
 			}, 8, ["disabled"]),
-			i.value ? (E(), U(B(ft), {
+			i.value ? (T(), U(B(ft), {
 				key: 4,
 				name: B(j)("rechnungswerk", "API-Schlüssel anlegen"),
 				onClose: n[5] ||= (e) => i.value = !1
 			}, {
 				default: g(() => [Y("div", MS, [
 					Y("h3", null, H(B(j)("rechnungswerk", "API-Schlüssel anlegen")), 1),
-					Y("label", NS, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), S(Y("input", {
+					Y("label", NS, [Y("span", null, H(B(j)("rechnungswerk", "Name")), 1), x(Y("input", {
 						ref_key: "nameInput",
 						ref: m,
 						"onUpdate:modelValue": n[1] ||= (e) => a.value = e,
@@ -9613,15 +9624,15 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 						maxlength: "64",
 						placeholder: B(j)("rechnungswerk", "z. B. WerkPlus")
 					}, null, 8, PS), [[J, a.value]])]),
-					Y("div", FS, [Y("span", null, H(B(j)("rechnungswerk", "Rechte")), 1), (E(), q(k, null, C(t, (e) => Y("label", {
+					Y("div", FS, [Y("span", null, H(B(j)("rechnungswerk", "Rechte")), 1), (T(), q(O, null, S(t, (e) => Y("label", {
 						key: e,
 						class: "rw-api-keys__scope"
-					}, [S(Y("input", {
+					}, [x(Y("input", {
 						"onUpdate:modelValue": n[2] ||= (e) => o.value = e,
 						type: "checkbox",
 						value: e
 					}, null, 8, IS), [[ne, o.value]]), R(" " + H(ee(e)), 1)])), 64))]),
-					Y("label", LS, [Y("span", null, H(B(j)("rechnungswerk", "Anfragen pro Minute")), 1), S(Y("input", {
+					Y("label", LS, [Y("span", null, H(B(j)("rechnungswerk", "Anfragen pro Minute")), 1), x(Y("input", {
 						"onUpdate:modelValue": n[3] ||= (e) => s.value = e,
 						class: "input",
 						type: "number",
@@ -9629,7 +9640,7 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 						max: BS,
 						placeholder: B(j)("rechnungswerk", "Standard: 60")
 					}, null, 8, RS), [[J, s.value]])]),
-					u.value ? (E(), U(B(Q), {
+					u.value ? (T(), U(B(Q), {
 						key: 0,
 						type: "error",
 						text: u.value
@@ -9640,7 +9651,7 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 					}), W(B(I), {
 						variant: "primary",
 						disabled: c.value || !h.value,
-						onClick: y
+						onClick: v
 					}, {
 						default: g(() => [R(H(B(j)("rechnungswerk", "Anlegen")), 1)]),
 						_: 1
@@ -9654,7 +9665,7 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				message: B(j)("rechnungswerk", "Programme mit diesem Schlüssel verlieren sofort den Zugang. Widerrufen lässt sich ein Schlüssel nicht rückgängig machen. Fortfahren?"),
 				confirmLabel: B(j)("rechnungswerk", "Widerrufen"),
 				onClose: n[6] ||= (e) => p.value = null,
-				onConfirm: b
+				onConfirm: y
 			}, null, 8, [
 				"open",
 				"name",
@@ -9728,94 +9739,94 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				i.value = !1;
 			}
 		}
-		function v() {
+		function re() {
 			return c.value = "", _(() => WS(n.value.trim(), r.value));
 		}
-		function y() {
+		function v() {
 			return u.value = !1, c.value = "", _(async () => {
 				let e = await GS(r.value);
 				return c.value = e.key, e.status;
 			});
 		}
-		function b() {
+		function y() {
 			return _(KS);
 		}
-		function x() {
+		function b() {
 			return l.value = !1, c.value = "", _(qS);
 		}
-		return ce(ne), (e, d) => (E(), q("div", JS, [
+		return A(ne), (e, d) => (T(), q("div", JS, [
 			Y("p", YS, H(B(j)("rechnungswerk", "Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist.")), 1),
-			a.value ? (E(), U(B(Q), {
+			a.value ? (T(), U(B(Q), {
 				key: 0,
 				type: "error",
 				text: a.value
 			}, null, 8, ["text"])) : L("", !0),
-			t.value ? (E(), q(k, { key: 1 }, [
-				m.value ? (E(), U(B(Q), {
+			t.value ? (T(), q(O, { key: 1 }, [
+				m.value ? (T(), U(B(Q), {
 					key: 0,
 					type: m.value.type,
 					text: m.value.text
 				}, null, 8, ["type", "text"])) : L("", !0),
-				c.value ? (E(), U(B(Q), {
+				c.value ? (T(), U(B(Q), {
 					key: 1,
 					type: "success",
 					class: "rw-werkplus__trial-key"
 				}, {
 					default: g(() => [
-						f.value ? (E(), q("p", XS, H(B(j)("rechnungswerk", "Der Testzeitraum läuft. Das ist dein WerkPlus-Schlüssel:")), 1)) : (E(), q("p", ZS, H(B(j)("rechnungswerk", "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:")), 1)),
+						f.value ? (T(), q("p", XS, H(B(j)("rechnungswerk", "Der Testzeitraum läuft. Das ist dein WerkPlus-Schlüssel:")), 1)) : (T(), q("p", ZS, H(B(j)("rechnungswerk", "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:")), 1)),
 						Y("p", null, [Y("code", null, H(c.value), 1)]),
 						Y("p", null, H(B(j)("rechnungswerk", "Bitte bewahre ihn sicher auf. Er ist hinterlegt, wird aber nur jetzt vollständig angezeigt.")), 1)
 					]),
 					_: 1
 				})) : L("", !0),
-				s.value ? (E(), U(B(Q), {
+				s.value ? (T(), U(B(Q), {
 					key: 2,
 					type: "info",
 					text: s.value
 				}, null, 8, ["text"])) : L("", !0),
-				o.value ? (E(), U(B(Q), {
+				o.value ? (T(), U(B(Q), {
 					key: 3,
 					type: "error",
 					text: o.value
-				}, null, 8, ["text"])) : t.value.lastError ? (E(), U(B(Q), {
+				}, null, 8, ["text"])) : t.value.lastError ? (T(), U(B(Q), {
 					key: 4,
 					type: "warning",
 					text: t.value.lastError.message
 				}, null, 8, ["text"])) : L("", !0),
-				t.value.keySet ? (E(), q("dl", QS, [
+				t.value.keySet ? (T(), q("dl", QS, [
 					Y("dt", null, H(B(j)("rechnungswerk", "Tarif")), 1),
 					Y("dd", null, H(p.value), 1),
-					t.value.expiresAt ? (E(), q(k, { key: 0 }, [Y("dt", null, H(B(j)("rechnungswerk", "Gültig bis")), 1), Y("dd", null, H(h(t.value.expiresAt)), 1)], 64)) : L("", !0),
+					t.value.expiresAt ? (T(), q(O, { key: 0 }, [Y("dt", null, H(B(j)("rechnungswerk", "Gültig bis")), 1), Y("dd", null, H(h(t.value.expiresAt)), 1)], 64)) : L("", !0),
 					Y("dt", null, H(B(j)("rechnungswerk", "Letzte erfolgreiche Prüfung")), 1),
 					Y("dd", null, H(t.value.lastCheckAt ? ee(t.value.lastCheckAt) : B(j)("rechnungswerk", "noch keine")), 1),
 					Y("dt", null, H(B(j)("rechnungswerk", "Schlüssel")), 1),
 					Y("dd", null, H(t.value.keyHint), 1)
 				])) : L("", !0),
-				Y("div", $S, [Y("label", eC, [Y("span", null, H(B(j)("rechnungswerk", "WerkPlus-Schlüssel")), 1), S(Y("input", {
+				Y("div", $S, [Y("label", eC, [Y("span", null, H(B(j)("rechnungswerk", "WerkPlus-Schlüssel")), 1), x(Y("input", {
 					"onUpdate:modelValue": d[0] ||= (e) => n.value = e,
 					class: "rw-input",
 					type: "text",
 					autocomplete: "off",
 					spellcheck: "false",
 					placeholder: t.value.keySet ? B(j)("rechnungswerk", "gespeichert, leer lassen") : "wp_…"
-				}, null, 8, tC), [[J, n.value]])]), Y("label", nC, [Y("span", null, H(B(j)("rechnungswerk", "Mitarbeitende")), 1), S(Y("select", {
+				}, null, 8, tC), [[J, n.value]])]), Y("label", nC, [Y("span", null, H(B(j)("rechnungswerk", "Mitarbeitende")), 1), x(Y("select", {
 					"onUpdate:modelValue": d[1] ||= (e) => r.value = e,
 					class: "rw-input"
-				}, [(E(!0), q(k, null, C(B(HS), (e) => (E(), q("option", {
+				}, [(T(!0), q(O, null, S(B(HS), (e) => (T(), q("option", {
 					key: e,
 					value: e
-				}, H(e), 9, rC))), 128))], 512), [[re, r.value]])])]),
+				}, H(e), 9, rC))), 128))], 512), [[ie, r.value]])])]),
 				Y("p", iC, H(B(j)("rechnungswerk", "Übertragen wird nur die Größenklasse, keine Mitarbeiterzahl.")), 1),
 				Y("div", aC, [
 					W(B(I), {
 						variant: "primary",
 						disabled: i.value || !n.value.trim() && !t.value.keySet,
-						onClick: v
+						onClick: re
 					}, {
 						default: g(() => [R(H(t.value.keySet ? B(j)("rechnungswerk", "Speichern und prüfen") : B(j)("rechnungswerk", "Schlüssel prüfen und speichern")), 1)]),
 						_: 1
 					}, 8, ["disabled"]),
-					t.value.keySet ? L("", !0) : (E(), U(B(I), {
+					t.value.keySet ? L("", !0) : (T(), U(B(I), {
 						key: 0,
 						disabled: i.value,
 						onClick: d[2] ||= (e) => u.value = !0
@@ -9823,15 +9834,15 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 						default: g(() => [R(H(B(j)("rechnungswerk", "30 Tage testen")), 1)]),
 						_: 1
 					}, 8, ["disabled"])),
-					t.value.keySet ? (E(), U(B(I), {
+					t.value.keySet ? (T(), U(B(I), {
 						key: 1,
 						disabled: i.value,
-						onClick: b
+						onClick: y
 					}, {
 						default: g(() => [R(H(B(j)("rechnungswerk", "Jetzt prüfen")), 1)]),
 						_: 1
 					}, 8, ["disabled"])) : L("", !0),
-					t.value.keySet ? (E(), U(B(I), {
+					t.value.keySet ? (T(), U(B(I), {
 						key: 2,
 						variant: "tertiary",
 						disabled: i.value,
@@ -9854,7 +9865,7 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				message: B(j)("rechnungswerk", "Der Testzeitraum läuft 30 Tage, braucht keine Zahlungsdaten und ist je Installation nur einmal möglich. Jetzt starten?"),
 				confirmLabel: B(j)("rechnungswerk", "Testzeitraum starten"),
 				onClose: d[4] ||= (e) => u.value = !1,
-				onConfirm: y
+				onConfirm: v
 			}, null, 8, [
 				"open",
 				"name",
@@ -9867,7 +9878,7 @@ var xS = /*#__PURE__*/ $(hS, [["render", bS]]), SS = () => bs("/api-keys"), CS =
 				message: B(j)("rechnungswerk", "RechnungsWerk arbeitet danach im freien Umfang. Den Schlüssel kannst du jederzeit wieder eintragen. Fortfahren?"),
 				confirmLabel: B(j)("rechnungswerk", "Entfernen"),
 				onClose: d[5] ||= (e) => l.value = !1,
-				onConfirm: x
+				onConfirm: b
 			}, null, 8, [
 				"open",
 				"name",
@@ -9931,25 +9942,25 @@ function vC(e, t) {
 var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title" }, xC = {
 	key: 0,
 	class: "rw-settingspage"
-}, SC = { class: "rw-settingspage__content" }, CC = { class: "rw-section" }, wC = { class: "rw-field" }, TC = { class: "rw-field" }, EC = { class: "rw-form-row" }, DC = { class: "rw-field" }, OC = { class: "rw-field" }, kC = { class: "rw-form-row" }, AC = { class: "rw-field" }, jC = { class: "rw-field" }, MC = { class: "rw-field" }, NC = { class: "rw-hint" }, PC = { class: "rw-section" }, FC = { class: "rw-form-row" }, IC = { class: "rw-field" }, LC = { class: "rw-field" }, RC = { class: "rw-field" }, zC = { class: "rw-hint" }, BC = { class: "rw-section" }, VC = { class: "rw-field rw-field--inline" }, HC = { class: "rw-accent" }, UC = ["aria-label"], WC = { class: "rw-field" }, GC = { class: "rw-accent-preview" }, KC = { class: "rw-hint" }, qC = {
+}, SC = { class: "rw-settingspage__content" }, CC = { class: "rw-section" }, wC = { class: "rw-field" }, TC = { class: "rw-field" }, EC = { class: "rw-form-row" }, DC = { class: "rw-field" }, OC = { class: "rw-field" }, kC = { class: "rw-field" }, AC = ["placeholder"], jC = { class: "rw-form-row" }, MC = { class: "rw-field" }, NC = { class: "rw-field" }, PC = { class: "rw-field" }, FC = { class: "rw-hint" }, IC = { class: "rw-section" }, LC = { class: "rw-form-row" }, RC = { class: "rw-field" }, zC = { class: "rw-field" }, BC = { class: "rw-field" }, VC = { class: "rw-hint" }, HC = { class: "rw-section" }, UC = { class: "rw-field rw-field--inline" }, WC = { class: "rw-accent" }, GC = ["aria-label"], KC = { class: "rw-field" }, qC = { class: "rw-accent-preview" }, JC = { class: "rw-hint" }, YC = {
 	key: 0,
 	class: "rw-hint"
-}, JC = { class: "rw-field" }, YC = { class: "rw-logo" }, XC = ["src", "alt"], ZC = {
+}, XC = { class: "rw-field" }, ZC = { class: "rw-logo" }, QC = ["src", "alt"], $C = {
 	key: 1,
 	class: "rw-logo__empty"
-}, QC = { class: "rw-logo__actions" }, $C = { class: "rw-hint" }, ew = { class: "rw-section" }, tw = { class: "rw-field" }, nw = { class: "rw-hint" }, rw = { class: "rw-field" }, iw = { class: "rw-hint" }, aw = { class: "rw-field rw-reset-mode" }, ow = { class: "rw-hint" }, sw = { class: "rw-section" }, cw = { class: "rw-field" }, lw = { class: "rw-hint" }, uw = { class: "rw-field rw-reset-mode" }, dw = { class: "rw-hint" }, fw = { class: "rw-section" }, pw = { class: "rw-field" }, mw = { class: "rw-hint" }, hw = { class: "rw-section" }, gw = {
+}, ew = { class: "rw-logo__actions" }, tw = { class: "rw-hint" }, nw = { class: "rw-section" }, rw = { class: "rw-field" }, iw = { class: "rw-hint" }, aw = { class: "rw-field" }, ow = { class: "rw-hint" }, sw = { class: "rw-field rw-reset-mode" }, cw = { class: "rw-hint" }, lw = { class: "rw-section" }, uw = { class: "rw-field" }, dw = { class: "rw-hint" }, fw = { class: "rw-field rw-reset-mode" }, pw = { class: "rw-hint" }, mw = { class: "rw-section" }, hw = { class: "rw-field" }, gw = { class: "rw-hint" }, _w = { class: "rw-section" }, vw = {
 	key: 0,
 	class: "rw-field"
-}, _w = ["placeholder"], vw = { class: "rw-hint" }, yw = {
+}, yw = ["placeholder"], bw = { class: "rw-hint" }, xw = {
 	key: 1,
 	class: "rw-field tax-rate-field"
-}, bw = ["value"], xw = { class: "rw-section" }, Sw = { class: "rw-field rw-field--narrow" }, Cw = { class: "rw-hint" }, ww = { class: "rw-section" }, Tw = { class: "rw-field" }, Ew = { class: "rw-hint" }, Dw = { class: "rw-form-row" }, Ow = { class: "rw-field" }, kw = { class: "rw-field" }, Aw = { class: "rw-section" }, jw = { class: "rw-field" }, Mw = { class: "rw-archive-folder" }, Nw = {
+}, Sw = ["value"], Cw = { class: "rw-section" }, ww = { class: "rw-field rw-field--narrow" }, Tw = { class: "rw-hint" }, Ew = { class: "rw-section" }, Dw = { class: "rw-field" }, Ow = { class: "rw-hint" }, kw = { class: "rw-form-row" }, Aw = { class: "rw-field" }, jw = { class: "rw-field" }, Mw = { class: "rw-section" }, Nw = { class: "rw-field" }, Pw = { class: "rw-archive-folder" }, Fw = {
 	key: 0,
 	class: "rw-archive-folder__path"
-}, Pw = {
+}, Iw = {
 	key: 1,
 	class: "rw-archive-folder__empty"
-}, Fw = { class: "rw-field" }, Iw = ["placeholder"], Lw = { class: "rw-hint" }, Rw = { class: "rw-section" }, zw = { class: "rw-hint" }, Bw = { class: "rw-form-row" }, Vw = { class: "rw-field" }, Hw = { class: "rw-field rw-field--narrow" }, Uw = { class: "rw-field rw-field--narrow" }, Ww = { value: "none" }, Gw = { class: "rw-form-row" }, Kw = { class: "rw-field" }, qw = { class: "rw-field" }, Jw = ["placeholder"], Yw = { class: "smtp-test" }, Xw = { class: "rw-section" }, Zw = { class: "rw-hint" }, Qw = { class: "rw-form-row" }, $w = { class: "rw-field" }, eT = { class: "rw-field rw-field--narrow" }, tT = { class: "rw-field rw-field--narrow" }, nT = { class: "rw-form-row" }, rT = { class: "rw-field" }, iT = { class: "rw-field" }, aT = ["placeholder"], oT = { class: "rw-section" }, sT = { class: "rw-hint" }, cT = { class: "rw-section" }, lT = { class: "rw-hint rw-access-intro" }, uT = { class: "rw-access-group" }, dT = { class: "rw-access-label" }, fT = { class: "rw-hint rw-access-desc" }, pT = { class: "rw-access-group" }, mT = { class: "rw-access-label" }, hT = { class: "rw-hint rw-access-desc" }, gT = { class: "rw-section" }, _T = { class: "rw-section" }, vT = { class: "rw-action-bar" }, yT = [
+}, Lw = { class: "rw-field" }, Rw = ["placeholder"], zw = { class: "rw-hint" }, Bw = { class: "rw-section" }, Vw = { class: "rw-hint" }, Hw = { class: "rw-form-row" }, Uw = { class: "rw-field" }, Ww = { class: "rw-field rw-field--narrow" }, Gw = { class: "rw-field rw-field--narrow" }, Kw = { value: "none" }, qw = { class: "rw-form-row" }, Jw = { class: "rw-field" }, Yw = { class: "rw-field" }, Xw = ["placeholder"], Zw = { class: "smtp-test" }, Qw = { class: "rw-section" }, $w = { class: "rw-hint" }, eT = { class: "rw-form-row" }, tT = { class: "rw-field" }, nT = { class: "rw-field rw-field--narrow" }, rT = { class: "rw-field rw-field--narrow" }, iT = { class: "rw-form-row" }, aT = { class: "rw-field" }, oT = { class: "rw-field" }, sT = ["placeholder"], cT = { class: "rw-section" }, lT = { class: "rw-hint" }, uT = { class: "rw-section" }, dT = { class: "rw-hint rw-access-intro" }, fT = { class: "rw-access-group" }, pT = { class: "rw-access-label" }, mT = { class: "rw-hint rw-access-desc" }, hT = { class: "rw-access-group" }, gT = { class: "rw-access-label" }, _T = { class: "rw-hint rw-access-desc" }, vT = { class: "rw-section" }, yT = { class: "rw-section" }, bT = { class: "rw-action-bar" }, xT = [
 	{
 		path: "/",
 		redirect: { name: "invoices" }
@@ -10012,7 +10023,7 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 		component: /* @__PURE__ */ $(/* @__PURE__ */ z({
 			__name: "SettingsView",
 			setup(e) {
-				let t = je(), n = nu(), r = X(null), i = G(() => [
+				let t = je(), n = nu(), r = X(null), i = G(() => !!r.value?.vatId?.trim() || !!r.value?.registerNumber?.trim()), a = G(() => [
 					{
 						label: j("rechnungswerk", "Firma"),
 						items: [
@@ -10114,82 +10125,83 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 							icon: xS
 						}]
 					}
-				]), a = X("firma");
-				function o() {
+				]), o = X("firma");
+				function s() {
 					t.push({ name: "text-snippets" });
 				}
-				let s = X(null), c = X(!1), l = X(""), u = X(null);
-				async function d(e) {
-					l.value = e, await rt(), u.value?.scrollIntoView({
+				let c = X(null), l = X(!1), u = X(""), d = X(null);
+				async function f(e) {
+					u.value = e, await rt(), d.value?.scrollIntoView({
 						behavior: "smooth",
 						block: "center"
 					});
 				}
-				let f = X(!1), p = X(!1), m = X(!1), h = X(!1), ee = X(!1), te = X(0), ne = X((/* @__PURE__ */ new Date()).getFullYear()), _ = X((/* @__PURE__ */ new Date()).getMonth() + 1), v = X((/* @__PURE__ */ new Date()).getDate()), y = X(null), b = X(0), ie = X(null), w = X(null), T = G(() => r.value?.accentColor || "#2c3e50"), D = G(() => ({
-					background: T.value,
-					color: mC(T.value)
-				})), O = G(() => hC(T.value));
-				function ae(e) {
+				let p = X(!1), m = X(!1), h = X(!1), ee = X(!1), te = X(!1), ne = X(0), _ = X((/* @__PURE__ */ new Date()).getFullYear()), re = X((/* @__PURE__ */ new Date()).getMonth() + 1), v = X((/* @__PURE__ */ new Date()).getDate()), y = X(null), ae = X(0), C = X(null), w = X(null), E = G(() => r.value?.accentColor || "#2c3e50"), D = G(() => ({
+					background: E.value,
+					color: mC(E.value)
+				})), oe = G(() => hC(E.value));
+				function se(e) {
 					r.value && (r.value.accentColor = e ?? null);
 				}
-				let oe = X([]), se = X([]), A = X([]), M = X(!1), le = X(!1), ue = X(""), de = null, N = X(""), fe = X(""), pe = X(!1), P = X(""), F = X(!1), me = X(!1), he = G(() => r.value?.logoFileId ? $l(r.value.logoFileId) : ""), ge = G(() => M.value ? j("rechnungswerk", "Suche läuft\xA0…") : ue.value.trim().length < 2 ? j("rechnungswerk", "Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.") : j("rechnungswerk", "Keine Treffer.")), _e = G(() => r.value?.numberResetMode === "continuous" || ne.value === y.value ? te.value : 0), ve = G(() => _e.value + 1), ye = G(() => {
+				let ce = X([]), k = X([]), M = X([]), le = X(!1), ue = X(!1), de = X(""), N = null, fe = X(""), pe = X(""), P = X(!1), F = X(""), me = X(!1), he = X(!1), ge = G(() => r.value?.logoFileId ? $l(r.value.logoFileId) : ""), _e = G(() => le.value ? j("rechnungswerk", "Suche läuft\xA0…") : de.value.trim().length < 2 ? j("rechnungswerk", "Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.") : j("rechnungswerk", "Keine Treffer.")), ve = G(() => r.value?.numberResetMode === "continuous" || _.value === y.value ? ne.value : 0), ye = G(() => ve.value + 1), be = G(() => {
 					if (!r.value) return "";
-					let e = w.value && w.value > 0 ? w.value : ve.value;
-					return gC(r.value.numberFormat || "RE-{YYYY}-{####}", e, ne.value, _.value, v.value);
-				}), be = G(() => {
+					let e = w.value && w.value > 0 ? w.value : ye.value;
+					return gC(r.value.numberFormat || "RE-{YYYY}-{####}", e, _.value, re.value, v.value);
+				}), xe = G(() => {
 					if (!r.value) return "";
-					let e = r.value.quoteNumberResetMode === "continuous" || ne.value === ie.value ? b.value : 0;
-					return gC(r.value.quoteNumberFormat || "AN-{YYYY}-{####}", e + 1, ne.value, _.value, v.value);
-				}), xe = G(() => r.value ? vC(r.value.fileNameFormat || "{nummer}", {
-					nummer: ye.value,
+					let e = r.value.quoteNumberResetMode === "continuous" || _.value === C.value ? ae.value : 0;
+					return gC(r.value.quoteNumberFormat || "AN-{YYYY}-{####}", e + 1, _.value, re.value, v.value);
+				}), Se = G(() => r.value ? vC(r.value.fileNameFormat || "{nummer}", {
+					nummer: be.value,
 					date: /* @__PURE__ */ new Date(),
 					kunde: "Muster GmbH",
 					typ: "Rechnung"
 				}) : "");
-				ce(async () => {
+				A(async () => {
 					try {
-						await n.fetch(), z();
+						await n.fetch(), we();
 						let e = await Hs();
-						oe.value = Se(e.admins), se.value = Se(e.users);
+						ce.value = Ce(e.admins), k.value = Ce(e.users);
 					} catch (e) {
-						Ve(e, j("rechnungswerk", "Laden fehlgeschlagen"));
+						He(e, j("rechnungswerk", "Laden fehlgeschlagen"));
 					}
 				});
-				function Se(e) {
+				function Ce(e) {
 					return e.map((e) => ({
 						id: e,
 						type: e.startsWith("group:") ? "group" : "user",
 						displayName: e.replace(/^(user|group):/, "")
 					}));
 				}
-				function Ce(e) {
-					if (ue.value = e, de && clearTimeout(de), e.trim().length < 2) {
-						A.value = [], M.value = !1;
+				function z(e) {
+					if (de.value = e, N && clearTimeout(N), e.trim().length < 2) {
+						M.value = [], le.value = !1;
 						return;
 					}
-					M.value = !0, de = setTimeout(async () => {
+					le.value = !0, N = setTimeout(async () => {
 						try {
-							A.value = await Ws(e.trim());
+							M.value = await Ws(e.trim());
 						} catch {
-							A.value = [];
+							M.value = [];
 						} finally {
-							M.value = !1;
+							le.value = !1;
 						}
 					}, 300);
 				}
-				function z() {
+				function we() {
 					let e = n.settings;
 					if (e) {
-						te.value = e.numberCounter, y.value = e.numberCounterYear, b.value = e.quoteNumberCounter, ie.value = e.quoteNumberCounterYear;
+						ne.value = e.numberCounter, y.value = e.numberCounterYear, ae.value = e.quoteNumberCounter, C.value = e.quoteNumberCounterYear;
 						{
-							let t = e.numberResetMode === "continuous" || ne.value === e.numberCounterYear ? e.numberCounter : 0;
+							let t = e.numberResetMode === "continuous" || _.value === e.numberCounterYear ? e.numberCounter : 0;
 							w.value = t + 1;
 						}
-						s.value = e.archiveFolderPath ?? null, r.value = {
+						c.value = e.archiveFolderPath ?? null, r.value = {
 							companyName: e.companyName,
 							companyAddress: e.companyAddress,
 							vatId: e.vatId,
 							taxNumber: e.taxNumber,
+							registerNumber: e.registerNumber,
 							iban: e.iban,
 							bic: e.bic,
 							bankName: e.bankName,
@@ -10232,37 +10244,37 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 						};
 					}
 				}
-				function we(e) {
-					r.value && (e ? f.value = !0 : r.value.smallBusiness = !1);
+				function Te(e) {
+					r.value && (e ? p.value = !0 : r.value.smallBusiness = !1);
 				}
-				function Te() {
-					f.value = !1, r.value && (r.value.smallBusiness = !0);
+				function Ee() {
+					p.value = !1, r.value && (r.value.smallBusiness = !0);
 				}
-				function Ee(e) {
-					r.value && (e ? p.value = !0 : r.value.datevAutoSend = !1);
+				function De(e) {
+					r.value && (e ? m.value = !0 : r.value.datevAutoSend = !1);
 				}
-				function De() {
-					p.value = !1, r.value && (r.value.datevAutoSend = !0);
+				function Oe() {
+					m.value = !1, r.value && (r.value.datevAutoSend = !0);
 				}
-				function Oe(e) {
-					r.value && (e ? m.value = !0 : r.value.archiveEnabled = !1);
+				function ke(e) {
+					r.value && (e ? h.value = !0 : r.value.archiveEnabled = !1);
 				}
-				function ke() {
-					m.value = !1, r.value && (r.value.archiveEnabled = !0);
+				function Ae() {
+					h.value = !1, r.value && (r.value.archiveEnabled = !0);
 				}
-				function Ae(e) {
-					r.value && e !== r.value.numberResetMode && (e === "continuous" ? h.value = !0 : r.value.numberResetMode = "yearly");
+				function Me(e) {
+					r.value && e !== r.value.numberResetMode && (e === "continuous" ? ee.value = !0 : r.value.numberResetMode = "yearly");
 				}
-				function Me() {
-					h.value = !1, r.value && (r.value.numberResetMode = "continuous");
+				function Ne() {
+					ee.value = !1, r.value && (r.value.numberResetMode = "continuous");
 				}
-				function Ne(e) {
-					r.value && e !== r.value.quoteNumberResetMode && (e === "continuous" ? ee.value = !0 : r.value.quoteNumberResetMode = "yearly");
+				function Pe(e) {
+					r.value && e !== r.value.quoteNumberResetMode && (e === "continuous" ? te.value = !0 : r.value.quoteNumberResetMode = "yearly");
 				}
-				function Pe() {
-					ee.value = !1, r.value && (r.value.quoteNumberResetMode = "continuous");
+				function Fe() {
+					te.value = !1, r.value && (r.value.quoteNumberResetMode = "continuous");
 				}
-				async function Fe() {
+				async function Ie() {
 					let e;
 					try {
 						e = await vt(j("rechnungswerk", "Zielordner für die Ablage wählen")).setMultiSelect(!1).setMimeTypeFilter(["httpd/unix-directory"]).allowDirectories(!0).addButton({
@@ -10272,32 +10284,32 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 						}).build().pick();
 					} catch (e) {
 						if (e instanceof yt) return;
-						Ve(e, j("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
+						He(e, j("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
 						return;
 					}
 					if (e) {
-						c.value = !0, l.value = "";
+						l.value = !0, u.value = "";
 						try {
 							let t = await eu(e);
-							r.value && (r.value.archiveFolderId = t.archiveFolderId), s.value = t.archiveFolderPath;
+							r.value && (r.value.archiveFolderId = t.archiveFolderId), c.value = t.archiveFolderPath;
 						} catch (e) {
-							Ve(e, j("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
+							He(e, j("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
 						} finally {
-							c.value = !1;
+							l.value = !1;
 						}
 					}
 				}
-				async function Ie() {
-					c.value = !0, l.value = "";
+				async function Le() {
+					l.value = !0, u.value = "";
 					try {
-						await tu(), r.value && (r.value.archiveFolderId = null, r.value.archiveEnabled = !1), s.value = null;
+						await tu(), r.value && (r.value.archiveFolderId = null, r.value.archiveEnabled = !1), c.value = null;
 					} catch (e) {
-						Ve(e, j("rechnungswerk", "Zielordner konnte nicht entfernt werden."));
+						He(e, j("rechnungswerk", "Zielordner konnte nicht entfernt werden."));
 					} finally {
-						c.value = !1;
+						l.value = !1;
 					}
 				}
-				async function Le() {
+				async function Re() {
 					let e;
 					try {
 						e = await vt(j("rechnungswerk", "Firmenlogo wählen")).setMultiSelect(!1).setMimeTypeFilter([
@@ -10311,59 +10323,59 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 						}).build().pick();
 					} catch (e) {
 						if (e instanceof yt) return;
-						Ve(e, j("rechnungswerk", "Logo konnte nicht gesetzt werden."));
+						He(e, j("rechnungswerk", "Logo konnte nicht gesetzt werden."));
 						return;
 					}
 					if (e) {
-						me.value = !0, l.value = "";
+						he.value = !0, u.value = "";
 						try {
 							let t = await Zl(e);
 							r.value && (r.value.logoFileId = t.logoFileId);
 						} catch (e) {
-							Ve(e, j("rechnungswerk", "Logo konnte nicht gesetzt werden."));
+							He(e, j("rechnungswerk", "Logo konnte nicht gesetzt werden."));
 						} finally {
-							me.value = !1;
+							he.value = !1;
 						}
 					}
 				}
-				async function Re() {
-					me.value = !0, l.value = "";
+				async function Be() {
+					he.value = !0, u.value = "";
 					try {
 						await Ql(), r.value && (r.value.logoFileId = null);
 					} catch (e) {
-						Ve(e, j("rechnungswerk", "Logo konnte nicht entfernt werden."));
+						He(e, j("rechnungswerk", "Logo konnte nicht entfernt werden."));
 					} finally {
-						me.value = !1;
+						he.value = !1;
 					}
 				}
-				async function Be() {
+				async function K() {
 					if (!r.value) return;
-					l.value = "";
+					u.value = "";
 					let e = (r.value.numberFormat || "").trim();
 					if (r.value.numberResetMode === "yearly" && !/\{YYYY\}|\{YY\}/.test(e)) {
-						d(j("rechnungswerk", "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
+						f(j("rechnungswerk", "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
 						return;
 					}
 					let t = w.value;
 					if (t == null || !Number.isInteger(t) || t < 1) {
-						d(j("rechnungswerk", "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein."));
+						f(j("rechnungswerk", "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein."));
 						return;
 					}
-					if (t < ve.value) {
-						d(j("rechnungswerk", "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.", {
-							min: ve.value,
-							issued: _e.value
+					if (t < ye.value) {
+						f(j("rechnungswerk", "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.", {
+							min: ye.value,
+							issued: ve.value
 						}));
 						return;
 					}
 					let i = (r.value.quoteNumberFormat || "").trim();
 					if (r.value.quoteNumberResetMode === "yearly" && !/\{YYYY\}|\{YY\}/.test(i)) {
-						d(j("rechnungswerk", "Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
+						f(j("rechnungswerk", "Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
 						return;
 					}
 					let a = (r.value.fileNameFormat || "").trim();
 					if (a !== "" && !a.includes("{nummer}")) {
-						d(j("rechnungswerk", "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben."));
+						f(j("rechnungswerk", "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben."));
 						return;
 					}
 					let o = [
@@ -10383,128 +10395,140 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 					for (let { value: e, label: t } of o) {
 						let n = (e || "").trim();
 						if (n !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(n)) {
-							d(j("rechnungswerk", "Bitte eine gültige E-Mail-Adresse angeben ({field}).", { field: t }));
+							f(j("rechnungswerk", "Bitte eine gültige E-Mail-Adresse angeben ({field}).", { field: t }));
 							return;
 						}
 					}
-					le.value = !0;
+					ue.value = !0;
 					try {
 						let e = { ...r.value };
-						t > ve.value && (e.numberCounter = t - 1), delete e.logoFileId, delete e.archiveFolderId, N.value !== "" && (e.smtpPassword = N.value), fe.value !== "" && (e.imapPassword = fe.value);
+						t > ye.value && (e.numberCounter = t - 1), delete e.logoFileId, delete e.archiveFolderId, fe.value !== "" && (e.smtpPassword = fe.value), pe.value !== "" && (e.imapPassword = pe.value);
 						try {
 							await n.save(e);
 						} catch (e) {
-							Ve(e, j("rechnungswerk", "Speichern der Einstellungen fehlgeschlagen."));
+							He(e, j("rechnungswerk", "Speichern der Einstellungen fehlgeschlagen."));
 							return;
 						}
 						try {
 							await Us({
-								admins: oe.value.map((e) => e.id),
-								users: se.value.map((e) => e.id)
+								admins: ce.value.map((e) => e.id),
+								users: k.value.map((e) => e.id)
 							});
 						} catch (e) {
-							Ve(e, j("rechnungswerk", "Einstellungen gespeichert, aber die Zugriffsrechte konnten nicht gespeichert werden. Bitte erneut speichern."));
+							He(e, j("rechnungswerk", "Einstellungen gespeichert, aber die Zugriffsrechte konnten nicht gespeichert werden. Bitte erneut speichern."));
 							return;
 						}
-						N.value = "", fe.value = "", z();
+						fe.value = "", pe.value = "", we();
 					} finally {
-						le.value = !1;
+						ue.value = !1;
 					}
 				}
-				async function K() {
+				async function Ve() {
 					if (r.value?.smtpHost) {
-						pe.value = !0, P.value = "";
+						P.value = !0, F.value = "";
 						try {
 							await Jl({
 								host: r.value.smtpHost,
 								port: r.value.smtpPort ?? 587,
 								security: r.value.smtpSecurity || "starttls",
 								user: r.value.smtpUser ?? "",
-								password: N.value
-							}), F.value = !0, P.value = j("rechnungswerk", "Verbindung erfolgreich.");
+								password: fe.value
+							}), me.value = !0, F.value = j("rechnungswerk", "Verbindung erfolgreich.");
 						} catch (e) {
-							F.value = !1, P.value = e.message ?? j("rechnungswerk", "Verbindung fehlgeschlagen.");
+							me.value = !1, F.value = e.message ?? j("rechnungswerk", "Verbindung fehlgeschlagen.");
 						} finally {
-							pe.value = !1;
+							P.value = !1;
 						}
 					}
 				}
-				function Ve(e, t) {
-					d(e.message ?? t), console.error("[rechnungswerk] settings:", e);
+				function He(e, t) {
+					f(e.message ?? t), console.error("[rechnungswerk] settings:", e);
 				}
-				return (e, t) => (E(), q("div", yC, [
+				return (e, t) => (T(), q("div", yC, [
 					Y("h2", bC, H(B(j)("rechnungswerk", "Einstellungen")), 1),
 					Y("div", {
 						ref_key: "errorAnchor",
-						ref: u
-					}, [l.value ? (E(), U(B(Q), {
+						ref: d
+					}, [u.value ? (T(), U(B(Q), {
 						key: 0,
 						type: "error",
-						text: l.value
+						text: u.value
 					}, null, 8, ["text"])) : L("", !0)], 512),
-					r.value ? (E(), q("div", xC, [W(jb, {
-						groups: i.value,
-						modelValue: a.value,
+					r.value ? (T(), q("div", xC, [W(jb, {
+						groups: a.value,
+						modelValue: o.value,
 						ariaLabel: B(j)("rechnungswerk", "Einstellungs-Navigation"),
-						"onUpdate:modelValue": t[0] ||= (e) => a.value = e
+						"onUpdate:modelValue": t[0] ||= (e) => o.value = e
 					}, null, 8, [
 						"groups",
 						"modelValue",
 						"ariaLabel"
 					]), Y("div", SC, [
-						S(Y("section", CC, [
+						x(Y("section", CC, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Firma")), 1),
-							Y("label", wC, [Y("span", null, H(B(j)("rechnungswerk", "Firmenname")), 1), S(Y("input", {
+							Y("label", wC, [Y("span", null, H(B(j)("rechnungswerk", "Firmenname")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[1] ||= (e) => r.value.companyName = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[J, r.value.companyName]])]),
-							Y("label", TC, [Y("span", null, H(B(j)("rechnungswerk", "Adresse")), 1), S(Y("textarea", {
+							Y("label", TC, [Y("span", null, H(B(j)("rechnungswerk", "Adresse")), 1), x(Y("textarea", {
 								"onUpdate:modelValue": t[2] ||= (e) => r.value.companyAddress = e,
 								class: "rw-input",
 								rows: "3"
 							}, null, 512), [[J, r.value.companyAddress]])]),
-							Y("div", EC, [Y("label", DC, [Y("span", null, H(B(j)("rechnungswerk", "USt-IdNr.")), 1), S(Y("input", {
+							Y("div", EC, [Y("label", DC, [Y("span", null, H(B(j)("rechnungswerk", "USt-IdNr.")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[3] ||= (e) => r.value.vatId = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[J, r.value.vatId]])]), Y("label", OC, [Y("span", null, H(B(j)("rechnungswerk", "Steuernummer")), 1), S(Y("input", {
+							}, null, 512), [[J, r.value.vatId]])]), Y("label", OC, [Y("span", null, H(B(j)("rechnungswerk", "Steuernummer")), 1), x(Y("input", {
 								"onUpdate:modelValue": t[4] ||= (e) => r.value.taxNumber = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[J, r.value.taxNumber]])])]),
-							Y("div", kC, [
-								Y("label", AC, [Y("span", null, H(B(j)("rechnungswerk", "Ansprechpartner")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[5] ||= (e) => r.value.contactPerson = e,
+							Y("label", kC, [Y("span", null, H(B(j)("rechnungswerk", "Registernummer")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[5] ||= (e) => r.value.registerNumber = e,
+								class: "rw-input",
+								type: "text",
+								placeholder: B(j)("rechnungswerk", "z. B. HRB 12345, Amtsgericht Stuttgart")
+							}, null, 8, AC), [[J, r.value.registerNumber]])]),
+							i.value ? L("", !0) : (T(), U(B(Q), {
+								key: 0,
+								type: "warning",
+								heading: B(j)("rechnungswerk", "Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus."),
+								text: B(j)("rechnungswerk", "Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer.")
+							}, null, 8, ["heading", "text"])),
+							Y("div", jC, [
+								Y("label", MC, [Y("span", null, H(B(j)("rechnungswerk", "Ansprechpartner")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[6] ||= (e) => r.value.contactPerson = e,
 									class: "rw-input",
 									type: "text"
 								}, null, 512), [[J, r.value.contactPerson]])]),
-								Y("label", jC, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[6] ||= (e) => r.value.contactPhone = e,
+								Y("label", NC, [Y("span", null, H(B(j)("rechnungswerk", "Telefon")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[7] ||= (e) => r.value.contactPhone = e,
 									class: "rw-input",
 									type: "text"
 								}, null, 512), [[J, r.value.contactPhone]])]),
-								Y("label", MC, [Y("span", null, H(B(j)("rechnungswerk", "Kontakt-E-Mail")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[7] ||= (e) => r.value.contactEmail = e,
+								Y("label", PC, [Y("span", null, H(B(j)("rechnungswerk", "Kontakt-E-Mail")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[8] ||= (e) => r.value.contactEmail = e,
 									class: "rw-input",
 									type: "email"
 								}, null, 512), [[J, r.value.contactEmail]])])
 							]),
-							Y("p", NC, H(B(j)("rechnungswerk", "Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).")), 1)
-						], 512), [[x, a.value === "firma"]]),
-						S(Y("section", PC, [
+							Y("p", FC, H(B(j)("rechnungswerk", "Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).")), 1)
+						], 512), [[b, o.value === "firma"]]),
+						x(Y("section", IC, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Bankverbindung")), 1),
-							Y("div", FC, [Y("label", IC, [Y("span", null, H(B(j)("rechnungswerk", "IBAN")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[8] ||= (e) => r.value.iban = e,
+							Y("div", LC, [Y("label", RC, [Y("span", null, H(B(j)("rechnungswerk", "IBAN")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[9] ||= (e) => r.value.iban = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[J, r.value.iban]])]), Y("label", LC, [Y("span", null, H(B(j)("rechnungswerk", "BIC")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[9] ||= (e) => r.value.bic = e,
+							}, null, 512), [[J, r.value.iban]])]), Y("label", zC, [Y("span", null, H(B(j)("rechnungswerk", "BIC")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[10] ||= (e) => r.value.bic = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[J, r.value.bic]])])]),
-							Y("label", RC, [Y("span", null, H(B(j)("rechnungswerk", "Bankname")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[10] ||= (e) => r.value.bankName = e,
+							Y("label", BC, [Y("span", null, H(B(j)("rechnungswerk", "Bankname")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[11] ||= (e) => r.value.bankName = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[J, r.value.bankName]])]),
@@ -10512,91 +10536,91 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 								type: "switch",
 								modelValue: r.value.girocodeEnabled,
 								disabled: !r.value.iban && !r.value.girocodeEnabled,
-								"onUpdate:modelValue": t[11] ||= (e) => {
+								"onUpdate:modelValue": t[12] ||= (e) => {
 									r.value && (r.value.girocodeEnabled = e);
 								}
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "Girocode (Bezahl-QR-Code) auf Rechnungen anzeigen")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"]),
-							Y("p", zC, H(B(j)("rechnungswerk", "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.")), 1)
-						], 512), [[x, a.value === "bank"]]),
-						S(Y("section", BC, [
+							Y("p", VC, H(B(j)("rechnungswerk", "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.")), 1)
+						], 512), [[b, o.value === "bank"]]),
+						x(Y("section", HC, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Branding")), 1),
-							Y("div", VC, [Y("span", null, H(B(j)("rechnungswerk", "Akzentfarbe")), 1), Y("div", HC, [W(B(Eb), {
-								modelValue: T.value,
+							Y("div", UC, [Y("span", null, H(B(j)("rechnungswerk", "Akzentfarbe")), 1), Y("div", WC, [W(B(Eb), {
+								modelValue: E.value,
 								advancedFields: "",
-								"onUpdate:modelValue": ae
+								"onUpdate:modelValue": se
 							}, {
 								default: g(() => [Y("button", {
 									type: "button",
 									class: "rw-accent__trigger",
-									"aria-label": B(j)("rechnungswerk", "Akzentfarbe") + ": " + T.value.toUpperCase(),
+									"aria-label": B(j)("rechnungswerk", "Akzentfarbe") + ": " + E.value.toUpperCase(),
 									style: ze(D.value)
-								}, H(T.value.toUpperCase()), 13, UC)]),
+								}, H(E.value.toUpperCase()), 13, GC)]),
 								_: 1
-							}, 8, ["modelValue"]), r.value.accentColor ? (E(), U(B(I), {
+							}, 8, ["modelValue"]), r.value.accentColor ? (T(), U(B(I), {
 								key: 0,
 								variant: "tertiary",
-								onClick: t[12] ||= (e) => r.value.accentColor = null
+								onClick: t[13] ||= (e) => r.value.accentColor = null
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "Zurücksetzen")), 1)]),
 								_: 1
 							})) : L("", !0)])]),
-							Y("div", WC, [
-								Y("table", GC, [Y("thead", null, [Y("tr", { style: ze(D.value) }, [...t[42] ||= [
+							Y("div", KC, [
+								Y("table", qC, [Y("thead", null, [Y("tr", { style: ze(D.value) }, [...t[43] ||= [
 									Y("th", null, "Beschreibung", -1),
 									Y("th", { class: "num" }, "Menge", -1),
 									Y("th", { class: "num" }, "Einzelpreis", -1),
 									Y("th", { class: "num" }, "Betrag", -1)
-								]], 4)]), t[43] ||= Y("tbody", null, [Y("tr", null, [
+								]], 4)]), t[44] ||= Y("tbody", null, [Y("tr", null, [
 									Y("td", null, "Beratungsleistung"),
 									Y("td", { class: "num" }, "2"),
 									Y("td", { class: "num" }, "95,00 €"),
 									Y("td", { class: "num" }, "190,00 €")
 								])], -1)]),
-								Y("p", KC, H(B(j)("rechnungswerk", "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.")), 1),
-								O.value ? (E(), q("p", qC, H(B(j)("rechnungswerk", "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.")), 1)) : L("", !0)
+								Y("p", JC, H(B(j)("rechnungswerk", "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.")), 1),
+								oe.value ? (T(), q("p", YC, H(B(j)("rechnungswerk", "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.")), 1)) : L("", !0)
 							]),
-							Y("div", JC, [
+							Y("div", XC, [
 								Y("span", null, H(B(j)("rechnungswerk", "Firmenlogo")), 1),
-								Y("div", YC, [r.value.logoFileId ? (E(), q("img", {
+								Y("div", ZC, [r.value.logoFileId ? (T(), q("img", {
 									key: 0,
-									src: he.value,
+									src: ge.value,
 									alt: B(j)("rechnungswerk", "Firmenlogo"),
 									class: "rw-logo__preview"
-								}, null, 8, XC)) : (E(), q("span", ZC, H(B(j)("rechnungswerk", "Kein Logo gewählt")), 1)), Y("div", QC, [W(B(I), {
-									disabled: me.value,
-									onClick: Le
+								}, null, 8, QC)) : (T(), q("span", $C, H(B(j)("rechnungswerk", "Kein Logo gewählt")), 1)), Y("div", ew, [W(B(I), {
+									disabled: he.value,
+									onClick: Re
 								}, {
 									default: g(() => [R(H(r.value.logoFileId ? B(j)("rechnungswerk", "Logo ändern") : B(j)("rechnungswerk", "Logo wählen")), 1)]),
 									_: 1
-								}, 8, ["disabled"]), r.value.logoFileId ? (E(), U(B(I), {
+								}, 8, ["disabled"]), r.value.logoFileId ? (T(), U(B(I), {
 									key: 0,
 									variant: "tertiary",
-									disabled: me.value,
-									onClick: Re
+									disabled: he.value,
+									onClick: Be
 								}, {
 									default: g(() => [R(H(B(j)("rechnungswerk", "Entfernen")), 1)]),
 									_: 1
 								}, 8, ["disabled"])) : L("", !0)])]),
-								Y("p", $C, H(B(j)("rechnungswerk", "Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.")), 1)
+								Y("p", tw, H(B(j)("rechnungswerk", "Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.")), 1)
 							])
-						], 512), [[x, a.value === "branding"]]),
-						S(Y("section", ew, [
+						], 512), [[b, o.value === "branding"]]),
+						x(Y("section", nw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Rechnungsnummer")), 1),
-							Y("label", tw, [Y("span", null, H(B(j)("rechnungswerk", "Format")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[13] ||= (e) => r.value.numberFormat = e,
+							Y("label", rw, [Y("span", null, H(B(j)("rechnungswerk", "Format")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[14] ||= (e) => r.value.numberFormat = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[J, r.value.numberFormat]])]),
-							Y("p", nw, [
+							Y("p", iw, [
 								R(H(B(j)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
-								t[44] ||= Y("br", null, null, -1),
-								R(" " + H(B(j)("rechnungswerk", "Vorschau: {preview}", { preview: ye.value })), 1)
+								t[45] ||= Y("br", null, null, -1),
+								R(" " + H(B(j)("rechnungswerk", "Vorschau: {preview}", { preview: be.value })), 1)
 							]),
-							Y("label", rw, [Y("span", null, H(B(j)("rechnungswerk", "Nächste Rechnungsnummer")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[14] ||= (e) => w.value = e,
+							Y("label", aw, [Y("span", null, H(B(j)("rechnungswerk", "Nächste Rechnungsnummer")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[15] ||= (e) => w.value = e,
 								class: "rw-input",
 								type: "number",
 								min: "1",
@@ -10607,15 +10631,15 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 								void 0,
 								{ number: !0 }
 							]])]),
-							Y("p", iw, H(B(j)("rechnungswerk", "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.")), 1),
-							Y("div", aw, [
+							Y("p", ow, H(B(j)("rechnungswerk", "Die laufende Nummer der nächsten Rechnung. Zum Einstieg in eine bestehende Nummernfolge hier den gewünschten Wert setzen. Nummern lassen sich nur vorwärts setzen, nie unter eine bereits vergebene.")), 1),
+							Y("div", sw, [
 								Y("span", null, H(B(j)("rechnungswerk", "Nummernkreis")), 1),
 								W(B(At), {
 									type: "radio",
 									name: "rw-reset-mode",
 									value: "yearly",
 									modelValue: r.value.numberResetMode,
-									"onUpdate:modelValue": Ae
+									"onUpdate:modelValue": Me
 								}, {
 									default: g(() => [R(H(B(j)("rechnungswerk", "Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)")), 1)]),
 									_: 1
@@ -10625,35 +10649,35 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 									name: "rw-reset-mode",
 									value: "continuous",
 									modelValue: r.value.numberResetMode,
-									"onUpdate:modelValue": Ae
+									"onUpdate:modelValue": Me
 								}, {
 									default: g(() => [R(H(B(j)("rechnungswerk", "Fortlaufend (Zähler läuft über Jahre durch)")), 1)]),
 									_: 1
 								}, 8, ["modelValue"])
 							]),
-							Y("p", ow, H(B(j)("rechnungswerk", "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.")), 1)
-						], 512), [[x, a.value === "rechnungsnummer"]]),
-						S(Y("section", sw, [
+							Y("p", cw, H(B(j)("rechnungswerk", "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.")), 1)
+						], 512), [[b, o.value === "rechnungsnummer"]]),
+						x(Y("section", lw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Angebotsnummer")), 1),
-							Y("label", cw, [Y("span", null, H(B(j)("rechnungswerk", "Format")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[15] ||= (e) => r.value.quoteNumberFormat = e,
+							Y("label", uw, [Y("span", null, H(B(j)("rechnungswerk", "Format")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[16] ||= (e) => r.value.quoteNumberFormat = e,
 								class: "rw-input",
 								type: "text",
 								placeholder: "AN-{YYYY}-{####}"
 							}, null, 512), [[J, r.value.quoteNumberFormat]])]),
-							Y("p", lw, [
+							Y("p", dw, [
 								R(H(B(j)("rechnungswerk", "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
-								t[45] ||= Y("br", null, null, -1),
-								R(" " + H(B(j)("rechnungswerk", "Vorschau: {preview}", { preview: be.value })), 1)
+								t[46] ||= Y("br", null, null, -1),
+								R(" " + H(B(j)("rechnungswerk", "Vorschau: {preview}", { preview: xe.value })), 1)
 							]),
-							Y("div", uw, [
+							Y("div", fw, [
 								Y("span", null, H(B(j)("rechnungswerk", "Nummernkreis")), 1),
 								W(B(At), {
 									type: "radio",
 									name: "rw-quote-reset-mode",
 									value: "yearly",
 									modelValue: r.value.quoteNumberResetMode,
-									"onUpdate:modelValue": Ne
+									"onUpdate:modelValue": Pe
 								}, {
 									default: g(() => [R(H(B(j)("rechnungswerk", "Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)")), 1)]),
 									_: 1
@@ -10663,64 +10687,64 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 									name: "rw-quote-reset-mode",
 									value: "continuous",
 									modelValue: r.value.quoteNumberResetMode,
-									"onUpdate:modelValue": Ne
+									"onUpdate:modelValue": Pe
 								}, {
 									default: g(() => [R(H(B(j)("rechnungswerk", "Fortlaufend (Zähler läuft über Jahre durch)")), 1)]),
 									_: 1
 								}, 8, ["modelValue"])
 							]),
-							Y("p", dw, H(B(j)("rechnungswerk", "Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.")), 1)
-						], 512), [[x, a.value === "angebotsnummer"]]),
-						S(Y("section", fw, [
+							Y("p", pw, H(B(j)("rechnungswerk", "Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.")), 1)
+						], 512), [[b, o.value === "angebotsnummer"]]),
+						x(Y("section", mw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "PDF-Dateiname")), 1),
-							Y("label", pw, [Y("span", null, H(B(j)("rechnungswerk", "Schema")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[16] ||= (e) => r.value.fileNameFormat = e,
+							Y("label", hw, [Y("span", null, H(B(j)("rechnungswerk", "Schema")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[17] ||= (e) => r.value.fileNameFormat = e,
 								class: "rw-input",
 								type: "text"
 							}, null, 512), [[J, r.value.fileNameFormat]])]),
-							Y("p", mw, [
+							Y("p", gw, [
 								R(H(B(j)("rechnungswerk", "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.")) + " ", 1),
-								t[46] ||= Y("br", null, null, -1),
-								R(" " + H(B(j)("rechnungswerk", "Vorschau: {preview}", { preview: xe.value })), 1)
+								t[47] ||= Y("br", null, null, -1),
+								R(" " + H(B(j)("rechnungswerk", "Vorschau: {preview}", { preview: Se.value })), 1)
 							])
-						], 512), [[x, a.value === "dateiname"]]),
-						S(Y("section", hw, [
+						], 512), [[b, o.value === "dateiname"]]),
+						x(Y("section", _w, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Steuer")), 1),
 							W(B(At), {
 								type: "switch",
 								modelValue: r.value.smallBusiness,
-								"onUpdate:modelValue": we
+								"onUpdate:modelValue": Te
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "Kleinunternehmer nach §19 UStG (kein USt-Ausweis)")), 1)]),
 								_: 1
 							}, 8, ["modelValue"]),
-							r.value.smallBusiness ? (E(), q("label", gw, [
+							r.value.smallBusiness ? (T(), q("label", vw, [
 								Y("span", null, H(B(j)("rechnungswerk", "Hinweistext auf der Rechnung (§ 19 UStG)")), 1),
-								S(Y("textarea", {
-									"onUpdate:modelValue": t[17] ||= (e) => r.value.smallBusinessNote = e,
+								x(Y("textarea", {
+									"onUpdate:modelValue": t[18] ||= (e) => r.value.smallBusinessNote = e,
 									class: "rw-input",
 									rows: "2",
 									placeholder: B(ou)
-								}, null, 8, _w), [[J, r.value.smallBusinessNote]]),
-								Y("span", vw, H(B(j)("rechnungswerk", "Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.")), 1)
+								}, null, 8, yw), [[J, r.value.smallBusinessNote]]),
+								Y("span", bw, H(B(j)("rechnungswerk", "Erscheint bei aktiviertem Kleinunternehmer-Status auf der Rechnung. Leer lassen für den Standardtext.")), 1)
 							])) : L("", !0),
-							r.value.smallBusiness ? L("", !0) : (E(), q("label", yw, [Y("span", null, H(B(j)("rechnungswerk", "Standard-USt-Satz")), 1), S(Y("select", {
-								"onUpdate:modelValue": t[18] ||= (e) => r.value.defaultTaxRateBp = e,
+							r.value.smallBusiness ? L("", !0) : (T(), q("label", xw, [Y("span", null, H(B(j)("rechnungswerk", "Standard-USt-Satz")), 1), x(Y("select", {
+								"onUpdate:modelValue": t[19] ||= (e) => r.value.defaultTaxRateBp = e,
 								class: "rw-input"
-							}, [(E(!0), q(k, null, C(B(au), (e) => (E(), q("option", {
+							}, [(T(!0), q(O, null, S(B(au), (e) => (T(), q("option", {
 								key: e,
 								value: e
-							}, H(B(Su)(e)), 9, bw))), 128))], 512), [[
-								re,
+							}, H(B(Su)(e)), 9, Sw))), 128))], 512), [[
+								ie,
 								r.value.defaultTaxRateBp,
 								void 0,
 								{ number: !0 }
 							]])]))
-						], 512), [[x, a.value === "steuer"]]),
-						S(Y("section", xw, [
+						], 512), [[b, o.value === "steuer"]]),
+						x(Y("section", Cw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Zahlung")), 1),
-							Y("label", Sw, [Y("span", null, H(B(j)("rechnungswerk", "Standard-Zahlungsziel (Tage)")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[19] ||= (e) => r.value.defaultPaymentTermDays = e,
+							Y("label", ww, [Y("span", null, H(B(j)("rechnungswerk", "Standard-Zahlungsziel (Tage)")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[20] ||= (e) => r.value.defaultPaymentTermDays = e,
 								class: "rw-input",
 								type: "number",
 								min: "0",
@@ -10732,12 +10756,12 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 								void 0,
 								{ number: !0 }
 							]])]),
-							Y("p", Cw, H(B(j)("rechnungswerk", "Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.")), 1)
-						], 512), [[x, a.value === "zahlung"]]),
-						S(Y("section", ww, [
+							Y("p", Tw, H(B(j)("rechnungswerk", "Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.")), 1)
+						], 512), [[b, o.value === "zahlung"]]),
+						x(Y("section", Ew, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Versand")), 1),
-							Y("label", Tw, [Y("span", null, H(B(j)("rechnungswerk", "DATEV-Upload-Mail")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[20] ||= (e) => r.value.datevUploadMail = e,
+							Y("label", Dw, [Y("span", null, H(B(j)("rechnungswerk", "DATEV-Upload-Mail")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[21] ||= (e) => r.value.datevUploadMail = e,
 								class: "rw-input",
 								type: "email"
 							}, null, 512), [[J, r.value.datevUploadMail]])]),
@@ -10745,38 +10769,38 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 								type: "switch",
 								modelValue: r.value.datevAutoSend,
 								disabled: !r.value.datevUploadMail,
-								"onUpdate:modelValue": Ee
+								"onUpdate:modelValue": De
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "E-Rechnung beim Festschreiben automatisch an DATEV senden")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"]),
-							Y("p", Ew, H(B(j)("rechnungswerk", "Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.")), 1),
-							Y("div", Dw, [Y("label", Ow, [Y("span", null, H(B(j)("rechnungswerk", "Absender-Name")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[21] ||= (e) => r.value.smtpFromName = e,
+							Y("p", Ow, H(B(j)("rechnungswerk", "Sendet bei jedem Festschreiben automatisch eine E-Mail mit der ZUGFeRD-PDF an die DATEV-Upload-Mail.")), 1),
+							Y("div", kw, [Y("label", Aw, [Y("span", null, H(B(j)("rechnungswerk", "Absender-Name")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[22] ||= (e) => r.value.smtpFromName = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[J, r.value.smtpFromName]])]), Y("label", kw, [Y("span", null, H(B(j)("rechnungswerk", "Absender-E-Mail")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[22] ||= (e) => r.value.smtpFromEmail = e,
+							}, null, 512), [[J, r.value.smtpFromName]])]), Y("label", jw, [Y("span", null, H(B(j)("rechnungswerk", "Absender-E-Mail")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[23] ||= (e) => r.value.smtpFromEmail = e,
 								class: "rw-input",
 								type: "email"
 							}, null, 512), [[J, r.value.smtpFromEmail]])])])
-						], 512), [[x, a.value === "versand"]]),
-						S(Y("section", Aw, [
+						], 512), [[b, o.value === "versand"]]),
+						x(Y("section", Mw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Ablage in Nextcloud")), 1),
-							Y("div", jw, [Y("span", null, H(B(j)("rechnungswerk", "Zielordner")), 1), Y("div", Mw, [
-								s.value ? (E(), q("span", Nw, H(s.value), 1)) : (E(), q("span", Pw, H(B(j)("rechnungswerk", "Kein Ordner gewählt")), 1)),
+							Y("div", Nw, [Y("span", null, H(B(j)("rechnungswerk", "Zielordner")), 1), Y("div", Pw, [
+								c.value ? (T(), q("span", Fw, H(c.value), 1)) : (T(), q("span", Iw, H(B(j)("rechnungswerk", "Kein Ordner gewählt")), 1)),
 								W(B(I), {
-									disabled: c.value,
-									onClick: Fe
+									disabled: l.value,
+									onClick: Ie
 								}, {
-									default: g(() => [R(H(s.value ? B(j)("rechnungswerk", "Ordner ändern") : B(j)("rechnungswerk", "Ordner wählen")), 1)]),
+									default: g(() => [R(H(c.value ? B(j)("rechnungswerk", "Ordner ändern") : B(j)("rechnungswerk", "Ordner wählen")), 1)]),
 									_: 1
 								}, 8, ["disabled"]),
-								s.value ? (E(), U(B(I), {
+								c.value ? (T(), U(B(I), {
 									key: 2,
 									variant: "tertiary",
-									disabled: c.value,
-									onClick: Ie
+									disabled: l.value,
+									onClick: Le
 								}, {
 									default: g(() => [R(H(B(j)("rechnungswerk", "Entfernen")), 1)]),
 									_: 1
@@ -10786,35 +10810,35 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 								type: "switch",
 								modelValue: r.value.archiveEnabled,
 								disabled: !r.value.archiveFolderId,
-								"onUpdate:modelValue": Oe
+								"onUpdate:modelValue": ke
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"]),
-							Y("label", Fw, [Y("span", null, H(B(j)("rechnungswerk", "Unterordner (optional)")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[23] ||= (e) => r.value.archiveSubfolder = e,
+							Y("label", Lw, [Y("span", null, H(B(j)("rechnungswerk", "Unterordner (optional)")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[24] ||= (e) => r.value.archiveSubfolder = e,
 								class: "rw-input",
 								type: "text",
 								placeholder: B(j)("rechnungswerk", "z. B. {YYYY}")
-							}, null, 8, Iw), [[J, r.value.archiveSubfolder]])]),
-							Y("p", Lw, [
+							}, null, 8, Rw), [[J, r.value.archiveSubfolder]])]),
+							Y("p", zw, [
 								R(H(B(j)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {MM} Monat, {DD} Tag (Rechnungsdatum). Unterordner werden bei Bedarf angelegt. Vorhandene Dateien werden nie überschrieben.")) + " ", 1),
-								t[47] ||= Y("br", null, null, -1),
+								t[48] ||= Y("br", null, null, -1),
 								R(" " + H(B(j)("rechnungswerk", "Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.")), 1)
 							])
-						], 512), [[x, a.value === "ablage"]]),
-						S(Y("section", Rw, [
+						], 512), [[b, o.value === "ablage"]]),
+						x(Y("section", Bw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Eigenes SMTP-Konto (optional)")), 1),
-							Y("p", zw, H(B(j)("rechnungswerk", "Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).")), 1),
-							Y("div", Bw, [
-								Y("label", Vw, [Y("span", null, H(B(j)("rechnungswerk", "Server (Host)")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[24] ||= (e) => r.value.smtpHost = e,
+							Y("p", Vw, H(B(j)("rechnungswerk", "Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).")), 1),
+							Y("div", Hw, [
+								Y("label", Uw, [Y("span", null, H(B(j)("rechnungswerk", "Server (Host)")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[25] ||= (e) => r.value.smtpHost = e,
 									class: "rw-input",
 									type: "text",
 									placeholder: "smtp.example.com"
 								}, null, 512), [[J, r.value.smtpHost]])]),
-								Y("label", Hw, [Y("span", null, H(B(j)("rechnungswerk", "Port")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[25] ||= (e) => r.value.smtpPort = e,
+								Y("label", Ww, [Y("span", null, H(B(j)("rechnungswerk", "Port")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[26] ||= (e) => r.value.smtpPort = e,
 									class: "rw-input",
 									type: "number",
 									placeholder: "587"
@@ -10824,48 +10848,48 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 									void 0,
 									{ number: !0 }
 								]])]),
-								Y("label", Uw, [Y("span", null, H(B(j)("rechnungswerk", "Verschlüsselung")), 1), S(Y("select", {
-									"onUpdate:modelValue": t[26] ||= (e) => r.value.smtpSecurity = e,
+								Y("label", Gw, [Y("span", null, H(B(j)("rechnungswerk", "Verschlüsselung")), 1), x(Y("select", {
+									"onUpdate:modelValue": t[27] ||= (e) => r.value.smtpSecurity = e,
 									class: "rw-input"
 								}, [
-									t[48] ||= Y("option", { value: "starttls" }, "STARTTLS", -1),
-									t[49] ||= Y("option", { value: "ssl" }, "SSL/TLS", -1),
-									Y("option", Ww, H(B(j)("rechnungswerk", "Keine")), 1)
-								], 512), [[re, r.value.smtpSecurity]])])
+									t[49] ||= Y("option", { value: "starttls" }, "STARTTLS", -1),
+									t[50] ||= Y("option", { value: "ssl" }, "SSL/TLS", -1),
+									Y("option", Kw, H(B(j)("rechnungswerk", "Keine")), 1)
+								], 512), [[ie, r.value.smtpSecurity]])])
 							]),
-							Y("div", Gw, [Y("label", Kw, [Y("span", null, H(B(j)("rechnungswerk", "Benutzer")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[27] ||= (e) => r.value.smtpUser = e,
+							Y("div", qw, [Y("label", Jw, [Y("span", null, H(B(j)("rechnungswerk", "Benutzer")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[28] ||= (e) => r.value.smtpUser = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[J, r.value.smtpUser]])]), Y("label", qw, [Y("span", null, H(B(j)("rechnungswerk", "Passwort")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[28] ||= (e) => N.value = e,
+							}, null, 512), [[J, r.value.smtpUser]])]), Y("label", Yw, [Y("span", null, H(B(j)("rechnungswerk", "Passwort")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[29] ||= (e) => fe.value = e,
 								class: "rw-input",
 								type: "password",
 								placeholder: r.value.smtpPasswordSet ? B(j)("rechnungswerk", "•••••••• (gespeichert, leer lassen)") : ""
-							}, null, 8, Jw), [[J, N.value]])])]),
-							Y("div", Yw, [W(B(I), {
-								disabled: !r.value.smtpHost || pe.value,
-								onClick: K
+							}, null, 8, Xw), [[J, fe.value]])])]),
+							Y("div", Zw, [W(B(I), {
+								disabled: !r.value.smtpHost || P.value,
+								onClick: Ve
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "Verbindung testen")), 1)]),
 								_: 1
-							}, 8, ["disabled"]), P.value ? (E(), q("span", {
+							}, 8, ["disabled"]), F.value ? (T(), q("span", {
 								key: 0,
-								class: V(["smtp-test__result", F.value ? "rw-ok" : "rw-err"])
-							}, H(P.value), 3)) : L("", !0)])
-						], 512), [[x, a.value === "smtp"]]),
-						S(Y("section", Xw, [
+								class: V(["smtp-test__result", me.value ? "rw-ok" : "rw-err"])
+							}, H(F.value), 3)) : L("", !0)])
+						], 512), [[b, o.value === "smtp"]]),
+						x(Y("section", Qw, [
 							Y("h3", null, H(B(j)("rechnungswerk", "DATEV-Rückmeldung (IMAP, optional)")), 1),
-							Y("p", Zw, H(B(j)("rechnungswerk", "DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.")), 1),
-							Y("div", Qw, [
-								Y("label", $w, [Y("span", null, H(B(j)("rechnungswerk", "Server (Host)")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[29] ||= (e) => r.value.imapHost = e,
+							Y("p", $w, H(B(j)("rechnungswerk", "DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.")), 1),
+							Y("div", eT, [
+								Y("label", tT, [Y("span", null, H(B(j)("rechnungswerk", "Server (Host)")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[30] ||= (e) => r.value.imapHost = e,
 									class: "rw-input",
 									type: "text",
 									placeholder: "imap.example.com"
 								}, null, 512), [[J, r.value.imapHost]])]),
-								Y("label", eT, [Y("span", null, H(B(j)("rechnungswerk", "Port")), 1), S(Y("input", {
-									"onUpdate:modelValue": t[30] ||= (e) => r.value.imapPort = e,
+								Y("label", nT, [Y("span", null, H(B(j)("rechnungswerk", "Port")), 1), x(Y("input", {
+									"onUpdate:modelValue": t[31] ||= (e) => r.value.imapPort = e,
 									class: "rw-input",
 									type: "number",
 									placeholder: "993"
@@ -10875,61 +10899,61 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 									void 0,
 									{ number: !0 }
 								]])]),
-								Y("label", tT, [Y("span", null, H(B(j)("rechnungswerk", "Verschlüsselung")), 1), S(Y("select", {
-									"onUpdate:modelValue": t[31] ||= (e) => r.value.imapSecurity = e,
+								Y("label", rT, [Y("span", null, H(B(j)("rechnungswerk", "Verschlüsselung")), 1), x(Y("select", {
+									"onUpdate:modelValue": t[32] ||= (e) => r.value.imapSecurity = e,
 									class: "rw-input"
-								}, [...t[50] ||= [
+								}, [...t[51] ||= [
 									Y("option", { value: "ssl" }, "SSL/TLS", -1),
 									Y("option", { value: "starttls" }, "STARTTLS", -1),
 									Y("option", { value: "tls" }, "TLS", -1)
-								]], 512), [[re, r.value.imapSecurity]])])
+								]], 512), [[ie, r.value.imapSecurity]])])
 							]),
-							Y("div", nT, [Y("label", rT, [Y("span", null, H(B(j)("rechnungswerk", "Benutzer")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[32] ||= (e) => r.value.imapUser = e,
+							Y("div", iT, [Y("label", aT, [Y("span", null, H(B(j)("rechnungswerk", "Benutzer")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[33] ||= (e) => r.value.imapUser = e,
 								class: "rw-input",
 								type: "text"
-							}, null, 512), [[J, r.value.imapUser]])]), Y("label", iT, [Y("span", null, H(B(j)("rechnungswerk", "Passwort")), 1), S(Y("input", {
-								"onUpdate:modelValue": t[33] ||= (e) => fe.value = e,
+							}, null, 512), [[J, r.value.imapUser]])]), Y("label", oT, [Y("span", null, H(B(j)("rechnungswerk", "Passwort")), 1), x(Y("input", {
+								"onUpdate:modelValue": t[34] ||= (e) => pe.value = e,
 								class: "rw-input",
 								type: "password",
 								placeholder: r.value.imapPasswordSet ? B(j)("rechnungswerk", "•••••••• (gespeichert, leer lassen)") : ""
-							}, null, 8, aT), [[J, fe.value]])])]),
+							}, null, 8, sT), [[J, pe.value]])])]),
 							W(B(At), {
 								modelValue: r.value.imapCleanup,
 								disabled: !r.value.imapHost,
-								"onUpdate:modelValue": t[34] ||= (e) => r.value.imapCleanup = e
+								"onUpdate:modelValue": t[35] ||= (e) => r.value.imapCleanup = e
 							}, {
 								default: g(() => [R(H(B(j)("rechnungswerk", "Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)")), 1)]),
 								_: 1
 							}, 8, ["modelValue", "disabled"])
-						], 512), [[x, a.value === "datev"]]),
-						S(Y("section", oT, [
+						], 512), [[b, o.value === "datev"]]),
+						x(Y("section", cT, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Standardtexte")), 1),
-							Y("p", sT, H(B(j)("rechnungswerk", "Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.")), 1),
-							W(B(I), { onClick: o }, {
+							Y("p", lT, H(B(j)("rechnungswerk", "Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.")), 1),
+							W(B(I), { onClick: s }, {
 								icon: g(() => [W(so, { size: 20 })]),
 								default: g(() => [R(" " + H(B(j)("rechnungswerk", "Textbausteine verwalten")), 1)]),
 								_: 1
 							})
-						], 512), [[x, a.value === "texte"]]),
-						S(Y("section", cT, [
+						], 512), [[b, o.value === "texte"]]),
+						x(Y("section", uT, [
 							Y("h3", null, H(B(j)("rechnungswerk", "Zugriff & Administration")), 1),
-							Y("p", lT, H(B(j)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
-							Y("div", uT, [
-								Y("span", dT, H(B(j)("rechnungswerk", "App-Administratoren")), 1),
-								Y("p", fT, H(B(j)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
+							Y("p", dT, H(B(j)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
+							Y("div", fT, [
+								Y("span", pT, H(B(j)("rechnungswerk", "App-Administratoren")), 1),
+								Y("p", mT, H(B(j)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
 								W(B(Ct), {
-									modelValue: oe.value,
-									"onUpdate:modelValue": t[35] ||= (e) => oe.value = e,
-									options: A.value,
-									loading: M.value,
+									modelValue: ce.value,
+									"onUpdate:modelValue": t[36] ||= (e) => ce.value = e,
+									options: M.value,
+									loading: le.value,
 									multiple: !0,
 									keepOpen: "",
 									label: "displayName",
 									placeholder: B(j)("rechnungswerk", "Name eingeben, um Nutzer oder Gruppe zu suchen\xA0…"),
-									onSearch: Ce
+									onSearch: z
 								}, {
-									"no-options": g(() => [R(H(ge.value), 1)]),
+									"no-options": g(() => [R(H(_e.value), 1)]),
 									_: 1
 								}, 8, [
 									"modelValue",
@@ -10938,21 +10962,21 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 									"placeholder"
 								])
 							]),
-							Y("div", pT, [
-								Y("span", mT, H(B(j)("rechnungswerk", "Berechtigte Nutzer")), 1),
-								Y("p", hT, H(B(j)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
+							Y("div", hT, [
+								Y("span", gT, H(B(j)("rechnungswerk", "Berechtigte Nutzer")), 1),
+								Y("p", _T, H(B(j)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
 								W(B(Ct), {
-									modelValue: se.value,
-									"onUpdate:modelValue": t[36] ||= (e) => se.value = e,
-									options: A.value,
-									loading: M.value,
+									modelValue: k.value,
+									"onUpdate:modelValue": t[37] ||= (e) => k.value = e,
+									options: M.value,
+									loading: le.value,
 									multiple: !0,
 									keepOpen: "",
 									label: "displayName",
 									placeholder: B(j)("rechnungswerk", "Name eingeben, um Nutzer oder Gruppe zu suchen\xA0…"),
-									onSearch: Ce
+									onSearch: z
 								}, {
-									"no-options": g(() => [R(H(ge.value), 1)]),
+									"no-options": g(() => [R(H(_e.value), 1)]),
 									_: 1
 								}, 8, [
 									"modelValue",
@@ -10961,39 +10985,26 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 									"placeholder"
 								])
 							])
-						], 512), [[x, a.value === "zugriff"]]),
-						S(Y("section", gT, [Y("h3", null, H(B(j)("rechnungswerk", "WerkPlus")), 1), W(dC)], 512), [[x, a.value === "werkplus"]]),
-						S(Y("section", _T, [Y("h3", null, H(B(j)("rechnungswerk", "API-Schlüssel")), 1), W(VS)], 512), [[x, a.value === "apikeys"]]),
-						S(Y("div", vT, [W(B(I), {
+						], 512), [[b, o.value === "zugriff"]]),
+						x(Y("section", vT, [Y("h3", null, H(B(j)("rechnungswerk", "WerkPlus")), 1), W(dC)], 512), [[b, o.value === "werkplus"]]),
+						x(Y("section", yT, [Y("h3", null, H(B(j)("rechnungswerk", "API-Schlüssel")), 1), W(VS)], 512), [[b, o.value === "apikeys"]]),
+						x(Y("div", bT, [W(B(I), {
 							variant: "primary",
-							disabled: B(n).saving || le.value,
-							onClick: Be
+							disabled: B(n).saving || ue.value,
+							onClick: K
 						}, {
 							icon: g(() => [W(Tv, { size: 20 })]),
 							default: g(() => [R(" " + H(B(j)("rechnungswerk", "Speichern")), 1)]),
 							_: 1
-						}, 8, ["disabled"])], 512), [[x, a.value !== "werkplus"]])
+						}, 8, ["disabled"])], 512), [[b, o.value !== "werkplus"]])
 					])])) : L("", !0),
 					W(ip, {
-						open: f.value,
+						open: p.value,
 						name: B(j)("rechnungswerk", "Kleinunternehmer §19 aktivieren"),
 						message: B(j)("rechnungswerk", "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?"),
 						confirmLabel: B(j)("rechnungswerk", "Aktivieren"),
-						onClose: t[37] ||= (e) => f.value = !1,
-						onConfirm: Te
-					}, null, 8, [
-						"open",
-						"name",
-						"message",
-						"confirmLabel"
-					]),
-					W(ip, {
-						open: p.value,
-						name: B(j)("rechnungswerk", "Automatischen DATEV-Versand aktivieren"),
-						message: B(j)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?"),
-						confirmLabel: B(j)("rechnungswerk", "Aktivieren"),
 						onClose: t[38] ||= (e) => p.value = !1,
-						onConfirm: De
+						onConfirm: Ee
 					}, null, 8, [
 						"open",
 						"name",
@@ -11002,11 +11013,11 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 					]),
 					W(ip, {
 						open: m.value,
-						name: B(j)("rechnungswerk", "Automatische Ablage aktivieren"),
-						message: B(j)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?"),
+						name: B(j)("rechnungswerk", "Automatischen DATEV-Versand aktivieren"),
+						message: B(j)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?"),
 						confirmLabel: B(j)("rechnungswerk", "Aktivieren"),
 						onClose: t[39] ||= (e) => m.value = !1,
-						onConfirm: ke
+						onConfirm: Oe
 					}, null, 8, [
 						"open",
 						"name",
@@ -11015,11 +11026,11 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 					]),
 					W(ip, {
 						open: h.value,
-						name: B(j)("rechnungswerk", "Nummernkreis auf „Fortlaufend“ stellen"),
-						message: B(j)("rechnungswerk", "Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?"),
-						confirmLabel: B(j)("rechnungswerk", "Fortlaufend aktivieren"),
+						name: B(j)("rechnungswerk", "Automatische Ablage aktivieren"),
+						message: B(j)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?"),
+						confirmLabel: B(j)("rechnungswerk", "Aktivieren"),
 						onClose: t[40] ||= (e) => h.value = !1,
-						onConfirm: Me
+						onConfirm: Ae
 					}, null, 8, [
 						"open",
 						"name",
@@ -11028,11 +11039,24 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 					]),
 					W(ip, {
 						open: ee.value,
+						name: B(j)("rechnungswerk", "Nummernkreis auf „Fortlaufend“ stellen"),
+						message: B(j)("rechnungswerk", "Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?"),
+						confirmLabel: B(j)("rechnungswerk", "Fortlaufend aktivieren"),
+						onClose: t[41] ||= (e) => ee.value = !1,
+						onConfirm: Ne
+					}, null, 8, [
+						"open",
+						"name",
+						"message",
+						"confirmLabel"
+					]),
+					W(ip, {
+						open: te.value,
 						name: B(j)("rechnungswerk", "Angebots-Nummernkreis auf „Fortlaufend“ stellen"),
 						message: B(j)("rechnungswerk", "Der Angebots-Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Fortfahren?"),
 						confirmLabel: B(j)("rechnungswerk", "Fortlaufend aktivieren"),
-						onClose: t[41] ||= (e) => ee.value = !1,
-						onConfirm: Pe
+						onClose: t[42] ||= (e) => te.value = !1,
+						onConfirm: Fe
 					}, null, 8, [
 						"open",
 						"name",
@@ -11041,17 +11065,17 @@ var yC = { class: "rw-view rw-view--narrow" }, bC = { class: "rw-settings-title"
 					])
 				]));
 			}
-		}), [["__scopeId", "data-v-2dfca1a7"]])
+		}), [["__scopeId", "data-v-c4294ef4"]])
 	}
-], bT = Xr({
+], ST = Xr({
 	history: vr(),
-	routes: yT
+	routes: xT
 });
 //#endregion
 //#region src/main.js
 document.addEventListener("DOMContentLoaded", () => {
 	let e = de(Ks);
-	e.use(Jt()), e.use(bT), e.use(lt, { themes: { tooltip: { delay: {
+	e.use(Jt()), e.use(ST), e.use(lt, { themes: { tooltip: { delay: {
 		show: 100,
 		hide: 0
 	} } } }), e.mount(".app-rechnungswerk");

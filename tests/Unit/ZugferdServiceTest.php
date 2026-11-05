@@ -282,6 +282,30 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringNotContainsString('ShipToTradeParty', $xml);
 	}
 
+	public function testRegisterNumberIsTheSellerLegalOrganisation(): void {
+		$settings = $this->settings();
+		$settings->setRegisterNumber('HRB 12345, Amtsgericht Stuttgart');
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+
+		$xml = $this->service->buildXml($invoice, [$this->item(1000000, 1900, 20000)], $settings);
+
+		$this->assertMatchesRegularExpression('#<ram:SellerTradeParty>.*<ram:SpecifiedLegalOrganization>\s*<ram:ID>HRB 12345, Amtsgericht Stuttgart</ram:ID>.*</ram:SellerTradeParty>#s', $xml);
+	}
+
+	public function testNoRegisterNumberMeansNoLegalOrganisation(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+
+		$xml = $this->service->buildXml($invoice, [$this->item(1000000, 1900, 20000)], $this->settings());
+
+		$this->assertStringNotContainsString('SpecifiedLegalOrganization', $xml);
+	}
+
 	public function testReferencesAndPerformanceDateInXml(): void {
 		$invoice = $this->invoice();
 		$invoice->setPerformanceDate(new DateTime('2026-06-10'));

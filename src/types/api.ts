@@ -254,6 +254,7 @@ export interface Settings {
 	companyAddress: string | null
 	vatId: string | null
 	taxNumber: string | null
+	registerNumber: string | null
 	iban: string | null
 	bic: string | null
 	bankName: string | null

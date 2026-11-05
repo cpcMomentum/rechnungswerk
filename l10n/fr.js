@@ -580,6 +580,12 @@ OC.L10N.register(
     "Verwerfen" : "Abandonner",
     "Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich." : "Une livraison intracommunautaire nécessite une date de prestation ou une période de prestation.",
     "Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren)." : "Une livraison intracommunautaire nécessite votre propre numéro de TVA intracommunautaire. Vous pouvez le saisir dans les Paramètres (administrateurs uniquement).",
-    "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich." : "Une livraison intracommunautaire nécessite le numéro de TVA intracommunautaire du client."
+    "Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich." : "Une livraison intracommunautaire nécessite le numéro de TVA intracommunautaire du client.",
+    "Hinweis zur E-Rechnung" : "Remarque sur la facture électronique",
+    "Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen." : "Aucun numéro de TVA intracommunautaire ni numéro d'immatriculation n'est renseigné. La facture est correcte sur le plan fiscal, mais les logiciels de validation du destinataire signalent une erreur et peuvent la rejeter.",
+    "Registernummer" : "Numéro d'immatriculation",
+    "z. B. HRB 12345, Amtsgericht Stuttgart" : "p. ex. HRB 12345, Amtsgericht Stuttgart",
+    "Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus." : "Vos factures électroniques échouent aux contrôles de validation.",
+    "Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer." : "Sans numéro de TVA intracommunautaire ni numéro d'immatriculation (p. ex. registre du commerce), la validation EN 16931 signale une erreur. Sur le plan fiscal, cela ne pose pas de problème : le numéro fiscal suffit comme mention obligatoire. Certaines entreprises rejettent toutefois automatiquement ces factures. Pour les factures destinées à des entreprises, renseignez donc l'un des deux champs. Vous pouvez demander gratuitement un numéro de TVA intracommunautaire auprès du Bundeszentralamt für Steuern, y compris en tant que petite entreprise."
 },
 "nplurals=2; plural=(n > 1);");

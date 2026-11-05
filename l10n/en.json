@@ -579,7 +579,13 @@
 		"Verwerfen": "Discard",
 		"Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich.": "An intra-community supply requires a date of supply or a service period.",
 		"Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).": "An intra-community supply requires your own VAT ID. You can set it under Settings (administrators only).",
-		"Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.": "An intra-community supply requires the customer's VAT ID."
+		"Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.": "An intra-community supply requires the customer's VAT ID.",
+		"Hinweis zur E-Rechnung": "Note on the e-invoice",
+		"Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen.": "Neither a VAT ID nor a register number is set. The invoice is fine for tax purposes, but the recipient's validation software reports an error and may reject it.",
+		"Registernummer": "Register number",
+		"z. B. HRB 12345, Amtsgericht Stuttgart": "e.g. HRB 12345, Amtsgericht Stuttgart",
+		"Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus.": "Your e-invoices fail validation checks.",
+		"Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer.": "Without a VAT ID or register number (e.g. commercial register), EN 16931 validation reports an error. This is harmless for tax purposes, the tax number satisfies the mandatory information. Some companies reject such invoices automatically, though. For invoices to businesses, fill in one of the two fields. You can apply for a VAT ID free of charge at the Federal Central Tax Office (Bundeszentralamt für Steuern), also as a small business."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }
