@@ -27,6 +27,12 @@
 						<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
 							<input v-model="form.taxNumber" class="rw-input" type="text" /></label>
 					</div>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Registernummer') }}</span>
+						<input v-model="form.registerNumber" class="rw-input" type="text"
+							:placeholder="t('rechnungswerk', 'z. B. HRB 12345, Amtsgericht Stuttgart')" /></label>
+					<NcNoteCard v-if="!hasSellerIdentifier" type="warning"
+						:heading="t('rechnungswerk', 'Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus.')"
+						:text="t('rechnungswerk', 'Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer.')" />
 					<div class="rw-form-row">
 						<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
 							<input v-model="form.contactPerson" class="rw-input" type="text" /></label>
@@ -530,6 +536,8 @@ type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' 
 const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+// EN 16931 BR-CO-26 needs a VAT ID or register number; the tax number does not count.
+const hasSellerIdentifier = computed(() => !!form.value?.vatId?.trim() || !!form.value?.registerNumber?.trim())
 
 /**
  * Die Bereiche der Einstellungsseite (#350).
@@ -793,6 +801,7 @@ function hydrate() {
 		companyAddress: s.companyAddress,
 		vatId: s.vatId,
 		taxNumber: s.taxNumber,
+		registerNumber: s.registerNumber,
 		iban: s.iban,
 		bic: s.bic,
 		bankName: s.bankName,

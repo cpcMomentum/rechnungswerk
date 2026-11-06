@@ -311,7 +311,11 @@
 			:name="isQuote ? t('rechnungswerk', 'Angebot festschreiben') : t('rechnungswerk', 'Rechnung festschreiben')"
 			:message="finalizeMessage"
 			:confirmLabel="t('rechnungswerk', 'Festschreiben')"
-			@close="dialog = null" @confirm="doFinalize" />
+			@close="dialog = null" @confirm="doFinalize">
+			<NcNoteCard v-if="missingSellerIdentifier" type="warning"
+				:heading="t('rechnungswerk', 'Hinweis zur E-Rechnung')"
+				:text="t('rechnungswerk', 'Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen.')" />
+		</ConfirmDialog>
 		<ConfirmDialog :open="dialog === 'delete'"
 			:name="isQuote ? t('rechnungswerk', 'Angebot löschen') : t('rechnungswerk', 'Entwurf löschen')"
 			:message="isQuote ? t('rechnungswerk', 'Diesen Angebots-Entwurf wirklich löschen?') : t('rechnungswerk', 'Diesen Entwurf wirklich löschen?')"
@@ -529,6 +533,12 @@ const typeTooltip = computed(() => {
 	return invoice.value.relatedNumber
 		? t('rechnungswerk', '{type} zu Rechnung {number}', { type: typeLabel.value, number: invoice.value.relatedNumber })
 		: typeLabel.value
+})
+
+// Without either, the e-invoice breaks EN 16931 BR-CO-26 (the tax number does not count).
+const missingSellerIdentifier = computed(() => {
+	const s = settingsStore.settings
+	return !isQuote.value && !!s && !s.vatId?.trim() && !s.registerNumber?.trim()
 })
 
 const finalizeMessage = computed(() => {

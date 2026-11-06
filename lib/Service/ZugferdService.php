@@ -287,6 +287,9 @@ class ZugferdService {
 		if (($settings->getTaxNumber() ?? '') !== '') {
 			$builder->addDocumentSellerTaxNumber($settings->getTaxNumber());
 		}
+		if (($settings->getRegisterNumber() ?? '') !== '') {
+			$builder->setDocumentSellerLegalOrganisation($settings->getRegisterNumber(), null, null);
+		}
 		$addr = $this->parseGermanAddress($settings->getCompanyAddress());
 		$builder->setDocumentSellerAddress(
 			$addr['street'],
@@ -896,6 +899,7 @@ class ZugferdService {
 		$taxIds = array_filter([
 			($settings->getVatId() ?? '') !== '' ? 'USt-IdNr.: ' . $e($settings->getVatId()) : null,
 			($settings->getTaxNumber() ?? '') !== '' ? 'Steuernummer: ' . $e($settings->getTaxNumber()) : null,
+			($settings->getRegisterNumber() ?? '') !== '' ? 'Registernummer: ' . $e($settings->getRegisterNumber()) : null,
 		]);
 		$footer = $taxIds !== [] ? '<div class="footer">' . implode(' &middot; ', $taxIds) . '</div>' : '';
 

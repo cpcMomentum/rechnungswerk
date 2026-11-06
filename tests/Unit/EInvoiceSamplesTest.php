@@ -59,6 +59,15 @@ class EInvoiceSamplesTest extends TestCase {
 				self::totals($inv, [[0, 20000]], exempt: true);
 				return [$inv, [self::item(1000000, 0, 20000)], self::settings(1), null, null];
 			}],
+			'register-number-without-vat-id' => [static function (): array {
+				$settings = self::settings();
+				$settings->setVatId(null);
+				$settings->setTaxNumber('12/345/67890');
+				$settings->setRegisterNumber('HRB 12345, Amtsgericht Stuttgart');
+				$inv = self::invoice();
+				self::totals($inv, [[1900, 20000]]);
+				return [$inv, [self::item(1000000, 1900, 20000)], $settings, null, null];
+			}],
 			'reverse-charge' => [static function (): array {
 				$inv = self::invoice();
 				$inv->setSpecialTaxCase(Invoice::SPECIAL_TAX_REVERSE_CHARGE);
