@@ -137,7 +137,7 @@
 		"Der Name darf höchstens 255 Zeichen lang sein.": "The name must not exceed 255 characters.",
 		"Der Preis darf nicht negativ sein.": "The price must not be negative.",
 		"Der SMTP-Port muss zwischen 1 und 65535 liegen.": "The SMTP port must be between 1 and 65535.",
-		"Der Schlüssel, die Kennung dieser Installation, die Version von RechnungsWerk und die Größenklasse. Niemals: Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "The key, the identifier of this installation, the RechnungsWerk version and the size class. Never: invoices, customers or other document data, personal data, Nextcloud users or files.",
+		"Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "The identifier of this installation, the RechnungsWerk version, the size class and, once available, the key. Not transmitted: invoices, customers or other document data, personal data, Nextcloud users or files.",
 		"Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.": "The default snippet pre-fills new documents of this type. There is exactly one default per document type and text area.",
 		"Der Steuersatz darf nicht negativ sein.": "The tax rate must not be negative.",
 		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Your trial has started, but the licence could not be verified yet. Use “Check now” to try again. This is your WerkPlus key:",

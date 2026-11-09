@@ -9985,7 +9985,7 @@ var Rx = /*#__PURE__*/ Q(Nx, [["render", Lx]]), zx = () => ds("/api-keys"), Bx =
 				]),
 				z("div", CS, [
 					z("span", wS, Y(t(T)("rechnungswerk", "Was an WerkPlus übertragen wird")), 1),
-					z("p", TS, Y(t(T)("rechnungswerk", "Der Schlüssel, die Kennung dieser Installation, die Version von RechnungsWerk und die Größenklasse. Niemals: Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.")), 1),
+					z("p", TS, Y(t(T)("rechnungswerk", "Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.")), 1),
 					z("p", ES, Y(t(T)("rechnungswerk", "Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter.")), 1),
 					z("p", DS, [K(Y(t(T)("rechnungswerk", "Kennung dieser Installation:")) + " ", 1), z("code", null, Y(r.value.instanceUuid), 1)])
 				])
@@ -10018,7 +10018,7 @@ var Rx = /*#__PURE__*/ Q(Nx, [["render", Lx]]), zx = () => ds("/api-keys"), Bx =
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-964bd0e3"]]);
+}), [["__scopeId", "data-v-db5333d3"]]);
 function kS(e) {
 	if (typeof e != "string") return null;
 	let t = e.trim().replace(/^#/, "");
