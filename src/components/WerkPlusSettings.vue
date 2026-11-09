@@ -67,7 +67,7 @@
 
 			<div class="rw-werkplus__privacy">
 				<span class="rw-werkplus__label">{{ t('rechnungswerk', 'Was an WerkPlus übertragen wird') }}</span>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Der Schlüssel, die Kennung dieser Installation, die Version von RechnungsWerk und die Größenklasse. Niemals: Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.') }}</p>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Kennung dieser Installation:') }} <code>{{ status.instanceUuid }}</code></p>
 			</div>

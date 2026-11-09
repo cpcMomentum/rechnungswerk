@@ -5,6 +5,65 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.7.0] - 2026-11-10
+
+Registernummer für E-Rechnungen ohne USt-IdNr., gültige innergemeinschaftliche
+Lieferungen, Rückfrage vor verlorenen Eingaben und die optionale
+WerkPlus-Lizenz mit API-Schlüsseln.
+
+### Added
+- **Registernummer.** Neues Feld in Einstellungen › Firma (z. B. „HRB 12345,
+  Amtsgericht Stuttgart"). Sie geht als Verkäuferkennung (BT-30) in die
+  E-Rechnung und steht in der Fußzeile des Belegs. Solange weder USt-IdNr.
+  noch Registernummer hinterlegt ist, weisen die Einstellungen und der
+  Festschreiben-Dialog darauf hin: Steuerlich ist das unschädlich (BMF-Schreiben
+  vom 15.10.2025, Rn. 35a), Prüfprogramme beim Empfänger melden aber einen
+  Fehler (BR-CO-26). Keine Sperre (#386)
+- **WerkPlus-Lizenz (optional).** Unter Einstellungen › WerkPlus lässt sich ein
+  Schlüssel eintragen oder ein 30-tägiger Testzeitraum starten. Die Instanz holt
+  sich damit bei api.werkwolke.de ein signiertes Token und prüft es danach
+  lokal; erneuert wird in der Regel einmal pro Woche. Ohne Schlüssel nimmt
+  RechnungsWerk erst Kontakt auf, wenn der Testzeitraum gestartet wird.
+  Übertragen werden nur eine zufällige Kennung der Installation, die
+  App-Version und eine Größenklasse, mit Schlüssel zusätzlich der Schlüssel,
+  keine Belegdaten, Personendaten, Benutzer oder Dateien. Alle bisherigen
+  Funktionen sind ohne Lizenz nutzbar (#335, #336)
+- **API-Schlüssel für den Maschinenzugang.** Bearer-Schlüssel (`rwrk_…`) für
+  die Rechnungs-API mit Rechten je Aktion und einstellbarem Ratenlimit; in der
+  Datenbank liegt nur der Hash. Erste Funktion, die WerkPlus voraussetzt
+  (#326, #361)
+- **Musterrechnungen in der CI.** Jede Änderung erzeugt zwölf echte
+  ZUGFeRD-PDFs (alle Steuerfälle, Storno, Sonderfälle) und prüft sie mit
+  Mustang gegen EN 16931 und PDF/A-3 (#21)
+
+### Changed
+- **Einstellungen mit Bereichsauswahl.** Statt vierzehn Abschnitten
+  untereinander steht links eine Auswahl in fünf Gruppen, rechts der gewählte
+  Bereich. Angefangene Eingaben bleiben beim Wechsel erhalten (#350)
+- **Festschreiben-Dialog kürzer.** Ein Satz statt vier; „Weitere Felder" im
+  Editor ist geöffnet, sobald dort etwas eingetragen ist (#365)
+- **Listen-Layout wie in WorkTime.** Lange Empfängernamen brechen um, statt die
+  Aktionen aus dem Bild zu schieben (#364)
+- AGPL-3.0-Lizenztext liegt als `LICENSE` bei
+
+### Fixed
+- **Innergemeinschaftliche Lieferungen waren nie gültige E-Rechnungen.** Es
+  fehlten Lieferland, Leistungsdatum und USt-IdNr. (BR-IC-02/11/12). Die
+  Lieferanschrift ist jetzt die Kundenanschrift, Festschreiben verlangt eigene
+  und Kunden-USt-IdNr. sowie Leistungsdatum oder -zeitraum, und ein Storno
+  übernimmt Datum bzw. Zeitraum des Originals (#21)
+- **Ungespeicherte Eingaben gingen beim Wegnavigieren verloren.** Der Editor
+  fragt jetzt „Weiter bearbeiten / Verwerfen", auch beim Neuladen der Seite
+  (#349)
+- **Produktauswahl.** Ein Klick ins Feld zeigt alle Produkte statt einer leeren
+  Liste, ohne Produkte führt ein Hinweis zum Produktbereich, und ein
+  eingefügtes Produkt füllt die leere Startzeile, statt eine zweite anzuhängen
+  (#305, #346, #347)
+
+### Security
+- Abhängigkeiten aktualisiert, darunter symfony/validator und symfony/yaml
+  (GHSA-4qpf-57w4-m3wc, GHSA-hwfg-qwvh-2wfx) sowie dompurify (#388)
+
 ## [0.6.0] - 2026-09-27
 
 ### Changed
@@ -548,7 +607,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...v0.5.2

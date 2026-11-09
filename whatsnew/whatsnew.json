@@ -1,4 +1,126 @@
 {
+	"0.7.0": [
+		{
+			"title": {
+				"de": "Registernummer für E-Rechnungen ohne USt-IdNr.",
+				"en": "Register number for e-invoices without a VAT ID",
+				"fr": "Numéro d'immatriculation pour les factures électroniques sans numéro de TVA"
+			},
+			"text": {
+				"de": "Ohne USt-IdNr. melden Prüfprogramme beim Empfänger einen Fehler, obwohl die Rechnung steuerlich in Ordnung ist. Trage unter Firma deine Registernummer ein, z. B. „HRB 12345, Amtsgericht Stuttgart“. Fehlen beide, weist RechnungsWerk darauf hin.",
+				"en": "Without a VAT ID, the recipient's validation software reports an error, even though the invoice is fine for tax purposes. Enter your register number under Company, e.g. “HRB 12345, Amtsgericht Stuttgart”. If both are missing, RechnungsWerk points it out.",
+				"fr": "Sans numéro de TVA, les logiciels de contrôle du destinataire signalent une erreur, alors que la facture est correcte sur le plan fiscal. Saisissez votre numéro d'immatriculation sous Entreprise, par ex. « HRB 12345, Amtsgericht Stuttgart ». Si les deux manquent, RechnungsWerk vous le signale."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": true,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Innergemeinschaftliche Lieferungen jetzt gültig",
+				"en": "Intra-community supplies are now valid",
+				"fr": "Les livraisons intracommunautaires sont désormais valides"
+			},
+			"text": {
+				"de": "E-Rechnungen für Lieferungen in andere EU-Länder fielen bisher bei der Prüfung durch. Jetzt stimmen sie. Beim Festschreiben verlangt RechnungsWerk dafür beide USt-IdNr. und das Leistungsdatum.",
+				"en": "E-invoices for supplies to other EU countries used to fail validation. They are correct now. For these, RechnungsWerk requires both VAT IDs and the date of supply when finalising.",
+				"fr": "Les factures électroniques pour les livraisons vers d'autres pays de l'UE échouaient jusqu'ici au contrôle. Elles sont désormais correctes. Pour celles-ci, RechnungsWerk exige les deux numéros de TVA et la date de livraison lors de la finalisation."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Rechnungen",
+				"en": "Invoices",
+				"fr": "Factures"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Keine verlorenen Eingaben mehr",
+				"en": "No more lost input",
+				"fr": "Plus de saisies perdues"
+			},
+			"text": {
+				"de": "Wer einen geänderten Entwurf verlässt, ohne zu speichern, wird jetzt gefragt: weiter bearbeiten oder verwerfen. Auch beim Neuladen der Seite.",
+				"en": "If you leave a changed draft without saving, you are now asked whether to keep editing or discard. This also applies when reloading the page.",
+				"fr": "Si vous quittez un brouillon modifié sans l'enregistrer, il vous est désormais demandé de continuer la modification ou de l'abandonner. Également lors du rechargement de la page."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Rechnungen",
+				"en": "Invoices",
+				"fr": "Factures"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Produkte schneller in die Rechnung",
+				"en": "Products into the invoice faster",
+				"fr": "Les produits plus vite dans la facture"
+			},
+			"text": {
+				"de": "Ein Klick ins Produktfeld zeigt jetzt alle Produkte, Tippen grenzt ein. Ein eingefügtes Produkt füllt die leere erste Zeile, statt eine zweite anzuhängen.",
+				"en": "Clicking into the product field now shows all products, typing narrows them down. An inserted product fills the empty first line instead of adding a second one.",
+				"fr": "Un clic dans le champ produit affiche désormais tous les produits, la saisie affine la liste. Un produit inséré remplit la première ligne vide au lieu d'en ajouter une seconde."
+			},
+			"icon": "magnify",
+			"where": {
+				"de": "Rechnungen",
+				"en": "Invoices",
+				"fr": "Factures"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "API-Zugang für Automatisierungen",
+				"en": "API access for automations",
+				"fr": "Accès API pour les automatisations"
+			},
+			"text": {
+				"de": "Mit API-Schlüsseln legen andere Programme Rechnungen an, schreiben sie fest, versenden sie oder melden Zahlungen. Jeder Schlüssel bekommt nur die Rechte, die er braucht. Der API-Zugang gehört zu WerkPlus: Damit finanzieren wir, dass RechnungsWerk weiter gepflegt wird, mit neuen Nextcloud-Versionen, Sicherheit und Support. Alle bisherigen Funktionen sind weiter kostenlos. Unter Einstellungen › WerkPlus kannst du es 30 Tage testen.",
+				"en": "With API keys, other programs can create, finalise and send invoices or record payments. Each key gets only the permissions it needs. API access is part of WerkPlus: it funds the ongoing care of RechnungsWerk, with new Nextcloud versions, security and support. All existing features remain free. You can try it for 30 days under Settings › WerkPlus.",
+				"fr": "Grâce aux clés API, d'autres programmes peuvent créer, finaliser et envoyer des factures ou enregistrer des paiements. Chaque clé ne reçoit que les droits nécessaires. L'accès API fait partie de WerkPlus : il finance la maintenance de RechnungsWerk, avec les nouvelles versions de Nextcloud, la sécurité et le support. Toutes les fonctions existantes restent gratuites. Vous pouvez l'essayer 30 jours sous Paramètres › WerkPlus."
+			},
+			"icon": "star",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": true,
+			"plus": true
+		},
+		{
+			"title": {
+				"de": "Einstellungen übersichtlicher",
+				"en": "Clearer settings",
+				"fr": "Des paramètres plus clairs"
+			},
+			"text": {
+				"de": "Die Einstellungen sind jetzt in Bereiche gegliedert: links die Auswahl, rechts der gewählte Bereich. Angefangene Eingaben bleiben beim Wechsel erhalten.",
+				"en": "Settings are now organised into sections: the selection on the left, the chosen section on the right. Unsaved input is kept when you switch.",
+				"fr": "Les paramètres sont désormais organisés en sections : la sélection à gauche, la section choisie à droite. Les saisies en cours sont conservées lors du changement."
+			},
+			"icon": "cog",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": true,
+			"plus": false
+		}
+	],
 	"0.6.0": [
 		{
 			"title": {
