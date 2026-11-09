@@ -93,5 +93,17 @@ return [
 		['name' => 'admin#updatePermissions',  'url' => '/api/v1/permissions',         'verb' => 'PUT'],
 		['name' => 'admin#searchPrincipals',   'url' => '/api/v1/principals/search',   'verb' => 'GET'],
 		['name' => 'admin#testSmtp',           'url' => '/api/v1/smtp/test',           'verb' => 'POST'],
+
+		// API-Schluessel fuer Maschinenzugang
+		['name' => 'api_key#index',   'url' => '/api/v1/api-keys',      'verb' => 'GET'],
+		['name' => 'api_key#create',  'url' => '/api/v1/api-keys',      'verb' => 'POST'],
+		['name' => 'api_key#destroy', 'url' => '/api/v1/api-keys/{id}', 'verb' => 'DELETE'],
+
+		// WerkPlus-Lizenz (entitlement-v1)
+		['name' => 'license#show',     'url' => '/api/v1/license',         'verb' => 'GET'],
+		['name' => 'license#activate', 'url' => '/api/v1/license',         'verb' => 'PUT'],
+		['name' => 'license#trial',    'url' => '/api/v1/license/trial',   'verb' => 'POST'],
+		['name' => 'license#refresh',  'url' => '/api/v1/license/refresh', 'verb' => 'POST'],
+		['name' => 'license#destroy',  'url' => '/api/v1/license',         'verb' => 'DELETE'],
 	],
 ];

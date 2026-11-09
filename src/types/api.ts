@@ -6,6 +6,7 @@
 export interface ApiError {
 	status: number
 	message: string
+	code?: string
 }
 
 /** UN/ECE Rec. 20 unit codes used in EN16931. Labels are translated at render time. */
@@ -253,6 +254,7 @@ export interface Settings {
 	companyAddress: string | null
 	vatId: string | null
 	taxNumber: string | null
+	registerNumber: string | null
 	iban: string | null
 	bic: string | null
 	bankName: string | null

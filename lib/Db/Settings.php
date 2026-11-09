@@ -26,6 +26,8 @@ use OCP\DB\Types;
  * @method void setVatId(?string $vatId)
  * @method ?string getTaxNumber()
  * @method void setTaxNumber(?string $taxNumber)
+ * @method ?string getRegisterNumber()
+ * @method void setRegisterNumber(?string $registerNumber)
  * @method ?string getIban()
  * @method void setIban(?string $iban)
  * @method ?string getBic()
@@ -137,6 +139,7 @@ class Settings extends Entity implements JsonSerializable {
 	protected ?string $companyAddress = null;
 	protected ?string $vatId = null;
 	protected ?string $taxNumber = null;
+	protected ?string $registerNumber = null;
 	protected ?string $iban = null;
 	protected ?string $bic = null;
 	protected ?string $bankName = null;
@@ -189,6 +192,7 @@ class Settings extends Entity implements JsonSerializable {
 		$this->addType('companyAddress', Types::TEXT);
 		$this->addType('vatId', Types::STRING);
 		$this->addType('taxNumber', Types::STRING);
+		$this->addType('registerNumber', Types::STRING);
 		$this->addType('iban', Types::STRING);
 		$this->addType('bic', Types::STRING);
 		$this->addType('bankName', Types::STRING);
@@ -243,6 +247,7 @@ class Settings extends Entity implements JsonSerializable {
 			'companyAddress' => $this->getCompanyAddress(),
 			'vatId' => $this->getVatId(),
 			'taxNumber' => $this->getTaxNumber(),
+			'registerNumber' => $this->getRegisterNumber(),
 			'iban' => $this->getIban(),
 			'bic' => $this->getBic(),
 			'bankName' => $this->getBankName(),

@@ -140,7 +140,7 @@ class SettingsService {
 		$this->validate($data, $settings);
 
 		$stringFields = [
-			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'iban', 'bic',
+			'companyName', 'companyAddress', 'vatId', 'taxNumber', 'registerNumber', 'iban', 'bic',
 			'bankName', 'contactPerson', 'contactPhone', 'contactEmail',
 			'accentColor', 'numberFormat', 'quoteNumberFormat', 'fileNameFormat', 'archiveSubfolder', 'datevUploadMail',
 			'smtpFromName', 'smtpFromEmail', 'smtpHost', 'smtpUser',
@@ -407,7 +407,7 @@ class SettingsService {
 
 		// Column-length limits mirror the migration schema.
 		$maxLengths = [
-			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'iban' => 34,
+			'companyName' => 255, 'vatId' => 64, 'taxNumber' => 64, 'registerNumber' => 128, 'iban' => 34,
 			'bic' => 16, 'bankName' => 255, 'accentColor' => 9, 'numberFormat' => 64,
 			'quoteNumberFormat' => 64,
 			'fileNameFormat' => 128, 'archiveSubfolder' => 64,

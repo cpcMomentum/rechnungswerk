@@ -21,9 +21,23 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - **Kundenversand** — PDF-Download und In-App-Versand mit Empfängerwahl aus Nextcloud-Kontakten
 - **Produktkatalog** — wiederkehrende Leistungen einmal pflegen
 - **Stammdaten** — Firmendaten, Logo, Standardtexte, Nummernformat, Kleinunternehmer §19
+
+## WerkPlus (optional)
+
+RechnungsWerk ist kostenlos und Open Source (AGPL-3.0-or-later).
+Damit die Werk-Apps gepflegt bleiben, gibt es WerkPlus: Zusatzfunktionen in allen
+Werk-Apps, in RechnungsWerk ab 0.7 der API-Zugang für Automatisierungen. Alle bisherigen
+Funktionen sind ohne Lizenz nutzbar. Unter Einstellungen › WerkPlus lässt sich WerkPlus
+30 Tage kostenlos testen. Mehr dazu auf https://werkwolke.de.
+
+Ohne Lizenzschlüssel nimmt die App erst Kontakt zu unserem Server auf, wenn du den
+Testzeitraum startest. Übertragen werden dann nur eine zufällige Kennung der Installation,
+die App-Version und die gewählte Größenklasse, mit Schlüssel zusätzlich der
+Lizenzschlüssel. Keine Rechnungen, keine Kunden. Ist der Server nicht erreichbar, arbeitet
+RechnungsWerk normal weiter.
     ]]></description>
 
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <licence>AGPL-3.0-or-later</licence>
 
     <author mail="axel.deffner@cpcmomentum.com" homepage="https://github.com/cpcMomentum">Axel Deffner</author>

@@ -1,5 +1,5 @@
 <template>
-	<div class="rw-view">
+	<div class="rw-view rw-view--narrow">
 		<div class="rw-editor-head">
 			<NcBreadcrumbs>
 				<NcBreadcrumb :name="isQuote ? t('rechnungswerk', 'Angebote') : t('rechnungswerk', 'Rechnungen')" :to="{ name: listRoute }" />
@@ -46,7 +46,8 @@
 			<p class="rw-hint">{{ isQuote
 				? t('rechnungswerk', 'Optional: geplanter Termin oder Zeitraum der Leistung. Nur das erste Feld → Datum, beide Felder → Zeitraum. Für ein Angebot nicht verpflichtend.')
 				: t('rechnungswerk', 'Pflichtangabe nach § 14 UStG: Nur das erste Feld ausfüllen → Leistungsdatum. Beide Felder → Leistungszeitraum.') }}</p>
-			<details class="more">
+			<!-- Open on load when any field has a value (#365); toggling stays manual. -->
+			<details class="more" :open="moreOpen" @toggle="moreOpen = ($event.target as HTMLDetailsElement).open">
 				<summary>{{ isQuote
 					? t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt)')
 					: t('rechnungswerk', 'Weitere Felder (Referenz, Bestellnummer, Vertrag, Projekt, Leitweg-ID)') }}</summary>
@@ -310,7 +311,11 @@
 			:name="isQuote ? t('rechnungswerk', 'Angebot festschreiben') : t('rechnungswerk', 'Rechnung festschreiben')"
 			:message="finalizeMessage"
 			:confirmLabel="t('rechnungswerk', 'Festschreiben')"
-			@close="dialog = null" @confirm="doFinalize" />
+			@close="dialog = null" @confirm="doFinalize">
+			<NcNoteCard v-if="missingSellerIdentifier" type="warning"
+				:heading="t('rechnungswerk', 'Hinweis zur E-Rechnung')"
+				:text="t('rechnungswerk', 'Es ist weder eine USt-IdNr. noch eine Registernummer hinterlegt. Die Rechnung ist steuerlich in Ordnung, Prüfprogramme beim Empfänger melden aber einen Fehler und können sie zurückweisen.')" />
+		</ConfirmDialog>
 		<ConfirmDialog :open="dialog === 'delete'"
 			:name="isQuote ? t('rechnungswerk', 'Angebot löschen') : t('rechnungswerk', 'Entwurf löschen')"
 			:message="isQuote ? t('rechnungswerk', 'Diesen Angebots-Entwurf wirklich löschen?') : t('rechnungswerk', 'Diesen Entwurf wirklich löschen?')"
@@ -331,6 +336,12 @@
 			:message="t('rechnungswerk', 'Es wird eine überarbeitbare Kopie als neue Angebots-Revision erstellt. Beim Festschreiben erhält sie eine Revisionsnummer (z. B. AN-…-1) und dieses Angebot wird als „revidiert“ markiert. Fortfahren?')"
 			:confirmLabel="t('rechnungswerk', 'Revision erstellen')"
 			@close="dialog = null" @confirm="doRevise" />
+		<ConfirmDialog :open="dialog === 'leave'"
+			:name="t('rechnungswerk', 'Ungespeicherte Änderungen')"
+			:message="t('rechnungswerk', 'Deine Änderungen sind noch nicht gespeichert. Wenn du die Seite verlässt, gehen sie verloren.')"
+			:cancelLabel="t('rechnungswerk', 'Weiter bearbeiten')"
+			:confirmLabel="t('rechnungswerk', 'Verwerfen')" destructive
+			@close="answerLeave(false)" @confirm="answerLeave(true)" />
 
 		<SendInvoiceDialog
 			:open="sendDialogOpen"
@@ -354,8 +365,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter, type RouteLocationNormalized } from 'vue-router'
 import { translate as t } from '@nextcloud/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
@@ -446,7 +457,12 @@ const sending = ref(false)
 const sendDialogOpen = ref(false)
 const previewOpen = ref(false)
 const previewUrl = ref('')
-const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | null>(null)
+const dialog = ref<'finalize' | 'delete' | 'cancel' | 'convert' | 'revise' | 'leave' | null>(null)
+// "Weitere Felder" block: set once per load, not derived from the fields, so
+// typing into (or clearing) a field never collapses it under the cursor.
+const moreOpen = ref(false)
+// Form as last loaded or saved; null while loading, so there is nothing to lose.
+let savedState: string | null = null
 
 const emptyForm = () => ({
 	customerId: null as number | null,
@@ -519,16 +535,21 @@ const typeTooltip = computed(() => {
 		: typeLabel.value
 })
 
+// Without either, the e-invoice breaks EN 16931 BR-CO-26 (the tax number does not count).
+const missingSellerIdentifier = computed(() => {
+	const s = settingsStore.settings
+	return !isQuote.value && !!s && !s.vatId?.trim() && !s.registerNumber?.trim()
+})
+
 const finalizeMessage = computed(() => {
 	if (isQuote.value) {
-		return t('rechnungswerk', 'Das Angebot erhält eine endgültige Angebotsnummer und ist danach unveränderbar. Fortfahren?')
+		return t('rechnungswerk', 'Das Angebot erhält seine endgültige Nummer und ist danach unveränderbar.')
 	}
-	let msg = t('rechnungswerk', 'Die Rechnung erhält eine endgültige Nummer und ist danach unveränderbar. Korrektur nur per Storno. Fortfahren?')
+	const msg = t('rechnungswerk', 'Die Rechnung erhält ihre endgültige Nummer und kann danach nur noch storniert werden.')
 	const s = settingsStore.settings
-	if (s?.datevAutoSend && s.datevUploadMail) {
-		msg += '\n\n' + t('rechnungswerk', 'Beim Festschreiben wird automatisch eine E-Rechnung an DATEV ({mail}) gesendet.', { mail: s.datevUploadMail })
-	}
-	return msg
+	return s?.datevAutoSend && s.datevUploadMail
+		? msg + ' ' + t('rechnungswerk', 'Sie wird automatisch an DATEV übergeben.')
+		: msg
 })
 
 const defaultMailBody = computed(() => {
@@ -625,7 +646,9 @@ function resetEditor() {
 	previewOpen.value = false
 	previewUrl.value = ''
 	dialog.value = null
+	moreOpen.value = false
 	Object.assign(form, emptyForm())
+	savedState = null
 }
 
 /** Defaults for a new invoice: text templates + seller-contact cascade. */
@@ -657,6 +680,8 @@ async function initNew(token: number = navToken) {
 	form.sellerContactPerson = mine.person || (s?.contactPerson ?? '')
 	form.sellerContactPhone = mine.phone || (s?.contactPhone ?? '')
 	form.sellerContactEmail = mine.email || (s?.contactEmail ?? '')
+	// Defaults are not changes: an untouched new document can be left silently.
+	markSaved()
 }
 
 async function load(id: number, token: number = navToken) {
@@ -690,6 +715,9 @@ async function load(id: number, token: number = navToken) {
 	form.buyerReference = detail.buyerReference ?? ''
 	form.contractNumber = detail.contractNumber ?? ''
 	form.projectReference = detail.projectReference ?? ''
+	// Leitweg-ID is invoice-only; a quote never shows that field.
+	moreOpen.value = [form.referenceNumber, form.orderNumber, isQuote.value ? '' : form.buyerReference,
+		form.contractNumber, form.projectReference].some(v => v.trim() !== '')
 	notes.value = [...(detail.notes ?? [])]
 	form.specialTaxCase = detail.specialTaxCase ?? ''
 	form.greeting = detail.greeting ?? ''
@@ -699,6 +727,7 @@ async function load(id: number, token: number = navToken) {
 	form.validUntil = detail.validUntil ?? ''
 	form.offerFreeform = detail.offerFreeform ?? false
 	items.value = detail.items.length > 0 ? detail.items.map(itemFromInvoiceItem) : [emptyItem()]
+	markSaved()
 }
 
 function addNote() {
@@ -792,18 +821,64 @@ function buildInput(): InvoiceInput {
 	return input
 }
 
+let leaveTarget: string | null = null
+
+function markSaved(state: string = JSON.stringify(buildInput())) {
+	savedState = state
+}
+
+function hasUnsavedChanges(): boolean {
+	return !readonly.value && savedState !== null && JSON.stringify(buildInput()) !== savedState
+}
+
+// Cancel at once and navigate again on discard: a guard left pending desyncs the URL on repeated back.
+function confirmLeave(to: RouteLocationNormalized): boolean {
+	if (!hasUnsavedChanges()) {
+		return true
+	}
+	leaveTarget = to.fullPath
+	dialog.value = 'leave'
+	return false
+}
+
+function answerLeave(leave: boolean) {
+	dialog.value = null
+	const target = leaveTarget
+	leaveTarget = null
+	if (leave && target !== null) {
+		savedState = null
+		router.push(target)
+	}
+}
+
+// Update covers switching documents within the same route record.
+onBeforeRouteLeave(confirmLeave)
+onBeforeRouteUpdate(confirmLeave)
+
+// Reload and closing the tab only allow the browser's own prompt.
+function onBeforeUnload(event: BeforeUnloadEvent) {
+	if (hasUnsavedChanges()) {
+		event.preventDefault()
+	}
+}
+onMounted(() => window.addEventListener('beforeunload', onBeforeUnload))
+onUnmounted(() => window.removeEventListener('beforeunload', onBeforeUnload))
+
 async function save(): Promise<InvoiceDetail | null> {
 	error.value = ''
 	saving.value = true
 	try {
-		let detail: InvoiceDetail
-		if (invoice.value) {
-			detail = await docStore.value.update(invoice.value.id, buildInput())
-		} else {
-			detail = await docStore.value.create(buildInput())
+		const input = buildInput()
+		const created = !invoice.value
+		const detail: InvoiceDetail = invoice.value
+			? await docStore.value.update(invoice.value.id, input)
+			: await docStore.value.create(input)
+		invoice.value = detail
+		// Before the replace below, so switching to the detail route does not ask.
+		markSaved(JSON.stringify(input))
+		if (created) {
 			router.replace({ name: detailRoute.value, params: { id: String(detail.id) } })
 		}
-		invoice.value = detail
 		return detail
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Speichern fehlgeschlagen'))
@@ -1002,6 +1077,8 @@ async function doDelete() {
 	saving.value = true
 	try {
 		await docStore.value.remove(invoice.value.id)
+		// The deletion was confirmed already; nothing is left to lose.
+		savedState = null
 		backToList()
 	} catch (e) {
 		fail(e, t('rechnungswerk', 'Löschen fehlgeschlagen'))

@@ -2,6 +2,7 @@
 	<NcDialog :open="open" :name="name" @update:open="onUpdateOpen">
 		<div class="confirm-dialog">
 			<p class="confirm-dialog__message">{{ message }}</p>
+			<slot />
 		</div>
 
 		<template #actions>

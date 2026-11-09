@@ -13,12 +13,14 @@ use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\AuthContext;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataDownloadResponse;
@@ -31,7 +33,7 @@ class InvoiceController extends Controller {
 
 	public function __construct(
 		IRequest $request,
-		private readonly ?string $userId,
+		private readonly AuthContext $authContext,
 		private readonly InvoiceService $invoiceService,
 		private readonly PermissionService $permissionService,
 		private readonly LoggerInterface $logger,
@@ -39,17 +41,19 @@ class InvoiceController extends Controller {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function index(): DataResponse {
-		if (($r = $this->guardAccess()) !== null) {
+		if (($r = $this->guardAccess('invoices:read')) !== null) {
 			return $r;
 		}
 		return new DataResponse($this->invoiceService->list());
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function show(int $id): DataResponse {
-		if (($r = $this->guardAccess()) !== null) {
+		if (($r = $this->guardAccess('invoices:read')) !== null) {
 			return $r;
 		}
 		try {
@@ -59,13 +63,14 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function create(array $data = []): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
+		if (($r = $this->guardEdit('invoices:create')) !== null) {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->create($this->userId, $data), Http::STATUS_CREATED);
+			return new DataResponse($this->invoiceService->create($this->actingUserId(), $data), Http::STATUS_CREATED);
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -102,9 +107,10 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function commit(int $id): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
+		if (($r = $this->guardEdit('invoices:commit')) !== null) {
 			return $r;
 		}
 		try {
@@ -121,10 +127,11 @@ class InvoiceController extends Controller {
 	// GET download triggered via an <a download> click; browsers do not attach
 	// custom request headers (including CSRF tokens) on anchor navigations.
 	// Safe: read-only, access-gated below, authenticated session required.
+	#[PublicPage]
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function download(int $id): Response {
-		if (($r = $this->guardAccess()) !== null) {
+		if (($r = $this->guardAccess('invoices:pdf')) !== null) {
 			return $r;
 		}
 		try {
@@ -168,9 +175,10 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function send(int $id, string $to = '', string $subject = '', string $body = ''): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
+		if (($r = $this->guardEdit('invoices:send')) !== null) {
 			return $r;
 		}
 		try {
@@ -188,13 +196,14 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function cancel(int $id): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
+		if (($r = $this->guardEdit('invoices:cancel')) !== null) {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->cancel($id, $this->userId));
+			return new DataResponse($this->invoiceService->cancel($id, $this->actingUserId()));
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -212,7 +221,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->duplicate($id, $this->userId), Http::STATUS_CREATED);
+			return new DataResponse($this->invoiceService->duplicate($id, $this->actingUserId()), Http::STATUS_CREATED);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
@@ -220,9 +229,10 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function markPaid(int $id, ?string $date = null): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
+		if (($r = $this->guardEdit('invoices:pay')) !== null) {
 			return $r;
 		}
 		try {
@@ -248,23 +258,56 @@ class InvoiceController extends Controller {
 		}
 	}
 
-	private function guardAccess(): ?DataResponse {
-		if ($this->userId === null) {
+	private function guardAccess(?string $scope = null): ?DataResponse {
+		$userId = $this->actingUserId();
+		if ($userId === null) {
+			if (($rejection = $this->authContext->rejection()) !== null) {
+				return new DataResponse(
+					['error' => $rejection['message'], 'code' => $rejection['error']],
+					$rejection['status'],
+					$rejection['retryAfter'] > 0 ? ['Retry-After' => (string)$rejection['retryAfter']] : []
+				);
+			}
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
 		}
-		if (!$this->permissionService->hasAccess($this->userId)) {
+		if ($this->authContext->isMachine()) {
+			if ($scope !== null && $this->authContext->hasScope($scope)) {
+				return null;
+			}
+			return new DataResponse(['error' => 'Forbidden', 'code' => 'SCOPE_MISSING'], Http::STATUS_FORBIDDEN);
+		}
+		if (!$this->permissionService->hasAccess($userId)) {
 			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
 		return null;
 	}
 
-	private function guardEdit(): ?DataResponse {
-		if ($this->userId === null) {
+	private function guardEdit(?string $scope = null): ?DataResponse {
+		$userId = $this->actingUserId();
+		if ($userId === null) {
+			if (($rejection = $this->authContext->rejection()) !== null) {
+				return new DataResponse(
+					['error' => $rejection['message'], 'code' => $rejection['error']],
+					$rejection['status'],
+					$rejection['retryAfter'] > 0 ? ['Retry-After' => (string)$rejection['retryAfter']] : []
+				);
+			}
 			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
 		}
-		if (!$this->permissionService->canEdit($this->userId)) {
+		if ($this->authContext->isMachine()) {
+			if ($scope !== null && $this->authContext->hasScope($scope) && $this->permissionService->canEdit($userId)) {
+				return null;
+			}
+			return new DataResponse(['error' => 'Forbidden', 'code' => 'SCOPE_MISSING'], Http::STATUS_FORBIDDEN);
+		}
+		if (!$this->permissionService->canEdit($userId)) {
 			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
 		}
 		return null;
+	}
+
+	/** Session user or key owner — the identity every invoice operation acts as. */
+	private function actingUserId(): ?string {
+		return $this->authContext->getUserId();
 	}
 }

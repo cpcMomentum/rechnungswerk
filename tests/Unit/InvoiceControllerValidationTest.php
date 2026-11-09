@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\Tests\Unit;
 
 use OCA\Rechnungswerk\Controller\InvoiceController;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\AuthContext;
 use OCA\Rechnungswerk\Service\InvoiceService;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCP\AppFramework\Http;
@@ -37,9 +38,14 @@ class InvoiceControllerValidationTest extends TestCase {
 		$permissions->method('hasAccess')->willReturn(true);
 		$permissions->method('canEdit')->willReturn(true);
 
+		$authContext = $this->createMock(AuthContext::class);
+		$authContext->method('getUserId')->willReturn('alice');
+		$authContext->method('isMachine')->willReturn(false);
+		$authContext->method('rejection')->willReturn(null);
+
 		return new InvoiceController(
 			$this->createMock(IRequest::class),
-			'alice',
+			$authContext,
 			$service,
 			$permissions,
 			$this->createMock(LoggerInterface::class),
