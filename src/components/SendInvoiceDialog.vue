@@ -80,11 +80,11 @@ watch(() => props.open, (open) => {
 	if (isQuote.value) {
 		form.subject = inv?.number
 			? t('rechnungswerk', 'Angebot {number}', { number: inv.number })
-			: t('rechnungswerk', 'Ihr Angebot')
+			: t('rechnungswerk', 'Ihr Angebot') // TRANSLATORS: formal, addresses the customer
 	} else {
 		form.subject = inv?.number
 			? t('rechnungswerk', 'Rechnung {number}', { number: inv.number })
-			: t('rechnungswerk', 'Ihre Rechnung')
+			: t('rechnungswerk', 'Ihre Rechnung') // TRANSLATORS: formal, addresses the customer
 	}
 	form.body = props.defaultBody
 	nextTick(() => toInput.value?.focus())

@@ -569,8 +569,8 @@ const defaultMailBody = computed(() => {
 	const closing = (invoice.value?.extraText
 		?? textSnippetStore.defaultContent(snippetDocType.value, 'closing')).trim()
 	const fallback = isQuote.value
-		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.')
-		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).')
+		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.') // TRANSLATORS: formal, addresses the customer
+		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).') // TRANSLATORS: formal, addresses the customer
 	const parts = [
 		opening !== '' ? opening : fallback,
 		closing,

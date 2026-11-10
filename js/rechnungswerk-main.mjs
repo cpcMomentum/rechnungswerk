@@ -5210,7 +5210,7 @@ var lf = { class: "rw-table-wrap" }, uf = { class: "rw-table rw-table--positions
 			_: 1
 		}, 8, ["name"])) : n("", !0);
 	}
-}), [["__scopeId", "data-v-2f5a808a"]]), Yf = (e) => vs(`/audit/documents/${e}`), Xf = (e, t, n) => vs(`/audit?number=${encodeURIComponent(e)}&limit=${t}&offset=${n}`);
+}), [["__scopeId", "data-v-89fbe141"]]), Yf = (e) => vs(`/audit/documents/${e}`), Xf = (e, t, n) => vs(`/audit?number=${encodeURIComponent(e)}&limit=${t}&offset=${n}`);
 // src/utils/auditLabels.ts
 function Zf(e) {
 	switch (e) {
@@ -6433,7 +6433,7 @@ var Np = yn("textSnippet", () => {
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-ca0a5d98"]]), zh = {
+}), [["__scopeId", "data-v-3c22f017"]]), zh = {
 	name: "AlertCircleOutlineIcon",
 	emits: ["click"],
 	props: {
