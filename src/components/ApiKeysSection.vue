@@ -64,6 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 					<span>{{ t('rechnungswerk', 'Name') }}</span>
 					<input ref="nameInput" v-model="newName" class="input" type="text"
 						maxlength="64" :placeholder="t('rechnungswerk', 'z. B. WerkPlus')" />
+					<span class="rw-hint">{{ t('rechnungswerk', 'Der Name ist im Protokoll für alle App-Nutzer sichtbar.') }}</span>
 				</label>
 
 				<div class="field">
@@ -110,7 +111,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { createApiKey, getApiKeys, revokeApiKey, type ApiKey } from '@/api/apiKeys'
 
-const SCOPES = ['invoices:create', 'invoices:commit', 'invoices:send', 'invoices:pay', 'invoices:cancel', 'invoices:read', 'invoices:pdf'] as const
+const SCOPES = ['invoices:create', 'invoices:commit', 'invoices:send', 'invoices:pay', 'invoices:cancel', 'invoices:read', 'invoices:pdf', 'invoices:delete'] as const
 const RATE_LIMIT_MAX = 10000
 
 const SCOPE_LABELS: Record<string, string> = {
@@ -121,6 +122,7 @@ const SCOPE_LABELS: Record<string, string> = {
 	'invoices:cancel': t('rechnungswerk', 'Stornieren'),
 	'invoices:read': t('rechnungswerk', 'Rechnungen lesen'),
 	'invoices:pdf': t('rechnungswerk', 'PDF abrufen'),
+	'invoices:delete': t('rechnungswerk', 'Eigene Entwürfe löschen'),
 }
 
 const keys = ref<ApiKey[]>([])
@@ -265,6 +267,13 @@ onMounted(load)
 .field > span {
 	font-weight: 600;
 	font-size: 0.9em;
+}
+
+/* The modal renders outside .app-rechnungswerk, so the global hint style does not reach it. */
+.field > span.rw-hint {
+	font-weight: normal;
+	font-size: 0.85em;
+	color: var(--color-text-maxcontrast);
 }
 
 .input {

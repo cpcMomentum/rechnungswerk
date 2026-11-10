@@ -20,7 +20,7 @@ class ApiKeyService {
 
 	public const SCOPES = [
 		'invoices:create', 'invoices:commit', 'invoices:send', 'invoices:pay',
-		'invoices:cancel', 'invoices:read', 'invoices:pdf',
+		'invoices:cancel', 'invoices:read', 'invoices:pdf', 'invoices:delete',
 	];
 
 	public const RATE_LIMIT_DEFAULT = 60;

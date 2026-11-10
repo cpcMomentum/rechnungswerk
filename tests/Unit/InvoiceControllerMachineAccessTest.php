@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Tests\Unit;
 
 use OCA\Rechnungswerk\Controller\InvoiceController;
+use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Service\ApiKeyService;
 use OCA\Rechnungswerk\Service\AuthContext;
 use OCA\Rechnungswerk\Service\InvoiceService;
@@ -85,6 +86,83 @@ class InvoiceControllerMachineAccessTest extends TestCase {
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 	}
 
+	public function testAnonymousDeleteIsRejected(): void {
+		$service = $this->createMock(InvoiceService::class);
+		$service->expects($this->never())->method('deleteInvoice');
+		$controller = $this->controller(
+			context: $this->context(null, machine: false),
+			permissions: $this->permissions(true),
+			service: $service
+		);
+
+		$this->assertSame(Http::STATUS_UNAUTHORIZED, $controller->destroy(7)->getStatus());
+	}
+
+	public function testDeleteNeedsTheDeleteScope(): void {
+		$service = $this->createMock(InvoiceService::class);
+		$service->expects($this->never())->method('deleteInvoice');
+		$controller = $this->controller(
+			context: $this->context('alice', machine: true, scopes: ['invoices:create'], apiKeyId: 3),
+			permissions: $this->permissions(true),
+			service: $service
+		);
+
+		$response = $controller->destroy(7);
+
+		$this->assertSame(Http::STATUS_FORBIDDEN, $response->getStatus());
+		$this->assertSame('SCOPE_MISSING', $response->getData()['code']);
+	}
+
+	public function testDeleteByKeyIsLimitedToThatKey(): void {
+		$service = $this->createMock(InvoiceService::class);
+		$service->expects($this->once())->method('deleteInvoice')->with(7, 3);
+		$controller = $this->controller(
+			context: $this->context('alice', machine: true, scopes: ['invoices:delete'], apiKeyId: 3),
+			permissions: $this->permissions(true),
+			service: $service
+		);
+
+		$response = $controller->destroy(7);
+
+		$this->assertSame(Http::STATUS_NO_CONTENT, $response->getStatus());
+	}
+
+	public function testDeleteOfAForeignDraftAnswers404(): void {
+		$service = $this->createMock(InvoiceService::class);
+		$service->method('deleteInvoice')->willThrowException(new NotFoundException('Rechnung nicht gefunden.'));
+		$controller = $this->controller(
+			context: $this->context('alice', machine: true, scopes: ['invoices:delete'], apiKeyId: 3),
+			permissions: $this->permissions(true),
+			service: $service
+		);
+
+		$this->assertSame(Http::STATUS_NOT_FOUND, $controller->destroy(7)->getStatus());
+	}
+
+	public function testSessionDeleteIsNotLimitedToAKey(): void {
+		$service = $this->createMock(InvoiceService::class);
+		$service->expects($this->once())->method('deleteInvoice')->with(7, null);
+		$controller = $this->controller(
+			context: $this->context('alice', machine: false),
+			permissions: $this->permissions(true),
+			service: $service
+		);
+
+		$this->assertSame(Http::STATUS_NO_CONTENT, $controller->destroy(7)->getStatus());
+	}
+
+	public function testCreateByKeyRemembersTheKey(): void {
+		$service = $this->createMock(InvoiceService::class);
+		$service->expects($this->once())->method('create')->with('alice', [], 3)->willReturn(['id' => 9]);
+		$controller = $this->controller(
+			context: $this->context('alice', machine: true, scopes: ['invoices:create'], apiKeyId: 3),
+			permissions: $this->permissions(true),
+			service: $service
+		);
+
+		$this->assertSame(Http::STATUS_CREATED, $controller->create([])->getStatus());
+	}
+
 	private function permissions(bool $hasAccess): PermissionService&MockObject {
 		$permissions = $this->createMock(PermissionService::class);
 		$permissions->method('hasAccess')->willReturn($hasAccess);
@@ -95,10 +173,11 @@ class InvoiceControllerMachineAccessTest extends TestCase {
 	/**
 	 * @param array{status: int, error: string, message: string, retryAfter: int}|null $rejection
 	 */
-	private function context(?string $userId, bool $machine, array $rejection = [], array $scopes = []): AuthContext&MockObject {
+	private function context(?string $userId, bool $machine, array $rejection = [], array $scopes = [], ?int $apiKeyId = null): AuthContext&MockObject {
 		$context = $this->createMock(AuthContext::class);
 		$context->method('getUserId')->willReturn($userId);
 		$context->method('isMachine')->willReturn($machine);
+		$context->method('getApiKeyId')->willReturn($apiKeyId);
 		$context->method('rejection')->willReturn($rejection === [] ? null : $rejection);
 		$context->method('hasScope')->willReturnCallback(fn (string $s) => in_array($s, $scopes, true));
 		return $context;

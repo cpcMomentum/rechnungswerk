@@ -617,6 +617,8 @@ OC.L10N.register(
     "Mehr laden" : "Load more",
     "Das Protokoll konnte nicht geladen werden." : "The audit log could not be loaded.",
     "Verlauf" : "History",
-    "Durch Überarbeitung ersetzt" : "Superseded by revision"
+    "Durch Überarbeitung ersetzt" : "Superseded by revision",
+    "Der Name ist im Protokoll für alle App-Nutzer sichtbar." : "The name is visible to all app users in the audit log.",
+    "Eigene Entwürfe löschen" : "Delete own drafts"
 },
 "nplurals=2; plural=(n != 1);");

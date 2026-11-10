@@ -617,6 +617,8 @@ OC.L10N.register(
     "Mehr laden" : "Mehr laden",
     "Das Protokoll konnte nicht geladen werden." : "Das Protokoll konnte nicht geladen werden.",
     "Verlauf" : "Verlauf",
-    "Durch Überarbeitung ersetzt" : "Durch Überarbeitung ersetzt"
+    "Durch Überarbeitung ersetzt" : "Durch Überarbeitung ersetzt",
+    "Der Name ist im Protokoll für alle App-Nutzer sichtbar." : "Der Name ist im Protokoll für alle App-Nutzer sichtbar.",
+    "Eigene Entwürfe löschen" : "Eigene Entwürfe löschen"
 },
 "nplurals=2; plural=(n != 1);");
