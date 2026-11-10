@@ -76,8 +76,12 @@ class InvoiceServiceAuditTest extends TestCase {
 		$this->audit->method('record')->willReturnCallback($capture);
 		$this->audit->method('recordNow')->willReturnCallback($capture);
 
-		$this->service = new InvoiceService(
-			$this->invoiceMapper,
+		$this->service = $this->newService($this->invoiceMapper, $this->audit);
+	}
+
+	private function newService(InvoiceMapper $mapper, AuditService $audit): InvoiceService {
+		return new InvoiceService(
+			$mapper,
 			$this->itemMapper,
 			$this->settingsService,
 			$this->createMock(ZugferdService::class),
@@ -89,7 +93,7 @@ class InvoiceServiceAuditTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
-			$this->audit,
+			$audit,
 		);
 	}
 
@@ -261,24 +265,11 @@ class InvoiceServiceAuditTest extends TestCase {
 			}
 			return $i;
 		});
-		$service = new InvoiceService(
-			$this->invoiceMapper,
-			$this->itemMapper,
-			$this->settingsService,
-			$this->createMock(ZugferdService::class),
-			$this->createMock(ArchiveService::class),
-			$this->createMock(DocumentStore::class),
-			$this->mail,
-			$this->createMock(CountryService::class),
-			$this->db,
-			$this->createMock(LoggerInterface::class),
-			new NumberFormatMessage($this->l10nStub()),
-			$this->l10nStub(),
-			$this->audit,
-		);
+		$service = $this->newService($this->invoiceMapper, $this->audit);
 
-		$service->commit(7);
+		$result = $service->commit(7);
 
+		$this->assertTrue($result['datevMailSent']);
 		$this->assertSame([[AuditEntry::COMMIT, 7], [AuditEntry::DATEV_SEND, 7]], $this->recorded);
 	}
 
@@ -286,21 +277,7 @@ class InvoiceServiceAuditTest extends TestCase {
 		$this->document(Invoice::TYPE_INVOICE, Invoice::STATUS_DRAFT);
 		$audit = $this->createMock(AuditService::class);
 		$audit->method('record')->willThrowException(new \RuntimeException('db down'));
-		$service = new InvoiceService(
-			$this->invoiceMapper,
-			$this->itemMapper,
-			$this->settingsService,
-			$this->createMock(ZugferdService::class),
-			$this->createMock(ArchiveService::class),
-			$this->createMock(DocumentStore::class),
-			$this->createMock(MailService::class),
-			$this->createMock(CountryService::class),
-			$this->db,
-			$this->createMock(LoggerInterface::class),
-			new NumberFormatMessage($this->l10nStub()),
-			$this->l10nStub(),
-			$audit,
-		);
+		$service = $this->newService($this->invoiceMapper, $audit);
 
 		$audit->expects($this->once())->method('discard');
 		$audit->expects($this->never())->method('flush');

@@ -389,7 +389,7 @@ class InvoiceService {
 	/**
 	 * Attempt the automatic DATEV hand-off for a freshly committed invoice.
 	 * Returns true if a mail was sent, false if skipped (toggle off / no
-	 * address), null if it was attempted but failed.
+	 * address), null if the mail could not be sent.
 	 */
 	private function maybeSendToDatev(Invoice $invoice): ?bool {
 		$mailSent = false;
@@ -427,9 +427,9 @@ class InvoiceService {
 				'exception' => $e,
 				'invoice' => $invoice->getId(),
 			]);
-			// The audit log states what DATEV actually received, even if only the status update failed.
+			// Once the mail is out, report it as sent: a "failed" notice would invite a duplicate upload.
 			$this->auditService->recordNow($mailSent ? AuditEntry::DATEV_SEND : AuditEntry::DATEV_SEND_FAILED, $invoice);
-			return null;
+			return $mailSent ? true : null;
 		}
 		$this->auditService->recordNow(AuditEntry::DATEV_SEND, $invoice);
 		return true;
