@@ -14,6 +14,7 @@ use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ArchiveService;
+use OCA\Rechnungswerk\Service\AuditService;
 use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
@@ -61,6 +62,7 @@ class InvoiceServiceCountryTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
 		);
 	}
 

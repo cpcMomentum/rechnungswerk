@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Service;
 
 use DateTime;
+use OCA\Rechnungswerk\Db\AuditEntry;
 use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
@@ -39,6 +40,7 @@ class InvoiceService {
 		private readonly LoggerInterface $logger,
 		private readonly NumberFormatMessage $numberFormatMessage,
 		private readonly IL10N $l10n,
+		private readonly AuditService $auditService,
 	) {
 	}
 
@@ -103,9 +105,12 @@ class InvoiceService {
 			$this->replaceItems($invoice, $items);
 			$this->recomputeTotals($invoice);
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::CREATE, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -152,9 +157,12 @@ class InvoiceService {
 			$this->recomputeTotals($invoice);
 			$invoice->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::UPDATE, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -189,9 +197,12 @@ class InvoiceService {
 			$this->assertDraft($invoice);
 			$this->itemMapper->deleteByInvoice((int)$invoice->getId());
 			$this->invoiceMapper->delete($invoice);
+			$this->auditService->record(AuditEntry::DELETE, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 	}
@@ -247,9 +258,12 @@ class InvoiceService {
 			$invoice->setUpdatedAt($now);
 			$this->recomputeTotals($invoice);
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::COMMIT, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -432,6 +446,13 @@ class InvoiceService {
 		// unterscheiden, was beim Festschreiben ins Archiv ging.
 		$document = $this->documentFor($invoice);
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $document['content'], $document['filename'], $settings, $this->settingsService->getSmtpConfig());
+		try {
+			$this->auditService->record(AuditEntry::SEND, $invoice);
+			$this->auditService->flush();
+		} catch (\Throwable $e) {
+			// The mail is out; an error here would invite a second send.
+			$this->logger->error('Rechnungswerk: audit entry for send failed', ['exception' => $e, 'invoice' => $invoice->getId()]);
+		}
 	}
 
 	/**
@@ -525,9 +546,13 @@ class InvoiceService {
 			$original->setUpdatedAt($now);
 			$this->invoiceMapper->update($original);
 
+			$this->auditService->record(AuditEntry::CANCEL, $original);
+			$this->auditService->record(AuditEntry::CANCEL_DOCUMENT, $storno);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -620,9 +645,12 @@ class InvoiceService {
 			$this->recomputeTotals($copy);
 			$this->invoiceMapper->update($copy);
 
+			$this->auditService->record(AuditEntry::DUPLICATE, $copy);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -1079,9 +1107,12 @@ class InvoiceService {
 			$invoice->setPaidAt($paidAt);
 			$invoice->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::PAY, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($invoice);
@@ -1104,9 +1135,12 @@ class InvoiceService {
 			$invoice->setPaidAt(null);
 			$invoice->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::UNPAY, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($invoice);
@@ -1174,9 +1208,12 @@ class InvoiceService {
 			$this->replaceItems($quote, $items);
 			$this->recomputeTotals($quote);
 			$this->invoiceMapper->update($quote);
+			$this->auditService->record(AuditEntry::CREATE, $quote);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($quote);
@@ -1249,9 +1286,12 @@ class InvoiceService {
 			$quote->setUpdatedAt($now);
 			$this->recomputeTotals($quote);
 			$this->invoiceMapper->update($quote);
+			$this->auditService->record(AuditEntry::COMMIT, $quote);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($quote);
@@ -1328,6 +1368,7 @@ class InvoiceService {
 		$source->setQuoteStatus(Invoice::QUOTE_SUPERSEDED);
 		$source->setUpdatedAt($now);
 		$this->invoiceMapper->update($source);
+		$this->auditService->record(AuditEntry::SUPERSEDE, $source);
 	}
 
 	/**
@@ -1401,9 +1442,12 @@ class InvoiceService {
 			$this->recomputeTotals($revision);
 			$this->invoiceMapper->update($revision);
 
+			$this->auditService->record(AuditEntry::REVISE, $revision);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($revision);
@@ -1444,9 +1488,12 @@ class InvoiceService {
 			$quote->setQuoteStatus($outcome);
 			$quote->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($quote);
+			$this->auditService->record($outcome === Invoice::QUOTE_ACCEPTED ? AuditEntry::ACCEPT : AuditEntry::REJECT, $quote);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($quote);
@@ -1527,9 +1574,13 @@ class InvoiceService {
 			$quote->setUpdatedAt($now);
 			$this->invoiceMapper->update($quote);
 
+			$this->auditService->record(AuditEntry::CONVERT, $quote);
+			$this->auditService->record(AuditEntry::CONVERT_DOCUMENT, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($invoice);
@@ -1581,6 +1632,13 @@ class InvoiceService {
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
 		$pdf = $this->zugferdService->generateQuotePdf($quote, $items, $settings);
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $this->quoteFileName($quote), $settings, $this->settingsService->getSmtpConfig());
+		try {
+			$this->auditService->record(AuditEntry::SEND, $quote);
+			$this->auditService->flush();
+		} catch (\Throwable $e) {
+			// The mail is out; an error here would invite a second send.
+			$this->logger->error('Rechnungswerk: audit entry for send failed', ['exception' => $e, 'invoice' => $quote->getId()]);
+		}
 	}
 
 	private function quoteFileName(Invoice $quote): string {

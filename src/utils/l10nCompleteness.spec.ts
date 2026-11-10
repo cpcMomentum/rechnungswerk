@@ -210,7 +210,7 @@ describe('Übersetzungen sind vollständig', () => {
 		// Woerter, die in beiden Sprachen gleich sind; alles andere ist ein vergessener Eintrag.
 		const GLEICH = new Set([
 			'BIC', 'Bank', 'Branding', 'Format', 'IBAN', 'Name', 'Port', 'Status',
-			'Text', 'Tonne', 'WerkPlus', 'kWh', 'kg', 'm²',
+			'System', 'Text', 'Tonne', 'WerkPlus', 'kWh', 'kg', 'm²',
 			'Standard (60)', 'Standard: 60',
 			// „Version {version}" lautet im Englischen wortgleich.
 			'Version {version}',
