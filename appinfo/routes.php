@@ -83,6 +83,9 @@ return [
 		// Laenderliste fuer die Auswahlfelder (#167)
 		['name' => 'country#index', 'url' => '/api/v1/countries', 'verb' => 'GET'],
 
+		['name' => 'audit#index',    'url' => '/api/v1/audit',                'verb' => 'GET'],
+		['name' => 'audit#document', 'url' => '/api/v1/audit/documents/{id}', 'verb' => 'GET'],
+
 		// „Was ist neu?"-Fenster (#308)
 		['name' => 'whatsNew#index', 'url' => '/api/v1/whatsnew',      'verb' => 'GET'],
 		['name' => 'whatsNew#seen',  'url' => '/api/v1/whatsnew/seen', 'verb' => 'POST'],
