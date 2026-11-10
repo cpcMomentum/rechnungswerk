@@ -12,7 +12,6 @@ namespace OCA\Rechnungswerk\Migration;
 use Closure;
 use OCA\Rechnungswerk\Db\TextSnippet;
 use OCA\Rechnungswerk\Service\SettingsService;
-use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
@@ -24,7 +23,7 @@ class Version002400Date20261110160000 extends SimpleMigrationStep {
 	public const DEFAULTS = [
 		TextSnippet::DOC_TYPE_INVOICE => [
 			TextSnippet::SLOT_OPENING => ['Standard Rechnungseinleitung', "Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihren Auftrag. Hiermit erhalten Sie unsere Rechnung."],
-			TextSnippet::SLOT_CLOSING => ['Standard Rechnungsschluss', "Vielen Dank für die gute Zusammenarbeit.\n\nMit freundlichen Grüßen"],
+			TextSnippet::SLOT_CLOSING => ['Standard Rechnungsschluss', "Wir danken Ihnen für die gute Zusammenarbeit.\n\nMit freundlichen Grüßen"],
 		],
 		TextSnippet::DOC_TYPE_QUOTE => [
 			TextSnippet::SLOT_OPENING => ['Standard Angebotseinleitung', "Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihre Anfrage. Gerne unterbreiten wir Ihnen unser Angebot."],
