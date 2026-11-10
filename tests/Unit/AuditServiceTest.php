@@ -130,6 +130,21 @@ class AuditServiceTest extends TestCase {
 		$this->addToAssertionCount(1);
 	}
 
+	public function testRecordNowDispatchesRightAway(): void {
+		$this->mapper->method('insert')->willReturnArgument(0);
+		$this->eventDispatcher->expects($this->once())->method('dispatchTyped');
+
+		$this->service->recordNow(AuditEntry::DATEV_CONFIRM, $this->draft());
+	}
+
+	public function testRecordNowOnlyLogsAFailingEntry(): void {
+		$this->mapper->method('insert')->willThrowException(new \RuntimeException('db down'));
+		$this->eventDispatcher->expects($this->never())->method('dispatchTyped');
+
+		$this->service->recordNow(AuditEntry::DATEV_SEND, $this->draft());
+		$this->service->flush();
+	}
+
 	public function testPresentResolvesNamesAndMarksDeletedDocuments(): void {
 		$byUser = $this->entry(1, 15, 'alice', null);
 		$byKey = $this->entry(2, 16, 'gone', 3);

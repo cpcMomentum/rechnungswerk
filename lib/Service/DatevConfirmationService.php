@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Service;
 
 use DateTime;
+use OCA\Rechnungswerk\Db\AuditEntry;
 use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Imap\ImapClient;
@@ -33,6 +34,7 @@ class DatevConfirmationService {
 	public function __construct(
 		private readonly SettingsService $settingsService,
 		private readonly InvoiceMapper $invoiceMapper,
+		private readonly AuditService $auditService,
 		private readonly LoggerInterface $logger,
 	) {
 	}
@@ -113,16 +115,7 @@ class DatevConfirmationService {
 					if ($invoice === null) {
 						continue;
 					}
-					$body = $parsed['text'];
-					$success = self::isSuccess($body);
-					$invoice->setDatevStatus($success ? Invoice::DATEV_CONFIRMED : Invoice::DATEV_UNKNOWN);
-					$invoice->setDatevStatusAt(new DateTime());
-					if (!$success) {
-						// Error/rejection format is not yet known — keep the raw text for
-						// later analysis instead of guessing a 'failed' parse.
-						$invoice->setDatevResponseRaw(mb_substr($body, 0, 2000));
-					}
-					$this->invoiceMapper->update($invoice);
+					$success = $this->apply($invoice, $parsed['text']);
 
 					// Opt-in cleanup: only our own (matched) AND confirmed mails go to
 					// Trash. Unknown replies are kept for analysis; n8n's incoming
@@ -145,6 +138,21 @@ class DatevConfirmationService {
 		}
 
 		return ['pending' => count($pending), 'messages' => $seen, 'matched' => $matched];
+	}
+
+	/** Store DATEV's reply on the matched invoice; returns whether it reports success. */
+	public function apply(Invoice $invoice, string $body): bool {
+		$success = self::isSuccess($body);
+		$invoice->setDatevStatus($success ? Invoice::DATEV_CONFIRMED : Invoice::DATEV_UNKNOWN);
+		$invoice->setDatevStatusAt(new DateTime());
+		if (!$success) {
+			// Error/rejection format is not yet known — keep the raw text for
+			// later analysis instead of guessing a 'failed' parse.
+			$invoice->setDatevResponseRaw(mb_substr($body, 0, 2000));
+		}
+		$this->invoiceMapper->update($invoice);
+		$this->auditService->recordNow($success ? AuditEntry::DATEV_CONFIRM : AuditEntry::DATEV_UNKNOWN, $invoice);
+		return $success;
 	}
 
 	/**

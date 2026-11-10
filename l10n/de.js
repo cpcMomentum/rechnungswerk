@@ -619,6 +619,9 @@ OC.L10N.register(
     "Verlauf" : "Verlauf",
     "Durch Überarbeitung ersetzt" : "Durch Überarbeitung ersetzt",
     "Der Name ist im Protokoll für alle App-Nutzer sichtbar." : "Der Name ist im Protokoll für alle App-Nutzer sichtbar.",
-    "Eigene Entwürfe löschen" : "Eigene Entwürfe löschen"
+    "Eigene Entwürfe löschen" : "Eigene Entwürfe löschen",
+    "An DATEV gesendet" : "An DATEV gesendet",
+    "DATEV-Versand fehlgeschlagen" : "DATEV-Versand fehlgeschlagen",
+    "Von DATEV bestätigt" : "Von DATEV bestätigt"
 },
 "nplurals=2; plural=(n != 1);");

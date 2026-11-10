@@ -30,6 +30,10 @@ class AuditEntry extends Entity {
 	public const CONVERT = 'convert';
 	public const CONVERT_DOCUMENT = 'convert_document';
 	public const SUPERSEDE = 'supersede';
+	public const DATEV_SEND = 'datev_send';
+	public const DATEV_SEND_FAILED = 'datev_send_failed';
+	public const DATEV_CONFIRM = 'datev_confirm';
+	public const DATEV_UNKNOWN = 'datev_unknown';
 
 	protected ?int $createdAt = null;
 	protected ?string $userId = null;
