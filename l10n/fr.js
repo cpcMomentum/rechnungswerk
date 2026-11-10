@@ -617,6 +617,8 @@ OC.L10N.register(
     "Mehr laden" : "Charger plus",
     "Das Protokoll konnte nicht geladen werden." : "Le journal n’a pas pu être chargé.",
     "Verlauf" : "Historique",
-    "Durch Überarbeitung ersetzt" : "Remplacé par une révision"
+    "Durch Überarbeitung ersetzt" : "Remplacé par une révision",
+    "Der Name ist im Protokoll für alle App-Nutzer sichtbar." : "Le nom est visible par tous les utilisateurs de l'application dans le journal.",
+    "Eigene Entwürfe löschen" : "Supprimer ses propres brouillons"
 },
 "nplurals=2; plural=(n > 1);");

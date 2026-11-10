@@ -82,10 +82,11 @@ class InvoiceService {
 	 * @return array<string, mixed>
 	 * @throws ValidationException
 	 */
-	public function create(string $userId, array $data): array {
+	public function create(string $userId, array $data, ?int $apiKeyId = null): array {
 		$now = new DateTime();
 		$invoice = new Invoice();
 		$invoice->setOwnerUserId($userId);
+		$invoice->setApiKeyId($apiKeyId);
 		$invoice->setStatus(Invoice::STATUS_DRAFT);
 		$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
 		$invoice->setCreatedAt($now);
@@ -156,6 +157,8 @@ class InvoiceService {
 			}
 			$this->recomputeTotals($invoice);
 			$invoice->setUpdatedAt(new DateTime());
+			// Edited by a person, so the creating key may no longer delete it.
+			$invoice->setApiKeyId(null);
 			$this->invoiceMapper->update($invoice);
 			$this->auditService->record(AuditEntry::UPDATE, $invoice);
 			$this->db->commit();
@@ -172,20 +175,21 @@ class InvoiceService {
 	/**
 	 * Type-guarded entry point for InvoiceController: rejects a quote id before
 	 * reusing the shared delete() transaction (see assertInvoiceType()).
+	 * With $apiKeyId set, only drafts created by that key are deletable.
 	 *
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function deleteInvoice(int $id): void {
+	public function deleteInvoice(int $id, ?int $apiKeyId = null): void {
 		$this->assertInvoiceType($this->findById($id));
-		$this->delete($id);
+		$this->delete($id, $apiKeyId);
 	}
 
 	/**
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function delete(int $id): void {
+	public function delete(int $id, ?int $apiKeyId = null): void {
 		$this->findById($id); // Fast 404 before opening a transaction.
 
 		$this->db->beginTransaction();
@@ -194,6 +198,7 @@ class InvoiceService {
 			// slipping through: without this a committed (GoBD-relevant)
 			// invoice could be deleted by a concurrent in-flight delete call.
 			$invoice = $this->findByIdForUpdate($id);
+			$this->assertCreatedByKey($invoice, $apiKeyId);
 			$this->assertDraft($invoice);
 			$this->itemMapper->deleteByInvoice((int)$invoice->getId());
 			$this->invoiceMapper->delete($invoice);
@@ -774,6 +779,17 @@ class InvoiceService {
 		try {
 			return $this->invoiceMapper->findOne($id);
 		} catch (DoesNotExistException) {
+			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
+		}
+	}
+
+	/**
+	 * Foreign documents answer like missing ones, so a key cannot probe which ids exist.
+	 *
+	 * @throws NotFoundException
+	 */
+	private function assertCreatedByKey(Invoice $invoice, ?int $apiKeyId): void {
+		if ($apiKeyId !== null && $invoice->getApiKeyId() !== $apiKeyId) {
 			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
 		}
 	}

@@ -119,6 +119,24 @@ describe('ApiKeysSection', () => {
 		expect(wrapper.text()).toContain('rwrk_newplaintext')
 	})
 
+	it('bietet das Löschen eigener Entwürfe als eigenes Recht an', async () => {
+		getApiKeys.mockResolvedValue([])
+		createApiKey.mockResolvedValue({ ...KEY, plaintext: 'rwrk_newplaintext' })
+		const wrapper = mount(ApiKeysSection)
+		await flushPromises()
+
+		await wrapper.find('.stub-button').trigger('click')
+		expect(wrapper.text()).toContain('Der Name ist im Protokoll für alle App-Nutzer sichtbar.')
+		const deleteScope = wrapper.findAll('.rw-api-keys__scope').find((l) => l.text() === 'Eigene Entwürfe löschen')
+		expect(deleteScope).toBeDefined()
+		await wrapper.find('input[type="text"]').setValue('WerkPlus')
+		await deleteScope!.find('input').setValue(true)
+		await wrapper.findAll('.stub-button')[2].trigger('click')
+		await flushPromises()
+
+		expect(createApiKey).toHaveBeenCalledWith('WerkPlus', ['invoices:delete'], null)
+	})
+
 	it('übergibt ein gesetztes Rate-Limit', async () => {
 		getApiKeys.mockResolvedValue([])
 		createApiKey.mockResolvedValue({ ...KEY, plaintext: 'rwrk_newplaintext' })
