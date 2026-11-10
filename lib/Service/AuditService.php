@@ -80,6 +80,17 @@ class AuditService {
 		$this->pending = [];
 	}
 
+	/** For actions outside a transaction (mail sent, mailbox read): a failing entry is only logged. */
+	public function recordNow(string $action, Invoice $document): void {
+		try {
+			$this->record($action, $document);
+			$this->flush();
+		} catch (\Throwable $e) {
+			$this->discard();
+			$this->logger->error('Rechnungswerk: audit entry failed', ['exception' => $e, 'action' => $action, 'invoice' => $document->getId()]);
+		}
+	}
+
 	/** @return list<array<string, mixed>> */
 	public function forDocument(int $documentId): array {
 		return $this->present($this->mapper->findByDocument($documentId));

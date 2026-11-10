@@ -619,6 +619,9 @@ OC.L10N.register(
     "Verlauf" : "Historique",
     "Durch Überarbeitung ersetzt" : "Remplacé par une révision",
     "Der Name ist im Protokoll für alle App-Nutzer sichtbar." : "Le nom est visible par tous les utilisateurs de l'application dans le journal.",
-    "Eigene Entwürfe löschen" : "Supprimer ses propres brouillons"
+    "Eigene Entwürfe löschen" : "Supprimer ses propres brouillons",
+    "An DATEV gesendet" : "Envoyée à DATEV",
+    "DATEV-Versand fehlgeschlagen" : "Échec de l'envoi à DATEV",
+    "Von DATEV bestätigt" : "Confirmée par DATEV"
 },
 "nplurals=2; plural=(n > 1);");

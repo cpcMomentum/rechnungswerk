@@ -5230,6 +5230,10 @@ function Zf(e) {
 		case "convert": return T("rechnungswerk", "In Rechnung übernommen");
 		case "convert_document": return T("rechnungswerk", "Aus Angebot angelegt");
 		case "supersede": return T("rechnungswerk", "Durch Überarbeitung ersetzt");
+		case "datev_send": return T("rechnungswerk", "An DATEV gesendet");
+		case "datev_send_failed": return T("rechnungswerk", "DATEV-Versand fehlgeschlagen");
+		case "datev_confirm": return T("rechnungswerk", "Von DATEV bestätigt");
+		case "datev_unknown": return T("rechnungswerk", "DATEV-Antwort prüfen");
 		default: return e;
 	}
 }

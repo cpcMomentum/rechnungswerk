@@ -619,6 +619,9 @@ OC.L10N.register(
     "Verlauf" : "History",
     "Durch Überarbeitung ersetzt" : "Superseded by revision",
     "Der Name ist im Protokoll für alle App-Nutzer sichtbar." : "The name is visible to all app users in the audit log.",
-    "Eigene Entwürfe löschen" : "Delete own drafts"
+    "Eigene Entwürfe löschen" : "Delete own drafts",
+    "An DATEV gesendet" : "Sent to DATEV",
+    "DATEV-Versand fehlgeschlagen" : "Sending to DATEV failed",
+    "Von DATEV bestätigt" : "Confirmed by DATEV"
 },
 "nplurals=2; plural=(n != 1);");

@@ -389,9 +389,10 @@ class InvoiceService {
 	/**
 	 * Attempt the automatic DATEV hand-off for a freshly committed invoice.
 	 * Returns true if a mail was sent, false if skipped (toggle off / no
-	 * address), null if it was attempted but failed.
+	 * address), null if the mail could not be sent.
 	 */
 	private function maybeSendToDatev(Invoice $invoice): ?bool {
+		$mailSent = false;
 		try {
 			$settings = $this->settingsService->getCompany();
 			$target = $settings->getDatevUploadMail();
@@ -412,6 +413,7 @@ class InvoiceService {
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
+			$mailSent = true;
 			// Record the hand-off so the DATEV confirmation channel (#36) can match
 			// the reply (via In-Reply-To = this Message-ID) and flip the status.
 			$invoice->setDatevStatus(Invoice::DATEV_PENDING);
@@ -420,14 +422,17 @@ class InvoiceService {
 				$invoice->setDatevMessageId($messageId);
 			}
 			$this->invoiceMapper->update($invoice);
-			return true;
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: DATEV-Auto-Versand fehlgeschlagen', [
 				'exception' => $e,
 				'invoice' => $invoice->getId(),
 			]);
-			return null;
+			// Once the mail is out, report it as sent: a "failed" notice would invite a duplicate upload.
+			$this->auditService->recordNow($mailSent ? AuditEntry::DATEV_SEND : AuditEntry::DATEV_SEND_FAILED, $invoice);
+			return $mailSent ? true : null;
 		}
+		$this->auditService->recordNow(AuditEntry::DATEV_SEND, $invoice);
+		return true;
 	}
 
 	/**
@@ -451,13 +456,8 @@ class InvoiceService {
 		// unterscheiden, was beim Festschreiben ins Archiv ging.
 		$document = $this->documentFor($invoice);
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $document['content'], $document['filename'], $settings, $this->settingsService->getSmtpConfig());
-		try {
-			$this->auditService->record(AuditEntry::SEND, $invoice);
-			$this->auditService->flush();
-		} catch (\Throwable $e) {
-			// The mail is out; an error here would invite a second send.
-			$this->logger->error('Rechnungswerk: audit entry for send failed', ['exception' => $e, 'invoice' => $invoice->getId()]);
-		}
+		// The mail is out; an audit error here must not invite a second send.
+		$this->auditService->recordNow(AuditEntry::SEND, $invoice);
 	}
 
 	/**
@@ -1648,13 +1648,7 @@ class InvoiceService {
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
 		$pdf = $this->zugferdService->generateQuotePdf($quote, $items, $settings);
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $this->quoteFileName($quote), $settings, $this->settingsService->getSmtpConfig());
-		try {
-			$this->auditService->record(AuditEntry::SEND, $quote);
-			$this->auditService->flush();
-		} catch (\Throwable $e) {
-			// The mail is out; an error here would invite a second send.
-			$this->logger->error('Rechnungswerk: audit entry for send failed', ['exception' => $e, 'invoice' => $quote->getId()]);
-		}
+		$this->auditService->recordNow(AuditEntry::SEND, $quote);
 	}
 
 	private function quoteFileName(Invoice $quote): string {

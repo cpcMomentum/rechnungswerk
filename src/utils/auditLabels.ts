@@ -24,6 +24,10 @@ export function auditActionLabel(action: string): string {
 	case 'convert': return t('rechnungswerk', 'In Rechnung übernommen')
 	case 'convert_document': return t('rechnungswerk', 'Aus Angebot angelegt')
 	case 'supersede': return t('rechnungswerk', 'Durch Überarbeitung ersetzt')
+	case 'datev_send': return t('rechnungswerk', 'An DATEV gesendet')
+	case 'datev_send_failed': return t('rechnungswerk', 'DATEV-Versand fehlgeschlagen')
+	case 'datev_confirm': return t('rechnungswerk', 'Von DATEV bestätigt')
+	case 'datev_unknown': return t('rechnungswerk', 'DATEV-Antwort prüfen')
 	default: return action
 	}
 }

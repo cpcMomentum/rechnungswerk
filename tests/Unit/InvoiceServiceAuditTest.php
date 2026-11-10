@@ -39,6 +39,8 @@ class InvoiceServiceAuditTest extends TestCase {
 	private SettingsService&MockObject $settingsService;
 	private IDBConnection&MockObject $db;
 	private AuditService&MockObject $audit;
+	private MailService&MockObject $mail;
+	private Settings $settings;
 	private InvoiceService $service;
 	/** @var list<array{string, int}> */
 	private array $recorded = [];
@@ -51,7 +53,8 @@ class InvoiceServiceAuditTest extends TestCase {
 		$this->db = $this->createMock(IDBConnection::class);
 		$this->audit = $this->createMock(AuditService::class);
 
-		$settings = new Settings();
+		$this->mail = $this->createMock(MailService::class);
+		$this->settings = $settings = new Settings();
 		$settings->setOwnerUserId('__company__');
 		$settings->setCompanyName('Muster GmbH');
 		$settings->setVatId('DE123456789');
@@ -67,24 +70,30 @@ class InvoiceServiceAuditTest extends TestCase {
 		});
 		$this->invoiceMapper->method('update')->willReturnArgument(0);
 		$this->itemMapper->method('findByInvoice')->willReturn([$this->item()]);
-		$this->audit->method('record')->willReturnCallback(function (string $action, Invoice $doc): void {
+		$capture = function (string $action, Invoice $doc): void {
 			$this->recorded[] = [$action, (int)$doc->getId()];
-		});
+		};
+		$this->audit->method('record')->willReturnCallback($capture);
+		$this->audit->method('recordNow')->willReturnCallback($capture);
 
-		$this->service = new InvoiceService(
-			$this->invoiceMapper,
+		$this->service = $this->newService($this->invoiceMapper, $this->audit);
+	}
+
+	private function newService(InvoiceMapper $mapper, AuditService $audit): InvoiceService {
+		return new InvoiceService(
+			$mapper,
 			$this->itemMapper,
 			$this->settingsService,
 			$this->createMock(ZugferdService::class),
 			$this->createMock(ArchiveService::class),
 			$this->createMock(DocumentStore::class),
-			$this->createMock(MailService::class),
+			$this->mail,
 			$this->createMock(CountryService::class),
 			$this->db,
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
-			$this->audit,
+			$audit,
 		);
 	}
 
@@ -216,25 +225,59 @@ class InvoiceServiceAuditTest extends TestCase {
 		$this->assertSame([[AuditEntry::SEND, 7]], $this->recorded);
 	}
 
+	private function enableDatev(): void {
+		$this->settings->setDatevAutoSend(1);
+		$this->settings->setDatevUploadMail('upload@datev.example');
+	}
+
+	public function testCommitRecordsTheDatevHandOff(): void {
+		$this->enableDatev();
+		$this->document(Invoice::TYPE_INVOICE, Invoice::STATUS_DRAFT);
+		$this->mail->method('sendInvoicePdf')->willReturn('<msg@localhost>');
+
+		$result = $this->service->commit(7);
+
+		$this->assertTrue($result['datevMailSent']);
+		$this->assertSame([[AuditEntry::COMMIT, 7], [AuditEntry::DATEV_SEND, 7]], $this->recorded);
+	}
+
+	public function testFailedDatevMailIsRecorded(): void {
+		$this->enableDatev();
+		$this->document(Invoice::TYPE_INVOICE, Invoice::STATUS_DRAFT);
+		$this->mail->method('sendInvoicePdf')->willThrowException(new \RuntimeException('smtp down'));
+
+		$result = $this->service->commit(7);
+
+		$this->assertNull($result['datevMailSent']);
+		$this->assertSame([[AuditEntry::COMMIT, 7], [AuditEntry::DATEV_SEND_FAILED, 7]], $this->recorded);
+	}
+
+	public function testDatevMailThatWentOutIsRecordedAsSentEvenIfTheStatusUpdateFails(): void {
+		$this->enableDatev();
+		$doc = $this->document(Invoice::TYPE_INVOICE, Invoice::STATUS_DRAFT);
+		$this->mail->method('sendInvoicePdf')->willReturn('<msg@localhost>');
+		$this->invoiceMapper = $this->createMock(InvoiceMapper::class);
+		$this->invoiceMapper->method('findOne')->willReturn($doc);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($doc);
+		$this->invoiceMapper->method('update')->willReturnCallback(function (Invoice $i): Invoice {
+			if ($i->getDatevStatus() === Invoice::DATEV_PENDING) {
+				throw new \RuntimeException('db down');
+			}
+			return $i;
+		});
+		$service = $this->newService($this->invoiceMapper, $this->audit);
+
+		$result = $service->commit(7);
+
+		$this->assertTrue($result['datevMailSent']);
+		$this->assertSame([[AuditEntry::COMMIT, 7], [AuditEntry::DATEV_SEND, 7]], $this->recorded);
+	}
+
 	public function testFailingRecordRollsTheActionBack(): void {
 		$this->document(Invoice::TYPE_INVOICE, Invoice::STATUS_DRAFT);
 		$audit = $this->createMock(AuditService::class);
 		$audit->method('record')->willThrowException(new \RuntimeException('db down'));
-		$service = new InvoiceService(
-			$this->invoiceMapper,
-			$this->itemMapper,
-			$this->settingsService,
-			$this->createMock(ZugferdService::class),
-			$this->createMock(ArchiveService::class),
-			$this->createMock(DocumentStore::class),
-			$this->createMock(MailService::class),
-			$this->createMock(CountryService::class),
-			$this->db,
-			$this->createMock(LoggerInterface::class),
-			new NumberFormatMessage($this->l10nStub()),
-			$this->l10nStub(),
-			$audit,
-		);
+		$service = $this->newService($this->invoiceMapper, $audit);
 
 		$audit->expects($this->once())->method('discard');
 		$audit->expects($this->never())->method('flush');
