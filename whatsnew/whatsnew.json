@@ -1,4 +1,81 @@
 {
+	"0.8.0": [
+		{
+			"title": {
+				"de": "Protokoll: wer hat was getan",
+				"en": "Audit log: who did what",
+				"fr": "Journal : qui a fait quoi"
+			},
+			"text": {
+				"de": "Ein neues Protokoll zeigt, wer Rechnungen und Angebote angelegt, festgeschrieben, versendet oder storniert hat, auch über API-Schlüssel. Die Übergabe an DATEV und deren Rückmeldung stehen ebenfalls darin. Vorgänge vor diesem Update sind nicht erfasst.",
+				"en": "A new audit log shows who created, finalised, sent or cancelled invoices and quotes, including actions via API keys. The handover to DATEV and its response are listed there as well. Actions before this update are not recorded.",
+				"fr": "Un nouveau journal indique qui a créé, finalisé, envoyé ou annulé des factures et des devis, y compris via des clés API. La transmission à DATEV et sa réponse y figurent également. Les opérations antérieures à cette mise à jour ne sont pas enregistrées."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Protokoll",
+				"en": "Audit log",
+				"fr": "Journal"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Standard-Textbausteine ab Werk",
+				"en": "Default text snippets included",
+				"fr": "Modèles de texte par défaut inclus"
+			},
+			"text": {
+				"de": "Wer noch keine Textbausteine angelegt hatte, findet jetzt vier vor: Einleitung und Schluss für Rechnungen und für Angebote. Neue Belege tragen diese Texte automatisch, auch im PDF. Unter Textbausteine lassen sie sich ändern oder löschen.",
+				"en": "Installations without any text snippets now come with four: an opening and a closing text for invoices and for quotes, in German. New documents carry these texts automatically, also in the PDF. They can be changed or deleted under Text snippets.",
+				"fr": "Les installations sans modèle de texte en reçoivent désormais quatre : une introduction et une conclusion pour les factures et pour les devis, en allemand. Les nouveaux documents portent automatiquement ces textes, y compris dans le PDF. Ils peuvent être modifiés ou supprimés sous Modèles de texte."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Textbausteine",
+				"en": "Text snippets",
+				"fr": "Modèles de texte"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Anrede folgt der Kontosprache",
+				"en": "Form of address follows the account language",
+				"fr": "La forme d'adresse suit la langue du compte"
+			},
+			"text": {
+				"de": "RechnungsWerk richtet sich jetzt nach der Sprache des Nextcloud-Kontos: „Deutsch (Persönlich)“ duzt, „Deutsch (Förmlich)“ siezt. Auch „English (UK)“ wird erkannt.",
+				"en": "RechnungsWerk now follows the language of the Nextcloud account: “Deutsch (Persönlich)” uses the informal address, “Deutsch (Förmlich)” the formal one. “English (UK)” is recognised as well.",
+				"fr": "RechnungsWerk suit désormais la langue du compte Nextcloud : « Deutsch (Persönlich) » tutoie, « Deutsch (Förmlich) » vouvoie. « English (UK) » est également reconnu."
+			},
+			"icon": "translate",
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "API-Schlüssel löschen eigene Entwürfe",
+				"en": "API keys delete their own drafts",
+				"fr": "Les clés API suppriment leurs propres brouillons"
+			},
+			"text": {
+				"de": "Ein API-Schlüssel kann jetzt Entwürfe löschen, die er selbst angelegt hat. Dafür gibt es das neue Recht „Eigene Entwürfe löschen“. Fremde Belege und von Personen bearbeitete Entwürfe bleiben unangetastet.",
+				"en": "An API key can now delete drafts it created itself. This uses the new permission “Delete own drafts”. Other documents and drafts edited by a person remain untouched.",
+				"fr": "Une clé API peut désormais supprimer les brouillons qu'elle a elle-même créés. Cela passe par le nouveau droit « Supprimer ses propres brouillons ». Les autres documents et les brouillons modifiés par une personne restent intacts."
+			},
+			"icon": "star",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": true,
+			"plus": true
+		}
+	],
 	"0.7.0": [
 		{
 			"title": {
