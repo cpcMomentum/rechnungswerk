@@ -17,6 +17,7 @@ use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ArchiveService;
+use OCA\Rechnungswerk\Service\AuditService;
 use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
@@ -85,6 +86,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
 		);
 	}
 
@@ -209,6 +211,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
 		);
 
 		// Dieselbe Datei geht auch in die Ablage — hier mitgeprueft, statt eine
@@ -327,6 +330,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
 		);
 
 		$this->assertFalse($service->freezeDocument($invoice, true));
@@ -522,6 +526,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
 		);
 	}
 

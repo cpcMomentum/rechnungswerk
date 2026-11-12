@@ -12,6 +12,7 @@ import TextSnippetsView from '@/views/TextSnippetsView.vue'
 import CustomersView from '@/views/CustomersView.vue'
 import MyContactView from '@/views/MyContactView.vue'
 import SettingsView from '@/views/SettingsView.vue'
+import AuditView from '@/views/AuditView.vue'
 
 const routes: RouteRecordRaw[] = [
 	{ path: '/', redirect: { name: 'invoices' } },
@@ -27,6 +28,7 @@ const routes: RouteRecordRaw[] = [
 	{ path: '/products', name: 'products', component: ProductsView },
 	{ path: '/text-snippets', name: 'text-snippets', component: TextSnippetsView },
 	{ path: '/me', name: 'my-contact', component: MyContactView },
+	{ path: '/audit', name: 'audit', component: AuditView },
 	{ path: '/settings', name: 'settings', component: SettingsView },
 ]
 

@@ -256,6 +256,11 @@
 				: t('rechnungswerk', 'Erscheint als Freitext auf der Rechnung und in der E-Rechnung (Notiz, BT-22) – kein strukturiertes Datenfeld.') }}</p>
 		</section>
 
+		<section v-if="invoice" class="rw-section">
+			<h3>{{ t('rechnungswerk', 'Verlauf') }}</h3>
+			<AuditTrail :documentId="invoice.id" :refreshKey="auditRefresh" />
+		</section>
+
 		<!-- Sticky actions -->
 		<div class="rw-action-bar">
 			<template v-if="!readonly">
@@ -394,6 +399,7 @@ import CustomerPicker from '@/components/CustomerPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
+import AuditTrail from '@/components/AuditTrail.vue'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
@@ -448,6 +454,9 @@ const listRoute = computed(() => (isQuote.value ? 'quotes' : 'invoices'))
 const detailRoute = computed(() => (isQuote.value ? 'quote-detail' : 'invoice-detail'))
 
 const invoice = ref<InvoiceDetail | null>(null)
+// Bumped whenever the server returns a new state, and after sending (which returns none).
+const auditRefresh = ref(0)
+watch(invoice, () => { auditRefresh.value++ })
 const items = ref<EditorItem[]>([emptyItem()])
 const notes = ref<string[]>([])
 const error = ref('')
@@ -560,8 +569,8 @@ const defaultMailBody = computed(() => {
 	const closing = (invoice.value?.extraText
 		?? textSnippetStore.defaultContent(snippetDocType.value, 'closing')).trim()
 	const fallback = isQuote.value
-		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.')
-		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).')
+		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.') // TRANSLATORS: formal, addresses the customer
+		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).') // TRANSLATORS: formal, addresses the customer
 	const parts = [
 		opening !== '' ? opening : fallback,
 		closing,
@@ -1054,10 +1063,12 @@ async function doSend(data: { to: string, subject: string, body: string }) {
 	try {
 		if (isQuote.value) {
 			await sendQuote(invoice.value.id, data)
+			auditRefresh.value++
 			sendDialogOpen.value = false
 			notice.value = t('rechnungswerk', 'Angebot an {to} gesendet.', { to: data.to })
 		} else {
 			await sendInvoice(invoice.value.id, data)
+			auditRefresh.value++
 			sendDialogOpen.value = false
 			notice.value = t('rechnungswerk', 'Rechnung an {to} gesendet.', { to: data.to })
 		}
