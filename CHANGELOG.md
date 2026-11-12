@@ -5,6 +5,46 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.8.0] - 2026-11-11
+
+Protokoll über alle Vorgänge an Rechnungen und Angeboten, Standard-Textbausteine
+ab Werk, Anrede nach Kontosprache und Löschrecht für API-Schlüssel.
+
+**Hinweis zum Update:** Instanzen ohne Textbausteine bekommen mit diesem Update
+vier Standard-Bausteine. Neue Belege tragen dann Einleitung und Schluss, auch
+im PDF. Das gilt auch dort, wo zuvor alle Bausteine bewusst gelöscht wurden.
+Unter Textbausteine lassen sie sich ändern oder löschen.
+
+### Added
+- **Protokoll.** Ein neuer Bereich zeigt, wer was an Rechnungen und Angeboten
+  getan hat: anlegen, ändern, löschen, festschreiben, versenden, bezahlt
+  markieren, stornieren, annehmen, ablehnen und übernehmen, auch über
+  API-Schlüssel. Der Editor zeigt die Einträge des jeweiligen Belegs. Vorgänge
+  vor diesem Update sind nicht erfasst (#392)
+- **DATEV im Protokoll.** Versand an DATEV, fehlgeschlagener Versand und die
+  Rückmeldung von DATEV stehen als eigene Einträge im Protokoll (#395)
+- **Standard-Textbausteine ab Werk.** Ist der Katalog leer, legt das Update
+  einmalig vier deutsche Bausteine an: Einleitung und Schluss für Rechnungen
+  und für Angebote. Bestehende Bausteine bleiben unberührt, gelöschte
+  Standard-Bausteine kommen nicht wieder (#398)
+- **Anrede nach Kontosprache.** „Deutsch (Persönlich)" duzt, „Deutsch
+  (Förmlich)" siezt. „English (UK)" wird erkannt und folgt nicht mehr der
+  Browsersprache (#397)
+- **API-Schlüssel löschen eigene Entwürfe.** Neues Recht `invoices:delete`:
+  Ein Schlüssel kann Entwürfe löschen, die er selbst angelegt hat. Fremde
+  Belege antworten mit 404; bearbeitet eine Person den Entwurf, verliert der
+  Schlüssel den Zugriff. Setzt WerkPlus voraus (#393)
+
+### Changed
+- Der Name eines API-Schlüssels ist im Protokoll für alle App-Nutzer sichtbar;
+  die Einstellungen weisen beim Anlegen darauf hin (#393)
+
+### Fixed
+- **DATEV-Übergabe.** Eine bereits rausgegangene DATEV-Mail wird auch dann als
+  gesendet gemeldet, wenn nur der Status nicht gespeichert werden konnte.
+  Bisher stand dort „Versand fehlgeschlagen", was ein erneutes Senden und damit
+  einen doppelten Upload bei DATEV nahelegte (#395)
+
 ## [0.7.0] - 2026-11-10
 
 Registernummer für E-Rechnungen ohne USt-IdNr., gültige innergemeinschaftliche
@@ -607,7 +647,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.2...v0.5.3

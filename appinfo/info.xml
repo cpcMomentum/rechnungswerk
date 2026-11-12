@@ -37,7 +37,7 @@ Lizenzschlüssel. Keine Rechnungen, keine Kunden. Ist der Server nicht erreichba
 RechnungsWerk normal weiter.
     ]]></description>
 
-    <version>0.7.0</version>
+    <version>0.8.0</version>
     <licence>AGPL-3.0-or-later</licence>
 
     <author mail="axel.deffner@cpcmomentum.com" homepage="https://github.com/cpcMomentum">Axel Deffner</author>
