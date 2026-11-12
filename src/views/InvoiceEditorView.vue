@@ -287,7 +287,7 @@
 					{{ t('rechnungswerk', 'An Kunde senden') }}
 				</NcButton>
 				<!-- Invoice: correction via storno -->
-				<NcButton v-if="!isQuote && invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
+				<NcButton v-if="invoice.invoiceType === 'invoice' && invoice.status === 'committed'" variant="error" :disabled="saving" @click="askCancel">
 					{{ t('rechnungswerk', 'Stornieren') }}
 				</NcButton>
 				<!-- Quote lifecycle (#111): decide (open/expired), revise and/or convert -->

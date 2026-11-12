@@ -622,6 +622,7 @@ OC.L10N.register(
     "Eigene Entwürfe löschen" : "Delete own drafts",
     "An DATEV gesendet" : "Sent to DATEV",
     "DATEV-Versand fehlgeschlagen" : "Sending to DATEV failed",
-    "Von DATEV bestätigt" : "Confirmed by DATEV"
+    "Von DATEV bestätigt" : "Confirmed by DATEV",
+    "Ein Stornobeleg kann nicht storniert werden." : "A cancellation document cannot be cancelled."
 },
 "nplurals=2; plural=(n != 1);");
