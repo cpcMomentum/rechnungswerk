@@ -473,10 +473,7 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function cancel(int $id, string $userId): array {
-		$original = $this->assertInvoiceType($this->findById($id));
-		if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
-		}
+		$this->assertCancellable($this->assertInvoiceType($this->findById($id)));
 
 		$settings = $this->settingsService->getCompany();
 		$this->assertSellerNameSet($settings);
@@ -487,10 +484,7 @@ class InvoiceService {
 		try {
 			// Lock the original and re-check inside the transaction so a double
 			// cancel cannot create two storno documents for the same invoice.
-			$original = $this->findByIdForUpdate($id);
-			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-				throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
-			}
+			$original = $this->assertCancellable($this->findByIdForUpdate($id));
 			$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
 			$storno = new Invoice();
@@ -1160,6 +1154,20 @@ class InvoiceService {
 			throw $e;
 		}
 		return $this->present($invoice);
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 */
+	private function assertCancellable(Invoice $invoice): Invoice {
+		if ($invoice->getInvoiceType() === Invoice::TYPE_CANCELLATION) {
+			throw new IllegalStateException($this->l10n->t('Ein Stornobeleg kann nicht storniert werden.'));
+		}
+		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
+			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
+		}
+		return $invoice;
 	}
 
 	/**

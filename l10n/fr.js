@@ -622,6 +622,7 @@ OC.L10N.register(
     "Eigene Entwürfe löschen" : "Supprimer ses propres brouillons",
     "An DATEV gesendet" : "Envoyée à DATEV",
     "DATEV-Versand fehlgeschlagen" : "Échec de l'envoi à DATEV",
-    "Von DATEV bestätigt" : "Confirmée par DATEV"
+    "Von DATEV bestätigt" : "Confirmée par DATEV",
+    "Ein Stornobeleg kann nicht storniert werden." : "Un avoir ne peut pas être annulé."
 },
 "nplurals=2; plural=(n > 1);");

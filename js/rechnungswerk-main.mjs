@@ -6231,7 +6231,7 @@ var Np = yn("textSnippet", () => {
 						default: _(() => [K(" " + Y(t(T)("rechnungswerk", "An Kunde senden")), 1)]),
 						_: 1
 					}, 8, ["variant", "disabled"]),
-					!d.value && C.value.status === "committed" ? (Z(), N(t(W), {
+					C.value.invoiceType === "invoice" && C.value.status === "committed" ? (Z(), N(t(W), {
 						key: 0,
 						variant: "error",
 						disabled: k.value,
@@ -6437,7 +6437,7 @@ var Np = yn("textSnippet", () => {
 			]);
 		};
 	}
-}), [["__scopeId", "data-v-3c22f017"]]), zh = {
+}), [["__scopeId", "data-v-d2bd521e"]]), zh = {
 	name: "AlertCircleOutlineIcon",
 	emits: ["click"],
 	props: {
