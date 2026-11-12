@@ -25,3 +25,7 @@ npm run build    # Produktions-Build nach js/ + css/
 ## Lizenz
 
 AGPL-3.0-or-later
+
+RechnungsWerk ist kostenlos und Open Source. Wer die Weiterentwicklung
+unterstützen möchte, findet mit WerkPlus optionale Zusatzfunktionen für alle
+Werk-Apps: https://werkwolke.de
