@@ -35,6 +35,7 @@ use Psr\Log\LoggerInterface;
 class InvoiceServiceApiKeyDeleteTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private InvoiceMapper&MockObject $invoiceMapper;
 	private AuditService&MockObject $audit;
@@ -74,6 +75,7 @@ class InvoiceServiceApiKeyDeleteTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->audit,
+			$this->companyClock(),
 		);
 	}
 
@@ -191,6 +193,7 @@ class InvoiceServiceApiKeyDeleteTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->audit,
+			$this->companyClock(),
 		);
 	}
 }

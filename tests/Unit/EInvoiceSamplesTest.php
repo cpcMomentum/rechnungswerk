@@ -24,6 +24,8 @@ use Psr\Log\LoggerInterface;
 /** One real ZUGFeRD PDF per variant; CI validates the files in RW_EINVOICE_SAMPLES_DIR with Mustang. */
 class EInvoiceSamplesTest extends TestCase {
 
+	use CompanyClockStub;
+
 	private ZugferdService $service;
 
 	protected function setUp(): void {
@@ -35,6 +37,7 @@ class EInvoiceSamplesTest extends TestCase {
 			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
 			$tempManager,
+			$this->companyClock(),
 		);
 	}
 

@@ -41,6 +41,7 @@ use Psr\Log\LoggerInterface;
 class InvoiceServiceDocumentTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private const FROZEN = '%PDF-1.7 eingefrorener Beleg';
 	private const RENDERED = '%PDF-1.7 frisch gerendert';
@@ -88,6 +89,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 
@@ -213,6 +215,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 
 		// Dieselbe Datei geht auch in die Ablage — hier mitgeprueft, statt eine
@@ -332,6 +335,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 
 		$this->assertFalse($service->freezeDocument($invoice, true));
@@ -585,6 +589,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 

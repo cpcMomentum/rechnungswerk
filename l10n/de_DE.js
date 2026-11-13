@@ -623,6 +623,10 @@ OC.L10N.register(
     "An DATEV gesendet" : "An DATEV gesendet",
     "DATEV-Versand fehlgeschlagen" : "DATEV-Versand fehlgeschlagen",
     "Von DATEV bestätigt" : "Von DATEV bestätigt",
-    "Ein Stornobeleg kann nicht storniert werden." : "Ein Stornobeleg kann nicht storniert werden."
+    "Ein Stornobeleg kann nicht storniert werden." : "Ein Stornobeleg kann nicht storniert werden.",
+    "Zeitzone" : "Zeitzone",
+    "Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin." : "Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.",
+    "Automatisch" : "Automatisch",
+    "Unbekannte Zeitzone." : "Unbekannte Zeitzone."
 },
 "nplurals=2; plural=(n != 1);");

@@ -41,6 +41,7 @@ class SettingsService {
 		private readonly IDBConnection $db,
 		private readonly ICrypto $crypto,
 		private readonly IL10N $l10n,
+		private readonly CompanyClock $clock,
 	) {
 	}
 
@@ -120,7 +121,7 @@ class SettingsService {
 			$settings->setSmallBusiness(0);
 			$settings->setDatevAutoSend(0);
 			$settings->setDefaultTaxRateBp(1900);
-			$now = new DateTime();
+			$now = new DateTime(); // tz-ok: Zeitstempel
 			$settings->setCreatedAt($now);
 			$settings->setUpdatedAt($now);
 			try {
@@ -153,6 +154,10 @@ class SettingsService {
 				$value = $data[$field];
 				$settings->{'set' . ucfirst($field)}($value !== null ? (string)$value : null);
 			}
+		}
+		if (array_key_exists('timezone', $data)) {
+			$tz = trim((string)($data['timezone'] ?? ''));
+			$settings->setTimezone($tz !== '' ? $tz : null);
 		}
 		// logoFileId is intentionally NOT writable here. The logo is managed only
 		// via the dedicated, validated endpoints (SettingsController::setLogo /
@@ -221,7 +226,7 @@ class SettingsService {
 			// Anchor the counter to the current year so it keeps running for the
 			// rest of the year; only the next Jan 1 resets to 1.
 			if ($oldMode === Settings::RESET_MODE_CONTINUOUS && $newMode === Settings::RESET_MODE_YEARLY) {
-				$settings->setNumberCounterYear((int)(new DateTime())->format('Y'));
+				$settings->setNumberCounterYear($this->clock->currentYear());
 			}
 		}
 		// Manuell gesetzte nächste Rechnungsnummer (#270): die Anfrage trägt den
@@ -232,7 +237,7 @@ class SettingsService {
 		// bereits erzwungen.
 		if (array_key_exists('numberCounter', $data) && $data['numberCounter'] !== null && $data['numberCounter'] !== '') {
 			$settings->setNumberCounter(max(0, (int)$data['numberCounter']));
-			$settings->setNumberCounterYear((int)(new DateTime())->format('Y'));
+			$settings->setNumberCounterYear($this->clock->currentYear());
 		}
 		if (($settings->getQuoteNumberFormat() ?? '') === '') {
 			$settings->setQuoteNumberFormat(Settings::DEFAULT_QUOTE_NUMBER_FORMAT);
@@ -243,12 +248,14 @@ class SettingsService {
 			$newMode = (string)$data['quoteNumberResetMode'];
 			$settings->setQuoteNumberResetMode($newMode);
 			if ($oldMode === Settings::RESET_MODE_CONTINUOUS && $newMode === Settings::RESET_MODE_YEARLY) {
-				$settings->setQuoteNumberCounterYear((int)(new DateTime())->format('Y'));
+				$settings->setQuoteNumberCounterYear($this->clock->currentYear());
 			}
 		}
 
 		$settings->setUpdatedAt(new DateTime());
-		return $this->mapper->update($settings);
+		$saved = $this->mapper->update($settings);
+		$this->clock->reset();
+		return $saved;
 	}
 
 	/**
@@ -263,6 +270,12 @@ class SettingsService {
 	 * @throws ValidationException
 	 */
 	private function validate(array $data, Settings $current): void {
+		if (array_key_exists('timezone', $data)) {
+			$tz = trim((string)($data['timezone'] ?? ''));
+			if ($tz !== '' && !CompanyClock::isValid($tz)) {
+				throw new ValidationException($this->l10n->t('Unbekannte Zeitzone.'));
+			}
+		}
 		if (array_key_exists('numberResetMode', $data)
 			&& !in_array((string)$data['numberResetMode'], Settings::RESET_MODES, true)) {
 			throw new ValidationException($this->l10n->t('Ungültiger Nummernkreis-Modus.'));
@@ -379,7 +392,7 @@ class SettingsService {
 			$effectiveMode = array_key_exists('numberResetMode', $data)
 				? (string)$data['numberResetMode']
 				: ($current->getNumberResetMode() ?: Settings::DEFAULT_RESET_MODE);
-			$currentYear = (int)(new DateTime())->format('Y');
+			$currentYear = $this->clock->currentYear();
 			$activeCounter = ($effectiveMode === Settings::RESET_MODE_CONTINUOUS
 				|| $current->getNumberCounterYear() === $currentYear)
 				? (int)$current->getNumberCounter() : 0;
