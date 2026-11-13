@@ -107,7 +107,6 @@
 		"Bitte eine gültige E-Mail-Adresse angeben ({field}).": "Bitte eine gültige E-Mail-Adresse angeben ({field}).",
 		"Bitte eine gültige E-Mail-Adresse angeben.": "Bitte eine gültige E-Mail-Adresse angeben.",
 		"Bitte gib einen gültigen WerkPlus-Schlüssel ein.": "Bitte gib einen gültigen WerkPlus-Schlüssel ein.",
-		"Bitte wähle eine gültige Größenklasse.": "Bitte wähle eine gültige Größenklasse.",
 		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).": "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).",
 		"Branding": "Branding",
 		"Brutto": "Brutto",
@@ -137,7 +136,6 @@
 		"Der Name darf höchstens 255 Zeichen lang sein.": "Der Name darf höchstens 255 Zeichen lang sein.",
 		"Der Preis darf nicht negativ sein.": "Der Preis darf nicht negativ sein.",
 		"Der SMTP-Port muss zwischen 1 und 65535 liegen.": "Der SMTP-Port muss zwischen 1 und 65535 liegen.",
-		"Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.",
 		"Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.": "Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.",
 		"Der Steuersatz darf nicht negativ sein.": "Der Steuersatz darf nicht negativ sein.",
 		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:",
@@ -313,7 +311,6 @@
 		"Menge": "Menge",
 		"Meter": "Meter",
 		"Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist.": "Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist.",
-		"Mitarbeitende": "Mitarbeitende",
 		"Monat": "Monat",
 		"Nachricht": "Nachricht",
 		"Name": "Name",
@@ -554,7 +551,6 @@
 		"Überfällig": "Überfällig",
 		"Übernahme fehlgeschlagen": "Übernahme fehlgeschlagen",
 		"Übernommen": "Übernommen",
-		"Übertragen wird nur die Größenklasse, keine Mitarbeiterzahl.": "Übertragen wird nur die Größenklasse, keine Mitarbeiterzahl.",
 		"— keine Vorgabe —": "— keine Vorgabe —",
 		"„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.": "„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.",
 		"„{name}“ wirklich löschen?": "„{name}“ wirklich löschen?",
@@ -626,7 +622,9 @@
 		"Zeitzone": "Zeitzone",
 		"Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.": "Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.",
 		"Automatisch": "Automatisch",
-		"Unbekannte Zeitzone.": "Unbekannte Zeitzone."
+		"Unbekannte Zeitzone.": "Unbekannte Zeitzone.",
+		"Lizenzierte Mitarbeitende": "Lizenzierte Mitarbeitende",
+		"Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

@@ -38,8 +38,8 @@ class LicenseControllerTrialTest extends TestCase {
 	}
 
 	public function testReturnsTheKeyOnceTogetherWithTheStatus(): void {
-		$this->entitlement->expects($this->once())->method('startTrial')->with('6-20')->willReturn('wp_NEU');
-		$response = $this->controller()->trial('6-20');
+		$this->entitlement->expects($this->once())->method('startTrial')->with()->willReturn('wp_NEU');
+		$response = $this->controller()->trial();
 
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 		$this->assertSame('wp_NEU', $response->getData()['key']);

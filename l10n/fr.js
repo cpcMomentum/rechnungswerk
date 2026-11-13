@@ -108,7 +108,6 @@ OC.L10N.register(
     "Bitte eine gültige E-Mail-Adresse angeben ({field})." : "Veuillez indiquer une adresse e-mail valide ({field}).",
     "Bitte eine gültige E-Mail-Adresse angeben." : "Veuillez indiquer une adresse e-mail valide.",
     "Bitte gib einen gültigen WerkPlus-Schlüssel ein." : "Veuillez saisir une clé WerkPlus valide.",
-    "Bitte wähle eine gültige Größenklasse." : "Veuillez choisir une tranche de taille valide.",
     "Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren)." : "Veuillez d'abord saisir le nom de votre entreprise. Sans lui, aucun document valide ne peut être créé. Vous le trouverez dans les Paramètres (administrateurs uniquement).",
     "Branding" : "Image de marque",
     "Brutto" : "Brut",
@@ -138,7 +137,6 @@ OC.L10N.register(
     "Der Name darf höchstens 255 Zeichen lang sein." : "Le nom ne doit pas dépasser 255 caractères.",
     "Der Preis darf nicht negativ sein." : "Le prix ne doit pas être négatif.",
     "Der SMTP-Port muss zwischen 1 und 65535 liegen." : "Le port SMTP doit être compris entre 1 et 65535.",
-    "Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien." : "L’identifiant de cette installation, la version de RechnungsWerk, la tranche de taille et, dès qu’elle existe, la clé. Ne sont pas transmis : factures, clients ou autres données de documents, données personnelles, utilisateurs ou fichiers Nextcloud.",
     "Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard." : "Le modèle par défaut préremplit automatiquement les nouveaux documents de ce type. Il existe exactement un modèle par défaut par type de document et zone de texte.",
     "Der Steuersatz darf nicht negativ sein." : "Le taux de TVA ne doit pas être négatif.",
     "Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:" : "La période d’essai a commencé, mais la licence n’a pas encore pu être vérifiée. Utilisez « Vérifier maintenant » pour réessayer. Voici votre clé WerkPlus :",
@@ -314,7 +312,6 @@ OC.L10N.register(
     "Menge" : "Quantité",
     "Meter" : "Mètre",
     "Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist." : "Une clé WerkPlus active des fonctions supplémentaires dans RechnungsWerk. Sans clé, rien ne change.",
-    "Mitarbeitende" : "Collaborateurs",
     "Monat" : "Mois",
     "Nachricht" : "Message",
     "Name" : "Nom",
@@ -555,7 +552,6 @@ OC.L10N.register(
     "Überfällig" : "En retard",
     "Übernahme fehlgeschlagen" : "Échec de la conversion",
     "Übernommen" : "Converti",
-    "Übertragen wird nur die Größenklasse, keine Mitarbeiterzahl." : "Seule la tranche de taille est transmise, pas le nombre de collaborateurs.",
     "— keine Vorgabe —" : "— aucune valeur par défaut —",
     "„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF." : "« Valable jusqu'au » fixe un délai d'acceptation clair (§ 148 BGB). « Sans engagement » (§ 145 BGB) indique que le devis n'est pas contraignant – une mention correspondante apparaît sur le PDF.",
     "„{name}“ wirklich löschen?" : "Voulez-vous vraiment supprimer « {name} » ?",
@@ -627,6 +623,8 @@ OC.L10N.register(
     "Zeitzone" : "Fuseau horaire",
     "Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin." : "Détermine quel jour est « aujourd’hui » : date de facture, année du numéro de facture, échéance et date de paiement. Automatique utilise le fuseau horaire du serveur, ou Europe/Berlin si aucun n’y est défini.",
     "Automatisch" : "Automatique",
-    "Unbekannte Zeitzone." : "Fuseau horaire inconnu."
+    "Unbekannte Zeitzone." : "Fuseau horaire inconnu.",
+    "Lizenzierte Mitarbeitende" : "Collaborateurs sous licence",
+    "Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien." : "L’identifiant de cette installation, la version de RechnungsWerk et, dès qu’elle existe, la clé. Ne sont pas transmis : factures, clients ou autres données de documents, données personnelles, utilisateurs ou fichiers Nextcloud."
 },
 "nplurals=2; plural=(n > 1);");
