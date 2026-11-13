@@ -66,7 +66,7 @@ trait EntitlementTokenFactory {
 			'exp' => self::NOW + 30 * 86400,
 			'tier' => 'werkplus',
 			'features' => ['tenants', 'inbound', 'pw_multi_board'],
-			'seatsBucket' => null,
+			'licensedEmployees' => null,
 			'graceUntil' => self::NOW + 44 * 86400,
 		];
 		foreach ($overrides as $name => $value) {
