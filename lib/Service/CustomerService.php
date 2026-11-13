@@ -46,7 +46,7 @@ class CustomerService {
 		$this->validate($data);
 		$this->ensureUniqueNumber((string)$data['customerNumber'], null);
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel
 		$customer = new Customer();
 		$customer->setOwnerUserId($userId);
 		$customer->setCreatedAt($now);

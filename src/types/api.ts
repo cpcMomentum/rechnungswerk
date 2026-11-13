@@ -255,6 +255,7 @@ export interface Settings {
 	vatId: string | null
 	taxNumber: string | null
 	registerNumber: string | null
+	timezone: string | null
 	iban: string | null
 	bic: string | null
 	bankName: string | null

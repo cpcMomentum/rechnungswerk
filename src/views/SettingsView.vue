@@ -42,6 +42,11 @@
 							<input v-model="form.contactEmail" class="rw-input" type="email" /></label>
 					</div>
 					<p class="rw-hint">{{ t('rechnungswerk', 'Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).') }}</p>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Zeitzone') }}</span>
+						<select v-model="selectedTimezone" class="rw-input">
+							<option v-for="o in timezoneOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
+						</select></label>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.') }}</p>
 				</section>
 
 				<!-- Bank -->
@@ -536,6 +541,35 @@ type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' 
 const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+
+const timezoneOptions = computed(() => {
+	let zones: string[]
+	try {
+		zones = Intl.supportedValuesOf('timeZone')
+	} catch {
+		zones = ['Europe/Berlin', 'Europe/Vienna', 'Europe/Zurich']
+	}
+	if (!zones.includes('UTC')) {
+		zones = [...zones, 'UTC']
+	}
+	const current = form.value?.timezone ?? ''
+	if (current !== '' && !zones.includes(current)) {
+		zones = [current, ...zones]
+	}
+	return [
+		{ id: '', label: t('rechnungswerk', 'Automatisch') },
+		...zones.map(z => ({ id: z, label: z })),
+	]
+})
+
+const selectedTimezone = computed({
+	get: () => form.value?.timezone ?? '',
+	set(id: string) {
+		if (form.value) {
+			form.value.timezone = id || null
+		}
+	},
+})
 // EN 16931 BR-CO-26 needs a VAT ID or register number; the tax number does not count.
 const hasSellerIdentifier = computed(() => !!form.value?.vatId?.trim() || !!form.value?.registerNumber?.trim())
 
@@ -802,6 +836,7 @@ function hydrate() {
 		vatId: s.vatId,
 		taxNumber: s.taxNumber,
 		registerNumber: s.registerNumber,
+		timezone: s.timezone,
 		iban: s.iban,
 		bic: s.bic,
 		bankName: s.bankName,

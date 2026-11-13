@@ -623,6 +623,10 @@ OC.L10N.register(
     "An DATEV gesendet" : "Envoyée à DATEV",
     "DATEV-Versand fehlgeschlagen" : "Échec de l'envoi à DATEV",
     "Von DATEV bestätigt" : "Confirmée par DATEV",
-    "Ein Stornobeleg kann nicht storniert werden." : "Un avoir ne peut pas être annulé."
+    "Ein Stornobeleg kann nicht storniert werden." : "Un avoir ne peut pas être annulé.",
+    "Zeitzone" : "Fuseau horaire",
+    "Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin." : "Détermine quel jour est « aujourd’hui » : date de facture, année du numéro de facture, échéance et date de paiement. Automatique utilise le fuseau horaire du serveur, ou Europe/Berlin si aucun n’y est défini.",
+    "Automatisch" : "Automatique",
+    "Unbekannte Zeitzone." : "Fuseau horaire inconnu."
 },
 "nplurals=2; plural=(n > 1);");
