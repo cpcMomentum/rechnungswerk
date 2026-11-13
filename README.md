@@ -28,4 +28,5 @@ AGPL-3.0-or-later
 
 RechnungsWerk ist kostenlos und Open Source. Wer die Weiterentwicklung
 unterstützen möchte, findet mit WerkPlus optionale Zusatzfunktionen für alle
-Werk-Apps: https://werkwolke.de
+Werk-Apps. Welche es für RechnungsWerk gibt, steht auf
+https://werkwolke.de/funktionen#rechnungswerk
