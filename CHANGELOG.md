@@ -5,6 +5,37 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.9.0] - 2026-11-13
+
+Richtiges Belegdatum auch kurz nach Mitternacht, WerkPlus ohne Größenklasse
+und ein deutscher Betreff für die Kundenmail.
+
+### Added
+- **Zeitzone der Firma.** Neues Feld unter Einstellungen › Firma. Ohne Eintrag
+  gilt die Zeitzone der Instanz, sonst Europe/Berlin. Die Auswahl zeigt die
+  Zonen, die der Server kennt (#405)
+- **Lizenzierte Mitarbeitende.** Ist die WerkPlus-Lizenz auf eine Zahl von
+  Mitarbeitenden ausgestellt, zeigt Einstellungen › WerkPlus sie an (#412)
+
+### Changed
+- **WerkPlus ohne Größenklasse.** Aktivierung, Testzeitraum und Erneuerung
+  fragen nicht mehr nach der Zahl der Mitarbeitenden. Die Auswahl
+  „Mitarbeitende" entfällt, der gespeicherte Wert wird bei der nächsten
+  Prüfung gelöscht (#412)
+- **Betreff der Kundenmail.** Der vorgeschlagene Betreff ist fest deutsch
+  („Rechnung RE-…", „Angebot …", „Stornorechnung …"), passend zu Mailtext und
+  PDF. Bisher folgte er der Sprache der Oberfläche (#402)
+
+### Fixed
+- **Belegdatum nach Mitternacht.** Zwischen Mitternacht und 1 bzw. 2 Uhr
+  deutscher Zeit bekamen Rechnungen, Stornos und Angebote das Datum des Vortags,
+  am Jahreswechsel auch die Nummer aus dem alten Jahr. Datum, Nummernjahr,
+  Fälligkeit und die Anzeige „überfällig" richten sich jetzt nach der Zeitzone
+  der Firma (#405)
+- **Storno eines Stornos.** Ein Stornobeleg lässt sich nicht mehr erneut
+  stornieren, weder im Editor noch über die API. Bisher entstand dabei ein
+  weiterer Beleg mit eigener Nummer. Bereits vorhandene bleiben unverändert (#408)
+
 ## [0.8.0] - 2026-11-11
 
 Protokoll über alle Vorgänge an Rechnungen und Angeboten, Standard-Textbausteine
@@ -647,7 +678,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.3...v0.6.0
