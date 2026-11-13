@@ -31,10 +31,9 @@ Funktionen sind ohne Lizenz nutzbar. Unter Einstellungen › WerkPlus lässt sic
 30 Tage kostenlos testen. Mehr dazu auf https://werkwolke.de.
 
 Ohne Lizenzschlüssel nimmt die App erst Kontakt zu unserem Server auf, wenn du den
-Testzeitraum startest. Übertragen werden dann nur eine zufällige Kennung der Installation,
-die App-Version und die gewählte Größenklasse, mit Schlüssel zusätzlich der
-Lizenzschlüssel. Keine Rechnungen, keine Kunden. Ist der Server nicht erreichbar, arbeitet
-RechnungsWerk normal weiter.
+Testzeitraum startest. Übertragen werden dann nur eine zufällige Kennung der Installation
+und die App-Version, mit Schlüssel zusätzlich der Lizenzschlüssel. Keine Rechnungen,
+keine Kunden. Ist der Server nicht erreichbar, arbeitet RechnungsWerk normal weiter.
     ]]></description>
 
     <version>0.8.0</version>

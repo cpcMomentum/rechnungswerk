@@ -106,7 +106,6 @@
 		"Bitte eine gültige E-Mail-Adresse angeben ({field}).": "Please enter a valid email address ({field}).",
 		"Bitte eine gültige E-Mail-Adresse angeben.": "Please enter a valid email address.",
 		"Bitte gib einen gültigen WerkPlus-Schlüssel ein.": "Please enter a valid WerkPlus key.",
-		"Bitte wähle eine gültige Größenklasse.": "Please choose a valid size class.",
 		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).": "Please enter your company name first. Without it, no valid document can be created. You will find it under Settings (administrators only).",
 		"Branding": "Branding",
 		"Brutto": "Gross",
@@ -136,7 +135,6 @@
 		"Der Name darf höchstens 255 Zeichen lang sein.": "The name must not exceed 255 characters.",
 		"Der Preis darf nicht negativ sein.": "The price must not be negative.",
 		"Der SMTP-Port muss zwischen 1 und 65535 liegen.": "The SMTP port must be between 1 and 65535.",
-		"Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "The identifier of this installation, the RechnungsWerk version, the size class and, once available, the key. Not transmitted: invoices, customers or other document data, personal data, Nextcloud users or files.",
 		"Der Standard-Baustein füllt neue Dokumente dieses Typs automatisch vor. Je Dokument und Textbereich gibt es genau einen Standard.": "The default snippet pre-fills new documents of this type. There is exactly one default per document type and text area.",
 		"Der Steuersatz darf nicht negativ sein.": "The tax rate must not be negative.",
 		"Der Testzeitraum ist gestartet, die Lizenz konnte aber noch nicht geprüft werden. Mit „Jetzt prüfen“ versuchst du es erneut. Das ist dein WerkPlus-Schlüssel:": "Your trial has started, but the licence could not be verified yet. Use “Check now” to try again. This is your WerkPlus key:",
@@ -310,7 +308,6 @@
 		"Menge": "Quantity",
 		"Meter": "Metre",
 		"Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist.": "A WerkPlus key unlocks additional features in RechnungsWerk. Without a key, everything stays as it is.",
-		"Mitarbeitende": "Employees",
 		"Monat": "Month",
 		"Nachricht": "Message",
 		"Name": "Name",
@@ -548,7 +545,6 @@
 		"Überfällig": "Overdue",
 		"Übernahme fehlgeschlagen": "Conversion failed",
 		"Übernommen": "Converted",
-		"Übertragen wird nur die Größenklasse, keine Mitarbeiterzahl.": "Only the size class is transmitted, not the number of employees.",
 		"— keine Vorgabe —": "— no default —",
 		"„Gültig bis“ setzt eine klare Annahmefrist (§ 148 BGB). „Freibleibend“ (§ 145 BGB) kennzeichnet das Angebot als unverbindlich – ein entsprechender Hinweis erscheint auf dem PDF.": "“Valid until” sets a clear acceptance deadline (§ 148 BGB). “Non-binding” (§ 145 BGB) marks the quote as non-committal – a corresponding note appears on the PDF.",
 		"„{name}“ wirklich löschen?": "Really delete “{name}”?",
@@ -620,7 +616,9 @@
 		"Zeitzone": "Time zone",
 		"Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.": "Determines which day is “today”: invoice date, year of the invoice number, due date and payment date. Automatic uses the server's time zone, or Europe/Berlin if none is set there.",
 		"Automatisch": "Automatic",
-		"Unbekannte Zeitzone.": "Unknown time zone."
+		"Unbekannte Zeitzone.": "Unknown time zone.",
+		"Lizenzierte Mitarbeitende": "Licensed employees",
+		"Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "The identifier of this installation, the RechnungsWerk version and, once available, the key. Not transmitted: invoices, customers or other document data, personal data, Nextcloud users or files."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

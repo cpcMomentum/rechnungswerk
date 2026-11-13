@@ -25,6 +25,10 @@
 			<dl v-if="status.keySet" class="rw-werkplus__facts">
 				<dt>{{ t('rechnungswerk', 'Tarif') }}</dt>
 				<dd>{{ tierLabel }}</dd>
+				<template v-if="status.licensedEmployees">
+					<dt>{{ t('rechnungswerk', 'Lizenzierte Mitarbeitende') }}</dt>
+					<dd>{{ status.licensedEmployees }}</dd>
+				</template>
 				<template v-if="status.expiresAt">
 					<dt>{{ t('rechnungswerk', 'Gültig bis') }}</dt>
 					<dd>{{ formatDate(status.expiresAt) }}</dd>
@@ -35,20 +39,13 @@
 				<dd>{{ status.keyHint }}</dd>
 			</dl>
 
-			<div class="rw-form-row">
-				<label class="rw-field"><span>{{ t('rechnungswerk', 'WerkPlus-Schlüssel') }}</span>
-					<input v-model="keyInput"
-						class="rw-input"
-						type="text"
-						autocomplete="off"
-						spellcheck="false"
-						:placeholder="status.keySet ? t('rechnungswerk', 'gespeichert, leer lassen') : 'wp_…'" /></label>
-				<label class="rw-field rw-field--narrow"><span>{{ t('rechnungswerk', 'Mitarbeitende') }}</span>
-					<select v-model="bucket" class="rw-input">
-						<option v-for="b in EMPLOYEE_BUCKETS" :key="b" :value="b">{{ b }}</option>
-					</select></label>
-			</div>
-			<p class="rw-hint">{{ t('rechnungswerk', 'Übertragen wird nur die Größenklasse, keine Mitarbeiterzahl.') }}</p>
+			<label class="rw-field"><span>{{ t('rechnungswerk', 'WerkPlus-Schlüssel') }}</span>
+				<input v-model="keyInput"
+					class="rw-input"
+					type="text"
+					autocomplete="off"
+					spellcheck="false"
+					:placeholder="status.keySet ? t('rechnungswerk', 'gespeichert, leer lassen') : 'wp_…'" /></label>
 
 			<div class="rw-werkplus__actions">
 				<NcButton variant="primary" :disabled="busy || (!keyInput.trim() && !status.keySet)" @click="onActivate">
@@ -67,7 +64,7 @@
 
 			<div class="rw-werkplus__privacy">
 				<span class="rw-werkplus__label">{{ t('rechnungswerk', 'Was an WerkPlus übertragen wird') }}</span>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Die Kennung dieser Installation, die Version von RechnungsWerk, die Größenklasse und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.') }}</p>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Kennung dieser Installation:') }} <code>{{ status.instanceUuid }}</code></p>
 			</div>
@@ -98,7 +95,6 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import {
-	EMPLOYEE_BUCKETS,
 	activateLicense,
 	getLicense,
 	refreshLicense,
@@ -109,7 +105,6 @@ import {
 
 const status = ref<LicenseStatus | null>(null)
 const keyInput = ref('')
-const bucket = ref<string>(EMPLOYEE_BUCKETS[0])
 const busy = ref(false)
 const loadError = ref('')
 const actionError = ref('')
@@ -155,16 +150,9 @@ function formatDateTime(iso: string): string {
 	return new Date(iso).toLocaleString()
 }
 
-function apply(next: LicenseStatus, keepBucket = false): void {
-	status.value = next
-	if (!keepBucket) {
-		bucket.value = next.employeeBucket
-	}
-}
-
-async function load(keepBucket = false): Promise<void> {
+async function load(): Promise<void> {
 	try {
-		apply(await getLicense(), keepBucket)
+		status.value = await getLicense()
 		loadError.value = ''
 	} catch (e) {
 		loadError.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Lizenzstatus konnte nicht geladen werden.')
@@ -177,7 +165,7 @@ async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 	actionError.value = ''
 	actionInfo.value = ''
 	try {
-		apply(await action())
+		status.value = await action()
 		keyInput.value = ''
 	} catch (e) {
 		const { message, code } = e as { message?: string, code?: string }
@@ -187,7 +175,7 @@ async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 		} else {
 			actionError.value = text
 		}
-		await load(true)
+		await load()
 	} finally {
 		busy.value = false
 	}
@@ -195,14 +183,14 @@ async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 
 function onActivate(): Promise<void> {
 	trialKey.value = ''
-	return run(() => activateLicense(keyInput.value.trim(), bucket.value))
+	return run(() => activateLicense(keyInput.value.trim()))
 }
 
 function onTrial(): Promise<void> {
 	confirmTrial.value = false
 	trialKey.value = ''
 	return run(async () => {
-		const result = await startTrial(bucket.value)
+		const result = await startTrial()
 		trialKey.value = result.key
 		return result.status
 	})

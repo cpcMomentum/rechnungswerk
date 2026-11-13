@@ -95,7 +95,7 @@ final class EntitlementTokenVerifier {
 				throw new InvalidTokenException('features enthaelt einen Nicht-Namen');
 			}
 		}
-		$seatsBucket = $claims['seatsBucket'] ?? null;
+		$licensedEmployees = $claims['licensedEmployees'] ?? null;
 
 		return new EntitlementToken(
 			$tier,
@@ -103,7 +103,7 @@ final class EntitlementTokenVerifier {
 			$claims['iat'],
 			$claims['exp'],
 			max($claims['exp'], $claims['graceUntil']),
-			is_string($seatsBucket) ? $seatsBucket : null,
+			self::positiveCount($licensedEmployees),
 		);
 	}
 
@@ -125,5 +125,13 @@ final class EntitlementTokenVerifier {
 			throw new InvalidTokenException('Token-Teil ist nicht base64url-kodiert');
 		}
 		return $decoded;
+	}
+
+	/** JSON may carry a whole number as 12.0; anything else is treated as absent. */
+	private static function positiveCount(mixed $value): ?int {
+		if (is_float($value) && floor($value) === $value) {
+			$value = (int)$value;
+		}
+		return is_int($value) && $value > 0 ? $value : null;
 	}
 }
