@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
-use DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use horstoeko\zugferd\codelists\ZugferdCountryCodes;
@@ -53,6 +52,7 @@ class ZugferdService {
 		private readonly GirocodeService $girocodeService,
 		private readonly LoggerInterface $logger,
 		private readonly ITempManager $tempManager,
+		private readonly CompanyClock $clock,
 	) {
 	}
 
@@ -169,7 +169,7 @@ class ZugferdService {
 		$typeCode = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE
 			? ZugferdInvoiceType::INVOICE
 			: ZugferdInvoiceType::CORRECTION;
-		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? new DateTime();
+		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? $this->clock->today();
 
 		$builder->setDocumentInformation(
 			$invoice->getNumber() ?? '',

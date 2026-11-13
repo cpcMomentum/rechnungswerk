@@ -27,6 +27,8 @@ use Psr\Log\LoggerInterface;
  */
 class ZugferdServiceTest extends TestCase {
 
+	use CompanyClockStub;
+
 	private ZugferdService $service;
 
 	protected function setUp(): void {
@@ -38,6 +40,7 @@ class ZugferdServiceTest extends TestCase {
 			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
 			$tempManager,
+			$this->companyClock(),
 		);
 	}
 
@@ -103,6 +106,24 @@ class ZugferdServiceTest extends TestCase {
 		$this->expectExceptionMessageMatches('/seller name/i');
 
 		$this->service->buildXml($this->invoice(), [$this->item(9500, 1900, 19000)], $settings);
+	}
+
+	public function testDraftWithoutIssueDateIsPreviewedWithTheCompanyDay(): void {
+		$tempManager = $this->createMock(ITempManager::class);
+		$service = new ZugferdService(
+			$this->createMock(IRootFolder::class),
+			new GirocodeService($this->createMock(LoggerInterface::class)),
+			$this->createMock(LoggerInterface::class),
+			$tempManager,
+			$this->companyClock('2026-12-31 23:30:00'),
+		);
+		$draft = $this->invoice();
+		$draft->setStatus(Invoice::STATUS_DRAFT);
+		$draft->setIssueDate(null);
+
+		$xml = $service->buildXml($draft, [$this->item(9500, 1900, 19000)], $this->settings());
+
+		$this->assertMatchesRegularExpression('/<udt:DateTimeString format="102">20270101</', $xml);
 	}
 
 	public function testFreeTextUnitLabelMapsToGenericCodeInXml(): void {
@@ -616,6 +637,7 @@ class ZugferdServiceTest extends TestCase {
 			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
 			$tempManager,
+			$this->companyClock(),
 		);
 
 		$invoice = $this->invoice();

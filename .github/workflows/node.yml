@@ -64,6 +64,10 @@ jobs:
       - name: l10n-Vollstaendigkeit
         run: npm run l10n:check
 
+      # Kalendertage duerfen nicht aus dem UTC-"jetzt" des Servers entstehen
+      - name: Zeitzonen-Check
+        run: npm run timezone:check
+
       - name: Typecheck
         run: npm run typecheck
 

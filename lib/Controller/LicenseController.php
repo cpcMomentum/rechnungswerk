@@ -43,12 +43,12 @@ class LicenseController extends Controller {
 	}
 
 	#[NoAdminRequired]
-	public function activate(#[\SensitiveParameter] string $key = '', string $employeeBucket = EntitlementService::DEFAULT_BUCKET): DataResponse {
+	public function activate(#[\SensitiveParameter] string $key = ''): DataResponse {
 		if (($resp = $this->requireAdmin()) !== null) {
 			return $resp;
 		}
 		try {
-			$this->entitlementService->activate($key, $employeeBucket);
+			$this->entitlementService->activate($key);
 		} catch (\InvalidArgumentException $e) {
 			return $this->invalidInput($e->getMessage());
 		} catch (WerkPlusApiException $e) {
@@ -59,12 +59,12 @@ class LicenseController extends Controller {
 
 	// Der Schluessel steht nur in dieser Antwort; spaeter liefert der Status nur noch den Hinweis.
 	#[NoAdminRequired]
-	public function trial(string $employeeBucket = EntitlementService::DEFAULT_BUCKET): DataResponse {
+	public function trial(): DataResponse {
 		if (($resp = $this->requireAdmin()) !== null) {
 			return $resp;
 		}
 		try {
-			$key = $this->entitlementService->startTrial($employeeBucket);
+			$key = $this->entitlementService->startTrial();
 		} catch (\InvalidArgumentException $e) {
 			return $this->invalidInput($e->getMessage());
 		} catch (WerkPlusApiException $e) {
@@ -121,7 +121,6 @@ class LicenseController extends Controller {
 
 	private function invalidInput(string $field): DataResponse {
 		$message = match ($field) {
-			'employeeBucket' => $this->l10n->t('Bitte wähle eine gültige Größenklasse.'),
 			'keySet' => $this->l10n->t('Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich.'),
 			default => $this->l10n->t('Bitte gib einen gültigen WerkPlus-Schlüssel ein.'),
 		};

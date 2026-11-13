@@ -46,7 +46,7 @@ class TextSnippetService {
 	public function create(string $userId, array $data): TextSnippet {
 		$this->validate($data);
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel
 		$snippet = new TextSnippet();
 		$snippet->setOwnerUserId($userId);
 		$snippet->setCreatedAt($now);

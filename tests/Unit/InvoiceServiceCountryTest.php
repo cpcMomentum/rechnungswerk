@@ -38,6 +38,7 @@ use Psr\Log\LoggerInterface;
 class InvoiceServiceCountryTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private IDBConnection $db;
 	private InvoiceMapper $invoiceMapper;
@@ -63,6 +64,7 @@ class InvoiceServiceCountryTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 

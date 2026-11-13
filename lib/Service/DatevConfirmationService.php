@@ -82,7 +82,7 @@ class DatevConfirmationService {
 			// Confirmations may not stay in INBOX (mail rules / external automations
 			// archive them), so search across folders — but skip the obvious noise.
 			// The sender + 30-day filters run server-side and keep this bounded.
-			$since = (new DateTime())->modify('-30 days');
+			$since = (new DateTime())->modify('-30 days'); // tz-ok: Zeitfenster über Zeitstempel, kein Kalendertag
 			$criteria = 'FROM "' . self::DATEV_SENDER . '" SINCE ' . $since->format('j-M-Y');
 			$skipFolders = ['Trash', 'Junk', 'Drafts', 'Sent'];
 

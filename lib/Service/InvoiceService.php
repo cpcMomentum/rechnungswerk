@@ -41,6 +41,7 @@ class InvoiceService {
 		private readonly NumberFormatMessage $numberFormatMessage,
 		private readonly IL10N $l10n,
 		private readonly AuditService $auditService,
+		private readonly CompanyClock $clock,
 	) {
 	}
 
@@ -83,7 +84,7 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function create(string $userId, array $data, ?int $apiKeyId = null): array {
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 		$invoice = new Invoice();
 		$invoice->setOwnerUserId($userId);
 		$invoice->setApiKeyId($apiKeyId);
@@ -238,7 +239,7 @@ class InvoiceService {
 		$this->assertSellerNameSet($settings);
 		$this->assertIntraCommunityComplete($invoice, $settings);
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
@@ -249,14 +250,14 @@ class InvoiceService {
 			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 
-			$number = $this->settingsService->reserveNextNumber($now);
+			$today = $this->clock->today();
+			$number = $this->settingsService->reserveNextNumber($today);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
-			$invoice->setIssueDate($now);
+			$invoice->setIssueDate($today);
 			if ($invoice->getPaymentTermDays() !== null) {
-				$due = (clone $now);
+				$due = (clone $today);
 				$due->modify('+' . (int)$invoice->getPaymentTermDays() . ' days');
-				$due->setTime(0, 0, 0);
 				$invoice->setDueDate($due);
 			}
 			$invoice->setCommittedAt($now);
@@ -473,24 +474,18 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function cancel(int $id, string $userId): array {
-		$original = $this->assertInvoiceType($this->findById($id));
-		if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
-		}
+		$this->assertCancellable($this->assertInvoiceType($this->findById($id)));
 
 		$settings = $this->settingsService->getCompany();
 		$this->assertSellerNameSet($settings);
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
 			// Lock the original and re-check inside the transaction so a double
 			// cancel cannot create two storno documents for the same invoice.
-			$original = $this->findByIdForUpdate($id);
-			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-				throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
-			}
+			$original = $this->assertCancellable($this->findByIdForUpdate($id));
 			$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
 			$storno = new Invoice();
@@ -516,11 +511,12 @@ class InvoiceService {
 			$storno->setBuyerReference($original->getBuyerReference());
 			$storno->setContractNumber($original->getContractNumber());
 			$storno->setProjectReference($original->getProjectReference());
-			$storno->setIssueDate($now);
+			$today = $this->clock->today();
+			$storno->setIssueDate($today);
 			$storno->setCommittedAt($now);
 			$storno->setCreatedAt($now);
 			$storno->setUpdatedAt($now);
-			$storno->setNumber($this->settingsService->reserveNextNumber($now));
+			$storno->setNumber($this->settingsService->reserveNextNumber($today));
 			$storno = $this->invoiceMapper->insert($storno);
 
 			foreach ($originalItems as $item) {
@@ -598,7 +594,7 @@ class InvoiceService {
 		}
 		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
@@ -1067,8 +1063,7 @@ class InvoiceService {
 		}
 		$validUntil = $quote->getValidUntil();
 		if ($validUntil !== null) {
-			$today = new DateTime();
-			$today->setTime(0, 0, 0);
+			$today = $this->clock->today();
 			if ($validUntil < $today) {
 				return Invoice::QUOTE_EXPIRED;
 			}
@@ -1091,8 +1086,7 @@ class InvoiceService {
 		}
 		$due = $invoice->getDueDate();
 		if ($due !== null) {
-			$today = new DateTime();
-			$today->setTime(0, 0, 0);
+			$today = $this->clock->today();
 			if ($due < $today) {
 				return Invoice::PAYMENT_OVERDUE;
 			}
@@ -1111,11 +1105,7 @@ class InvoiceService {
 	 */
 	public function markPaid(int $id, ?string $date = null): array {
 		$invoice = $this->assertPayable($this->findById($id));
-		$paidAt = $this->parseDate($date) ?? (function () {
-			$now = new DateTime();
-			$now->setTime(0, 0, 0);
-			return $now;
-		})();
+		$paidAt = $this->parseDate($date) ?? $this->clock->today();
 
 		$this->db->beginTransaction();
 		try {
@@ -1165,6 +1155,20 @@ class InvoiceService {
 	/**
 	 * @throws IllegalStateException
 	 */
+	private function assertCancellable(Invoice $invoice): Invoice {
+		if ($invoice->getInvoiceType() === Invoice::TYPE_CANCELLATION) {
+			throw new IllegalStateException($this->l10n->t('Ein Stornobeleg kann nicht storniert werden.'));
+		}
+		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
+			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
+		}
+		return $invoice;
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 */
 	private function assertPayable(Invoice $invoice): Invoice {
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
 			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
@@ -1206,7 +1210,7 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function createQuote(string $userId, array $data): array {
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 		$quote = new Invoice();
 		$quote->setOwnerUserId($userId);
 		$quote->setStatus(Invoice::STATUS_DRAFT);
@@ -1280,7 +1284,8 @@ class InvoiceService {
 		// Create the settings row outside the transaction (see commit()).
 		$this->settingsService->getCompany();
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
+		$today = $this->clock->today();
 
 		$this->db->beginTransaction();
 		try {
@@ -1294,10 +1299,10 @@ class InvoiceService {
 				$quote->setNumber($this->reserveNextRevisionNumber($quote));
 				$this->markSourceSuperseded((int)$quote->getRelatedQuoteId(), $now);
 			} else {
-				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($now));
+				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($today));
 			}
 			$quote->setStatus(Invoice::STATUS_COMMITTED);
-			$quote->setIssueDate($now);
+			$quote->setIssueDate($today);
 			$quote->setCommittedAt($now);
 			$quote->setUpdatedAt($now);
 			$this->recomputeTotals($quote);
@@ -1401,7 +1406,7 @@ class InvoiceService {
 	 */
 	public function reviseQuote(int $id, string $userId): array {
 		$this->assertQuoteRevisable($this->assertCommittedQuote($this->findById($id)));
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
@@ -1527,7 +1532,7 @@ class InvoiceService {
 	 */
 	public function convertToInvoice(int $id, string $userId): array {
 		$this->assertQuoteConvertible($this->assertCommittedQuote($this->findById($id)));
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {

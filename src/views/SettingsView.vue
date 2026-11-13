@@ -42,6 +42,11 @@
 							<input v-model="form.contactEmail" class="rw-input" type="email" /></label>
 					</div>
 					<p class="rw-hint">{{ t('rechnungswerk', 'Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).') }}</p>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Zeitzone') }}</span>
+						<select v-model="selectedTimezone" class="rw-input">
+							<option v-for="o in timezoneOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
+						</select></label>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.') }}</p>
 				</section>
 
 				<!-- Bank -->
@@ -536,6 +541,30 @@ type SettingsForm = Omit<Settings, 'id' | 'numberCounter' | 'numberCounterYear' 
 const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
+
+// The server's own list: browsers offer legacy names that some PHP builds reject.
+const serverTimezones = ref<string[]>([])
+
+const timezoneOptions = computed(() => {
+	let zones = serverTimezones.value
+	const current = form.value?.timezone ?? ''
+	if (current !== '' && !zones.includes(current)) {
+		zones = [current, ...zones]
+	}
+	return [
+		{ id: '', label: t('rechnungswerk', 'Automatisch') },
+		...zones.map(z => ({ id: z, label: z })),
+	]
+})
+
+const selectedTimezone = computed({
+	get: () => form.value?.timezone ?? '',
+	set(id: string) {
+		if (form.value) {
+			form.value.timezone = id || null
+		}
+	},
+})
 // EN 16931 BR-CO-26 needs a VAT ID or register number; the tax number does not count.
 const hasSellerIdentifier = computed(() => !!form.value?.vatId?.trim() || !!form.value?.registerNumber?.trim())
 
@@ -796,12 +825,14 @@ function hydrate() {
 		nextNumberInput.value = base + 1
 	}
 	archiveFolderPath.value = s.archiveFolderPath ?? null
+	serverTimezones.value = s.timezones ?? []
 	form.value = {
 		companyName: s.companyName,
 		companyAddress: s.companyAddress,
 		vatId: s.vatId,
 		taxNumber: s.taxNumber,
 		registerNumber: s.registerNumber,
+		timezone: s.timezone,
 		iban: s.iban,
 		bic: s.bic,
 		bankName: s.bankName,

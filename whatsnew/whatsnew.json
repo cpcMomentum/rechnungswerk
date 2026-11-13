@@ -1,4 +1,86 @@
 {
+	"0.9.0": [
+		{
+			"title": {
+				"de": "Richtiges Datum auch kurz nach Mitternacht",
+				"en": "Correct date just after midnight",
+				"fr": "Date correcte juste après minuit"
+			},
+			"text": {
+				"de": "Zwischen Mitternacht und 1 bzw. 2 Uhr bekamen Rechnungen, Stornos und Angebote bisher das Datum des Vortags. Jetzt zählt die Zeitzone der Firma. Sie lässt sich unter Einstellungen › Firma festlegen.",
+				"en": "Between midnight and 1 or 2 a.m., invoices, cancellations and quotes used to get the previous day's date. The company's time zone now applies. You can set it under Settings › Company.",
+				"fr": "Entre minuit et 1 h ou 2 h, les factures, les avoirs d'annulation et les devis recevaient jusqu'ici la date de la veille. C'est désormais le fuseau horaire de l'entreprise qui compte. Il se règle sous Paramètres › Entreprise."
+			},
+			"icon": "cog",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "Stornobeleg lässt sich nicht erneut stornieren",
+				"en": "Cancellations can no longer be cancelled again",
+				"fr": "Un avoir d'annulation ne peut plus être annulé"
+			},
+			"text": {
+				"de": "Bei einem Stornobeleg fehlt jetzt der Button „Stornieren“. Bisher entstand dabei ein weiterer Beleg mit eigener Nummer.",
+				"en": "A cancellation document no longer shows the “Cancel” button. Previously this created another document with its own number.",
+				"fr": "Un avoir d'annulation n'affiche plus le bouton « Annuler ». Auparavant, cela créait un document supplémentaire avec son propre numéro."
+			},
+			"icon": "file-document",
+			"where": {
+				"de": "Rechnungen",
+				"en": "Invoices",
+				"fr": "Factures"
+			},
+			"adminOnly": false,
+			"plus": false
+		},
+		{
+			"title": {
+				"de": "WerkPlus ohne Angabe der Mitarbeiterzahl",
+				"en": "WerkPlus without headcount",
+				"fr": "WerkPlus sans indication de l'effectif"
+			},
+			"text": {
+				"de": "Für Aktivierung und Testzeitraum ist die Auswahl „Mitarbeitende“ entfallen. Ist die Lizenz auf eine Zahl von Mitarbeitenden ausgestellt, steht diese unter Einstellungen › WerkPlus.",
+				"en": "Activation and the trial no longer ask for the number of employees. If your licence covers a number of employees, Settings › WerkPlus shows it.",
+				"fr": "L'activation et la période d'essai ne demandent plus le nombre de collaborateurs. Si la licence porte sur un nombre de collaborateurs, il figure sous Paramètres › WerkPlus."
+			},
+			"icon": "star",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": true,
+			"plus": true
+		},
+		{
+			"title": {
+				"de": "Betreff der Kundenmail passt zur Rechnung",
+				"en": "Customer email subject matches the invoice",
+				"fr": "L'objet de l'e-mail client correspond à la facture"
+			},
+			"text": {
+				"de": "Der vorgeschlagene Betreff lautet jetzt immer „Rechnung …“, „Angebot …“ oder „Stornorechnung …“, passend zu Mailtext und PDF. Das gilt auch, wenn die Oberfläche in einer anderen Sprache läuft.",
+				"en": "The suggested subject is now always the German “Rechnung …”, “Angebot …” or “Stornorechnung …”, matching the email text and the PDF, even when the interface uses another language.",
+				"fr": "L'objet proposé est désormais toujours en allemand (« Rechnung … », « Angebot … » ou « Stornorechnung … »), comme le texte de l'e-mail et le PDF, même si l'interface est dans une autre langue."
+			},
+			"icon": "email",
+			"where": {
+				"de": "Rechnungen",
+				"en": "Invoices",
+				"fr": "Factures"
+			},
+			"adminOnly": false,
+			"plus": false
+		}
+	],
 	"0.8.0": [
 		{
 			"title": {

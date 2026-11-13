@@ -15,6 +15,7 @@ use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
+use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ArchiveService;
 use OCA\Rechnungswerk\Service\AuditService;
@@ -40,6 +41,7 @@ use Psr\Log\LoggerInterface;
 class InvoiceServiceDocumentTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private const FROZEN = '%PDF-1.7 eingefrorener Beleg';
 	private const RENDERED = '%PDF-1.7 frisch gerendert';
@@ -87,6 +89,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 
@@ -212,6 +215,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 
 		// Dieselbe Datei geht auch in die Ablage — hier mitgeprueft, statt eine
@@ -331,6 +335,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 
 		$this->assertFalse($service->freezeDocument($invoice, true));
@@ -367,6 +372,63 @@ class InvoiceServiceDocumentTest extends TestCase {
 		$this->expectExceptionMessageMatches('/Firmennamen/');
 
 		$service->cancel((int)$committed->getId(), 'alice');
+	}
+
+	/** Sonst entstuende ein Storno zum Storno mit verbrauchter Nummer. */
+	public function testCancelOfACancellationIsRefusedAndBurnsNoNumber(): void {
+		$storno = $this->committedInvoice();
+		$storno->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$this->invoiceMapper->method('findOne')->willReturn($storno);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($storno);
+
+		$this->settingsService->expects($this->never())->method('reserveNextNumber');
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Stornobeleg/');
+
+		$this->service->cancel((int)$storno->getId(), 'alice');
+	}
+
+	public function testCancelOfAnAlreadyCancelledStornoNamesTheStornoAsReason(): void {
+		$storno = $this->committedInvoice();
+		$storno->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$storno->setStatus(Invoice::STATUS_CANCELLED);
+		$this->invoiceMapper->method('findOne')->willReturn($storno);
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Stornobeleg/');
+
+		$this->service->cancel((int)$storno->getId(), 'alice');
+	}
+
+	public function testCancelOfADraftIsRefused(): void {
+		$draft = $this->draftInvoice();
+		$this->invoiceMapper->method('findOne')->willReturn($draft);
+
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Nur festgeschriebene Rechnungen/');
+
+		$this->service->cancel((int)$draft->getId(), 'alice');
+	}
+
+	/** Dieselbe Pruefung greift auch auf dem gesperrten Datensatz in der Transaktion. */
+	public function testCancelRechecksTheTypeOnTheLockedRow(): void {
+		$seen = $this->committedInvoice();
+		$locked = $this->committedInvoice();
+		$locked->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$this->invoiceMapper->method('findOne')->willReturn($seen);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($locked);
+
+		$this->settingsService->expects($this->never())->method('reserveNextNumber');
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Stornobeleg/');
+
+		$this->service->cancel((int)$seen->getId(), 'alice');
 	}
 
 	/** Mit Firmennamen laeuft derselbe Weg durch — die Sperre trifft nur den Leerfall. */
@@ -527,6 +589,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
 			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 
