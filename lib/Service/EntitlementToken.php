@@ -24,7 +24,7 @@ final class EntitlementToken {
 		public readonly int $issuedAt,
 		public readonly int $expiresAt,
 		public readonly int $graceUntil,
-		public readonly ?string $seatsBucket,
+		public readonly ?int $licensedEmployees,
 	) {
 	}
 

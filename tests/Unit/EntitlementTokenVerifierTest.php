@@ -19,13 +19,23 @@ use PHPUnit\Framework\TestCase;
 class EntitlementTokenVerifierTest extends TestCase {
 	use EntitlementTokenFactory;
 
+	public function testLicensedEmployeesIsReadWhenItIsAPositiveNumber(): void {
+		$read = fn (mixed $value) => $this->verifier()->verify($this->token($this->claims(['licensedEmployees' => $value])), self::UUID, self::NOW)->licensedEmployees;
+
+		$this->assertSame(12, $read(12));
+		$this->assertNull($read(0));
+		$this->assertNull($read('12'));
+		$this->assertNull($read(12.5));
+		$this->assertSame(12, $read(12.0));
+	}
+
 	public function testValidTokenYieldsTierAndFeatures(): void {
 		$token = $this->verifier()->verify($this->token($this->claims()), self::UUID, self::NOW);
 
 		$this->assertSame('werkplus', $token->tier);
 		$this->assertSame(['tenants', 'inbound', 'pw_multi_board'], $token->features);
 		$this->assertSame(EntitlementToken::STATE_VALID, $token->stateAt(self::NOW));
-		$this->assertSame('6-20', $token->seatsBucket);
+		$this->assertNull($token->licensedEmployees);
 	}
 
 	public function testSubIsComparedIgnoringCase(): void {
