@@ -542,16 +542,11 @@ const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
 
+// The server's own list: browsers offer legacy names that some PHP builds reject.
+const serverTimezones = ref<string[]>([])
+
 const timezoneOptions = computed(() => {
-	let zones: string[]
-	try {
-		zones = Intl.supportedValuesOf('timeZone')
-	} catch {
-		zones = ['Europe/Berlin', 'Europe/Vienna', 'Europe/Zurich']
-	}
-	if (!zones.includes('UTC')) {
-		zones = [...zones, 'UTC']
-	}
+	let zones = serverTimezones.value
 	const current = form.value?.timezone ?? ''
 	if (current !== '' && !zones.includes(current)) {
 		zones = [current, ...zones]
@@ -830,6 +825,7 @@ function hydrate() {
 		nextNumberInput.value = base + 1
 	}
 	archiveFolderPath.value = s.archiveFolderPath ?? null
+	serverTimezones.value = s.timezones ?? []
 	form.value = {
 		companyName: s.companyName,
 		companyAddress: s.companyAddress,

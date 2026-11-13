@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Tests\Unit;
 
+use DateTimeZone;
 use OCA\Rechnungswerk\Db\SettingsMapper;
 use OCA\Rechnungswerk\Service\CompanyClock;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -71,10 +72,25 @@ class CompanyClockTest extends TestCase {
 		$this->assertSame('Europe/Vienna', $clock->timeZone()->getName());
 	}
 
-	public function testLegacyNamesThatBrowsersOfferAreAccepted(): void {
-		$this->assertTrue(CompanyClock::isValid('Asia/Calcutta'));
-		$this->assertTrue(CompanyClock::isValid('Europe/Kiev'));
-		$this->assertSame('Europe/Kiev', $this->companyClock('now', null, 'Europe/Kiev')->timeZone()->getName());
+	public function testEveryNameOfferedToThePickerIsAccepted(): void {
+		$names = CompanyClock::zoneNames();
+		$this->assertContains('Europe/Berlin', $names);
+		$this->assertContains('UTC', $names);
+		foreach ($names as $name) {
+			$this->assertTrue(CompanyClock::isValid($name), $name);
+		}
+	}
+
+	public function testAliasesThisServerKnowsAreAcceptedButNotOffered(): void {
+		$aliases = array_diff(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC), DateTimeZone::listIdentifiers());
+		if ($aliases === []) {
+			$this->markTestSkipped('This PHP build ships no legacy zone names.');
+		}
+		$alias = reset($aliases);
+
+		$this->assertTrue(CompanyClock::isValid($alias));
+		$this->assertNotContains($alias, CompanyClock::zoneNames());
+		$this->assertSame($alias, $this->companyClock('now', null, $alias)->timeZone()->getName());
 	}
 
 	public function testIsValidAcceptsOnlyKnownIdentifiers(): void {

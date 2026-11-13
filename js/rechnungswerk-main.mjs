@@ -10237,19 +10237,8 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 }, Tw = { class: "rw-field" }, Ew = ["placeholder"], Dw = { class: "rw-hint" }, Ow = { class: "rw-section" }, kw = { class: "rw-hint" }, Aw = { class: "rw-form-row" }, jw = { class: "rw-field" }, Mw = { class: "rw-field rw-field--narrow" }, Nw = { class: "rw-field rw-field--narrow" }, Pw = { value: "none" }, Fw = { class: "rw-form-row" }, Iw = { class: "rw-field" }, Lw = { class: "rw-field" }, Rw = ["placeholder"], zw = { class: "smtp-test" }, Bw = { class: "rw-section" }, Vw = { class: "rw-hint" }, Hw = { class: "rw-form-row" }, Uw = { class: "rw-field" }, Ww = { class: "rw-field rw-field--narrow" }, Gw = { class: "rw-field rw-field--narrow" }, Kw = { class: "rw-form-row" }, qw = { class: "rw-field" }, Jw = { class: "rw-field" }, Yw = ["placeholder"], Xw = { class: "rw-section" }, Zw = { class: "rw-hint" }, Qw = { class: "rw-section" }, $w = { class: "rw-hint rw-access-intro" }, eT = { class: "rw-access-group" }, tT = { class: "rw-access-label" }, nT = { class: "rw-hint rw-access-desc" }, rT = { class: "rw-access-group" }, iT = { class: "rw-access-label" }, aT = { class: "rw-hint rw-access-desc" }, oT = { class: "rw-section" }, sT = { class: "rw-section" }, cT = { class: "rw-action-bar" }, lT = /*#__PURE__*/ Q(/* @__PURE__ */ U({
 	__name: "SettingsView",
 	setup(e) {
-		let r = st(), i = Wl(), a = v(null), o = L(() => {
-			let e;
-			try {
-				e = Intl.supportedValuesOf("timeZone");
-			} catch {
-				e = [
-					"Europe/Berlin",
-					"Europe/Vienna",
-					"Europe/Zurich"
-				];
-			}
-			e.includes("UTC") || (e = [...e, "UTC"]);
-			let t = a.value?.timezone ?? "";
+		let r = st(), i = Wl(), a = v(null), o = v([]), s = L(() => {
+			let e = o.value, t = a.value?.timezone ?? "";
 			return t !== "" && !e.includes(t) && (e = [t, ...e]), [{
 				id: "",
 				label: w("rechnungswerk", "Automatisch")
@@ -10257,12 +10246,12 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 				id: e,
 				label: e
 			}))];
-		}), s = L({
+		}), c = L({
 			get: () => a.value?.timezone ?? "",
 			set(e) {
 				a.value && (a.value.timezone = e || null);
 			}
-		}), c = L(() => !!a.value?.vatId?.trim() || !!a.value?.registerNumber?.trim()), l = L(() => [
+		}), l = L(() => !!a.value?.vatId?.trim() || !!a.value?.registerNumber?.trim()), u = L(() => [
 			{
 				label: w("rechnungswerk", "Firma"),
 				items: [
@@ -10364,74 +10353,74 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 					icon: aS
 				}]
 			}
-		]), u = v("firma");
-		function d() {
+		]), d = v("firma");
+		function f() {
 			r.push({ name: "text-snippets" });
 		}
-		let f = v(null), p = v(!1), m = v(""), h = v(null);
-		async function g(e) {
-			m.value = e, await Je(), h.value?.scrollIntoView({
+		let p = v(null), m = v(!1), h = v(""), g = v(null);
+		async function ee(e) {
+			h.value = e, await Je(), g.value?.scrollIntoView({
 				behavior: "smooth",
 				block: "center"
 			});
 		}
-		let ee = v(!1), te = v(!1), b = v(!1), x = v(!1), S = v(!1), ne = v(0), T = v((/* @__PURE__ */ new Date()).getFullYear()), D = v((/* @__PURE__ */ new Date()).getMonth() + 1), re = v((/* @__PURE__ */ new Date()).getDate()), O = v(null), k = v(0), ie = v(null), ae = v(null), oe = L(() => a.value?.accentColor || "#2c3e50"), se = L(() => ({
-			background: oe.value,
-			color: $S(oe.value)
-		})), A = L(() => eC(oe.value));
-		function j(e) {
+		let te = v(!1), b = v(!1), x = v(!1), S = v(!1), ne = v(!1), T = v(0), D = v((/* @__PURE__ */ new Date()).getFullYear()), re = v((/* @__PURE__ */ new Date()).getMonth() + 1), O = v((/* @__PURE__ */ new Date()).getDate()), k = v(null), ie = v(0), ae = v(null), oe = v(null), se = L(() => a.value?.accentColor || "#2c3e50"), A = L(() => ({
+			background: se.value,
+			color: $S(se.value)
+		})), j = L(() => eC(se.value));
+		function ce(e) {
 			a.value && (a.value.accentColor = e ?? null);
 		}
-		let ce = v([]), le = v([]), ue = v([]), de = v(!1), fe = v(!1), M = v(""), pe = null, me = v(""), he = v(""), P = v(!1), ge = v(""), F = v(!1), _e = v(!1), ve = L(() => a.value?.logoFileId ? Vl(a.value.logoFileId) : ""), ye = L(() => de.value ? w("rechnungswerk", "Suche läuft\xA0…") : M.value.trim().length < 2 ? w("rechnungswerk", "Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.") : w("rechnungswerk", "Keine Treffer.")), be = L(() => a.value?.numberResetMode === "continuous" || T.value === O.value ? ne.value : 0), xe = L(() => be.value + 1), Se = L(() => {
+		let le = v([]), ue = v([]), de = v([]), fe = v(!1), M = v(!1), pe = v(""), me = null, he = v(""), P = v(""), ge = v(!1), F = v(""), _e = v(!1), ve = v(!1), ye = L(() => a.value?.logoFileId ? Vl(a.value.logoFileId) : ""), be = L(() => fe.value ? w("rechnungswerk", "Suche läuft\xA0…") : pe.value.trim().length < 2 ? w("rechnungswerk", "Tippe einen Namen (mind. 2 Zeichen), um Nutzer oder Gruppen zu finden.") : w("rechnungswerk", "Keine Treffer.")), xe = L(() => a.value?.numberResetMode === "continuous" || D.value === k.value ? T.value : 0), Se = L(() => xe.value + 1), we = L(() => {
 			if (!a.value) return "";
-			let e = ae.value && ae.value > 0 ? ae.value : xe.value;
-			return tC(a.value.numberFormat || "RE-{YYYY}-{####}", e, T.value, D.value, re.value);
-		}), we = L(() => {
+			let e = oe.value && oe.value > 0 ? oe.value : Se.value;
+			return tC(a.value.numberFormat || "RE-{YYYY}-{####}", e, D.value, re.value, O.value);
+		}), Te = L(() => {
 			if (!a.value) return "";
-			let e = a.value.quoteNumberResetMode === "continuous" || T.value === ie.value ? k.value : 0;
-			return tC(a.value.quoteNumberFormat || "AN-{YYYY}-{####}", e + 1, T.value, D.value, re.value);
-		}), Te = L(() => a.value ? rC(a.value.fileNameFormat || "{nummer}", {
-			nummer: Se.value,
+			let e = a.value.quoteNumberResetMode === "continuous" || D.value === ae.value ? ie.value : 0;
+			return tC(a.value.quoteNumberFormat || "AN-{YYYY}-{####}", e + 1, D.value, re.value, O.value);
+		}), Ee = L(() => a.value ? rC(a.value.fileNameFormat || "{nummer}", {
+			nummer: we.value,
 			date: /* @__PURE__ */ new Date(),
 			kunde: "Muster GmbH",
 			typ: "Rechnung"
 		}) : "");
 		Pe(async () => {
 			try {
-				await i.fetch(), Oe();
+				await i.fetch(), ke();
 				let e = await Bs();
-				ce.value = Ee(e.admins), le.value = Ee(e.users);
+				le.value = De(e.admins), ue.value = De(e.users);
 			} catch (e) {
-				B(e, w("rechnungswerk", "Laden fehlgeschlagen"));
+				Ge(e, w("rechnungswerk", "Laden fehlgeschlagen"));
 			}
 		});
-		function Ee(e) {
+		function De(e) {
 			return e.map((e) => ({
 				id: e,
 				type: e.startsWith("group:") ? "group" : "user",
 				displayName: e.replace(/^(user|group):/, "")
 			}));
 		}
-		function De(e) {
-			M.value = e, pe && clearTimeout(pe), e.trim().length < 2 ? (ue.value = [], de.value = !1) : (de.value = !0, pe = setTimeout(async () => {
+		function Oe(e) {
+			pe.value = e, me && clearTimeout(me), e.trim().length < 2 ? (de.value = [], fe.value = !1) : (fe.value = !0, me = setTimeout(async () => {
 				try {
-					ue.value = await Hs(e.trim());
+					de.value = await Hs(e.trim());
 				} catch {
-					ue.value = [];
+					de.value = [];
 				} finally {
-					de.value = !1;
+					fe.value = !1;
 				}
 			}, 300));
 		}
-		function Oe() {
+		function ke() {
 			let e = i.settings;
 			if (e) {
-				ne.value = e.numberCounter, O.value = e.numberCounterYear, k.value = e.quoteNumberCounter, ie.value = e.quoteNumberCounterYear;
+				T.value = e.numberCounter, k.value = e.numberCounterYear, ie.value = e.quoteNumberCounter, ae.value = e.quoteNumberCounterYear;
 				{
-					let t = e.numberResetMode === "continuous" || T.value === e.numberCounterYear ? e.numberCounter : 0;
-					ae.value = t + 1;
+					let t = e.numberResetMode === "continuous" || D.value === e.numberCounterYear ? e.numberCounter : 0;
+					oe.value = t + 1;
 				}
-				f.value = e.archiveFolderPath ?? null, a.value = {
+				p.value = e.archiveFolderPath ?? null, o.value = e.timezones ?? [], a.value = {
 					companyName: e.companyName,
 					companyAddress: e.companyAddress,
 					vatId: e.vatId,
@@ -10480,37 +10469,37 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 				};
 			}
 		}
-		function ke(e) {
-			a.value && (e ? ee.value = !0 : a.value.smallBusiness = !1);
+		function Ae(e) {
+			a.value && (e ? te.value = !0 : a.value.smallBusiness = !1);
 		}
-		function Ae() {
-			ee.value = !1, a.value && (a.value.smallBusiness = !0);
+		function je() {
+			te.value = !1, a.value && (a.value.smallBusiness = !0);
 		}
-		function je(e) {
-			a.value && (e ? te.value = !0 : a.value.datevAutoSend = !1);
+		function Me(e) {
+			a.value && (e ? b.value = !0 : a.value.datevAutoSend = !1);
 		}
-		function Me() {
-			te.value = !1, a.value && (a.value.datevAutoSend = !0);
+		function R() {
+			b.value = !1, a.value && (a.value.datevAutoSend = !0);
 		}
-		function R(e) {
-			a.value && (e ? b.value = !0 : a.value.archiveEnabled = !1);
+		function Ne(e) {
+			a.value && (e ? x.value = !0 : a.value.archiveEnabled = !1);
 		}
-		function Ne() {
-			b.value = !1, a.value && (a.value.archiveEnabled = !0);
+		function Fe() {
+			x.value = !1, a.value && (a.value.archiveEnabled = !0);
 		}
-		function Fe(e) {
-			a.value && e !== a.value.numberResetMode && (e === "continuous" ? x.value = !0 : a.value.numberResetMode = "yearly");
+		function Ie(e) {
+			a.value && e !== a.value.numberResetMode && (e === "continuous" ? S.value = !0 : a.value.numberResetMode = "yearly");
 		}
-		function Ie() {
-			x.value = !1, a.value && (a.value.numberResetMode = "continuous");
+		function Le() {
+			S.value = !1, a.value && (a.value.numberResetMode = "continuous");
 		}
-		function Le(e) {
-			a.value && e !== a.value.quoteNumberResetMode && (e === "continuous" ? S.value = !0 : a.value.quoteNumberResetMode = "yearly");
+		function Re(e) {
+			a.value && e !== a.value.quoteNumberResetMode && (e === "continuous" ? ne.value = !0 : a.value.quoteNumberResetMode = "yearly");
 		}
-		function Re() {
-			S.value = !1, a.value && (a.value.quoteNumberResetMode = "continuous");
+		function ze() {
+			ne.value = !1, a.value && (a.value.quoteNumberResetMode = "continuous");
 		}
-		async function ze() {
+		async function Be() {
 			let e;
 			try {
 				e = await Pv(w("rechnungswerk", "Zielordner für die Ablage wählen")).setMultiSelect(!1).setMimeTypeFilter(["httpd/unix-directory"]).allowDirectories(!0).addButton({
@@ -10520,32 +10509,32 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 				}).build().pick();
 			} catch (e) {
 				if (e instanceof jv) return;
-				B(e, w("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
+				Ge(e, w("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
 				return;
 			}
 			if (e) {
-				p.value = !0, m.value = "";
+				m.value = !0, h.value = "";
 				try {
 					let t = await Hl(e);
-					a.value && (a.value.archiveFolderId = t.archiveFolderId), f.value = t.archiveFolderPath;
+					a.value && (a.value.archiveFolderId = t.archiveFolderId), p.value = t.archiveFolderPath;
 				} catch (e) {
-					B(e, w("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
+					Ge(e, w("rechnungswerk", "Zielordner konnte nicht gesetzt werden."));
 				} finally {
-					p.value = !1;
+					m.value = !1;
 				}
 			}
 		}
-		async function Be() {
-			p.value = !0, m.value = "";
+		async function Ve() {
+			m.value = !0, h.value = "";
 			try {
-				await Ul(), a.value && (a.value.archiveFolderId = null, a.value.archiveEnabled = !1), f.value = null;
+				await Ul(), a.value && (a.value.archiveFolderId = null, a.value.archiveEnabled = !1), p.value = null;
 			} catch (e) {
-				B(e, w("rechnungswerk", "Zielordner konnte nicht entfernt werden."));
+				Ge(e, w("rechnungswerk", "Zielordner konnte nicht entfernt werden."));
 			} finally {
-				p.value = !1;
+				m.value = !1;
 			}
 		}
-		async function Ve() {
+		async function He() {
 			let e;
 			try {
 				e = await Pv(w("rechnungswerk", "Firmenlogo wählen")).setMultiSelect(!1).setMimeTypeFilter([
@@ -10559,59 +10548,59 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 				}).build().pick();
 			} catch (e) {
 				if (e instanceof jv) return;
-				B(e, w("rechnungswerk", "Logo konnte nicht gesetzt werden."));
+				Ge(e, w("rechnungswerk", "Logo konnte nicht gesetzt werden."));
 				return;
 			}
 			if (e) {
-				_e.value = !0, m.value = "";
+				ve.value = !0, h.value = "";
 				try {
 					let t = await zl(e);
 					a.value && (a.value.logoFileId = t.logoFileId);
 				} catch (e) {
-					B(e, w("rechnungswerk", "Logo konnte nicht gesetzt werden."));
+					Ge(e, w("rechnungswerk", "Logo konnte nicht gesetzt werden."));
 				} finally {
-					_e.value = !1;
+					ve.value = !1;
 				}
 			}
 		}
-		async function He() {
-			_e.value = !0, m.value = "";
+		async function Ue() {
+			ve.value = !0, h.value = "";
 			try {
 				await Bl(), a.value && (a.value.logoFileId = null);
 			} catch (e) {
-				B(e, w("rechnungswerk", "Logo konnte nicht entfernt werden."));
+				Ge(e, w("rechnungswerk", "Logo konnte nicht entfernt werden."));
 			} finally {
-				_e.value = !1;
+				ve.value = !1;
 			}
 		}
-		async function Ue() {
+		async function We() {
 			if (!a.value) return;
-			m.value = "";
+			h.value = "";
 			let e = (a.value.numberFormat || "").trim();
 			if (a.value.numberResetMode === "yearly" && !/\{YYYY\}|\{YY\}/.test(e)) {
-				g(w("rechnungswerk", "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
+				ee(w("rechnungswerk", "Bei jährlichem Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
 				return;
 			}
-			let t = ae.value;
+			let t = oe.value;
 			if (t == null || !Number.isInteger(t) || t < 1) {
-				g(w("rechnungswerk", "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein."));
+				ee(w("rechnungswerk", "Die nächste Rechnungsnummer muss eine ganze Zahl ab 1 sein."));
 				return;
 			}
-			if (t < xe.value) {
-				g(w("rechnungswerk", "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.", {
-					min: xe.value,
-					issued: be.value
+			if (t < Se.value) {
+				ee(w("rechnungswerk", "Die nächste Rechnungsnummer muss mindestens {min} sein, da bereits die Nummer {issued} vergeben wurde.", {
+					min: Se.value,
+					issued: xe.value
 				}));
 				return;
 			}
 			let n = (a.value.quoteNumberFormat || "").trim();
 			if (a.value.quoteNumberResetMode === "yearly" && !/\{YYYY\}|\{YY\}/.test(n)) {
-				g(w("rechnungswerk", "Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
+				ee(w("rechnungswerk", "Bei jährlichem Angebots-Nummernkreis muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten. Alternativ „Fortlaufend“ wählen."));
 				return;
 			}
 			let r = (a.value.fileNameFormat || "").trim();
 			if (r !== "" && !r.includes("{nummer}")) {
-				g(w("rechnungswerk", "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben."));
+				ee(w("rechnungswerk", "Das Dateinamen-Schema muss den Platzhalter {nummer} enthalten, damit Dateinamen eindeutig bleiben."));
 				return;
 			}
 			let o = [
@@ -10631,70 +10620,70 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 			for (let { value: e, label: t } of o) {
 				let n = (e || "").trim();
 				if (n !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(n)) {
-					g(w("rechnungswerk", "Bitte eine gültige E-Mail-Adresse angeben ({field}).", { field: t }));
+					ee(w("rechnungswerk", "Bitte eine gültige E-Mail-Adresse angeben ({field}).", { field: t }));
 					return;
 				}
 			}
-			fe.value = !0;
+			M.value = !0;
 			try {
 				let e = { ...a.value };
-				t > xe.value && (e.numberCounter = t - 1), delete e.logoFileId, delete e.archiveFolderId, me.value !== "" && (e.smtpPassword = me.value), he.value !== "" && (e.imapPassword = he.value);
+				t > Se.value && (e.numberCounter = t - 1), delete e.logoFileId, delete e.archiveFolderId, he.value !== "" && (e.smtpPassword = he.value), P.value !== "" && (e.imapPassword = P.value);
 				try {
 					await i.save(e);
 				} catch (e) {
-					B(e, w("rechnungswerk", "Speichern der Einstellungen fehlgeschlagen."));
+					Ge(e, w("rechnungswerk", "Speichern der Einstellungen fehlgeschlagen."));
 					return;
 				}
 				try {
 					await Vs({
-						admins: ce.value.map((e) => e.id),
-						users: le.value.map((e) => e.id)
+						admins: le.value.map((e) => e.id),
+						users: ue.value.map((e) => e.id)
 					});
 				} catch (e) {
-					B(e, w("rechnungswerk", "Einstellungen gespeichert, aber die Zugriffsrechte konnten nicht gespeichert werden. Bitte erneut speichern."));
+					Ge(e, w("rechnungswerk", "Einstellungen gespeichert, aber die Zugriffsrechte konnten nicht gespeichert werden. Bitte erneut speichern."));
 					return;
 				}
-				me.value = "", he.value = "", Oe();
+				he.value = "", P.value = "", ke();
 			} finally {
-				fe.value = !1;
+				M.value = !1;
 			}
 		}
-		async function We() {
+		async function B() {
 			if (a.value?.smtpHost) {
-				P.value = !0, ge.value = "";
+				ge.value = !0, F.value = "";
 				try {
 					await Il({
 						host: a.value.smtpHost,
 						port: a.value.smtpPort ?? 587,
 						security: a.value.smtpSecurity || "starttls",
 						user: a.value.smtpUser ?? "",
-						password: me.value
-					}), F.value = !0, ge.value = w("rechnungswerk", "Verbindung erfolgreich.");
+						password: he.value
+					}), _e.value = !0, F.value = w("rechnungswerk", "Verbindung erfolgreich.");
 				} catch (e) {
-					F.value = !1, ge.value = e.message ?? w("rechnungswerk", "Verbindung fehlgeschlagen.");
+					_e.value = !1, F.value = e.message ?? w("rechnungswerk", "Verbindung fehlgeschlagen.");
 				} finally {
-					P.value = !1;
+					ge.value = !1;
 				}
 			}
 		}
-		function B(e, t) {
-			g(e.message ?? t), console.error("[rechnungswerk] settings:", e);
+		function Ge(e, t) {
+			ee(e.message ?? t), console.error("[rechnungswerk] settings:", e);
 		}
 		return (e, r) => (Z(), V("div", iC, [
 			z("h2", aC, Y(t(w)("rechnungswerk", "Einstellungen")), 1),
 			z("div", {
 				ref_key: "errorAnchor",
-				ref: h
-			}, [m.value ? (Z(), N(t($), {
+				ref: g
+			}, [h.value ? (Z(), N(t($), {
 				key: 0,
 				type: "error",
-				text: m.value
+				text: h.value
 			}, null, 8, ["text"])) : n("", !0)], 512),
 			a.value ? (Z(), V("div", oC, [J(kb, {
-				groups: l.value,
-				modelValue: u.value,
+				groups: u.value,
+				modelValue: d.value,
 				ariaLabel: t(w)("rechnungswerk", "Einstellungs-Navigation"),
-				"onUpdate:modelValue": r[0] ||= (e) => u.value = e
+				"onUpdate:modelValue": r[0] ||= (e) => d.value = e
 			}, null, 8, [
 				"groups",
 				"modelValue",
@@ -10727,7 +10716,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						type: "text",
 						placeholder: t(w)("rechnungswerk", "z. B. HRB 12345, Amtsgericht Stuttgart")
 					}, null, 8, hC), [[I, a.value.registerNumber]])]),
-					c.value ? n("", !0) : (Z(), N(t($), {
+					l.value ? n("", !0) : (Z(), N(t($), {
 						key: 0,
 						type: "warning",
 						heading: t(w)("rechnungswerk", "Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus."),
@@ -10752,14 +10741,14 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 					]),
 					z("p", bC, Y(t(w)("rechnungswerk", "Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).")), 1),
 					z("label", xC, [z("span", null, Y(t(w)("rechnungswerk", "Zeitzone")), 1), C(z("select", {
-						"onUpdate:modelValue": r[9] ||= (e) => s.value = e,
+						"onUpdate:modelValue": r[9] ||= (e) => c.value = e,
 						class: "rw-input"
-					}, [(Z(!0), V(E, null, X(o.value, (e) => (Z(), V("option", {
+					}, [(Z(!0), V(E, null, X(s.value, (e) => (Z(), V("option", {
 						key: e.id,
 						value: e.id
-					}, Y(e.label), 9, SC))), 128))], 512), [[Ce, s.value]])]),
+					}, Y(e.label), 9, SC))), 128))], 512), [[Ce, c.value]])]),
 					z("p", CC, Y(t(w)("rechnungswerk", "Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.")), 1)
-				], 512), [[y, u.value === "firma"]]),
+				], 512), [[y, d.value === "firma"]]),
 				C(z("section", wC, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Bankverbindung")), 1),
 					z("div", TC, [z("label", EC, [z("span", null, Y(t(w)("rechnungswerk", "IBAN")), 1), C(z("input", {
@@ -10788,20 +10777,20 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						_: 1
 					}, 8, ["modelValue", "disabled"]),
 					z("p", kC, Y(t(w)("rechnungswerk", "Druckt einen EPC-QR-Code neben die Bankverbindung: Kunden scannen ihn mit der Banking-App, Empfänger, Betrag und Verwendungszweck sind vorausgefüllt. Erscheint nur auf Rechnungen mit positivem Betrag, nicht auf Stornobelegen.")), 1)
-				], 512), [[y, u.value === "bank"]]),
+				], 512), [[y, d.value === "bank"]]),
 				C(z("section", AC, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Branding")), 1),
 					z("div", jC, [z("span", null, Y(t(w)("rechnungswerk", "Akzentfarbe")), 1), z("div", MC, [J(t(Tb), {
-						modelValue: oe.value,
+						modelValue: se.value,
 						advancedFields: "",
-						"onUpdate:modelValue": j
+						"onUpdate:modelValue": ce
 					}, {
 						default: _(() => [z("button", {
 							type: "button",
 							class: "rw-accent__trigger",
-							"aria-label": t(w)("rechnungswerk", "Akzentfarbe") + ": " + oe.value.toUpperCase(),
-							style: ft(se.value)
-						}, Y(oe.value.toUpperCase()), 13, NC)]),
+							"aria-label": t(w)("rechnungswerk", "Akzentfarbe") + ": " + se.value.toUpperCase(),
+							style: ft(A.value)
+						}, Y(se.value.toUpperCase()), 13, NC)]),
 						_: 1
 					}, 8, ["modelValue"]), a.value.accentColor ? (Z(), N(t(W), {
 						key: 0,
@@ -10812,7 +10801,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						_: 1
 					})) : n("", !0)])]),
 					z("div", PC, [
-						z("table", FC, [z("thead", null, [z("tr", { style: ft(se.value) }, [...r[44] ||= [
+						z("table", FC, [z("thead", null, [z("tr", { style: ft(A.value) }, [...r[44] ||= [
 							z("th", null, "Beschreibung", -1),
 							z("th", { class: "num" }, "Menge", -1),
 							z("th", { class: "num" }, "Einzelpreis", -1),
@@ -10824,33 +10813,33 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 							z("td", { class: "num" }, "190,00 €")
 						])], -1)]),
 						z("p", IC, Y(t(w)("rechnungswerk", "So erscheint die Kopfzeile der Positionstabelle auf der Rechnung.")), 1),
-						A.value ? (Z(), V("p", LC, Y(t(w)("rechnungswerk", "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.")), 1)) : n("", !0)
+						j.value ? (Z(), V("p", LC, Y(t(w)("rechnungswerk", "Auf dieser Farbe wäre weiße Schrift zu blass, deshalb steht sie schwarz auf der Rechnung. Die Farbe selbst bleibt unverändert.")), 1)) : n("", !0)
 					]),
 					z("div", RC, [
 						z("span", null, Y(t(w)("rechnungswerk", "Firmenlogo")), 1),
 						z("div", zC, [a.value.logoFileId ? (Z(), V("img", {
 							key: 0,
-							src: ve.value,
+							src: ye.value,
 							alt: t(w)("rechnungswerk", "Firmenlogo"),
 							class: "rw-logo__preview"
 						}, null, 8, BC)) : (Z(), V("span", VC, Y(t(w)("rechnungswerk", "Kein Logo gewählt")), 1)), z("div", HC, [J(t(W), {
-							disabled: _e.value,
-							onClick: Ve
+							disabled: ve.value,
+							onClick: He
 						}, {
 							default: _(() => [K(Y(a.value.logoFileId ? t(w)("rechnungswerk", "Logo ändern") : t(w)("rechnungswerk", "Logo wählen")), 1)]),
 							_: 1
 						}, 8, ["disabled"]), a.value.logoFileId ? (Z(), N(t(W), {
 							key: 0,
 							variant: "tertiary",
-							disabled: _e.value,
-							onClick: He
+							disabled: ve.value,
+							onClick: Ue
 						}, {
 							default: _(() => [K(Y(t(w)("rechnungswerk", "Entfernen")), 1)]),
 							_: 1
 						}, 8, ["disabled"])) : n("", !0)])]),
 						z("p", UC, Y(t(w)("rechnungswerk", "Wird oben auf der Rechnung angezeigt. PNG, JPEG oder GIF.")), 1)
 					])
-				], 512), [[y, u.value === "branding"]]),
+				], 512), [[y, d.value === "branding"]]),
 				C(z("section", WC, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Rechnungsnummer")), 1),
 					z("label", GC, [z("span", null, Y(t(w)("rechnungswerk", "Format")), 1), C(z("input", {
@@ -10861,17 +10850,17 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 					z("p", KC, [
 						K(Y(t(w)("rechnungswerk", "Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
 						r[46] ||= z("br", null, null, -1),
-						K(" " + Y(t(w)("rechnungswerk", "Vorschau: {preview}", { preview: Se.value })), 1)
+						K(" " + Y(t(w)("rechnungswerk", "Vorschau: {preview}", { preview: we.value })), 1)
 					]),
 					z("label", qC, [z("span", null, Y(t(w)("rechnungswerk", "Nächste Rechnungsnummer")), 1), C(z("input", {
-						"onUpdate:modelValue": r[16] ||= (e) => ae.value = e,
+						"onUpdate:modelValue": r[16] ||= (e) => oe.value = e,
 						class: "rw-input",
 						type: "number",
 						min: "1",
 						step: "1"
 					}, null, 512), [[
 						I,
-						ae.value,
+						oe.value,
 						void 0,
 						{ number: !0 }
 					]])]),
@@ -10883,7 +10872,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 							name: "rw-reset-mode",
 							value: "yearly",
 							modelValue: a.value.numberResetMode,
-							"onUpdate:modelValue": Fe
+							"onUpdate:modelValue": Ie
 						}, {
 							default: _(() => [K(Y(t(w)("rechnungswerk", "Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)")), 1)]),
 							_: 1
@@ -10893,14 +10882,14 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 							name: "rw-reset-mode",
 							value: "continuous",
 							modelValue: a.value.numberResetMode,
-							"onUpdate:modelValue": Fe
+							"onUpdate:modelValue": Ie
 						}, {
 							default: _(() => [K(Y(t(w)("rechnungswerk", "Fortlaufend (Zähler läuft über Jahre durch)")), 1)]),
 							_: 1
 						}, 8, ["modelValue"])
 					]),
 					z("p", XC, Y(t(w)("rechnungswerk", "Bei „Jährlich zurücksetzen“ muss das Format eine Jahreskomponente ({YYYY} oder {YY}) enthalten, sonst entstehen doppelte Rechnungsnummern. „Fortlaufend“ kommt ohne Jahr aus.")), 1)
-				], 512), [[y, u.value === "rechnungsnummer"]]),
+				], 512), [[y, d.value === "rechnungsnummer"]]),
 				C(z("section", ZC, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Angebotsnummer")), 1),
 					z("label", QC, [z("span", null, Y(t(w)("rechnungswerk", "Format")), 1), C(z("input", {
@@ -10912,7 +10901,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 					z("p", $C, [
 						K(Y(t(w)("rechnungswerk", "Eigener, von den Rechnungen unabhängiger Nummernkreis. Platzhalter: {YYYY} Jahr, {YY} Jahr 2-stellig, {MM} Monat, {DD} Tag, {####} fortlaufender Zähler.")) + " ", 1),
 						r[47] ||= z("br", null, null, -1),
-						K(" " + Y(t(w)("rechnungswerk", "Vorschau: {preview}", { preview: we.value })), 1)
+						K(" " + Y(t(w)("rechnungswerk", "Vorschau: {preview}", { preview: Te.value })), 1)
 					]),
 					z("div", ew, [
 						z("span", null, Y(t(w)("rechnungswerk", "Nummernkreis")), 1),
@@ -10921,7 +10910,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 							name: "rw-quote-reset-mode",
 							value: "yearly",
 							modelValue: a.value.quoteNumberResetMode,
-							"onUpdate:modelValue": Le
+							"onUpdate:modelValue": Re
 						}, {
 							default: _(() => [K(Y(t(w)("rechnungswerk", "Jährlich zurücksetzen (Zähler startet jedes Jahr neu bei 1)")), 1)]),
 							_: 1
@@ -10931,14 +10920,14 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 							name: "rw-quote-reset-mode",
 							value: "continuous",
 							modelValue: a.value.quoteNumberResetMode,
-							"onUpdate:modelValue": Le
+							"onUpdate:modelValue": Re
 						}, {
 							default: _(() => [K(Y(t(w)("rechnungswerk", "Fortlaufend (Zähler läuft über Jahre durch)")), 1)]),
 							_: 1
 						}, 8, ["modelValue"])
 					]),
 					z("p", tw, Y(t(w)("rechnungswerk", "Angebote haben keine gesetzliche Nummernkreis-Pflicht; Lücken sind erlaubt. Bei „Jährlich zurücksetzen“ muss das Format dennoch eine Jahreskomponente enthalten.")), 1)
-				], 512), [[y, u.value === "angebotsnummer"]]),
+				], 512), [[y, d.value === "angebotsnummer"]]),
 				C(z("section", nw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "PDF-Dateiname")), 1),
 					z("label", rw, [z("span", null, Y(t(w)("rechnungswerk", "Schema")), 1), C(z("input", {
@@ -10949,15 +10938,15 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 					z("p", iw, [
 						K(Y(t(w)("rechnungswerk", "Gilt für Download, Kundenmail und DATEV-Mail. Platzhalter: {nummer} Rechnungsnummer, {YYYY}/{MM}/{DD} Rechnungsdatum, {kunde} Kundenname, {typ} Rechnung/Storno. {nummer} ist Pflicht.")) + " ", 1),
 						r[48] ||= z("br", null, null, -1),
-						K(" " + Y(t(w)("rechnungswerk", "Vorschau: {preview}", { preview: Te.value })), 1)
+						K(" " + Y(t(w)("rechnungswerk", "Vorschau: {preview}", { preview: Ee.value })), 1)
 					])
-				], 512), [[y, u.value === "dateiname"]]),
+				], 512), [[y, d.value === "dateiname"]]),
 				C(z("section", aw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Steuer")), 1),
 					J(t(qe), {
 						type: "switch",
 						modelValue: a.value.smallBusiness,
-						"onUpdate:modelValue": ke
+						"onUpdate:modelValue": Ae
 					}, {
 						default: _(() => [K(Y(t(w)("rechnungswerk", "Kleinunternehmer nach §19 UStG (kein USt-Ausweis)")), 1)]),
 						_: 1
@@ -10984,7 +10973,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						void 0,
 						{ number: !0 }
 					]])]))
-				], 512), [[y, u.value === "steuer"]]),
+				], 512), [[y, d.value === "steuer"]]),
 				C(z("section", dw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Zahlung")), 1),
 					z("label", fw, [z("span", null, Y(t(w)("rechnungswerk", "Standard-Zahlungsziel (Tage)")), 1), C(z("input", {
@@ -11001,7 +10990,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						{ number: !0 }
 					]])]),
 					z("p", pw, Y(t(w)("rechnungswerk", "Wird bei neuen Rechnungen als Zahlungsziel vorbelegt. Leer lassen für kein Standardziel.")), 1)
-				], 512), [[y, u.value === "zahlung"]]),
+				], 512), [[y, d.value === "zahlung"]]),
 				C(z("section", mw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Versand")), 1),
 					z("label", hw, [z("span", null, Y(t(w)("rechnungswerk", "DATEV-Upload-Mail")), 1), C(z("input", {
@@ -11013,7 +11002,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						type: "switch",
 						modelValue: a.value.datevAutoSend,
 						disabled: !a.value.datevUploadMail,
-						"onUpdate:modelValue": je
+						"onUpdate:modelValue": Me
 					}, {
 						default: _(() => [K(Y(t(w)("rechnungswerk", "E-Rechnung beim Festschreiben automatisch an DATEV senden")), 1)]),
 						_: 1
@@ -11028,23 +11017,23 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						class: "rw-input",
 						type: "email"
 					}, null, 512), [[I, a.value.smtpFromEmail]])])])
-				], 512), [[y, u.value === "versand"]]),
+				], 512), [[y, d.value === "versand"]]),
 				C(z("section", bw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Ablage in Nextcloud")), 1),
 					z("div", xw, [z("span", null, Y(t(w)("rechnungswerk", "Zielordner")), 1), z("div", Sw, [
-						f.value ? (Z(), V("span", Cw, Y(f.value), 1)) : (Z(), V("span", ww, Y(t(w)("rechnungswerk", "Kein Ordner gewählt")), 1)),
+						p.value ? (Z(), V("span", Cw, Y(p.value), 1)) : (Z(), V("span", ww, Y(t(w)("rechnungswerk", "Kein Ordner gewählt")), 1)),
 						J(t(W), {
-							disabled: p.value,
-							onClick: ze
+							disabled: m.value,
+							onClick: Be
 						}, {
-							default: _(() => [K(Y(f.value ? t(w)("rechnungswerk", "Ordner ändern") : t(w)("rechnungswerk", "Ordner wählen")), 1)]),
+							default: _(() => [K(Y(p.value ? t(w)("rechnungswerk", "Ordner ändern") : t(w)("rechnungswerk", "Ordner wählen")), 1)]),
 							_: 1
 						}, 8, ["disabled"]),
-						f.value ? (Z(), N(t(W), {
+						p.value ? (Z(), N(t(W), {
 							key: 2,
 							variant: "tertiary",
-							disabled: p.value,
-							onClick: Be
+							disabled: m.value,
+							onClick: Ve
 						}, {
 							default: _(() => [K(Y(t(w)("rechnungswerk", "Entfernen")), 1)]),
 							_: 1
@@ -11054,7 +11043,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						type: "switch",
 						modelValue: a.value.archiveEnabled,
 						disabled: !a.value.archiveFolderId,
-						"onUpdate:modelValue": R
+						"onUpdate:modelValue": Ne
 					}, {
 						default: _(() => [K(Y(t(w)("rechnungswerk", "ZUGFeRD-PDF beim Festschreiben automatisch im Zielordner ablegen")), 1)]),
 						_: 1
@@ -11070,7 +11059,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						r[49] ||= z("br", null, null, -1),
 						K(" " + Y(t(w)("rechnungswerk", "Komfort-Ablage für den Team-Zugriff. Kein revisionssicheres Archiv, die GoBD-Archivierung erfolgt über DATEV bzw. Steuerberater.")), 1)
 					])
-				], 512), [[y, u.value === "ablage"]]),
+				], 512), [[y, d.value === "ablage"]]),
 				C(z("section", Ow, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Eigenes SMTP-Konto (optional)")), 1),
 					z("p", kw, Y(t(w)("rechnungswerk", "Ohne eigenes Konto wird der globale Nextcloud-Mailserver genutzt. Mit eigenem Konto gehen Rechnungs-Mails über diesen Server – nutze ein Konto, das die Absenderadresse besitzt (SPF/DMARC).")), 1),
@@ -11106,22 +11095,22 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						class: "rw-input",
 						type: "text"
 					}, null, 512), [[I, a.value.smtpUser]])]), z("label", Lw, [z("span", null, Y(t(w)("rechnungswerk", "Passwort")), 1), C(z("input", {
-						"onUpdate:modelValue": r[30] ||= (e) => me.value = e,
+						"onUpdate:modelValue": r[30] ||= (e) => he.value = e,
 						class: "rw-input",
 						type: "password",
 						placeholder: a.value.smtpPasswordSet ? t(w)("rechnungswerk", "•••••••• (gespeichert, leer lassen)") : ""
-					}, null, 8, Rw), [[I, me.value]])])]),
+					}, null, 8, Rw), [[I, he.value]])])]),
 					z("div", zw, [J(t(W), {
-						disabled: !a.value.smtpHost || P.value,
-						onClick: We
+						disabled: !a.value.smtpHost || ge.value,
+						onClick: B
 					}, {
 						default: _(() => [K(Y(t(w)("rechnungswerk", "Verbindung testen")), 1)]),
 						_: 1
-					}, 8, ["disabled"]), ge.value ? (Z(), V("span", {
+					}, 8, ["disabled"]), F.value ? (Z(), V("span", {
 						key: 0,
-						class: H(["smtp-test__result", F.value ? "rw-ok" : "rw-err"])
-					}, Y(ge.value), 3)) : n("", !0)])
-				], 512), [[y, u.value === "smtp"]]),
+						class: H(["smtp-test__result", _e.value ? "rw-ok" : "rw-err"])
+					}, Y(F.value), 3)) : n("", !0)])
+				], 512), [[y, d.value === "smtp"]]),
 				C(z("section", Bw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "DATEV-Rückmeldung (IMAP, optional)")), 1),
 					z("p", Vw, Y(t(w)("rechnungswerk", "DATEV bestätigt hochgeladene Belege per Antwort-Mail an die Absenderadresse. Mit diesem IMAP-Konto wird das Postfach periodisch geprüft und der Status (gesendet → bestätigt) automatisch gesetzt. In der Regel dasselbe Postfach wie der SMTP-Absender.")), 1),
@@ -11157,11 +11146,11 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						class: "rw-input",
 						type: "text"
 					}, null, 512), [[I, a.value.imapUser]])]), z("label", Jw, [z("span", null, Y(t(w)("rechnungswerk", "Passwort")), 1), C(z("input", {
-						"onUpdate:modelValue": r[35] ||= (e) => he.value = e,
+						"onUpdate:modelValue": r[35] ||= (e) => P.value = e,
 						class: "rw-input",
 						type: "password",
 						placeholder: a.value.imapPasswordSet ? t(w)("rechnungswerk", "•••••••• (gespeichert, leer lassen)") : ""
-					}, null, 8, Yw), [[I, he.value]])])]),
+					}, null, 8, Yw), [[I, P.value]])])]),
 					J(t(qe), {
 						modelValue: a.value.imapCleanup,
 						disabled: !a.value.imapHost,
@@ -11170,16 +11159,16 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						default: _(() => [K(Y(t(w)("rechnungswerk", "Bestätigte DATEV-Quittungen nach Verarbeitung in den Papierkorb verschieben (nur eigene, bestätigte Mails)")), 1)]),
 						_: 1
 					}, 8, ["modelValue", "disabled"])
-				], 512), [[y, u.value === "datev"]]),
+				], 512), [[y, d.value === "datev"]]),
 				C(z("section", Xw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Standardtexte")), 1),
 					z("p", Zw, Y(t(w)("rechnungswerk", "Anrede-, Einleitungs- und Schlusstexte werden jetzt als Textbausteine verwaltet – getrennt für Rechnungen und Angebote, mit mehreren Vorlagen je Textbereich.")), 1),
-					J(t(W), { onClick: d }, {
+					J(t(W), { onClick: f }, {
 						icon: _(() => [J(co, { size: 20 })]),
 						default: _(() => [K(" " + Y(t(w)("rechnungswerk", "Textbausteine verwalten")), 1)]),
 						_: 1
 					})
-				], 512), [[y, u.value === "texte"]]),
+				], 512), [[y, d.value === "texte"]]),
 				C(z("section", Qw, [
 					z("h3", null, Y(t(w)("rechnungswerk", "Zugriff & Administration")), 1),
 					z("p", $w, Y(t(w)("rechnungswerk", "Lege fest, wer RechnungsWerk nutzen darf. Nextcloud-Server-Administratoren sind immer Admin.")), 1),
@@ -11187,17 +11176,17 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						z("span", tT, Y(t(w)("rechnungswerk", "App-Administratoren")), 1),
 						z("p", nT, Y(t(w)("rechnungswerk", "Dürfen Firmendaten, Nummernkreis, DATEV und den Zugriff festlegen.")), 1),
 						J(t(Tt), {
-							modelValue: ce.value,
-							"onUpdate:modelValue": r[37] ||= (e) => ce.value = e,
-							options: ue.value,
-							loading: de.value,
+							modelValue: le.value,
+							"onUpdate:modelValue": r[37] ||= (e) => le.value = e,
+							options: de.value,
+							loading: fe.value,
 							multiple: !0,
 							keepOpen: "",
 							label: "displayName",
 							placeholder: t(w)("rechnungswerk", "Name eingeben, um Nutzer oder Gruppe zu suchen\xA0…"),
-							onSearch: De
+							onSearch: Oe
 						}, {
-							"no-options": _(() => [K(Y(ye.value), 1)]),
+							"no-options": _(() => [K(Y(be.value), 1)]),
 							_: 1
 						}, 8, [
 							"modelValue",
@@ -11210,17 +11199,17 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 						z("span", iT, Y(t(w)("rechnungswerk", "Berechtigte Nutzer")), 1),
 						z("p", aT, Y(t(w)("rechnungswerk", "Dürfen Rechnungen anlegen, sehen, herunterladen und versenden.")), 1),
 						J(t(Tt), {
-							modelValue: le.value,
-							"onUpdate:modelValue": r[38] ||= (e) => le.value = e,
-							options: ue.value,
-							loading: de.value,
+							modelValue: ue.value,
+							"onUpdate:modelValue": r[38] ||= (e) => ue.value = e,
+							options: de.value,
+							loading: fe.value,
 							multiple: !0,
 							keepOpen: "",
 							label: "displayName",
 							placeholder: t(w)("rechnungswerk", "Name eingeben, um Nutzer oder Gruppe zu suchen\xA0…"),
-							onSearch: De
+							onSearch: Oe
 						}, {
-							"no-options": _(() => [K(Y(ye.value), 1)]),
+							"no-options": _(() => [K(Y(be.value), 1)]),
 							_: 1
 						}, 8, [
 							"modelValue",
@@ -11229,39 +11218,26 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 							"placeholder"
 						])
 					])
-				], 512), [[y, u.value === "zugriff"]]),
-				C(z("section", oT, [z("h3", null, Y(t(w)("rechnungswerk", "WerkPlus")), 1), J(XS)], 512), [[y, u.value === "werkplus"]]),
-				C(z("section", sT, [z("h3", null, Y(t(w)("rechnungswerk", "API-Schlüssel")), 1), J(ES)], 512), [[y, u.value === "apikeys"]]),
+				], 512), [[y, d.value === "zugriff"]]),
+				C(z("section", oT, [z("h3", null, Y(t(w)("rechnungswerk", "WerkPlus")), 1), J(XS)], 512), [[y, d.value === "werkplus"]]),
+				C(z("section", sT, [z("h3", null, Y(t(w)("rechnungswerk", "API-Schlüssel")), 1), J(ES)], 512), [[y, d.value === "apikeys"]]),
 				C(z("div", cT, [J(t(W), {
 					variant: "primary",
-					disabled: t(i).saving || fe.value,
-					onClick: Ue
+					disabled: t(i).saving || M.value,
+					onClick: We
 				}, {
 					icon: _(() => [J(vv, { size: 20 })]),
 					default: _(() => [K(" " + Y(t(w)("rechnungswerk", "Speichern")), 1)]),
 					_: 1
-				}, 8, ["disabled"])], 512), [[y, u.value !== "werkplus"]])
+				}, 8, ["disabled"])], 512), [[y, d.value !== "werkplus"]])
 			])])) : n("", !0),
 			J(Vf, {
-				open: ee.value,
+				open: te.value,
 				name: t(w)("rechnungswerk", "Kleinunternehmer §19 aktivieren"),
 				message: t(w)("rechnungswerk", "Damit werden künftige Rechnungen ohne Umsatzsteuer ausgewiesen (§19 UStG). Bestehende festgeschriebene Rechnungen bleiben unverändert. Fortfahren?"),
 				confirmLabel: t(w)("rechnungswerk", "Aktivieren"),
-				onClose: r[39] ||= (e) => ee.value = !1,
-				onConfirm: Ae
-			}, null, 8, [
-				"open",
-				"name",
-				"message",
-				"confirmLabel"
-			]),
-			J(Vf, {
-				open: te.value,
-				name: t(w)("rechnungswerk", "Automatischen DATEV-Versand aktivieren"),
-				message: t(w)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?"),
-				confirmLabel: t(w)("rechnungswerk", "Aktivieren"),
-				onClose: r[40] ||= (e) => te.value = !1,
-				onConfirm: Me
+				onClose: r[39] ||= (e) => te.value = !1,
+				onConfirm: je
 			}, null, 8, [
 				"open",
 				"name",
@@ -11270,11 +11246,11 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 			]),
 			J(Vf, {
 				open: b.value,
-				name: t(w)("rechnungswerk", "Automatische Ablage aktivieren"),
-				message: t(w)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?"),
+				name: t(w)("rechnungswerk", "Automatischen DATEV-Versand aktivieren"),
+				message: t(w)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben automatisch eine E-Mail mit der E-Rechnung an die hinterlegte DATEV-Upload-Mail gesendet. Fortfahren?"),
 				confirmLabel: t(w)("rechnungswerk", "Aktivieren"),
-				onClose: r[41] ||= (e) => b.value = !1,
-				onConfirm: Ne
+				onClose: r[40] ||= (e) => b.value = !1,
+				onConfirm: R
 			}, null, 8, [
 				"open",
 				"name",
@@ -11283,11 +11259,11 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 			]),
 			J(Vf, {
 				open: x.value,
-				name: t(w)("rechnungswerk", "Nummernkreis auf „Fortlaufend“ stellen"),
-				message: t(w)("rechnungswerk", "Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?"),
-				confirmLabel: t(w)("rechnungswerk", "Fortlaufend aktivieren"),
-				onClose: r[42] ||= (e) => x.value = !1,
-				onConfirm: Ie
+				name: t(w)("rechnungswerk", "Automatische Ablage aktivieren"),
+				message: t(w)("rechnungswerk", "Ab sofort wird bei jedem Festschreiben die ZUGFeRD-PDF automatisch im gewählten Ordner abgelegt. Alle Personen mit Zugriff auf den Ordner können die Rechnungen sehen. Fortfahren?"),
+				confirmLabel: t(w)("rechnungswerk", "Aktivieren"),
+				onClose: r[41] ||= (e) => x.value = !1,
+				onConfirm: Fe
 			}, null, 8, [
 				"open",
 				"name",
@@ -11296,11 +11272,24 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 			]),
 			J(Vf, {
 				open: S.value,
+				name: t(w)("rechnungswerk", "Nummernkreis auf „Fortlaufend“ stellen"),
+				message: t(w)("rechnungswerk", "Der Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Der Modus wirkt sich auf alle künftig festgeschriebenen Rechnungen aus. Fortfahren?"),
+				confirmLabel: t(w)("rechnungswerk", "Fortlaufend aktivieren"),
+				onClose: r[42] ||= (e) => S.value = !1,
+				onConfirm: Le
+			}, null, 8, [
+				"open",
+				"name",
+				"message",
+				"confirmLabel"
+			]),
+			J(Vf, {
+				open: ne.value,
 				name: t(w)("rechnungswerk", "Angebots-Nummernkreis auf „Fortlaufend“ stellen"),
 				message: t(w)("rechnungswerk", "Der Angebots-Zähler läuft dann dauerhaft weiter und wird nicht mehr jährlich zurückgesetzt. Das Format darf ohne Jahreskomponente auskommen. Fortfahren?"),
 				confirmLabel: t(w)("rechnungswerk", "Fortlaufend aktivieren"),
-				onClose: r[43] ||= (e) => S.value = !1,
-				onConfirm: Re
+				onClose: r[43] ||= (e) => ne.value = !1,
+				onConfirm: ze
 			}, null, 8, [
 				"open",
 				"name",
@@ -11309,7 +11298,7 @@ var iC = { class: "rw-view rw-view--narrow" }, aC = { class: "rw-settings-title"
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-984d7272"]]), uT = { class: "rw-view" }, dT = { class: "rw-view__head" }, fT = { class: "rw-view__actions" }, pT = ["placeholder", "aria-label"], mT = { class: "rw-hint" }, hT = {
+}), [["__scopeId", "data-v-a3c5051a"]]), uT = { class: "rw-view" }, dT = { class: "rw-view__head" }, fT = { class: "rw-view__actions" }, pT = ["placeholder", "aria-label"], mT = { class: "rw-hint" }, hT = {
 	key: 2,
 	class: "rw-table-wrap"
 }, gT = { class: "rw-table" }, _T = { class: "rw-muted" }, vT = 50, yT = [

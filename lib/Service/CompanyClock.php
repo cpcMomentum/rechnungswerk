@@ -67,11 +67,16 @@ class CompanyClock {
 		}
 	}
 
+	/** @return list<string> canonical names for the picker; isValid() also takes the aliases this server knows */
+	public static function zoneNames(): array {
+		return DateTimeZone::listIdentifiers();
+	}
+
 	private static function create(string $name): ?DateTimeZone {
 		return isset(self::knownNames()[$name]) ? new DateTimeZone($name) : null;
 	}
 
-	/** ALL_WITH_BC: browsers still offer legacy names such as Asia/Calcutta. */
+	/** @return array<string, int> */
 	private static function knownNames(): array {
 		static $names = null;
 		return $names ??= array_flip(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));

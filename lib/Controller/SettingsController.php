@@ -12,6 +12,7 @@ namespace OCA\Rechnungswerk\Controller;
 use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Db\Settings;
 use OCA\Rechnungswerk\Exception\ValidationException;
+use OCA\Rechnungswerk\Service\CompanyClock;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\AppFramework\Controller;
@@ -71,6 +72,7 @@ class SettingsController extends Controller {
 		// Display path of the archive target, resolved from the viewer's own
 		// files so the label matches what the admin sees in the picker.
 		$data['archiveFolderPath'] = $this->archiveFolderPath($settings->getArchiveFolderId());
+		$data['timezones'] = CompanyClock::zoneNames();
 		return $data;
 	}
 
