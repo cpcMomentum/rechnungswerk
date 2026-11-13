@@ -38,6 +38,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import SendIcon from 'vue-material-design-icons/Send.vue'
 import type { InvoiceDetail } from '@/types/api'
 import { escCloses } from '@/utils/modalEsc'
+import { customerMailSubject } from '@/utils/customerMail'
 
 const props = defineProps<{
 	open: boolean
@@ -77,15 +78,7 @@ watch(() => props.open, (open) => {
 	}
 	const inv = props.invoice
 	form.to = inv?.recipientEmail ?? ''
-	if (isQuote.value) {
-		form.subject = inv?.number
-			? t('rechnungswerk', 'Angebot {number}', { number: inv.number })
-			: t('rechnungswerk', 'Ihr Angebot') // TRANSLATORS: formal, addresses the customer
-	} else {
-		form.subject = inv?.number
-			? t('rechnungswerk', 'Rechnung {number}', { number: inv.number })
-			: t('rechnungswerk', 'Ihre Rechnung') // TRANSLATORS: formal, addresses the customer
-	}
+	form.subject = customerMailSubject(inv?.invoiceType ?? (isQuote.value ? 'quote' : 'invoice'), inv?.number)
 	form.body = props.defaultBody
 	nextTick(() => toInput.value?.focus())
 }, { immediate: true })

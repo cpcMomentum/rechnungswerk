@@ -399,6 +399,7 @@ import CustomerPicker from '@/components/CustomerPicker.vue'
 import InvoiceItemsTable from '@/components/InvoiceItemsTable.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SendInvoiceDialog from '@/components/SendInvoiceDialog.vue'
+import { customerMailFallbackBody } from '@/utils/customerMail'
 import AuditTrail from '@/components/AuditTrail.vue'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -568,9 +569,7 @@ const defaultMailBody = computed(() => {
 		?? textSnippetStore.defaultContent(snippetDocType.value, 'opening')).trim()
 	const closing = (invoice.value?.extraText
 		?? textSnippetStore.defaultContent(snippetDocType.value, 'closing')).trim()
-	const fallback = isQuote.value
-		? t('rechnungswerk', 'anbei erhalten Sie unser Angebot als PDF.') // TRANSLATORS: formal, addresses the customer
-		: t('rechnungswerk', 'anbei erhalten Sie Ihre Rechnung als E-Rechnung (ZUGFeRD-PDF).') // TRANSLATORS: formal, addresses the customer
+	const fallback = customerMailFallbackBody(isQuote.value)
 	const parts = [
 		opening !== '' ? opening : fallback,
 		closing,
