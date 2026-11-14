@@ -47,7 +47,7 @@ class ProductService {
 	public function create(string $userId, array $data): Product {
 		$this->validate($data);
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel
 		$product = new Product();
 		$product->setOwnerUserId($userId);
 		$product->setCreatedAt($now);

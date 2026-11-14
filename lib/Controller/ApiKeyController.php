@@ -19,6 +19,7 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\IL10N;
 use OCP\IRequest;
 
 /** Mandanten pflegen ihre eigenen API-Schluessel, App-Admins zusaetzlich alle — nur Session, kein Maschinenzugang. */
@@ -30,6 +31,7 @@ class ApiKeyController extends Controller {
 		private readonly ApiKeyService $apiKeyService,
 		private readonly EntitlementService $entitlementService,
 		private readonly PermissionService $permissionService,
+		private readonly IL10N $l10n,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -50,11 +52,17 @@ class ApiKeyController extends Controller {
 			return $r;
 		}
 		if (!$this->entitlementService->hasFeature('api_keys')) {
-			return new DataResponse(['error' => 'API-Schluessel erfordern eine aktive WerkPlus-Lizenz.'], Http::STATUS_FORBIDDEN);
+			return new DataResponse(['error' => $this->l10n->t('API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.')], Http::STATUS_FORBIDDEN);
 		}
 		try {
 			$scopes = array_key_exists('scopes', $data) && is_array($data['scopes']) ? $data['scopes'] : [];
-			$result = $this->apiKeyService->create($this->authContext->getUserId(), (string)($data['name'] ?? ''), $scopes);
+			$rateLimit = $data['rateLimit'] ?? null;
+			$result = $this->apiKeyService->create(
+				$this->authContext->getUserId(),
+				(string)($data['name'] ?? ''),
+				$scopes,
+				is_int($rateLimit) ? $rateLimit : null
+			);
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -71,21 +79,21 @@ class ApiKeyController extends Controller {
 		}
 		$isAdmin = $this->permissionService->isAdmin($this->authContext->getUserId());
 		if (!$this->apiKeyService->revoke($id, $this->authContext->getUserId(), $isAdmin)) {
-			return new DataResponse(['error' => 'Schlüssel nicht gefunden.'], Http::STATUS_NOT_FOUND);
+			return new DataResponse(['error' => $this->l10n->t('Schlüssel nicht gefunden.')], Http::STATUS_NOT_FOUND);
 		}
 		return new DataResponse(null, Http::STATUS_NO_CONTENT);
 	}
 
 	private function guard(): ?DataResponse {
 		if ($this->authContext->rejection() !== null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+			return new DataResponse(['error' => $this->l10n->t('Nicht angemeldet.')], Http::STATUS_UNAUTHORIZED);
 		}
 		$userId = $this->authContext->getUserId();
 		if ($userId === null) {
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+			return new DataResponse(['error' => $this->l10n->t('Nicht angemeldet.')], Http::STATUS_UNAUTHORIZED);
 		}
 		if ($this->authContext->isMachine() || !$this->permissionService->hasAccess($userId)) {
-			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+			return new DataResponse(['error' => $this->l10n->t('Zugriff verweigert.')], Http::STATUS_FORBIDDEN);
 		}
 		return null;
 	}

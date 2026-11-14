@@ -46,6 +46,11 @@ class AuthContext {
 		return $this->actingUserId;
 	}
 
+	public function getApiKeyId(): ?int {
+		$this->resolve();
+		return $this->key?->getId();
+	}
+
 	public function hasScope(string $scope): bool {
 		$this->resolve();
 		if (!$this->machine || $this->key === null) {

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
-use DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use horstoeko\zugferd\codelists\ZugferdCountryCodes;
@@ -53,6 +52,7 @@ class ZugferdService {
 		private readonly GirocodeService $girocodeService,
 		private readonly LoggerInterface $logger,
 		private readonly ITempManager $tempManager,
+		private readonly CompanyClock $clock,
 	) {
 	}
 
@@ -169,7 +169,7 @@ class ZugferdService {
 		$typeCode = $invoice->getInvoiceType() === Invoice::TYPE_INVOICE
 			? ZugferdInvoiceType::INVOICE
 			: ZugferdInvoiceType::CORRECTION;
-		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? new DateTime();
+		$issueDate = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? $this->clock->today();
 
 		$builder->setDocumentInformation(
 			$invoice->getNumber() ?? '',
@@ -287,6 +287,9 @@ class ZugferdService {
 		if (($settings->getTaxNumber() ?? '') !== '') {
 			$builder->addDocumentSellerTaxNumber($settings->getTaxNumber());
 		}
+		if (($settings->getRegisterNumber() ?? '') !== '') {
+			$builder->setDocumentSellerLegalOrganisation($settings->getRegisterNumber(), null, null);
+		}
 		$addr = $this->parseGermanAddress($settings->getCompanyAddress());
 		$builder->setDocumentSellerAddress(
 			$addr['street'],
@@ -332,14 +335,20 @@ class ZugferdService {
 		// wie bisher, damit die Belege unveraendert aussehen (#304).
 		$zusatz = trim((string)$invoice->getRecipientAddressAddition());
 		$strasse = (string)($invoice->getRecipientAddress() ?? '');
-		$builder->setDocumentBuyerAddress(
+		$address = [
 			$zusatz !== '' ? $zusatz : $strasse,
 			$zusatz !== '' ? $strasse : null,
 			null,
 			$invoice->getRecipientPostalCode() ?? '',
 			$invoice->getRecipientCity() ?? '',
 			$invoice->getRecipientCountry() ?: ZugferdCountryCodes::GERMANY,
-		);
+		];
+		$builder->setDocumentBuyerAddress(...$address);
+		// BR-IC-12 requires a deliver-to country; the app has no separate delivery address, so it is the buyer's.
+		if ($invoice->getSpecialTaxCase() === Invoice::SPECIAL_TAX_INTRA_COMMUNITY) {
+			$builder->setDocumentShipTo($invoice->getRecipientName() ?? '');
+			$builder->setDocumentShipToAddress(...$address);
+		}
 		// BT-10: Leitweg-ID / buyer reference (B2G).
 		if (($invoice->getBuyerReference() ?? '') !== '') {
 			$builder->setDocumentBuyerReference($invoice->getBuyerReference());
@@ -890,6 +899,7 @@ class ZugferdService {
 		$taxIds = array_filter([
 			($settings->getVatId() ?? '') !== '' ? 'USt-IdNr.: ' . $e($settings->getVatId()) : null,
 			($settings->getTaxNumber() ?? '') !== '' ? 'Steuernummer: ' . $e($settings->getTaxNumber()) : null,
+			($settings->getRegisterNumber() ?? '') !== '' ? 'Registernummer: ' . $e($settings->getRegisterNumber()) : null,
 		]);
 		$footer = $taxIds !== [] ? '<div class="footer">' . implode(' &middot; ', $taxIds) . '</div>' : '';
 

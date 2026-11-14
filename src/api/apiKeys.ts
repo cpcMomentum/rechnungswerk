@@ -14,6 +14,7 @@ export interface ApiKey {
 	createdAt: number
 	lastUsedAt: number | null
 	revokedAt: number | null
+	rateLimit: number | null
 }
 
 /** Nur direkt nach dem Anlegen: der Klartext ist danach nie wieder sichtbar. */
@@ -24,8 +25,8 @@ export interface CreatedApiKey extends ApiKey {
 export const getApiKeys = (): Promise<ApiKey[]> =>
 	apiGet<ApiKey[]>('/api-keys')
 
-export const createApiKey = (name: string, scopes: string[]): Promise<CreatedApiKey> =>
-	apiPost<CreatedApiKey, { data: { name: string, scopes: string[] } }>('/api-keys', { data: { name, scopes } })
+export const createApiKey = (name: string, scopes: string[], rateLimit: number | null = null): Promise<CreatedApiKey> =>
+	apiPost<CreatedApiKey, { data: { name: string, scopes: string[], rateLimit: number | null } }>('/api-keys', { data: { name, scopes, rateLimit } })
 
 export const revokeApiKey = (id: number): Promise<void> =>
 	apiDelete<void>(`/api-keys/${id}`)

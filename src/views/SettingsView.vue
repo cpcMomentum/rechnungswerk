@@ -1,5 +1,5 @@
 <template>
-	<div class="rw-view">
+	<div class="rw-view rw-view--narrow">
 		<h2 class="rw-settings-title">{{ t('rechnungswerk', 'Einstellungen') }}</h2>
 
 		<div ref="errorAnchor">
@@ -27,6 +27,12 @@
 						<label class="rw-field"><span>{{ t('rechnungswerk', 'Steuernummer') }}</span>
 							<input v-model="form.taxNumber" class="rw-input" type="text" /></label>
 					</div>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Registernummer') }}</span>
+						<input v-model="form.registerNumber" class="rw-input" type="text"
+							:placeholder="t('rechnungswerk', 'z. B. HRB 12345, Amtsgericht Stuttgart')" /></label>
+					<NcNoteCard v-if="!hasSellerIdentifier" type="warning"
+						:heading="t('rechnungswerk', 'Deine E-Rechnungen lösen bei Prüfprogrammen einen Fehler aus.')"
+						:text="t('rechnungswerk', 'Ohne USt-IdNr. oder Registernummer (z. B. Handelsregister) meldet die Prüfung nach EN 16931 einen Fehler. Steuerlich ist das unschädlich, die Steuernummer reicht als Pflichtangabe. Manche Unternehmen weisen solche Rechnungen aber automatisch zurück. Trage für Rechnungen an Unternehmen deshalb eines der beiden Felder ein. Eine USt-IdNr. kannst du kostenlos beim Bundeszentralamt für Steuern beantragen, auch als Kleinunternehmer.')" />
 					<div class="rw-form-row">
 						<label class="rw-field"><span>{{ t('rechnungswerk', 'Ansprechpartner') }}</span>
 							<input v-model="form.contactPerson" class="rw-input" type="text" /></label>
@@ -36,6 +42,11 @@
 							<input v-model="form.contactEmail" class="rw-input" type="email" /></label>
 					</div>
 					<p class="rw-hint">{{ t('rechnungswerk', 'Ansprechpartner und Kontaktdaten erscheinen auf jeder Rechnung (für Rückfragen des Kunden).') }}</p>
+					<label class="rw-field"><span>{{ t('rechnungswerk', 'Zeitzone') }}</span>
+						<select v-model="selectedTimezone" class="rw-input">
+							<option v-for="o in timezoneOptions" :key="o.id" :value="o.id">{{ o.label }}</option>
+						</select></label>
+					<p class="rw-hint">{{ t('rechnungswerk', 'Bestimmt, welcher Tag „heute“ ist: Rechnungsdatum, Jahr der Rechnungsnummer, Fälligkeit und Zahlungsdatum. Automatisch nimmt die Zeitzone des Servers, ist dort keine eingestellt, Europe/Berlin.') }}</p>
 				</section>
 
 				<!-- Bank -->
@@ -531,6 +542,32 @@ const router = useRouter()
 const store = useSettingsStore()
 const form = ref<SettingsForm | null>(null)
 
+// The server's own list: browsers offer legacy names that some PHP builds reject.
+const serverTimezones = ref<string[]>([])
+
+const timezoneOptions = computed(() => {
+	let zones = serverTimezones.value
+	const current = form.value?.timezone ?? ''
+	if (current !== '' && !zones.includes(current)) {
+		zones = [current, ...zones]
+	}
+	return [
+		{ id: '', label: t('rechnungswerk', 'Automatisch') },
+		...zones.map(z => ({ id: z, label: z })),
+	]
+})
+
+const selectedTimezone = computed({
+	get: () => form.value?.timezone ?? '',
+	set(id: string) {
+		if (form.value) {
+			form.value.timezone = id || null
+		}
+	},
+})
+// EN 16931 BR-CO-26 needs a VAT ID or register number; the tax number does not count.
+const hasSellerIdentifier = computed(() => !!form.value?.vatId?.trim() || !!form.value?.registerNumber?.trim())
+
 /**
  * Die Bereiche der Einstellungsseite (#350).
  *
@@ -788,11 +825,14 @@ function hydrate() {
 		nextNumberInput.value = base + 1
 	}
 	archiveFolderPath.value = s.archiveFolderPath ?? null
+	serverTimezones.value = s.timezones ?? []
 	form.value = {
 		companyName: s.companyName,
 		companyAddress: s.companyAddress,
 		vatId: s.vatId,
 		taxNumber: s.taxNumber,
+		registerNumber: s.registerNumber,
+		timezone: s.timezone,
 		iban: s.iban,
 		bic: s.bic,
 		bankName: s.bankName,

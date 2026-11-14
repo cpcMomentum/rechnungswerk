@@ -9,9 +9,14 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Tests\Unit;
 
+use OCA\Rechnungswerk\Db\AuditEntry;
 use OCA\Rechnungswerk\Db\Invoice;
+use OCA\Rechnungswerk\Db\InvoiceMapper;
+use OCA\Rechnungswerk\Service\AuditService;
 use OCA\Rechnungswerk\Service\DatevConfirmationService;
+use OCA\Rechnungswerk\Service\SettingsService;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 /**
  * Pure matching/parsing of DATEV upload-mail confirmations, using values taken
@@ -67,5 +72,34 @@ class DatevConfirmationServiceTest extends TestCase {
 	public function testIsSuccessDetectsUploadMarker(): void {
 		$this->assertTrue(DatevConfirmationService::isSuccess("Alle Belege erfolgreich hochgeladen (1)\n- RE-2026-0010.pdf"));
 		$this->assertFalse(DatevConfirmationService::isSuccess('Der Beleg konnte nicht verarbeitet werden.'));
+	}
+
+	public function testConfirmationIsRecordedInTheAuditLog(): void {
+		$invoice = new Invoice();
+		$invoice->setId(7);
+		$audit = $this->createMock(AuditService::class);
+		$audit->expects($this->once())->method('recordNow')->with(AuditEntry::DATEV_CONFIRM, $invoice);
+
+		$this->assertTrue($this->service($audit)->apply($invoice, 'Alle Belege erfolgreich hochgeladen (1)'));
+		$this->assertSame(Invoice::DATEV_CONFIRMED, $invoice->getDatevStatus());
+	}
+
+	public function testUnclearReplyIsRecordedInTheAuditLog(): void {
+		$invoice = new Invoice();
+		$invoice->setId(7);
+		$audit = $this->createMock(AuditService::class);
+		$audit->expects($this->once())->method('recordNow')->with(AuditEntry::DATEV_UNKNOWN, $invoice);
+
+		$this->assertFalse($this->service($audit)->apply($invoice, 'Beleg konnte nicht verarbeitet werden'));
+		$this->assertSame(Invoice::DATEV_UNKNOWN, $invoice->getDatevStatus());
+	}
+
+	private function service(AuditService $audit): DatevConfirmationService {
+		return new DatevConfirmationService(
+			$this->createMock(SettingsService::class),
+			$this->createMock(InvoiceMapper::class),
+			$audit,
+			$this->createMock(LoggerInterface::class),
+		);
 	}
 }

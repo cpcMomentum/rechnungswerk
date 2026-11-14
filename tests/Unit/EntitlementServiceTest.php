@@ -132,16 +132,17 @@ class EntitlementServiceTest extends TestCase {
 	}
 
 	public function testActivateStoresKeyAndTokenSensitively(): void {
+		$this->config['werkplus_employee_bucket'] = '6-20';
 		$this->client->expects($this->once())->method('validate')
-			->with(self::KEY, self::UUID, ['rechnungswerk' => '0.7.0'], '6-20')
+			->with(self::KEY, self::UUID, ['rechnungswerk' => '0.7.0'])
 			->willReturn($this->response());
 		$service = $this->service();
-		$service->activate('  ' . self::KEY . ' ', '6-20');
+		$service->activate('  ' . self::KEY . ' ');
 
 		$this->assertSame(self::KEY, $this->config['werkplus_key']);
 		$this->assertTrue($this->sensitive['werkplus_key']);
 		$this->assertTrue($this->sensitive['werkplus_token']);
-		$this->assertSame('6-20', $this->config['werkplus_employee_bucket']);
+		$this->assertArrayNotHasKey('werkplus_employee_bucket', $this->config);
 		$this->assertSame((string)self::NOW, $this->config['werkplus_last_check_at']);
 		$this->assertTrue($service->hasFeature('tenants'));
 		$this->assertNull($service->lastError());
@@ -155,7 +156,7 @@ class EntitlementServiceTest extends TestCase {
 			throw new WerkPlusApiException('SERVER_ERROR');
 		});
 		try {
-			$this->service()->activate(self::KEY, '1-5');
+			$this->service()->activate(self::KEY);
 		} catch (WerkPlusApiException) {
 		}
 
@@ -169,7 +170,7 @@ class EntitlementServiceTest extends TestCase {
 			->with(self::KEY, self::UUID)
 			->willReturn($this->response());
 		$service = $this->service();
-		$service->activate(self::KEY, '1-5');
+		$service->activate(self::KEY);
 
 		$this->assertTrue($service->hasFeature('tenants'));
 	}
@@ -178,7 +179,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_UNKNOWN', 'Schlüssel unbekannt'));
 		$service = $this->service();
 		try {
-			$service->activate(self::KEY, '1-5');
+			$service->activate(self::KEY);
 			$this->fail('Ausnahme erwartet');
 		} catch (WerkPlusApiException $e) {
 			$this->assertSame('KEY_UNKNOWN', $e->getErrorCode());
@@ -192,7 +193,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->client->expects($this->once())->method('validate')
 			->with(self::KEY)
 			->willReturn($this->response());
-		$this->service()->activate(' WP_b7k2-m9qx-4tn6 rj8v-c3hd-5pkw-2fsy-7gza 3efa69b6 ', '1-5');
+		$this->service()->activate(' WP_b7k2-m9qx-4tn6 rj8v-c3hd-5pkw-2fsy-7gza 3efa69b6 ');
 
 		$this->assertSame(self::KEY, $this->config['werkplus_key']);
 	}
@@ -202,7 +203,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_REVOKED'));
 		$service = $this->service();
 		try {
-			$service->activate('wp_b7k2-m9qx-4tn6-rj8v-c3hd-5pkw-2fsy-7gza-3efa-69b6', '1-5');
+			$service->activate('wp_b7k2-m9qx-4tn6-rj8v-c3hd-5pkw-2fsy-7gza-3efa-69b6');
 		} catch (WerkPlusApiException) {
 		}
 
@@ -213,7 +214,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->storeToken();
 		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_UNKNOWN'));
 		try {
-			$this->service()->activate('wp_VERTIPPT', '1-5');
+			$this->service()->activate('wp_VERTIPPT');
 		} catch (WerkPlusApiException) {
 		}
 
@@ -229,7 +230,7 @@ class EntitlementServiceTest extends TestCase {
 			'graceUntil' => 'y',
 		]);
 		try {
-			$this->service()->activate(self::KEY, '1-5');
+			$this->service()->activate(self::KEY);
 			$this->fail('Ausnahme erwartet');
 		} catch (WerkPlusApiException $e) {
 			$args = [];
@@ -248,7 +249,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_REVOKED'));
 		$service = $this->service();
 		try {
-			$service->activate('wp_ANDERERSCHLUESSEL', '1-5');
+			$service->activate('wp_ANDERERSCHLUESSEL');
 		} catch (WerkPlusApiException) {
 		}
 
@@ -306,7 +307,7 @@ class EntitlementServiceTest extends TestCase {
 		]);
 		$service = $this->service();
 		try {
-			$service->activate(self::KEY, '1-5');
+			$service->activate(self::KEY);
 			$this->fail('Ausnahme erwartet');
 		} catch (WerkPlusApiException $e) {
 			$this->assertSame(EntitlementService::TOKEN_REJECTED, $e->getErrorCode());
@@ -319,10 +320,10 @@ class EntitlementServiceTest extends TestCase {
 	public function testInvalidInputIsRejectedBeforeAnyCall(): void {
 		$this->client->expects($this->never())->method('validate');
 		$service = $this->service();
-		foreach ([['', '1-5'], ['wp_ok', '7'], ['wp_<script>', '1-5']] as [$key, $bucket]) {
+		foreach (['', 'wp_<script>', 'wp_' . str_repeat('A', 130)] as $key) {
 			try {
-				$service->activate($key, $bucket);
-				$this->fail('Ausnahme erwartet fuer ' . $key . '/' . $bucket);
+				$service->activate($key);
+				$this->fail('Ausnahme erwartet fuer ' . $key);
 			} catch (\InvalidArgumentException) {
 			}
 		}
@@ -331,11 +332,9 @@ class EntitlementServiceTest extends TestCase {
 	public function testEmptyKeyReusesTheStoredOne(): void {
 		$this->storeToken();
 		$this->client->expects($this->once())->method('validate')
-			->with(self::KEY, self::UUID, $this->anything(), '21-50')
+			->with(self::KEY, self::UUID, $this->anything())
 			->willReturn($this->response());
-		$this->service()->activate('', '21-50');
-
-		$this->assertSame('21-50', $this->config['werkplus_employee_bucket']);
+		$this->service()->activate('');
 	}
 
 	public function testFreshTokenIsNotRenewed(): void {
@@ -385,15 +384,14 @@ class EntitlementServiceTest extends TestCase {
 		$this->config['werkplus_instance_uuid'] = strtoupper(self::UUID);
 		$this->client->expects($this->never())->method('validate');
 		$this->client->expects($this->once())->method('trial')
-			->with(self::UUID, ['rechnungswerk' => '0.7.0'], '21-50')
+			->with(self::UUID, ['rechnungswerk' => '0.7.0'])
 			->willReturn(['key' => strtolower(self::KEY)] + $this->response());
 		$service = $this->service();
 
-		$this->assertSame(self::KEY, $service->startTrial('21-50'));
+		$this->assertSame(self::KEY, $service->startTrial());
 		$this->assertSame(self::KEY, $this->config['werkplus_key']);
 		$this->assertTrue($this->sensitive['werkplus_key']);
 		$this->assertTrue($this->sensitive['werkplus_token']);
-		$this->assertSame('21-50', $this->config['werkplus_employee_bucket']);
 		$this->assertSame((string)self::NOW, $this->config['werkplus_last_check_at']);
 		$this->assertTrue($service->hasFeature('tenants'));
 		$this->assertNull($service->lastError());
@@ -404,20 +402,14 @@ class EntitlementServiceTest extends TestCase {
 		$this->client->expects($this->never())->method('trial');
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('keySet');
-		$this->service()->startTrial('1-5');
-	}
-
-	public function testTrialRejectsAnInvalidBucketBeforeAnyCall(): void {
-		$this->client->expects($this->never())->method('trial');
-		$this->expectException(\InvalidArgumentException::class);
-		$this->service()->startTrial('7');
+		$this->service()->startTrial();
 	}
 
 	public function testRefusedTrialStoresNothing(): void {
 		$this->client->method('trial')->willThrowException(new WerkPlusApiException('TRIAL_ALREADY_USED', 'schon genutzt'));
 		$service = $this->service();
 		try {
-			$service->startTrial('1-5');
+			$service->startTrial();
 			$this->fail('Ausnahme erwartet');
 		} catch (WerkPlusApiException $e) {
 			$this->assertSame('TRIAL_ALREADY_USED', $e->getErrorCode());
@@ -437,7 +429,7 @@ class EntitlementServiceTest extends TestCase {
 		]);
 		$service = $this->service();
 
-		$this->assertSame(self::KEY, $service->startTrial('1-5'));
+		$this->assertSame(self::KEY, $service->startTrial());
 		$this->assertSame(self::KEY, $this->config['werkplus_key']);
 		$this->assertArrayNotHasKey('werkplus_token', $this->config);
 		$this->assertSame(EntitlementService::TOKEN_REJECTED, $service->getStatus()['lastError']['code']);
@@ -449,7 +441,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->client->method('trial')->willReturn(['key' => self::KEY, 'token' => '', 'expiresAt' => '', 'graceUntil' => '']);
 		$service = $this->service();
 
-		$this->assertSame(self::KEY, $service->startTrial('1-5'));
+		$this->assertSame(self::KEY, $service->startTrial());
 		$this->assertSame(self::KEY, $this->config['werkplus_key']);
 		$this->assertSame(EntitlementService::TOKEN_REJECTED, $service->lastError()['code']);
 	}
@@ -496,5 +488,28 @@ class EntitlementServiceTest extends TestCase {
 		$this->assertStringNotContainsString(self::KEY, (string)json_encode($status));
 		$this->assertSame('valid', $status['state']);
 		$this->assertSame(['tenants', 'inbound', 'pw_multi_board'], $status['features']);
+	}
+
+	public function testStatusShowsTheLicensedEmployeesFromTheToken(): void {
+		$this->storeToken(['licensedEmployees' => 12]);
+
+		$this->assertSame(12, $this->service()->getStatus()['licensedEmployees']);
+	}
+
+	public function testStatusHasNoLicensedEmployeesWithoutTheClaim(): void {
+		$this->storeToken();
+		$status = $this->service()->getStatus();
+
+		$this->assertNull($status['licensedEmployees']);
+		$this->assertArrayNotHasKey('employeeBucket', $status);
+	}
+
+	public function testRemovingTheKeyAlsoDropsTheOldSizeClass(): void {
+		$this->storeToken();
+		$this->config['werkplus_employee_bucket'] = '1-5';
+
+		$this->service()->removeKey();
+
+		$this->assertArrayNotHasKey('werkplus_employee_bucket', $this->config);
 	}
 }

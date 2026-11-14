@@ -70,7 +70,7 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->create($this->actingUserId(), $data), Http::STATUS_CREATED);
+			return new DataResponse($this->invoiceService->create($this->actingUserId(), $data, $this->authContext->getApiKeyId()), Http::STATUS_CREATED);
 		} catch (ValidationException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
@@ -92,13 +92,14 @@ class InvoiceController extends Controller {
 		}
 	}
 
+	#[PublicPage]
 	#[NoAdminRequired]
 	public function destroy(int $id): DataResponse {
-		if (($r = $this->guardEdit()) !== null) {
+		if (($r = $this->guardEdit('invoices:delete')) !== null) {
 			return $r;
 		}
 		try {
-			$this->invoiceService->deleteInvoice($id);
+			$this->invoiceService->deleteInvoice($id, $this->authContext->getApiKeyId());
 			return new DataResponse(null, Http::STATUS_NO_CONTENT);
 		} catch (NotFoundException $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);

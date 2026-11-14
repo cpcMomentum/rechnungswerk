@@ -5,6 +5,136 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.9.0] - 2026-11-13
+
+Richtiges Belegdatum auch kurz nach Mitternacht, WerkPlus ohne Größenklasse
+und ein deutscher Betreff für die Kundenmail.
+
+### Added
+- **Zeitzone der Firma.** Neues Feld unter Einstellungen › Firma. Ohne Eintrag
+  gilt die Zeitzone der Instanz, sonst Europe/Berlin. Die Auswahl zeigt die
+  Zonen, die der Server kennt (#405)
+- **Lizenzierte Mitarbeitende.** Ist die WerkPlus-Lizenz auf eine Zahl von
+  Mitarbeitenden ausgestellt, zeigt Einstellungen › WerkPlus sie an (#412)
+
+### Changed
+- **WerkPlus ohne Größenklasse.** Aktivierung, Testzeitraum und Erneuerung
+  fragen nicht mehr nach der Zahl der Mitarbeitenden. Die Auswahl
+  „Mitarbeitende" entfällt, der gespeicherte Wert wird bei der nächsten
+  Prüfung gelöscht (#412)
+- **Betreff der Kundenmail.** Der vorgeschlagene Betreff ist fest deutsch
+  („Rechnung RE-…", „Angebot …", „Stornorechnung …"), passend zu Mailtext und
+  PDF. Bisher folgte er der Sprache der Oberfläche (#402)
+
+### Fixed
+- **Belegdatum nach Mitternacht.** Zwischen Mitternacht und 1 bzw. 2 Uhr
+  deutscher Zeit bekamen Rechnungen, Stornos und Angebote das Datum des Vortags,
+  am Jahreswechsel auch die Nummer aus dem alten Jahr. Datum, Nummernjahr,
+  Fälligkeit und die Anzeige „überfällig" richten sich jetzt nach der Zeitzone
+  der Firma (#405)
+- **Storno eines Stornos.** Ein Stornobeleg lässt sich nicht mehr erneut
+  stornieren, weder im Editor noch über die API. Bisher entstand dabei ein
+  weiterer Beleg mit eigener Nummer. Bereits vorhandene bleiben unverändert (#408)
+
+## [0.8.0] - 2026-11-11
+
+Protokoll über alle Vorgänge an Rechnungen und Angeboten, Standard-Textbausteine
+ab Werk, Anrede nach Kontosprache und Löschrecht für API-Schlüssel.
+
+**Hinweis zum Update:** Instanzen ohne Textbausteine bekommen mit diesem Update
+vier Standard-Bausteine. Neue Belege tragen dann Einleitung und Schluss, auch
+im PDF. Das gilt auch dort, wo zuvor alle Bausteine bewusst gelöscht wurden.
+Unter Textbausteine lassen sie sich ändern oder löschen.
+
+### Added
+- **Protokoll.** Ein neuer Bereich zeigt, wer was an Rechnungen und Angeboten
+  getan hat: anlegen, ändern, löschen, festschreiben, versenden, bezahlt
+  markieren, stornieren, annehmen, ablehnen und übernehmen, auch über
+  API-Schlüssel. Der Editor zeigt die Einträge des jeweiligen Belegs. Vorgänge
+  vor diesem Update sind nicht erfasst (#392)
+- **DATEV im Protokoll.** Versand an DATEV, fehlgeschlagener Versand und die
+  Rückmeldung von DATEV stehen als eigene Einträge im Protokoll (#395)
+- **Standard-Textbausteine ab Werk.** Ist der Katalog leer, legt das Update
+  einmalig vier deutsche Bausteine an: Einleitung und Schluss für Rechnungen
+  und für Angebote. Bestehende Bausteine bleiben unberührt, gelöschte
+  Standard-Bausteine kommen nicht wieder (#398)
+- **Anrede nach Kontosprache.** „Deutsch (Persönlich)" duzt, „Deutsch
+  (Förmlich)" siezt. „English (UK)" wird erkannt und folgt nicht mehr der
+  Browsersprache (#397)
+- **API-Schlüssel löschen eigene Entwürfe.** Neues Recht `invoices:delete`:
+  Ein Schlüssel kann Entwürfe löschen, die er selbst angelegt hat. Fremde
+  Belege antworten mit 404; bearbeitet eine Person den Entwurf, verliert der
+  Schlüssel den Zugriff. Setzt WerkPlus voraus (#393)
+
+### Changed
+- Der Name eines API-Schlüssels ist im Protokoll für alle App-Nutzer sichtbar;
+  die Einstellungen weisen beim Anlegen darauf hin (#393)
+
+### Fixed
+- **DATEV-Übergabe.** Eine bereits rausgegangene DATEV-Mail wird auch dann als
+  gesendet gemeldet, wenn nur der Status nicht gespeichert werden konnte.
+  Bisher stand dort „Versand fehlgeschlagen", was ein erneutes Senden und damit
+  einen doppelten Upload bei DATEV nahelegte (#395)
+
+## [0.7.0] - 2026-11-10
+
+Registernummer für E-Rechnungen ohne USt-IdNr., gültige innergemeinschaftliche
+Lieferungen, Rückfrage vor verlorenen Eingaben und die optionale
+WerkPlus-Lizenz mit API-Schlüsseln.
+
+### Added
+- **Registernummer.** Neues Feld in Einstellungen › Firma (z. B. „HRB 12345,
+  Amtsgericht Stuttgart"). Sie geht als Verkäuferkennung (BT-30) in die
+  E-Rechnung und steht in der Fußzeile des Belegs. Solange weder USt-IdNr.
+  noch Registernummer hinterlegt ist, weisen die Einstellungen und der
+  Festschreiben-Dialog darauf hin: Steuerlich ist das unschädlich (BMF-Schreiben
+  vom 15.10.2025, Rn. 35a), Prüfprogramme beim Empfänger melden aber einen
+  Fehler (BR-CO-26). Keine Sperre (#386)
+- **WerkPlus-Lizenz (optional).** Unter Einstellungen › WerkPlus lässt sich ein
+  Schlüssel eintragen oder ein 30-tägiger Testzeitraum starten. Die Instanz holt
+  sich damit bei api.werkwolke.de ein signiertes Token und prüft es danach
+  lokal; erneuert wird in der Regel einmal pro Woche. Ohne Schlüssel nimmt
+  RechnungsWerk erst Kontakt auf, wenn der Testzeitraum gestartet wird.
+  Übertragen werden nur eine zufällige Kennung der Installation, die
+  App-Version und eine Größenklasse, mit Schlüssel zusätzlich der Schlüssel,
+  keine Belegdaten, Personendaten, Benutzer oder Dateien. Alle bisherigen
+  Funktionen sind ohne Lizenz nutzbar (#335, #336)
+- **API-Schlüssel für den Maschinenzugang.** Bearer-Schlüssel (`rwrk_…`) für
+  die Rechnungs-API mit Rechten je Aktion und einstellbarem Ratenlimit; in der
+  Datenbank liegt nur der Hash. Erste Funktion, die WerkPlus voraussetzt
+  (#326, #361)
+- **Musterrechnungen in der CI.** Jede Änderung erzeugt zwölf echte
+  ZUGFeRD-PDFs (alle Steuerfälle, Storno, Sonderfälle) und prüft sie mit
+  Mustang gegen EN 16931 und PDF/A-3 (#21)
+
+### Changed
+- **Einstellungen mit Bereichsauswahl.** Statt vierzehn Abschnitten
+  untereinander steht links eine Auswahl in fünf Gruppen, rechts der gewählte
+  Bereich. Angefangene Eingaben bleiben beim Wechsel erhalten (#350)
+- **Festschreiben-Dialog kürzer.** Ein Satz statt vier; „Weitere Felder" im
+  Editor ist geöffnet, sobald dort etwas eingetragen ist (#365)
+- **Listen-Layout wie in WorkTime.** Lange Empfängernamen brechen um, statt die
+  Aktionen aus dem Bild zu schieben (#364)
+- AGPL-3.0-Lizenztext liegt als `LICENSE` bei
+
+### Fixed
+- **Innergemeinschaftliche Lieferungen waren nie gültige E-Rechnungen.** Es
+  fehlten Lieferland, Leistungsdatum und USt-IdNr. (BR-IC-02/11/12). Die
+  Lieferanschrift ist jetzt die Kundenanschrift, Festschreiben verlangt eigene
+  und Kunden-USt-IdNr. sowie Leistungsdatum oder -zeitraum, und ein Storno
+  übernimmt Datum bzw. Zeitraum des Originals (#21)
+- **Ungespeicherte Eingaben gingen beim Wegnavigieren verloren.** Der Editor
+  fragt jetzt „Weiter bearbeiten / Verwerfen", auch beim Neuladen der Seite
+  (#349)
+- **Produktauswahl.** Ein Klick ins Feld zeigt alle Produkte statt einer leeren
+  Liste, ohne Produkte führt ein Hinweis zum Produktbereich, und ein
+  eingefügtes Produkt füllt die leere Startzeile, statt eine zweite anzuhängen
+  (#305, #346, #347)
+
+### Security
+- Abhängigkeiten aktualisiert, darunter symfony/validator und symfony/yaml
+  (GHSA-4qpf-57w4-m3wc, GHSA-hwfg-qwvh-2wfx) sowie dompurify (#388)
+
 ## [0.6.0] - 2026-09-27
 
 ### Changed
@@ -548,7 +678,10 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.8.0...v0.9.0
+[0.8.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.5.1...v0.5.2

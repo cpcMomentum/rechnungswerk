@@ -27,6 +27,8 @@ use Psr\Log\LoggerInterface;
  */
 class ZugferdServiceTest extends TestCase {
 
+	use CompanyClockStub;
+
 	private ZugferdService $service;
 
 	protected function setUp(): void {
@@ -38,6 +40,7 @@ class ZugferdServiceTest extends TestCase {
 			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
 			$tempManager,
+			$this->companyClock(),
 		);
 	}
 
@@ -103,6 +106,24 @@ class ZugferdServiceTest extends TestCase {
 		$this->expectExceptionMessageMatches('/seller name/i');
 
 		$this->service->buildXml($this->invoice(), [$this->item(9500, 1900, 19000)], $settings);
+	}
+
+	public function testDraftWithoutIssueDateIsPreviewedWithTheCompanyDay(): void {
+		$tempManager = $this->createMock(ITempManager::class);
+		$service = new ZugferdService(
+			$this->createMock(IRootFolder::class),
+			new GirocodeService($this->createMock(LoggerInterface::class)),
+			$this->createMock(LoggerInterface::class),
+			$tempManager,
+			$this->companyClock('2026-12-31 23:30:00'),
+		);
+		$draft = $this->invoice();
+		$draft->setStatus(Invoice::STATUS_DRAFT);
+		$draft->setIssueDate(null);
+
+		$xml = $service->buildXml($draft, [$this->item(9500, 1900, 19000)], $this->settings());
+
+		$this->assertMatchesRegularExpression('/<udt:DateTimeString format="102">20270101</', $xml);
 	}
 
 	public function testFreeTextUnitLabelMapsToGenericCodeInXml(): void {
@@ -254,6 +275,56 @@ class ZugferdServiceTest extends TestCase {
 		$this->assertStringContainsString('<ram:GrandTotalAmount>200.00</ram:GrandTotalAmount>', $xml);
 		$this->assertStringContainsString('Steuerschuldnerschaft des Leistungsempfängers', $xml);
 		$this->assertStringNotContainsString('<ram:CategoryCode>S</ram:CategoryCode>', $xml);
+	}
+
+	public function testIntraCommunityCarriesTheBuyerAddressAsDeliverTo(): void {
+		$invoice = $this->invoice();
+		$invoice->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$invoice->setRecipientCountry('AT');
+		$invoice->setRecipientVatId('ATU12345678');
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(20000);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 0]]));
+		$items = [$this->item(1000000, 1900, 20000)];
+
+		$xml = $this->service->buildXml($invoice, $items, $this->settings());
+
+		$this->assertMatchesRegularExpression('#<ram:ShipToTradeParty>.*<ram:CountryID>AT</ram:CountryID>.*</ram:ShipToTradeParty>#s', $xml);
+	}
+
+	public function testDomesticInvoiceHasNoDeliverToParty(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+
+		$xml = $this->service->buildXml($invoice, [$this->item(1000000, 1900, 20000)], $this->settings());
+
+		$this->assertStringNotContainsString('ShipToTradeParty', $xml);
+	}
+
+	public function testRegisterNumberIsTheSellerLegalOrganisation(): void {
+		$settings = $this->settings();
+		$settings->setRegisterNumber('HRB 12345, Amtsgericht Stuttgart');
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+
+		$xml = $this->service->buildXml($invoice, [$this->item(1000000, 1900, 20000)], $settings);
+
+		$this->assertMatchesRegularExpression('#<ram:SellerTradeParty>.*<ram:SpecifiedLegalOrganization>\s*<ram:ID>HRB 12345, Amtsgericht Stuttgart</ram:ID>.*</ram:SellerTradeParty>#s', $xml);
+	}
+
+	public function testNoRegisterNumberMeansNoLegalOrganisation(): void {
+		$invoice = $this->invoice();
+		$invoice->setSubtotalCents(20000);
+		$invoice->setTotalCents(23800);
+		$invoice->setTaxBreakdown(json_encode([['rateBp' => 1900, 'netCents' => 20000, 'taxCents' => 3800]]));
+
+		$xml = $this->service->buildXml($invoice, [$this->item(1000000, 1900, 20000)], $this->settings());
+
+		$this->assertStringNotContainsString('SpecifiedLegalOrganization', $xml);
 	}
 
 	public function testReferencesAndPerformanceDateInXml(): void {
@@ -566,6 +637,7 @@ class ZugferdServiceTest extends TestCase {
 			new GirocodeService($this->createMock(LoggerInterface::class)),
 			$this->createMock(LoggerInterface::class),
 			$tempManager,
+			$this->companyClock(),
 		);
 
 		$invoice = $this->invoice();
