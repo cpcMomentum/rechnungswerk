@@ -1,5 +1,5 @@
 <template>
-	<div class="rw-view">
+	<div class="rw-view rw-view--narrow">
 		<h2>{{ t('rechnungswerk', 'Mein Kontakt') }}</h2>
 
 		<NcNoteCard v-if="error" type="error" :text="error" />

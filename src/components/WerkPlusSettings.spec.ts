@@ -8,18 +8,17 @@ import { flushPromises, mount } from '@vue/test-utils'
 import type { LicenseStatus } from '@/api/license'
 
 const getLicense = vi.fn<() => Promise<LicenseStatus>>()
-const activateLicense = vi.fn<(key: string, bucket: string) => Promise<LicenseStatus>>()
+const activateLicense = vi.fn<(key: string) => Promise<LicenseStatus>>()
 const refreshLicense = vi.fn<() => Promise<LicenseStatus>>()
 const removeLicense = vi.fn<() => Promise<LicenseStatus>>()
-const startTrial = vi.fn<(bucket: string) => Promise<{ key: string, status: LicenseStatus }>>()
+const startTrial = vi.fn<() => Promise<{ key: string, status: LicenseStatus }>>()
 
 vi.mock('@/api/license', () => ({
-	EMPLOYEE_BUCKETS: ['1-5', '6-20', '21-50', '51-200', '200+'],
 	getLicense: () => getLicense(),
-	activateLicense: (key: string, bucket: string) => activateLicense(key, bucket),
+	activateLicense: (key: string) => activateLicense(key),
 	refreshLicense: () => refreshLicense(),
 	removeLicense: () => removeLicense(),
-	startTrial: (bucket: string) => startTrial(bucket),
+	startTrial: () => startTrial(),
 }))
 
 // Die echten Komponenten ziehen ihr CSS mit, das der Test-Runner nicht laedt.
@@ -53,7 +52,7 @@ const status = (teil: Partial<LicenseStatus> = {}): LicenseStatus => ({
 	instanceUuid: '3f2a1b64-9c8d-4e7f-a1b2-c3d4e5f60718',
 	keySet: false,
 	keyHint: null,
-	employeeBucket: '1-5',
+	licensedEmployees: null,
 	state: 'none',
 	tier: 'free',
 	features: [],
@@ -73,7 +72,6 @@ const aktiv = (teil: Partial<LicenseStatus> = {}): LicenseStatus => status({
 	expiresAt: '2026-11-05T12:00:00Z',
 	graceUntil: '2026-11-19T12:00:00Z',
 	lastCheckAt: '2026-10-06T12:00:00Z',
-	employeeBucket: '6-20',
 	...teil,
 })
 
@@ -101,7 +99,7 @@ describe('WerkPlusSettings', () => {
 		expect(wrapper.text()).toContain('3f2a1b64-9c8d-4e7f-a1b2-c3d4e5f60718')
 	})
 
-	it('mit Schlüssel: Tarif, Hinweis und alle Knöpfe, Größenklasse übernommen', async () => {
+	it('mit Schlüssel: Tarif, Hinweis und alle Knöpfe, keine Größenklasse', async () => {
 		getLicense.mockResolvedValue(aktiv())
 		const wrapper = mount(WerkPlusSettings)
 		await flushPromises()
@@ -110,7 +108,18 @@ describe('WerkPlusSettings', () => {
 		expect(wrapper.find('dl').text()).toContain('WerkPlus')
 		expect(wrapper.find('dl').text()).toContain('…69B6')
 		expect(buttons(wrapper)).toEqual(['Speichern und prüfen', 'Jetzt prüfen', 'Schlüssel entfernen'])
-		expect((wrapper.find('select').element as HTMLSelectElement).value).toBe('6-20')
+		expect(wrapper.find('select').exists()).toBe(false)
+		expect(wrapper.text()).not.toContain('Größenklasse')
+		expect(wrapper.find('dl').text()).not.toContain('Lizenzierte Mitarbeitende')
+	})
+
+	it('gekaufte Lizenz: zeigt, für wie viele Mitarbeitende sie gilt', async () => {
+		getLicense.mockResolvedValue(aktiv({ licensedEmployees: 12 }))
+		const wrapper = mount(WerkPlusSettings)
+		await flushPromises()
+
+		const facts = wrapper.findAll('dl > *').map((el) => el.text())
+		expect(facts[facts.indexOf('Lizenzierte Mitarbeitende') + 1]).toBe('12')
 	})
 
 	it('Grace-Frist: Warnung statt Erfolg', async () => {
@@ -131,18 +140,17 @@ describe('WerkPlusSettings', () => {
 		expect(wrapper.find('dl').text()).toContain('Frei')
 	})
 
-	it('sendet Schlüssel ohne Leerraum und die gewählte Größenklasse', async () => {
+	it('sendet nur den Schlüssel ohne Leerraum', async () => {
 		getLicense.mockResolvedValue(status())
 		activateLicense.mockResolvedValue(aktiv())
 		const wrapper = mount(WerkPlusSettings)
 		await flushPromises()
 
 		await wrapper.find('input').setValue('  wp_ABC  ')
-		await wrapper.find('select').setValue('21-50')
 		await wrapper.find('.stub-button').trigger('click')
 		await flushPromises()
 
-		expect(activateLicense).toHaveBeenCalledWith('wp_ABC', '21-50')
+		expect(activateLicense).toHaveBeenCalledWith('wp_ABC')
 		expect((wrapper.find('input').element as HTMLInputElement).value).toBe('')
 		expect(wrapper.find('.stub-note--success').exists()).toBe(true)
 	})
@@ -154,14 +162,12 @@ describe('WerkPlusSettings', () => {
 		await flushPromises()
 
 		await wrapper.find('input').setValue('wp_FALSCH')
-		await wrapper.find('select').setValue('51-200')
 		await wrapper.find('.stub-button').trigger('click')
 		await flushPromises()
 
 		expect(wrapper.find('.stub-note--error').text()).toBe('Dieser Schlüssel ist nicht bekannt.')
 		expect(getLicense).toHaveBeenCalledTimes(2)
 		expect((wrapper.find('input').element as HTMLInputElement).value).toBe('wp_FALSCH')
-		expect((wrapper.find('select').element as HTMLSelectElement).value).toBe('51-200')
 	})
 
 	it('Entfernen erst nach Bestätigung', async () => {
@@ -186,13 +192,12 @@ describe('WerkPlusSettings', () => {
 		const wrapper = mount(WerkPlusSettings)
 		await flushPromises()
 
-		await wrapper.find('select').setValue('21-50')
 		await wrapper.findAll('.stub-button')[1].trigger('click')
 		expect(startTrial).not.toHaveBeenCalled()
 		await wrapper.find('.stub-confirm-ok').trigger('click')
 		await flushPromises()
 
-		expect(startTrial).toHaveBeenCalledWith('21-50')
+		expect(startTrial).toHaveBeenCalledWith()
 		expect(wrapper.find('.rw-werkplus__trial-key').text()).toContain('wp_TESTKEY')
 		expect(buttons(wrapper)).not.toContain('30 Tage testen')
 

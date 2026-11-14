@@ -23,6 +23,7 @@ class ApiKey extends Entity implements JsonSerializable {
 	protected ?int $createdAt = null;
 	protected ?int $lastUsedAt = null;
 	protected ?int $revokedAt = null;
+	protected ?int $rateLimit = null;
 	protected ?int $rlWindowStart = null;
 	protected ?int $rlHits = null;
 
@@ -35,6 +36,7 @@ class ApiKey extends Entity implements JsonSerializable {
 		$this->addType('createdAt', Types::INTEGER);
 		$this->addType('lastUsedAt', Types::INTEGER);
 		$this->addType('revokedAt', Types::INTEGER);
+		$this->addType('rateLimit', Types::INTEGER);
 		$this->addType('rlWindowStart', Types::INTEGER);
 		$this->addType('rlHits', Types::INTEGER);
 	}
@@ -58,6 +60,7 @@ class ApiKey extends Entity implements JsonSerializable {
 			'createdAt' => $this->getCreatedAt(),
 			'lastUsedAt' => $this->getLastUsedAt(),
 			'revokedAt' => $this->getRevokedAt(),
+			'rateLimit' => $this->getRateLimit(),
 		];
 	}
 }

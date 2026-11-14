@@ -21,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 
 class ApiKeyServiceTest extends TestCase {
 
+	use TranslatorStub;
+
 	private const NOW = 1760000000;
 
 	private int $now = self::NOW;
@@ -37,7 +39,7 @@ class ApiKeyServiceTest extends TestCase {
 		$permissions = $this->createMock(PermissionService::class);
 		$permissions->method('hasAccess')->willReturn($ownerHasAccess);
 
-		return new ApiKeyService($mapper, $entitlements, $permissions, $this->time());
+		return new ApiKeyService($mapper, $entitlements, $permissions, $this->time(), $this->l10nStub());
 	}
 
 	private function time(): ITimeFactory {
@@ -92,6 +94,27 @@ class ApiKeyServiceTest extends TestCase {
 	public function testCreateRejectsEmptyScopes(): void {
 		$this->expectException(ValidationException::class);
 		$this->service($this->mapper())->create('alice', 'WerkPlus', []);
+	}
+
+	public function testCreateRejectsRateLimitAboveMaximum(): void {
+		$this->expectException(ValidationException::class);
+		$this->service($this->mapper())->create('alice', 'WerkPlus', ['invoices:read'], rateLimit: ApiKeyService::RATE_LIMIT_MAX + 1);
+	}
+
+	public function testCreateStoresCustomRateLimit(): void {
+		$stored = null;
+		$mapper = $this->mapper();
+		$mapper->method('insert')->willReturnCallback(function (ApiKey $k) use (&$stored) {
+			$stored = $k;
+			$k->setId(1);
+			return $k;
+		});
+
+		$this->service($mapper)->create('alice', 'WerkPlus', ['invoices:read'], rateLimit: 500);
+		$this->assertSame(500, $stored->getRateLimit());
+
+		$this->service($mapper)->create('alice', 'WerkPlus', ['invoices:read']);
+		$this->assertSame(ApiKeyService::RATE_LIMIT_DEFAULT, $stored->getRateLimit());
 	}
 
 	public function testAuthenticateRejectsMalformedToken(): void {
@@ -157,7 +180,7 @@ class ApiKeyServiceTest extends TestCase {
 	public function testAuthenticateRejectsBeyondTheRateLimit(): void {
 		$plaintext = 'rwrk_' . str_repeat('a', 43);
 		$key = $this->keyFor($plaintext);
-		$key->setRlHits(ApiKeyService::RATE_LIMIT);
+		$key->setRlHits(ApiKeyService::RATE_LIMIT_DEFAULT);
 		$key->setRlWindowStart(self::NOW - 10);
 
 		$mapper = $this->mapper();
@@ -169,10 +192,25 @@ class ApiKeyServiceTest extends TestCase {
 		$this->assertSame(50, $result['retryAfter']);
 	}
 
+	public function testAuthenticateAppliesThePerKeyRateLimit(): void {
+		$plaintext = 'rwrk_' . str_repeat('a', 43);
+		$key = $this->keyFor($plaintext);
+		$key->setRateLimit(1);
+		$key->setRlHits(1);
+		$key->setRlWindowStart(self::NOW - 10);
+
+		$mapper = $this->mapper();
+		$mapper->method('findByPrefix')->willReturn([$key]);
+
+		$result = $this->service($mapper)->authenticate($plaintext);
+
+		$this->assertSame(ApiKeyService::ERR_RATE_LIMITED, $result['error']);
+	}
+
 	public function testAuthenticateOpensANewWindowAfterExpiry(): void {
 		$plaintext = 'rwrk_' . str_repeat('a', 43);
 		$key = $this->keyFor($plaintext);
-		$key->setRlHits(ApiKeyService::RATE_LIMIT);
+		$key->setRlHits(ApiKeyService::RATE_LIMIT_DEFAULT);
 		$key->setRlWindowStart(self::NOW - ApiKeyService::RATE_WINDOW - 1);
 
 		$mapper = $this->mapper();

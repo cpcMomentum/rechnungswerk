@@ -11,6 +11,7 @@ namespace OCA\Rechnungswerk\Tests\Unit;
 
 use OCA\Rechnungswerk\Controller\SettingsController;
 use OCA\Rechnungswerk\Db\Settings;
+use OCA\Rechnungswerk\Service\CompanyClock;
 use OCA\Rechnungswerk\Service\PermissionService;
 use OCA\Rechnungswerk\Service\SettingsService;
 use OCP\Files\Folder;
@@ -76,5 +77,11 @@ class SettingsControllerSaveTest extends TestCase {
 			'save() muss archiveFolderPath enthalten, sonst verschwindet die Anzeige (#301)');
 		$this->assertSame('Rechnungen', $data['archiveFolderPath']);
 		$this->assertSame(123, $data['archiveFolderId']);
+	}
+
+	public function testSettingsCarryTheZonesThisServerAccepts(): void {
+		$data = $this->buildController(new Settings())->save(['iban' => 'DE00'])->getData();
+
+		$this->assertSame(CompanyClock::zoneNames(), $data['timezones']);
 	}
 }

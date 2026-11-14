@@ -100,7 +100,7 @@ class ArchiveService {
 		if ($pattern === '') {
 			return [];
 		}
-		$date = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? new \DateTimeImmutable();
+		$date = $invoice->getIssueDate() ?? $invoice->getCommittedAt() ?? new \DateTimeImmutable(); // tz-ok: Rückfall ohne Belegdatum, festgeschriebene Belege haben immer eins
 		$rendered = strtr($pattern, [
 			'{YYYY}' => $date->format('Y'),
 			'{MM}' => $date->format('m'),

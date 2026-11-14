@@ -26,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 class SettingsServiceTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private SettingsMapper $mapper;
 	private SettingsService $service;
@@ -37,7 +38,7 @@ class SettingsServiceTest extends TestCase {
 		$crypto = $this->createMock(ICrypto::class);
 		$crypto->method('encrypt')->willReturnCallback(static fn (string $v): string => 'enc:' . $v);
 		$crypto->method('decrypt')->willReturnCallback(static fn (string $v): string => str_replace('enc:', '', $v));
-		$this->service = new SettingsService($this->mapper, $db, $crypto, $this->l10nStub());
+		$this->service = new SettingsService($this->mapper, $db, $crypto, $this->l10nStub(), $this->companyClock());
 	}
 
 	public function testGetCompanyInsertsDefaultsOnFirstAccess(): void {
@@ -285,6 +286,34 @@ class SettingsServiceTest extends TestCase {
 
 		$this->expectException(ValidationException::class);
 		$this->service->save(['numberCounter' => 100]);
+	}
+
+	public function testSaveStoresAKnownTimezoneAndEmptyMeansAutomatic(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->mapper->method('update')->willReturnArgument(0);
+
+		$this->assertSame('Europe/Vienna', $this->service->save(['timezone' => 'Europe/Vienna'])->getTimezone());
+		$this->assertNull($this->service->save(['timezone' => ''])->getTimezone());
+	}
+
+	public function testSaveRejectsAnUnknownTimezone(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->expectException(ValidationException::class);
+		$this->service->save(['timezone' => 'Mars/Olympus']);
+	}
+
+	public function testNextNumberAnchorsToTheCompanyYearAfterBerlinMidnight(): void {
+		$this->mapper->method('findByOwner')->willReturn($this->existing());
+		$this->mapper->method('update')->willReturnArgument(0);
+		$service = new SettingsService(
+			$this->mapper,
+			$this->createMock(IDBConnection::class),
+			$this->createMock(ICrypto::class),
+			$this->l10nStub(),
+			$this->companyClock('2026-12-31 23:30:00'),
+		);
+
+		$this->assertSame(2027, $service->save(['numberCounter' => 5])->getNumberCounterYear());
 	}
 
 	private function existing(): Settings {

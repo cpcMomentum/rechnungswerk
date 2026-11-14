@@ -36,6 +36,9 @@
 					<template #icon><ChartBarIcon :size="20" /></template>
 				</NcAppNavigationItem>
 				<template #footer>
+					<NcAppNavigationItem :name="t('rechnungswerk', 'Protokoll')" :to="{ name: 'audit' }">
+						<template #icon><HistoryIcon :size="20" /></template>
+					</NcAppNavigationItem>
 					<NcAppNavigationItem :name="t('rechnungswerk', 'Mein Kontakt')" :to="{ name: 'my-contact' }">
 						<template #icon><AccountIcon :size="20" /></template>
 					</NcAppNavigationItem>
@@ -71,6 +74,7 @@ import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
 import ChartBarIcon from 'vue-material-design-icons/ChartBar.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
+import HistoryIcon from 'vue-material-design-icons/History.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import WhatsNewDialog from '@/components/WhatsNewDialog.vue'
 import { usePermissionStore } from '@/stores/permissionStore'
