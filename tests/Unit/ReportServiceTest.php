@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 class ReportServiceTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private InvoiceMapper&MockObject $mapper;
 	private ReportService $service;
@@ -39,6 +40,7 @@ class ReportServiceTest extends TestCase {
 			$settingsService,
 			$this->createMock(ZugferdService::class),
 			$this->l10nStub(),
+			$this->companyClock(),
 		);
 	}
 

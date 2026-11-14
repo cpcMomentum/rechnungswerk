@@ -48,6 +48,7 @@ class ReportService {
 		private readonly SettingsService $settingsService,
 		private readonly ZugferdService $zugferdService,
 		private readonly IL10N $l10n,
+		private readonly CompanyClock $clock,
 	) {
 	}
 
@@ -315,7 +316,7 @@ class ReportService {
 			. '<h1>' . $e($this->l10n->t('Umsatzbericht')) . '</h1>'
 			. ($company !== '' ? '<p class="meta">' . $e($company) . '</p>' : '')
 			. '<p class="meta">' . $e($period . ' · ' . $basisLabel) . '</p>'
-			. '<p class="meta">' . $e($this->l10n->t('Erstellt am %s', [(new DateTime())->format('d.m.Y')])) . '</p>'
+			. '<p class="meta">' . $e($this->l10n->t('Erstellt am %s', [$this->clock->today()->format('d.m.Y')])) . '</p>'
 			. '<h2>' . $e($this->l10n->t('Nach Steuersatz')) . '</h2>'
 			. '<table><thead><tr><th>' . $e($this->l10n->t('Steuerfall')) . '</th>' . $amountHead . '</tr></thead><tbody>'
 			. $groupRows . $sumRow . '</tbody></table>'
