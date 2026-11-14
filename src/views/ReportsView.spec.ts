@@ -21,6 +21,9 @@ vi.mock('@/api/reports', () => ({
 }))
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
+const settingsStore = { settings: null as { today?: string } | null, fetch: vi.fn(async () => {}) }
+vi.mock('@/stores/settingsStore', () => ({ useSettingsStore: () => settingsStore }))
+
 // Die echten Komponenten ziehen ihr CSS mit, das der Test-Runner nicht laedt.
 vi.mock('@nextcloud/vue/components/NcButton', () => ({
 	default: {
@@ -77,6 +80,20 @@ describe('ReportsView', () => {
 		getReport.mockReset()
 		downloadReport.mockReset()
 		getReport.mockResolvedValue(report())
+		settingsStore.settings = null
+	})
+
+	it('nimmt den heutigen Tag der Firma vom Server statt aus dem Browser', async () => {
+		settingsStore.settings = { today: '2025-12-31' }
+		const wrapper = mount(ReportsView)
+		await flushPromises()
+
+		expect(getReport).toHaveBeenCalledTimes(1)
+		expect(getReport).toHaveBeenCalledWith({ from: '2025-01-01', to: '2025-12-31', basis: 'issue' })
+
+		await chip(wrapper, 'Monat').trigger('click')
+		await flushPromises()
+		expect(getReport).toHaveBeenLastCalledWith({ from: '2025-12-01', to: '2025-12-31', basis: 'issue' })
 	})
 
 	it('lädt beim Öffnen das laufende Jahr nach Rechnungsdatum', async () => {

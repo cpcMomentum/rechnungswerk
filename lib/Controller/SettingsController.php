@@ -43,6 +43,7 @@ class SettingsController extends Controller {
 		private readonly SettingsService $settingsService,
 		private readonly PermissionService $permissionService,
 		private readonly IRootFolder $rootFolder,
+		private readonly CompanyClock $clock,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -73,6 +74,8 @@ class SettingsController extends Controller {
 		// files so the label matches what the admin sees in the picker.
 		$data['archiveFolderPath'] = $this->archiveFolderPath($settings->getArchiveFolderId());
 		$data['timezones'] = CompanyClock::zoneNames();
+		// Kalendertag der Firma, damit der Client nicht das Browserdatum nimmt (Berichte).
+		$data['today'] = $this->clock->today()->format('Y-m-d');
 		return $data;
 	}
 

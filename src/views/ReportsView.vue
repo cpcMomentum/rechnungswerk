@@ -193,6 +193,7 @@ import FileDelimitedIcon from 'vue-material-design-icons/FileDelimited.vue'
 import FilePdfBoxIcon from 'vue-material-design-icons/FilePdfBox.vue'
 import { downloadReport, getReport, type ReportQuery } from '@/api/reports'
 import type { Report, ReportBasis } from '@/types/api'
+import { useSettingsStore } from '@/stores/settingsStore'
 import { formatCents } from '@/utils/money'
 import { isoWeek, parseIsoDay, periodContaining, quarterOf, shiftPeriod, type DateRange, type PeriodKind } from '@/utils/reportPeriod'
 
@@ -211,9 +212,12 @@ const BASES: { key: ReportBasis, label: string }[] = [
 ]
 
 const router = useRouter()
+const settingsStore = useSettingsStore()
+/** Heute in der Zeitzone der Firma; bis der Server antwortet, der Tag des Browsers. */
+const today = ref(new Date())
 const kind = ref<Kind>('year')
 const basis = ref<ReportBasis>('issue')
-const range = ref<DateRange>(periodContaining('year', new Date()))
+const range = ref<DateRange>(periodContaining('year', today.value))
 const customFrom = ref(range.value.from)
 const customTo = ref(range.value.to)
 const report = ref<Report | null>(null)
@@ -241,7 +245,7 @@ function setKind(next: Kind) {
 			customTo.value = range.value.to
 		}
 	} else {
-		range.value = periodContaining(next, new Date())
+		range.value = periodContaining(next, today.value)
 	}
 	kind.value = next
 }
@@ -253,7 +257,7 @@ function shift(delta: number) {
 }
 
 const isCurrentPeriod = computed(() =>
-	kind.value === 'custom' || range.value.from === periodContaining(kind.value, new Date()).from)
+	kind.value === 'custom' || range.value.from === periodContaining(kind.value, today.value).from)
 
 const dayLabel = (iso: string): string => parseIsoDay(iso).toLocaleDateString()
 
@@ -318,8 +322,22 @@ async function load() {
 	}
 }
 
-watch(query, load)
-onMounted(load)
+onMounted(async () => {
+	try {
+		await settingsStore.fetch()
+	} catch {
+		// Ohne Einstellungen bleibt der Tag des Browsers.
+	}
+	const serverToday = settingsStore.settings?.today
+	if (serverToday) {
+		today.value = parseIsoDay(serverToday)
+		if (kind.value !== 'custom') {
+			range.value = periodContaining(kind.value, today.value)
+		}
+	}
+	watch(query, load)
+	await load()
+})
 
 function exportAs(format: 'csv' | 'pdf') {
 	if (query.value !== null) {

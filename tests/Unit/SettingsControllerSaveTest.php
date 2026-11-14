@@ -27,6 +27,8 @@ use PHPUnit\Framework\TestCase;
  */
 class SettingsControllerSaveTest extends TestCase {
 
+	use CompanyClockStub;
+
 	private function buildController(Settings $saved): SettingsController {
 		$settingsService = $this->createMock(SettingsService::class);
 		$settingsService->method('save')->willReturn($saved);
@@ -62,6 +64,7 @@ class SettingsControllerSaveTest extends TestCase {
 			$settingsService,
 			$permissions,
 			$rootFolder,
+			$this->companyClock('2026-03-31 22:30:00', 'Europe/Berlin'),
 		);
 	}
 
@@ -83,5 +86,12 @@ class SettingsControllerSaveTest extends TestCase {
 		$data = $this->buildController(new Settings())->save(['iban' => 'DE00'])->getData();
 
 		$this->assertSame(CompanyClock::zoneNames(), $data['timezones']);
+	}
+
+	public function testSettingsCarryTodayInTheCompanyZone(): void {
+		// 22:30 UTC am 31. März ist in Berlin schon der 1. April.
+		$data = $this->buildController(new Settings())->save(['iban' => 'DE00'])->getData();
+
+		$this->assertSame('2026-04-01', $data['today']);
 	}
 }

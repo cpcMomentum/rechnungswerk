@@ -279,6 +279,8 @@ export interface Settings {
 	archiveSubfolder: string | null
 	archiveFolderPath?: string | null
 	timezones?: string[]
+	/** Heutiger Kalendertag (Y-m-d) in der Zeitzone der Firma. */
+	today?: string
 	girocodeEnabled: boolean
 	smallBusiness: boolean
 	/** Configurable §19 UStG hint printed on invoices; null = use default wording (#141). */
