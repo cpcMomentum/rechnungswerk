@@ -70,6 +70,54 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * Belege fuer den Umsatzbericht, nach Rechnungsdatum: alles, was im Zeitraum
+	 * ausgestellt wurde — Rechnungen (auch spaeter stornierte) und Stornos. Die
+	 * stornierte Rechnung und ihr Storno heben sich auf, jeder im Zeitraum seines
+	 * eigenen Datums. Entwuerfe haben weder Nummer noch Rechnungsdatum und
+	 * Angebote (#111) sind kein Umsatz; beide bleiben draussen.
+	 *
+	 * @param \DateTime $from erster Tag des Zeitraums
+	 * @param \DateTime $toExclusive Tag NACH dem letzten Tag des Zeitraums
+	 * @return Invoice[] aelteste zuerst
+	 */
+	public function findIssuedBetween(\DateTime $from, \DateTime $toExclusive): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->in('invoice_type', $qb->createNamedParameter(Invoice::INVOICE_TYPES, IQueryBuilder::PARAM_STR_ARRAY)))
+			->andWhere($qb->expr()->in('status', $qb->createNamedParameter(
+				[Invoice::STATUS_COMMITTED, Invoice::STATUS_CANCELLED],
+				IQueryBuilder::PARAM_STR_ARRAY,
+			)))
+			->andWhere($qb->expr()->gte('issue_date', $qb->createNamedParameter($from, IQueryBuilder::PARAM_DATE_MUTABLE)))
+			->andWhere($qb->expr()->lt('issue_date', $qb->createNamedParameter($toExclusive, IQueryBuilder::PARAM_DATE_MUTABLE)))
+			->orderBy('issue_date', 'ASC')
+			->addOrderBy('id', 'ASC');
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Belege fuer den Umsatzbericht, nach Zahlungseingang: Rechnungen, deren
+	 * Zahldatum (#117) im Zeitraum liegt. Nur festgeschriebene Rechnungen sind
+	 * zahlbar; eine nachtraeglich stornierte Rechnung zaehlt nicht mehr, weil
+	 * die App die Rueckzahlung nicht kennt.
+	 *
+	 * @param \DateTime $from erster Tag des Zeitraums
+	 * @param \DateTime $toExclusive Tag NACH dem letzten Tag des Zeitraums
+	 * @return Invoice[] aelteste zuerst
+	 */
+	public function findPaidBetween(\DateTime $from, \DateTime $toExclusive): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->eq('invoice_type', $qb->createNamedParameter(Invoice::TYPE_INVOICE)))
+			->andWhere($qb->expr()->eq('status', $qb->createNamedParameter(Invoice::STATUS_COMMITTED)))
+			->andWhere($qb->expr()->gte('paid_at', $qb->createNamedParameter($from, IQueryBuilder::PARAM_DATETIME_MUTABLE)))
+			->andWhere($qb->expr()->lt('paid_at', $qb->createNamedParameter($toExclusive, IQueryBuilder::PARAM_DATETIME_MUTABLE)))
+			->orderBy('paid_at', 'ASC')
+			->addOrderBy('id', 'ASC');
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * Invoices handed to DATEV that are still awaiting a confirmation (#36).
 	 *
 	 * @return Invoice[]
