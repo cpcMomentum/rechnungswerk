@@ -33,10 +33,10 @@ class WerkPlusClientTest extends TestCase {
 	}
 
 	private function call(WerkPlusClient $client): array {
-		return $client->validate('wp_KEY', 'uuid', ['rechnungswerk' => '0.7.0'], '1-5');
+		return $client->validate('wp_KEY', 'uuid', ['rechnungswerk' => '0.7.0']);
 	}
 
-	public function testSendsOnlyTheFourContractFields(): void {
+	public function testSendsOnlyTheThreeContractFieldsWithoutSizeClass(): void {
 		$captured = null;
 		$result = $this->call($this->client(200, '{"token":"a.b.c","expiresAt":"e","graceUntil":"g"}', $captured));
 
@@ -45,7 +45,6 @@ class WerkPlusClientTest extends TestCase {
 			'key' => 'wp_KEY',
 			'instanceUuid' => 'uuid',
 			'appVersions' => ['rechnungswerk' => '0.7.0'],
-			'employeeBucket' => '1-5',
 		], $captured['options']['json']);
 		$this->assertFalse($captured['options']['http_errors']);
 		$this->assertSame(['token' => 'a.b.c', 'expiresAt' => 'e', 'graceUntil' => 'g'], $result);
@@ -54,13 +53,12 @@ class WerkPlusClientTest extends TestCase {
 	public function testTrialSendsTheContractFieldsWithoutKeyAndReturnsTheKey(): void {
 		$captured = null;
 		$client = $this->client(200, '{"key":"wp_NEU","token":"a.b.c","expiresAt":"e","graceUntil":"g"}', $captured);
-		$result = $client->trial('uuid', ['rechnungswerk' => '0.7.0'], '6-20');
+		$result = $client->trial('uuid', ['rechnungswerk' => '0.7.0']);
 
 		$this->assertSame('https://api.werkwolke.de/trial', $captured['uri']);
 		$this->assertSame([
 			'instanceUuid' => 'uuid',
 			'appVersions' => ['rechnungswerk' => '0.7.0'],
-			'employeeBucket' => '6-20',
 		], $captured['options']['json']);
 		$this->assertSame(['key' => 'wp_NEU', 'token' => 'a.b.c', 'expiresAt' => 'e', 'graceUntil' => 'g'], $result);
 	}
@@ -68,7 +66,7 @@ class WerkPlusClientTest extends TestCase {
 	public function testTrialWithoutKeyInTheAnswerIsInvalid(): void {
 		foreach (['{"token":"a.b.c","expiresAt":"e","graceUntil":"g"}', '{"key":"","token":"a.b.c","expiresAt":"e","graceUntil":"g"}'] as $body) {
 			try {
-				$this->client(200, $body)->trial('uuid', [], '1-5');
+				$this->client(200, $body)->trial('uuid', []);
 				$this->fail('Ausnahme erwartet fuer ' . $body);
 			} catch (WerkPlusApiException $e) {
 				$this->assertSame(WerkPlusClient::INVALID_RESPONSE, $e->getErrorCode());
@@ -77,7 +75,7 @@ class WerkPlusClientTest extends TestCase {
 	}
 
 	public function testTrialKeySurvivesBrokenTokenFields(): void {
-		$result = $this->client(200, '{"key":"wp_NEU","token":"a.b.c","graceUntil":"g"}')->trial('uuid', [], '1-5');
+		$result = $this->client(200, '{"key":"wp_NEU","token":"a.b.c","graceUntil":"g"}')->trial('uuid', []);
 
 		$this->assertSame('wp_NEU', $result['key']);
 		$this->assertSame('', $result['token']);
@@ -85,7 +83,7 @@ class WerkPlusClientTest extends TestCase {
 
 	public function testTrialAlreadyUsedIsPassedThrough(): void {
 		try {
-			$this->client(409, '{"error":{"code":"TRIAL_ALREADY_USED","message":"schon genutzt"}}')->trial('uuid', [], '1-5');
+			$this->client(409, '{"error":{"code":"TRIAL_ALREADY_USED","message":"schon genutzt"}}')->trial('uuid', []);
 			$this->fail('Ausnahme erwartet');
 		} catch (WerkPlusApiException $e) {
 			$this->assertSame('TRIAL_ALREADY_USED', $e->getErrorCode());

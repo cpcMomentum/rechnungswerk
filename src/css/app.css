@@ -9,11 +9,15 @@
  * CSS, so the design stays consistent from one source.
  */
 
-/* ---- View container: centered content column (mockup .nc-content__inner) ---- */
+/* ---- View container: left-aligned like WorkTime/ProjektWerk (#364) ---- */
 .app-rechnungswerk .rw-view {
-	max-width: 980px;
-	margin: 0 auto;
-	padding: 24px 28px 64px;
+	padding: 20px;
+	padding-left: 50px;
+	max-width: 1600px;
+}
+/* Forms (editor, settings, my contact) stay narrower, like the WorkTime settings. */
+.app-rechnungswerk .rw-view--narrow {
+	max-width: 1100px;
 }
 
 .app-rechnungswerk .rw-view__head {
@@ -129,6 +133,13 @@
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 14px;
+	/* NC core sets `table { white-space: nowrap }`; let cells wrap so the table
+	   fits its container (#364). Amounts and actions keep their own nowrap. */
+	white-space: normal;
+}
+/* Document numbers (RE-2026-0003) must not break at the hyphen. */
+.app-rechnungswerk .rw-table .rw-nowrap {
+	white-space: nowrap;
 }
 .app-rechnungswerk .rw-table th {
 	text-align: left;
@@ -286,9 +297,14 @@
 .app-rechnungswerk .rw-subline--overdue {
 	color: #c0392b;
 }
-/* Paid date (#257): the subline is a button that opens an inline date field. */
+/* Paid date (#257): the subline is a button that opens an inline date field.
+   Block below the amount like the other sublines (#364); reset the core button box. */
 .app-rechnungswerk button.rw-subline--editable {
-	display: inline-block;
+	display: block;
+	margin: 2px 0 0 auto;
+	min-height: 0;
+	height: auto;
+	line-height: normal;
 	background: none;
 	border: none;
 	padding: 0;
@@ -537,6 +553,9 @@
  * sonst bliebe fuer beides zu wenig Platz.
  */
 @media (max-width: 700px) {
+	.app-rechnungswerk .rw-view {
+		padding: 16px 12px 20px;
+	}
 	.app-rechnungswerk .rw-settingspage {
 		flex-direction: column;
 	}

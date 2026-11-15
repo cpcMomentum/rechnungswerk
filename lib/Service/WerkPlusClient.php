@@ -38,12 +38,11 @@ class WerkPlusClient {
 	 * @return array{token: string, expiresAt: string, graceUntil: string}
 	 * @throws WerkPlusApiException
 	 */
-	public function validate(#[\SensitiveParameter] string $key, string $instanceUuid, array $appVersions, string $employeeBucket): array {
+	public function validate(#[\SensitiveParameter] string $key, string $instanceUuid, array $appVersions): array {
 		$body = $this->post('/validate', [
 			'key' => $key,
 			'instanceUuid' => $instanceUuid,
 			'appVersions' => $appVersions,
-			'employeeBucket' => $employeeBucket,
 		]);
 		return self::tokenFields($body);
 	}
@@ -53,11 +52,10 @@ class WerkPlusClient {
 	 * @return array{key: string, token: string, expiresAt: string, graceUntil: string}
 	 * @throws WerkPlusApiException
 	 */
-	public function trial(string $instanceUuid, array $appVersions, string $employeeBucket): array {
+	public function trial(string $instanceUuid, array $appVersions): array {
 		$body = $this->post('/trial', [
 			'instanceUuid' => $instanceUuid,
 			'appVersions' => $appVersions,
-			'employeeBucket' => $employeeBucket,
 		]);
 		if (!is_string($body['key'] ?? null) || $body['key'] === '') {
 			throw new WerkPlusApiException(self::INVALID_RESPONSE);

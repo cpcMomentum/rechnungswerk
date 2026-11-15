@@ -15,8 +15,10 @@ use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
+use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCA\Rechnungswerk\Service\ArchiveService;
+use OCA\Rechnungswerk\Service\AuditService;
 use OCA\Rechnungswerk\Service\CountryService;
 use OCA\Rechnungswerk\Service\DocumentStore;
 use OCA\Rechnungswerk\Service\InvoiceService;
@@ -39,6 +41,7 @@ use Psr\Log\LoggerInterface;
 class InvoiceServiceDocumentTest extends TestCase {
 
 	use TranslatorStub;
+	use CompanyClockStub;
 
 	private const FROZEN = '%PDF-1.7 eingefrorener Beleg';
 	private const RENDERED = '%PDF-1.7 frisch gerendert';
@@ -67,6 +70,7 @@ class InvoiceServiceDocumentTest extends TestCase {
 		$settings = new Settings();
 		$settings->setOwnerUserId('__company__');
 		$settings->setCompanyName('Muster GmbH');
+		$settings->setVatId('DE123456789');
 		$settings->setFileNameFormat('{nummer}');
 		$this->settingsService->method('getCompany')->willReturn($settings);
 		$this->zugferdService->method('generatePdf')->willReturn(self::RENDERED);
@@ -84,6 +88,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 
@@ -208,6 +214,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 
 		// Dieselbe Datei geht auch in die Ablage — hier mitgeprueft, statt eine
@@ -326,6 +334,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 
 		$this->assertFalse($service->freezeDocument($invoice, true));
@@ -364,6 +374,63 @@ class InvoiceServiceDocumentTest extends TestCase {
 		$service->cancel((int)$committed->getId(), 'alice');
 	}
 
+	/** Sonst entstuende ein Storno zum Storno mit verbrauchter Nummer. */
+	public function testCancelOfACancellationIsRefusedAndBurnsNoNumber(): void {
+		$storno = $this->committedInvoice();
+		$storno->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$this->invoiceMapper->method('findOne')->willReturn($storno);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($storno);
+
+		$this->settingsService->expects($this->never())->method('reserveNextNumber');
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Stornobeleg/');
+
+		$this->service->cancel((int)$storno->getId(), 'alice');
+	}
+
+	public function testCancelOfAnAlreadyCancelledStornoNamesTheStornoAsReason(): void {
+		$storno = $this->committedInvoice();
+		$storno->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$storno->setStatus(Invoice::STATUS_CANCELLED);
+		$this->invoiceMapper->method('findOne')->willReturn($storno);
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Stornobeleg/');
+
+		$this->service->cancel((int)$storno->getId(), 'alice');
+	}
+
+	public function testCancelOfADraftIsRefused(): void {
+		$draft = $this->draftInvoice();
+		$this->invoiceMapper->method('findOne')->willReturn($draft);
+
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Nur festgeschriebene Rechnungen/');
+
+		$this->service->cancel((int)$draft->getId(), 'alice');
+	}
+
+	/** Dieselbe Pruefung greift auch auf dem gesperrten Datensatz in der Transaktion. */
+	public function testCancelRechecksTheTypeOnTheLockedRow(): void {
+		$seen = $this->committedInvoice();
+		$locked = $this->committedInvoice();
+		$locked->setInvoiceType(Invoice::TYPE_CANCELLATION);
+		$this->invoiceMapper->method('findOne')->willReturn($seen);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($locked);
+
+		$this->settingsService->expects($this->never())->method('reserveNextNumber');
+		$this->invoiceMapper->expects($this->never())->method('insert');
+
+		$this->expectException(IllegalStateException::class);
+		$this->expectExceptionMessageMatches('/Stornobeleg/');
+
+		$this->service->cancel((int)$seen->getId(), 'alice');
+	}
+
 	/** Mit Firmennamen laeuft derselbe Weg durch — die Sperre trifft nur den Leerfall. */
 	public function testCommitWithSellerNameReservesTheNumber(): void {
 		$draft = $this->draftInvoice();
@@ -380,6 +447,94 @@ class InvoiceServiceDocumentTest extends TestCase {
 
 		$this->assertSame('RE-2026-0001', $draft->getNumber());
 		$this->assertSame(Invoice::STATUS_COMMITTED, $draft->getStatus());
+	}
+
+	public function testIntraCommunityCommitWithoutPerformanceDateIsRefused(): void {
+		$draft = $this->draftInvoice();
+		$draft->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$draft->setRecipientVatId('ATU12345678');
+		$draft->setPerformancePeriodStart(new DateTime('2026-06-01'));
+		$this->invoiceMapper->method('findOne')->willReturn($draft);
+		$this->itemMapper->method('findByInvoice')->willReturn([$this->anItem()]);
+		$this->settingsService->expects($this->never())->method('reserveNextNumber');
+
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessageMatches('/innergemeinschaftliche Lieferung/');
+
+		$this->service->commit((int)$draft->getId());
+	}
+
+	public function testIntraCommunityCommitWithoutBuyerVatIdIsRefused(): void {
+		$draft = $this->draftInvoice();
+		$draft->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$draft->setPerformanceDate(new DateTime('2026-06-10'));
+		$this->invoiceMapper->method('findOne')->willReturn($draft);
+		$this->itemMapper->method('findByInvoice')->willReturn([$this->anItem()]);
+		$this->settingsService->expects($this->never())->method('reserveNextNumber');
+
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessageMatches('/USt-IdNr\. des Kunden/');
+
+		$this->service->commit((int)$draft->getId());
+	}
+
+	public function testIntraCommunityCommitWithoutOwnVatIdIsRefused(): void {
+		$draft = $this->draftInvoice();
+		$draft->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$draft->setRecipientVatId('ATU12345678');
+		$draft->setPerformanceDate(new DateTime('2026-06-10'));
+		$service = $this->serviceWithoutSellerName($draft, $settingsService);
+		$settingsService->getCompany()->setCompanyName('Muster GmbH');
+		$settingsService->expects($this->never())->method('reserveNextNumber');
+
+		$this->expectException(ValidationException::class);
+		$this->expectExceptionMessageMatches('/eigene USt-IdNr\./');
+
+		$service->commit((int)$draft->getId());
+	}
+
+	public function testIntraCommunityCommitWithPerformanceDateGoesThrough(): void {
+		$draft = $this->draftInvoice();
+		$draft->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$draft->setRecipientVatId('ATU12345678');
+		$draft->setPerformanceDate(new DateTime('2026-06-10'));
+		$this->invoiceMapper->method('findOne')->willReturn($draft);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($draft);
+		$this->invoiceMapper->method('update')->willReturnArgument(0);
+		$this->itemMapper->method('findByInvoice')->willReturn([$this->anItem()]);
+		$this->documentStore->method('read')->willReturn(self::FROZEN);
+		$this->settingsService->method('reserveNextNumber')->willReturn('RE-2026-0001');
+
+		$this->service->commit((int)$draft->getId());
+
+		$this->assertSame(Invoice::STATUS_COMMITTED, $draft->getStatus());
+	}
+
+	public function testStornoCarriesThePerformanceDatesOfTheOriginal(): void {
+		$original = $this->committedInvoice();
+		$original->setSpecialTaxCase(Invoice::SPECIAL_TAX_INTRA_COMMUNITY);
+		$original->setPerformanceDate(new DateTime('2026-06-10'));
+		$original->setPerformancePeriodStart(new DateTime('2026-06-01'));
+		$original->setPerformancePeriodEnd(new DateTime('2026-06-30'));
+		$this->invoiceMapper->method('findOne')->willReturn($original);
+		$this->invoiceMapper->method('findOneForUpdate')->willReturn($original);
+		$this->invoiceMapper->method('update')->willReturnArgument(0);
+		$storno = null;
+		$this->invoiceMapper->method('insert')->willReturnCallback(function (Invoice $inv) use (&$storno): Invoice {
+			$inv->setId(8);
+			$storno = $inv;
+			return $inv;
+		});
+		$this->itemMapper->method('findByInvoice')->willReturn([$this->anItem()]);
+		$this->documentStore->method('read')->willReturn(self::FROZEN);
+		$this->settingsService->method('reserveNextNumber')->willReturn('RE-2026-0008');
+
+		$this->service->cancel((int)$original->getId(), 'alice');
+
+		$this->assertInstanceOf(Invoice::class, $storno);
+		$this->assertSame('2026-06-10', $storno->getPerformanceDate()?->format('Y-m-d'));
+		$this->assertSame('2026-06-01', $storno->getPerformancePeriodStart()?->format('Y-m-d'));
+		$this->assertSame('2026-06-30', $storno->getPerformancePeriodEnd()?->format('Y-m-d'));
 	}
 
 	private function draftInvoice(): Invoice {
@@ -433,6 +588,8 @@ class InvoiceServiceDocumentTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
+			$this->createMock(AuditService::class),
+			$this->companyClock(),
 		);
 	}
 

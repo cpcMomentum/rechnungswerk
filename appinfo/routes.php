@@ -83,6 +83,9 @@ return [
 		// Laenderliste fuer die Auswahlfelder (#167)
 		['name' => 'country#index', 'url' => '/api/v1/countries', 'verb' => 'GET'],
 
+		['name' => 'audit#index',    'url' => '/api/v1/audit',                'verb' => 'GET'],
+		['name' => 'audit#document', 'url' => '/api/v1/audit/documents/{id}', 'verb' => 'GET'],
+
 		// „Was ist neu?"-Fenster (#308)
 		['name' => 'whatsNew#index', 'url' => '/api/v1/whatsnew',      'verb' => 'GET'],
 		['name' => 'whatsNew#seen',  'url' => '/api/v1/whatsnew/seen', 'verb' => 'POST'],
@@ -111,6 +114,10 @@ return [
 		['name' => 'club_status#show', 'url' => '/api/v1/club-status', 'verb' => 'GET'],
 		['name' => 'club_settings#show', 'url' => '/api/v1/club-settings', 'verb' => 'GET'],
 		['name' => 'club_settings#update', 'url' => '/api/v1/club-settings', 'verb' => 'PUT'],
+		// API-Schluessel fuer Maschinenzugang
+		['name' => 'api_key#index',   'url' => '/api/v1/api-keys',      'verb' => 'GET'],
+		['name' => 'api_key#create',  'url' => '/api/v1/api-keys',      'verb' => 'POST'],
+		['name' => 'api_key#destroy', 'url' => '/api/v1/api-keys/{id}', 'verb' => 'DELETE'],
 
 		// WerkPlus-Lizenz (entitlement-v1)
 		['name' => 'license#show',     'url' => '/api/v1/license',         'verb' => 'GET'],

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Service;
 
 use DateTime;
+use OCA\Rechnungswerk\Db\AuditEntry;
 use OCA\Rechnungswerk\Db\Invoice;
 use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
@@ -39,6 +40,8 @@ class InvoiceService {
 		private readonly LoggerInterface $logger,
 		private readonly NumberFormatMessage $numberFormatMessage,
 		private readonly IL10N $l10n,
+		private readonly AuditService $auditService,
+		private readonly CompanyClock $clock,
 	) {
 	}
 
@@ -80,10 +83,11 @@ class InvoiceService {
 	 * @return array<string, mixed>
 	 * @throws ValidationException
 	 */
-	public function create(string $userId, array $data): array {
-		$now = new DateTime();
+	public function create(string $userId, array $data, ?int $apiKeyId = null): array {
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 		$invoice = new Invoice();
 		$invoice->setOwnerUserId($userId);
+		$invoice->setApiKeyId($apiKeyId);
 		$invoice->setStatus(Invoice::STATUS_DRAFT);
 		$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
 		$invoice->setCreatedAt($now);
@@ -103,9 +107,12 @@ class InvoiceService {
 			$this->replaceItems($invoice, $items);
 			$this->recomputeTotals($invoice);
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::CREATE, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -151,10 +158,15 @@ class InvoiceService {
 			}
 			$this->recomputeTotals($invoice);
 			$invoice->setUpdatedAt(new DateTime());
+			// Edited by a person, so the creating key may no longer delete it.
+			$invoice->setApiKeyId(null);
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::UPDATE, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -164,20 +176,21 @@ class InvoiceService {
 	/**
 	 * Type-guarded entry point for InvoiceController: rejects a quote id before
 	 * reusing the shared delete() transaction (see assertInvoiceType()).
+	 * With $apiKeyId set, only drafts created by that key are deletable.
 	 *
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function deleteInvoice(int $id): void {
+	public function deleteInvoice(int $id, ?int $apiKeyId = null): void {
 		$this->assertInvoiceType($this->findById($id));
-		$this->delete($id);
+		$this->delete($id, $apiKeyId);
 	}
 
 	/**
 	 * @throws NotFoundException
 	 * @throws IllegalStateException
 	 */
-	public function delete(int $id): void {
+	public function delete(int $id, ?int $apiKeyId = null): void {
 		$this->findById($id); // Fast 404 before opening a transaction.
 
 		$this->db->beginTransaction();
@@ -186,231 +199,111 @@ class InvoiceService {
 			// slipping through: without this a committed (GoBD-relevant)
 			// invoice could be deleted by a concurrent in-flight delete call.
 			$invoice = $this->findByIdForUpdate($id);
+			$this->assertCreatedByKey($invoice, $apiKeyId);
 			$this->assertDraft($invoice);
 			$this->itemMapper->deleteByInvoice((int)$invoice->getId());
 			$this->invoiceMapper->delete($invoice);
+			$this->auditService->record(AuditEntry::DELETE, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 	}
 
 	/**
-	 * Normale Festschreibung.
+	 * Festschreibung: assign the final sequential number and lock the invoice.
 	 *
-	 * Das Rechnungsdatum entspricht dem Zeitpunkt der Festschreibung.
+	 * @return array<string, mixed>
+	 * @throws NotFoundException
+	 * @throws IllegalStateException
+	 * @throws ValidationException
 	 */
 	public function commit(int $id): array {
-		return $this->commitInternal(
-			$id,
-			null,
-			null
-		);
+		return $this->commitInternal($id);
 	}
 
-	/**
-	 * Festschreibung mit einem ausdrücklich vorgegebenen
-	 * Rechnungs- und optionalen Fälligkeitsdatum.
-	 *
-	 * Dieser Weg wird unter anderem für Beitragsrechnungen verwendet.
-	 *
-	 * Der Zeitpunkt der tatsächlichen Festschreibung bleibt davon getrennt
-	 * und wird weiterhin in committedAt gespeichert.
-	 *
-	 * @return array<string, mixed>
-	 * @throws NotFoundException
-	 * @throws IllegalStateException
-	 * @throws ValidationException
-	 */
-	public function commitWithDates(
-		int $id,
-		DateTime $issueDate,
-		?DateTime $dueDate = null,
-	): array {
-		$issueDate = clone $issueDate;
-		$issueDate->setTime(0, 0, 0);
-
-		if ($dueDate !== null) {
-			$dueDate = clone $dueDate;
-			$dueDate->setTime(0, 0, 0);
-
-			if ($dueDate < $issueDate) {
-				throw new ValidationException(
-					$this->l10n->t(
-						'Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.'
-					)
-				);
-			}
+	public function commitWithDates(int $id, DateTime $issueDate, ?DateTime $dueDate = null): array {
+		$issueDate = (clone $issueDate)->setTime(0, 0);
+		$dueDate = $dueDate === null ? null : (clone $dueDate)->setTime(0, 0);
+		if ($dueDate !== null && $dueDate < $issueDate) {
+			throw new ValidationException($this->l10n->t('Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.'));
 		}
 
-		return $this->commitInternal(
-			$id,
-			$issueDate,
-			$dueDate
-		);
+		return $this->commitInternal($id, $issueDate, $dueDate);
 	}
 
-	/**
-	 * Gemeinsame Festschreibungslogik.
-	 *
-	 * Wenn kein Rechnungsdatum vorgegeben wurde, verhält sich die Methode
-	 * exakt wie die bisherige normale Festschreibung.
-	 *
-	 * @return array<string, mixed>
-	 * @throws NotFoundException
-	 * @throws IllegalStateException
-	 * @throws ValidationException
-	 */
-	private function commitInternal(
-		int $id,
-		?DateTime $requestedIssueDate,
-		?DateTime $requestedDueDate,
-	): array {
-		$invoice = $this->assertInvoiceType(
-			$this->findById($id)
-	);
-
-	$this->assertDraft($invoice);
-
-	$items = $this->itemMapper->findByInvoice(
-		(int)$invoice->getId()
-	);
-
-	if (count($items) === 0) {
-		throw new ValidationException(
-			$this->l10n->t(
-				'Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.'
-			)
-		);
-	}
-
-	if (($invoice->getRecipientName() ?? '') === '') {
-		throw new ValidationException(
-			$this->l10n->t(
-				'Ein Empfänger ist zum Festschreiben erforderlich.'
-			)
-		);
-	}
-
-	/*
-	* Settings vor der Transaktion sicherstellen.
-	* Gleichzeitig die von Upstream geforderte Absender-/Firmenprüfung durchführen.
-	*/
-	$settings = $this->settingsService->getCompany();
-	$this->assertSellerNameSet($settings);
-
-	/*
-	 * Wichtig:
-	 *
-	 * committedAt = tatsächlicher Zeitpunkt der Festschreibung
-	 *
-	 * issueDate = fachliches Rechnungsdatum
-	 */
-	$committedAt = new DateTime();
-
-	$issueDate = $requestedIssueDate !== null
-		? clone $requestedIssueDate
-		: clone $committedAt;
-
-	if ($requestedIssueDate !== null) {
-		$issueDate->setTime(0, 0, 0);
-	}
-
-	$dueDate = null;
-
-	if ($requestedDueDate !== null) {
-		$dueDate = clone $requestedDueDate;
-		$dueDate->setTime(0, 0, 0);
-	} elseif ($invoice->getPaymentTermDays() !== null) {
-		$dueDate = clone $issueDate;
-
-		$dueDate->modify(
-			'+' . (int)$invoice->getPaymentTermDays() . ' days'
-		);
-
-		$dueDate->setTime(0, 0, 0);
-	}
-
-	if (
-		$dueDate !== null
-		&& $dueDate < $issueDate
-	) {
-		throw new ValidationException(
-			$this->l10n->t(
-				'Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.'
-			)
-		);
-	}
-
-	$this->db->beginTransaction();
-
-	try {
-		/*
-		 * Datensatz unter Row-Lock erneut lesen.
-		 *
-		 * Dadurch bleibt der bisherige Schutz vor parallelen
-		 * Festschreibungen erhalten.
-		 */
-		$invoice = $this->findByIdForUpdate($id);
-
+	private function commitInternal(int $id, ?DateTime $issueDate = null, ?DateTime $dueDate = null): array {
+		$invoice = $this->assertInvoiceType($this->findById($id));
 		$this->assertDraft($invoice);
 
-		/*
-		 * Der Nummernkreis orientiert sich am tatsächlichen
-		 * Rechnungsdatum.
-		 *
-		 * Das ist insbesondere bei jahresbezogenen Nummernkreisen
-		 * wichtig.
-		 */
-		$number = $this
-			->settingsService
-			->reserveNextNumber($issueDate);
+		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
+		if (count($items) === 0) {
+			throw new ValidationException($this->l10n->t('Eine Rechnung ohne Positionen kann nicht festgeschrieben werden.'));
+		}
+		if (($invoice->getRecipientName() ?? '') === '') {
+			throw new ValidationException($this->l10n->t('Ein Empfänger ist zum Festschreiben erforderlich.'));
+		}
 
-		$invoice->setNumber($number);
-		$invoice->setStatus(
-			Invoice::STATUS_COMMITTED
-		);
+		// Create the settings row outside the transaction: a failed INSERT would
+		// otherwise abort the commit transaction on PostgreSQL.
+		$settings = $this->settingsService->getCompany();
+		$this->assertSellerNameSet($settings);
+		$this->assertIntraCommunityComplete($invoice, $settings);
 
-		$invoice->setIssueDate($issueDate);
-		$invoice->setDueDate($dueDate);
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
-		/*
-		 * Tatsächlicher Festschreibungszeitpunkt.
-		 *
-		 * Dieser darf NICHT auf das Rechnungsdatum zurückdatiert
-		 * werden.
-		 */
-		$invoice->setCommittedAt($committedAt);
-		$invoice->setUpdatedAt($committedAt);
+		$this->db->beginTransaction();
+		try {
+			// Re-read under a row lock and re-check the status inside the
+			// transaction. Two concurrent commits on the same draft would
+			// otherwise both pass the pre-check and each reserve a number,
+			// leaving a gap in the sequence (GoBD violation).
+			$invoice = $this->findByIdForUpdate($id);
+			$this->assertDraft($invoice);
 
-		$this->recomputeTotals($invoice);
-
-		$this->invoiceMapper->update($invoice);
-
-		$this->db->commit();
+			$invoiceDate = $issueDate ?? $this->clock->today();
+			$number = $this->settingsService->reserveNextNumber($invoiceDate);
+			$invoice->setNumber($number);
+			$invoice->setStatus(Invoice::STATUS_COMMITTED);
+			$invoice->setIssueDate($invoiceDate);
+			if ($issueDate !== null) {
+				$invoice->setDueDate($dueDate);
+			} elseif ($invoice->getPaymentTermDays() !== null) {
+				$due = clone $invoiceDate;
+				$due->modify('+' . (int)$invoice->getPaymentTermDays() . ' days');
+				$invoice->setDueDate($due);
+			}
+			$invoice->setCommittedAt($now);
+			$invoice->setUpdatedAt($now);
+			$this->recomputeTotals($invoice);
+			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::COMMIT, $invoice);
+			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
-		/*
-		* Ab hier bleibt das bestehende RechnungsWerk-Verhalten erhalten:
-		*
-		* - PDF einfrieren
-		* - DATEV-Automatik
-		* - Archivierung
-		*/
+		// Fire-and-forget DATEV hand-off AFTER the invoice is committed: the
+		// invoice is already legally finalised, so a mail failure must never
+		// roll it back — it is only logged. The result is surfaced to the UI.
+		// Beleg einfrieren, BEVOR er irgendwohin geht (#181, Schritt 2). Ab hier
+		// wird er nur noch gelesen, nie neu erzeugt: DATEV, Kundenversand,
+		// Download und Ablage bekommen damit garantiert dieselbe Datei.
+		//
+		// Ausserhalb der Transaktion, weil ein Dateisystem-Schreibvorgang sich
+		// nicht zurueckrollen laesst — und weil die Rechnungsnummer erst in der
+		// Transaktion entsteht, vorher gaebe es gar nichts zu rendern.
 		$this->freezeDocument($invoice);
 
 		$result = $this->present($invoice);
-
-		$result['datevMailSent'] =
-			$this->maybeSendToDatev($invoice);
-
-		$result['archived'] =
-			$this->maybeArchive($invoice);
-
+		$result['datevMailSent'] = $this->maybeSendToDatev($invoice);
+		$result['archived'] = $this->maybeArchive($invoice);
 		return $result;
 	}
 
@@ -513,9 +406,10 @@ class InvoiceService {
 	/**
 	 * Attempt the automatic DATEV hand-off for a freshly committed invoice.
 	 * Returns true if a mail was sent, false if skipped (toggle off / no
-	 * address), null if it was attempted but failed.
+	 * address), null if the mail could not be sent.
 	 */
 	private function maybeSendToDatev(Invoice $invoice): ?bool {
+		$mailSent = false;
 		try {
 			$settings = $this->settingsService->getCompany();
 			$target = $settings->getDatevUploadMail();
@@ -536,6 +430,7 @@ class InvoiceService {
 				$settings,
 				$this->settingsService->getSmtpConfig(),
 			);
+			$mailSent = true;
 			// Record the hand-off so the DATEV confirmation channel (#36) can match
 			// the reply (via In-Reply-To = this Message-ID) and flip the status.
 			$invoice->setDatevStatus(Invoice::DATEV_PENDING);
@@ -544,14 +439,17 @@ class InvoiceService {
 				$invoice->setDatevMessageId($messageId);
 			}
 			$this->invoiceMapper->update($invoice);
-			return true;
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: DATEV-Auto-Versand fehlgeschlagen', [
 				'exception' => $e,
 				'invoice' => $invoice->getId(),
 			]);
-			return null;
+			// Once the mail is out, report it as sent: a "failed" notice would invite a duplicate upload.
+			$this->auditService->recordNow($mailSent ? AuditEntry::DATEV_SEND : AuditEntry::DATEV_SEND_FAILED, $invoice);
+			return $mailSent ? true : null;
 		}
+		$this->auditService->recordNow(AuditEntry::DATEV_SEND, $invoice);
+		return true;
 	}
 
 	/**
@@ -575,6 +473,8 @@ class InvoiceService {
 		// unterscheiden, was beim Festschreiben ins Archiv ging.
 		$document = $this->documentFor($invoice);
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $document['content'], $document['filename'], $settings, $this->settingsService->getSmtpConfig());
+		// The mail is out; an audit error here must not invite a second send.
+		$this->auditService->recordNow(AuditEntry::SEND, $invoice);
 	}
 
 	/**
@@ -590,24 +490,18 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function cancel(int $id, string $userId): array {
-		$original = $this->assertInvoiceType($this->findById($id));
-		if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
-		}
+		$this->assertCancellable($this->assertInvoiceType($this->findById($id)));
 
 		$settings = $this->settingsService->getCompany();
 		$this->assertSellerNameSet($settings);
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
 			// Lock the original and re-check inside the transaction so a double
 			// cancel cannot create two storno documents for the same invoice.
-			$original = $this->findByIdForUpdate($id);
-			if ($original->getStatus() !== Invoice::STATUS_COMMITTED) {
-				throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
-			}
+			$original = $this->assertCancellable($this->findByIdForUpdate($id));
 			$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
 			$storno = new Invoice();
@@ -620,6 +514,10 @@ class InvoiceService {
 			$storno->setSellerContactPhone($original->getSellerContactPhone());
 			$storno->setSellerContactEmail($original->getSellerContactEmail());
 			$storno->setSpecialTaxCase($original->getSpecialTaxCase());
+			// Same supply as the original; an intra-community storno is invalid without it (BR-IC-11).
+			$storno->setPerformanceDate($original->getPerformanceDate());
+			$storno->setPerformancePeriodStart($original->getPerformancePeriodStart());
+			$storno->setPerformancePeriodEnd($original->getPerformancePeriodEnd());
 			$storno->setGreeting($original->getGreeting());
 			$storno->setCustomFields($original->getCustomFields());
 			// The storno corrects the original, so it carries the same business
@@ -629,11 +527,12 @@ class InvoiceService {
 			$storno->setBuyerReference($original->getBuyerReference());
 			$storno->setContractNumber($original->getContractNumber());
 			$storno->setProjectReference($original->getProjectReference());
-			$storno->setIssueDate($now);
+			$today = $this->clock->today();
+			$storno->setIssueDate($today);
 			$storno->setCommittedAt($now);
 			$storno->setCreatedAt($now);
 			$storno->setUpdatedAt($now);
-			$storno->setNumber($this->settingsService->reserveNextNumber($now));
+			$storno->setNumber($this->settingsService->reserveNextNumber($today));
 			$storno = $this->invoiceMapper->insert($storno);
 
 			foreach ($originalItems as $item) {
@@ -664,9 +563,13 @@ class InvoiceService {
 			$original->setUpdatedAt($now);
 			$this->invoiceMapper->update($original);
 
+			$this->auditService->record(AuditEntry::CANCEL, $original);
+			$this->auditService->record(AuditEntry::CANCEL_DOCUMENT, $storno);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -707,7 +610,7 @@ class InvoiceService {
 		}
 		$originalItems = $this->itemMapper->findByInvoice((int)$original->getId());
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
@@ -759,9 +662,12 @@ class InvoiceService {
 			$this->recomputeTotals($copy);
 			$this->invoiceMapper->update($copy);
 
+			$this->auditService->record(AuditEntry::DUPLICATE, $copy);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 
@@ -890,6 +796,17 @@ class InvoiceService {
 	}
 
 	/**
+	 * Foreign documents answer like missing ones, so a key cannot probe which ids exist.
+	 *
+	 * @throws NotFoundException
+	 */
+	private function assertCreatedByKey(Invoice $invoice, ?int $apiKeyId): void {
+		if ($apiKeyId !== null && $invoice->getApiKeyId() !== $apiKeyId) {
+			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
+		}
+	}
+
+	/**
 	 * Quotes (#111) share this table's id space with invoices/cancellations, so
 	 * every invoice-only entry point (the generic findById()/findByIdForUpdate()
 	 * do not filter by type) must reject a quote id here — otherwise a quote
@@ -913,6 +830,23 @@ class InvoiceService {
 			return $this->invoiceMapper->findOneForUpdate($id);
 		} catch (DoesNotExistException) {
 			throw new NotFoundException($this->l10n->t('Rechnung nicht gefunden.'));
+		}
+	}
+
+	/** Without these the e-invoice breaks BR-IC-02/BR-IC-11 and is no valid EN 16931 invoice. */
+	private function assertIntraCommunityComplete(Invoice $invoice, Settings $settings): void {
+		if ($invoice->getSpecialTaxCase() !== Invoice::SPECIAL_TAX_INTRA_COMMUNITY) {
+			return;
+		}
+		if (trim((string)$settings->getVatId()) === '') {
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).'));
+		}
+		if (trim((string)$invoice->getRecipientVatId()) === '') {
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.'));
+		}
+		if ($invoice->getPerformanceDate() === null
+			&& ($invoice->getPerformancePeriodStart() === null || $invoice->getPerformancePeriodEnd() === null)) {
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung ist ein Leistungsdatum oder ein Leistungszeitraum erforderlich.'));
 		}
 	}
 
@@ -1145,8 +1079,7 @@ class InvoiceService {
 		}
 		$validUntil = $quote->getValidUntil();
 		if ($validUntil !== null) {
-			$today = new DateTime();
-			$today->setTime(0, 0, 0);
+			$today = $this->clock->today();
 			if ($validUntil < $today) {
 				return Invoice::QUOTE_EXPIRED;
 			}
@@ -1169,8 +1102,7 @@ class InvoiceService {
 		}
 		$due = $invoice->getDueDate();
 		if ($due !== null) {
-			$today = new DateTime();
-			$today->setTime(0, 0, 0);
+			$today = $this->clock->today();
 			if ($due < $today) {
 				return Invoice::PAYMENT_OVERDUE;
 			}
@@ -1189,11 +1121,7 @@ class InvoiceService {
 	 */
 	public function markPaid(int $id, ?string $date = null): array {
 		$invoice = $this->assertPayable($this->findById($id));
-		$paidAt = $this->parseDate($date) ?? (function () {
-			$now = new DateTime();
-			$now->setTime(0, 0, 0);
-			return $now;
-		})();
+		$paidAt = $this->parseDate($date) ?? $this->clock->today();
 
 		$this->db->beginTransaction();
 		try {
@@ -1201,9 +1129,12 @@ class InvoiceService {
 			$invoice->setPaidAt($paidAt);
 			$invoice->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::PAY, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($invoice);
@@ -1226,12 +1157,29 @@ class InvoiceService {
 			$invoice->setPaidAt(null);
 			$invoice->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($invoice);
+			$this->auditService->record(AuditEntry::UNPAY, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($invoice);
+	}
+
+	/**
+	 * @throws IllegalStateException
+	 */
+	private function assertCancellable(Invoice $invoice): Invoice {
+		if ($invoice->getInvoiceType() === Invoice::TYPE_CANCELLATION) {
+			throw new IllegalStateException($this->l10n->t('Ein Stornobeleg kann nicht storniert werden.'));
+		}
+		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
+			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
+			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
+		}
+		return $invoice;
 	}
 
 	/**
@@ -1278,7 +1226,7 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function createQuote(string $userId, array $data): array {
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 		$quote = new Invoice();
 		$quote->setOwnerUserId($userId);
 		$quote->setStatus(Invoice::STATUS_DRAFT);
@@ -1296,9 +1244,12 @@ class InvoiceService {
 			$this->replaceItems($quote, $items);
 			$this->recomputeTotals($quote);
 			$this->invoiceMapper->update($quote);
+			$this->auditService->record(AuditEntry::CREATE, $quote);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($quote);
@@ -1349,7 +1300,8 @@ class InvoiceService {
 		// Create the settings row outside the transaction (see commit()).
 		$this->settingsService->getCompany();
 
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
+		$today = $this->clock->today();
 
 		$this->db->beginTransaction();
 		try {
@@ -1363,17 +1315,20 @@ class InvoiceService {
 				$quote->setNumber($this->reserveNextRevisionNumber($quote));
 				$this->markSourceSuperseded((int)$quote->getRelatedQuoteId(), $now);
 			} else {
-				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($now));
+				$quote->setNumber($this->settingsService->reserveNextQuoteNumber($today));
 			}
 			$quote->setStatus(Invoice::STATUS_COMMITTED);
-			$quote->setIssueDate($now);
+			$quote->setIssueDate($today);
 			$quote->setCommittedAt($now);
 			$quote->setUpdatedAt($now);
 			$this->recomputeTotals($quote);
 			$this->invoiceMapper->update($quote);
+			$this->auditService->record(AuditEntry::COMMIT, $quote);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($quote);
@@ -1450,6 +1405,7 @@ class InvoiceService {
 		$source->setQuoteStatus(Invoice::QUOTE_SUPERSEDED);
 		$source->setUpdatedAt($now);
 		$this->invoiceMapper->update($source);
+		$this->auditService->record(AuditEntry::SUPERSEDE, $source);
 	}
 
 	/**
@@ -1466,7 +1422,7 @@ class InvoiceService {
 	 */
 	public function reviseQuote(int $id, string $userId): array {
 		$this->assertQuoteRevisable($this->assertCommittedQuote($this->findById($id)));
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
@@ -1523,9 +1479,12 @@ class InvoiceService {
 			$this->recomputeTotals($revision);
 			$this->invoiceMapper->update($revision);
 
+			$this->auditService->record(AuditEntry::REVISE, $revision);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($revision);
@@ -1566,9 +1525,12 @@ class InvoiceService {
 			$quote->setQuoteStatus($outcome);
 			$quote->setUpdatedAt(new DateTime());
 			$this->invoiceMapper->update($quote);
+			$this->auditService->record($outcome === Invoice::QUOTE_ACCEPTED ? AuditEntry::ACCEPT : AuditEntry::REJECT, $quote);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($quote);
@@ -1586,7 +1548,7 @@ class InvoiceService {
 	 */
 	public function convertToInvoice(int $id, string $userId): array {
 		$this->assertQuoteConvertible($this->assertCommittedQuote($this->findById($id)));
-		$now = new DateTime();
+		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 
 		$this->db->beginTransaction();
 		try {
@@ -1649,9 +1611,13 @@ class InvoiceService {
 			$quote->setUpdatedAt($now);
 			$this->invoiceMapper->update($quote);
 
+			$this->auditService->record(AuditEntry::CONVERT, $quote);
+			$this->auditService->record(AuditEntry::CONVERT_DOCUMENT, $invoice);
 			$this->db->commit();
+			$this->auditService->flush();
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
+			$this->auditService->discard();
 			throw $e;
 		}
 		return $this->present($invoice);
@@ -1703,6 +1669,7 @@ class InvoiceService {
 		$items = $this->itemMapper->findByInvoice((int)$quote->getId());
 		$pdf = $this->zugferdService->generateQuotePdf($quote, $items, $settings);
 		$this->mailService->sendInvoicePdf($to, $subject, $body, $pdf, $this->quoteFileName($quote), $settings, $this->settingsService->getSmtpConfig());
+		$this->auditService->recordNow(AuditEntry::SEND, $quote);
 	}
 
 	private function quoteFileName(Invoice $quote): string {

@@ -6,6 +6,7 @@ namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Service\ClubSettingsService;
+use OCA\Rechnungswerk\Service\CompanyClock;
 use OCA\Rechnungswerk\Service\MemberDirectoryService;
 use OCA\Rechnungswerk\Service\MembershipFeeConfigurationService;
 use OCA\Rechnungswerk\Service\MembershipFeeService;
@@ -31,6 +32,7 @@ class MembershipInvoiceController extends Controller {
 		private readonly MembershipFeeConfigurationService $membershipFeeConfigurationService,
 		private readonly ClubSettingsService $clubSettingsService,
 		private readonly PermissionService $permissionService,
+		private readonly CompanyClock $clock,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -339,7 +341,7 @@ class MembershipInvoiceController extends Controller {
 		}
 
 		if ($year === 0) {
-			$year = (int)date('Y');
+			$year = (int)$this->clock->today()->format('Y');
 		}
 
 		try {
@@ -462,7 +464,7 @@ class MembershipInvoiceController extends Controller {
 		}
 
 		if ($year === 0) {
-			$year = (int)date('Y');
+			$year = (int)$this->clock->today()->format('Y');
 		}
 
 		$group = $this->getConfiguredMemberGroup();
@@ -701,7 +703,7 @@ class MembershipInvoiceController extends Controller {
 		}
 
 		if ($year === 0) {
-            $year = (int)date('Y');
+            $year = (int)$this->clock->today()->format('Y');
         }
 
         try {

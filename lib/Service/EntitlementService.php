@@ -27,8 +27,6 @@ class EntitlementService {
 		'tenants', 'inbound', 'datev_service', 'api_keys',
 		'sepa_export', 'ai_extract', 'kontingent',
 	];
-	public const EMPLOYEE_BUCKETS = ['1-5', '6-20', '21-50', '51-200', '200+'];
-	public const DEFAULT_BUCKET = '1-5';
 
 	public const STATE_NONE = 'none';
 	public const STATE_INVALID = 'invalid';
@@ -45,10 +43,11 @@ class EntitlementService {
 	/** Nach diesen Codes faellt die Instanz auf Free, das Token wird verworfen. */
 	private const DROP_TOKEN = ['KEY_REVOKED', 'KEY_EXPIRED'];
 
+	/** Size class stored before entitlement-v1 dropped it; deleted on the next successful check. */
+	private const K_LEGACY_BUCKET = 'werkplus_employee_bucket';
 	private const K_UUID = 'werkplus_instance_uuid';
 	private const K_KEY = 'werkplus_key';
 	private const K_TOKEN = 'werkplus_token';
-	private const K_BUCKET = 'werkplus_employee_bucket';
 	private const K_LAST_CHECK = 'werkplus_last_check_at';
 	private const K_LAST_ATTEMPT = 'werkplus_last_attempt_at';
 	private const K_LAST_ERROR = 'werkplus_last_error';
@@ -97,7 +96,7 @@ class EntitlementService {
 	 * @throws WerkPlusApiException
 	 * @throws \InvalidArgumentException
 	 */
-	public function activate(#[\SensitiveParameter] string $key, string $employeeBucket): void {
+	public function activate(#[\SensitiveParameter] string $key): void {
 		$key = self::normalizeKey($key);
 		if ($key === '') {
 			$key = $this->get(self::K_KEY);
@@ -105,37 +104,28 @@ class EntitlementService {
 		if ($key === '' || strlen($key) > 128 || preg_match('/^[A-Za-z0-9_]+$/', $key) !== 1) {
 			throw new \InvalidArgumentException('key');
 		}
-		if (!in_array($employeeBucket, self::EMPLOYEE_BUCKETS, true)) {
-			throw new \InvalidArgumentException('employeeBucket');
-		}
-		$this->fetchToken($key, $employeeBucket);
+		$this->fetchToken($key);
 		$this->appConfig->setValueString(Application::APP_ID, self::K_KEY, $key, sensitive: true);
-		$this->appConfig->setValueString(Application::APP_ID, self::K_BUCKET, $employeeBucket);
 	}
 
 	/**
 	 * @throws WerkPlusApiException
 	 * @throws \InvalidArgumentException
 	 */
-	public function startTrial(string $employeeBucket): string {
+	public function startTrial(): string {
 		if ($this->get(self::K_KEY) !== '') {
 			throw new \InvalidArgumentException('keySet');
-		}
-		if (!in_array($employeeBucket, self::EMPLOYEE_BUCKETS, true)) {
-			throw new \InvalidArgumentException('employeeBucket');
 		}
 		$now = $this->now();
 		$this->appConfig->setValueString(Application::APP_ID, self::K_LAST_ATTEMPT, (string)$now);
 		$response = $this->client->trial(
 			strtolower($this->getInstanceUuid()),
 			[Application::APP_ID => $this->appManager->getAppVersion(Application::APP_ID)],
-			$employeeBucket,
 		);
 
 		// Vor der Pruefung sichern: Der Server schickt den Schluessel nur dieses eine Mal.
 		$key = self::normalizeKey($response['key']);
 		$this->appConfig->setValueString(Application::APP_ID, self::K_KEY, $key, sensitive: true);
-		$this->appConfig->setValueString(Application::APP_ID, self::K_BUCKET, $employeeBucket);
 		try {
 			$this->verifier->verify($response['token'], $this->getInstanceUuid(), $now);
 		} catch (InvalidTokenException $e) {
@@ -159,7 +149,7 @@ class EntitlementService {
 		if ($key === '') {
 			throw new \InvalidArgumentException('key');
 		}
-		$this->fetchToken($key, $this->employeeBucket());
+		$this->fetchToken($key);
 	}
 
 	/** Fuer den Hintergrundjob: erneuert nur, wenn faellig, und wirft nie. */
@@ -197,7 +187,7 @@ class EntitlementService {
 	}
 
 	public function removeKey(): void {
-		foreach ([self::K_KEY, self::K_TOKEN, self::K_LAST_CHECK, self::K_LAST_ATTEMPT, self::K_LAST_ERROR] as $configKey) {
+		foreach ([self::K_KEY, self::K_TOKEN, self::K_LAST_CHECK, self::K_LAST_ATTEMPT, self::K_LAST_ERROR, self::K_LEGACY_BUCKET] as $configKey) {
 			$this->appConfig->deleteKey(Application::APP_ID, $configKey);
 		}
 		$this->current = null;
@@ -216,10 +206,10 @@ class EntitlementService {
 			'instanceUuid' => $this->getInstanceUuid(),
 			'keySet' => $key !== '',
 			'keyHint' => $key !== '' ? '…' . substr($key, -4) : null,
-			'employeeBucket' => $this->employeeBucket(),
 			'state' => $current['state'],
 			'tier' => $this->tier(),
 			'features' => $active?->features ?? [],
+			'licensedEmployees' => $active?->licensedEmployees,
 			'expiresAt' => $token !== null ? $this->iso($token->expiresAt) : null,
 			'graceUntil' => $token !== null ? $this->iso($token->graceUntil) : null,
 			'lastCheckAt' => $lastCheck > 0 ? $this->iso($lastCheck) : null,
@@ -246,7 +236,7 @@ class EntitlementService {
 	/**
 	 * @throws WerkPlusApiException
 	 */
-	private function fetchToken(#[\SensitiveParameter] string $key, string $employeeBucket): void {
+	private function fetchToken(#[\SensitiveParameter] string $key): void {
 		$now = $this->now();
 		$this->appConfig->setValueString(Application::APP_ID, self::K_LAST_ATTEMPT, (string)$now);
 		try {
@@ -254,7 +244,6 @@ class EntitlementService {
 				$key,
 				strtolower($this->getInstanceUuid()),
 				[Application::APP_ID => $this->appManager->getAppVersion(Application::APP_ID)],
-				$employeeBucket,
 			);
 			try {
 				$this->verifier->verify($response['token'], $this->getInstanceUuid(), $now);
@@ -273,6 +262,7 @@ class EntitlementService {
 		$this->appConfig->setValueString(Application::APP_ID, self::K_TOKEN, $jwt, sensitive: true);
 		$this->appConfig->setValueString(Application::APP_ID, self::K_LAST_CHECK, (string)$now);
 		$this->appConfig->deleteKey(Application::APP_ID, self::K_LAST_ERROR);
+		$this->appConfig->deleteKey(Application::APP_ID, self::K_LEGACY_BUCKET);
 		$this->current = null;
 	}
 
@@ -327,11 +317,6 @@ class EntitlementService {
 			return 'wp_' . strtoupper(substr($key, 3));
 		}
 		return strtoupper($key);
-	}
-
-	private function employeeBucket(): string {
-		$bucket = $this->get(self::K_BUCKET);
-		return in_array($bucket, self::EMPLOYEE_BUCKETS, true) ? $bucket : self::DEFAULT_BUCKET;
 	}
 
 	private function get(string $configKey): string {

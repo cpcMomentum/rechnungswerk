@@ -72,7 +72,7 @@
 								<component :is="datevIcon(inv.datevStatus)" v-if="datevColumnActive && inv.datevStatus && datevIcon(inv.datevStatus)" :size="18" :class="['rw-sicon', `rw-sicon--datev-${inv.datevStatus}`]" :title="datevTitle(inv.datevStatus)" />
 							</span>
 						</td>
-						<td>
+						<td class="rw-nowrap">
 							{{ inv.number ?? t('rechnungswerk', '(Entwurf)') }}
 							<span v-if="inv.invoiceType !== 'invoice'" v-tooltip="typeTooltip(inv)" class="rw-pill">{{ typeLabel(inv.invoiceType) }}</span>
 						</td>

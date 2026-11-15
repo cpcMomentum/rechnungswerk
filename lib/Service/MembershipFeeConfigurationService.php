@@ -843,6 +843,7 @@ final class MembershipFeeConfigurationService {
 	}
 
 	private function now(): DateTime {
+		// tz-ok: Persisted timestamp, independent of the company's calendar.
 		return new DateTime(
 			'now',
 			new DateTimeZone('UTC')

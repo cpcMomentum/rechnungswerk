@@ -350,7 +350,7 @@ final class MembershipInvoiceMailService {
 		 * Erst jetzt darf STATUS_SENT gespeichert werden.
 		 */
 		try {
-			$now = new \DateTime();
+			$now = new \DateTime(); // tz-ok: Persisted timestamp for mail processing.
 
 			$state->setStatus(
 				MembershipInvoiceMail::STATUS_SENT
@@ -642,7 +642,7 @@ final class MembershipInvoiceMailService {
 				 *
 				 * Erst jetzt darf STATUS_SENDING angelegt werden.
 				 */
-				$now = new \DateTime();
+				$now = new \DateTime(); // tz-ok: Persisted timestamp for mail processing.
 
 				$state =
 					new MembershipInvoiceMail();
@@ -786,7 +786,7 @@ final class MembershipInvoiceMailService {
 		\Throwable $error,
 	): void {
 		try {
-			$now = new \DateTime();
+			$now = new \DateTime(); // tz-ok: Persisted timestamp for mail processing.
 
 			$state->setStatus(
 				MembershipInvoiceMail::STATUS_FAILED
@@ -830,7 +830,7 @@ final class MembershipInvoiceMailService {
 		\Throwable $error,
 	): void {
 		try {
-			$now = new \DateTime();
+			$now = new \DateTime(); // tz-ok: Persisted timestamp for mail processing.
 
 			$state->setUpdatedAt(
 				$now
