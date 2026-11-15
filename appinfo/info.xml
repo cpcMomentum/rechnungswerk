@@ -22,6 +22,13 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - **Produktkatalog** — wiederkehrende Leistungen einmal pflegen
 - **Stammdaten** — Firmendaten, Logo, Standardtexte, Nummernformat, Kleinunternehmer §19
 
+## Vereinsmodus (optional)
+
+Für die Aktivierung des Vereinsmodus muss die Nextcloud-App **Profile fields**
+installiert und aktiviert sein. Die Mitgliedergruppe wird unter **Einstellungen › Verein**
+ausgewählt. Beitragsgruppen und Beitragsarten werden unter **Beitragsabrechnung**
+eingerichtet.
+
 ## WerkPlus (optional)
 
 RechnungsWerk ist kostenlos und Open Source (AGPL-3.0-or-later).
