@@ -618,7 +618,15 @@
 		"Automatisch": "Automatic",
 		"Unbekannte Zeitzone.": "Unknown time zone.",
 		"Lizenzierte Mitarbeitende": "Licensed employees",
-		"Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "The identifier of this installation, the RechnungsWerk version and, once available, the key. Not transmitted: invoices, customers or other document data, personal data, Nextcloud users or files."
+		"Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "The identifier of this installation, the RechnungsWerk version and, once available, the key. Not transmitted: invoices, customers or other document data, personal data, Nextcloud users or files.",
+		"Beitragsabrechnung": "Membership fee billing",
+		"Verein": "Club",
+		"Vereinsmodus aktivieren": "Activate club mode",
+		"Mitgliedergruppe": "Member group",
+		"Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "The due date must not be before the invoice date.",
+		"RechnungsWerk Navigation": "RechnungsWerk navigation",
+		"Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.": "Choose the member group here. Then configure Nextcloud fee groups and fee types under Membership fee billing. The available types come from the Fee type profile field.",
+		"Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.": "Install and enable the Profile fields app in Nextcloud. Then choose the member group here and configure fee groups and fee types under Membership fee billing. The available types come from the Fee type profile field."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

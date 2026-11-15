@@ -14,6 +14,14 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 - Produktkatalog für wiederkehrende Leistungen
 - Stammdaten/Einstellungen (Nummernformat, Firmendaten, Logo, Standardtexte, §19)
 
+## Vereinsmodus (optional)
+
+Voraussetzung für die Aktivierung des Vereinsmodus ist die installierte und
+aktivierte Nextcloud-App **Profile fields**. Wähle unter **Einstellungen › Verein**
+die Mitgliedergruppe und konfiguriere anschließend unter **Beitragsabrechnung**
+die Beitragsgruppen und Beitragsarten. Die auswählbaren Beitragsarten stammen
+aus dem Profilfeld `beitragsart`.
+
 ## Entwicklung
 
 ```bash

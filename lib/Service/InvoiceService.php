@@ -222,6 +222,20 @@ class InvoiceService {
 	 * @throws ValidationException
 	 */
 	public function commit(int $id): array {
+		return $this->commitInternal($id);
+	}
+
+	public function commitWithDates(int $id, DateTime $issueDate, ?DateTime $dueDate = null): array {
+		$issueDate = (clone $issueDate)->setTime(0, 0);
+		$dueDate = $dueDate === null ? null : (clone $dueDate)->setTime(0, 0);
+		if ($dueDate !== null && $dueDate < $issueDate) {
+			throw new ValidationException($this->l10n->t('Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.'));
+		}
+
+		return $this->commitInternal($id, $issueDate, $dueDate);
+	}
+
+	private function commitInternal(int $id, ?DateTime $issueDate = null, ?DateTime $dueDate = null): array {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		$this->assertDraft($invoice);
 
@@ -250,13 +264,15 @@ class InvoiceService {
 			$invoice = $this->findByIdForUpdate($id);
 			$this->assertDraft($invoice);
 
-			$today = $this->clock->today();
-			$number = $this->settingsService->reserveNextNumber($today);
+			$invoiceDate = $issueDate ?? $this->clock->today();
+			$number = $this->settingsService->reserveNextNumber($invoiceDate);
 			$invoice->setNumber($number);
 			$invoice->setStatus(Invoice::STATUS_COMMITTED);
-			$invoice->setIssueDate($today);
-			if ($invoice->getPaymentTermDays() !== null) {
-				$due = (clone $today);
+			$invoice->setIssueDate($invoiceDate);
+			if ($issueDate !== null) {
+				$invoice->setDueDate($dueDate);
+			} elseif ($invoice->getPaymentTermDays() !== null) {
+				$due = clone $invoiceDate;
 				$due->modify('+' . (int)$invoice->getPaymentTermDays() . ' days');
 				$invoice->setDueDate($due);
 			}

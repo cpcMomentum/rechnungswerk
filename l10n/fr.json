@@ -618,7 +618,15 @@
 		"Automatisch": "Automatique",
 		"Unbekannte Zeitzone.": "Fuseau horaire inconnu.",
 		"Lizenzierte Mitarbeitende": "Collaborateurs sous licence",
-		"Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "L’identifiant de cette installation, la version de RechnungsWerk et, dès qu’elle existe, la clé. Ne sont pas transmis : factures, clients ou autres données de documents, données personnelles, utilisateurs ou fichiers Nextcloud."
+		"Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.": "L’identifiant de cette installation, la version de RechnungsWerk et, dès qu’elle existe, la clé. Ne sont pas transmis : factures, clients ou autres données de documents, données personnelles, utilisateurs ou fichiers Nextcloud.",
+		"Beitragsabrechnung": "Facturation des cotisations",
+		"Verein": "Association",
+		"Vereinsmodus aktivieren": "Activer le mode association",
+		"Mitgliedergruppe": "Groupe de membres",
+		"Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "La date d'échéance ne peut pas être antérieure à la date de facturation.",
+		"RechnungsWerk Navigation": "Navigation de RechnungsWerk",
+		"Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.": "Choisissez ici le groupe des membres. Configurez ensuite les groupes et types de cotisation dans la section Facturation des cotisations. Les types disponibles proviennent du champ de profil Type de cotisation.",
+		"Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.": "Installez et activez Profile fields dans Nextcloud. Sélectionnez ici le groupe des membres et configurez les groupes et types dans la section Facturation des cotisations. Les types disponibles proviennent du champ de profil Type de cotisation."
 	},
 	"pluralForm": "nplurals=2; plural=(n > 1);"
 }
