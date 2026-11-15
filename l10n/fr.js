@@ -544,6 +544,8 @@ OC.L10N.register(
     "Vereinsmodus aktivieren" : "Activer le mode association",
     "Mitgliedergruppe" : "Groupe de membres",
     "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen." : "La date d'échéance ne peut pas être antérieure à la date de facturation.",
-    "RechnungsWerk Navigation" : "Navigation de RechnungsWerk"
+    "RechnungsWerk Navigation" : "Navigation de RechnungsWerk",
+    "Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“." : "Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.",
+    "Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“." : "Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“."
 },
 "nplurals=2; plural=(n > 1);");

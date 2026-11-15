@@ -8,12 +8,13 @@ import { apiGet, apiPut } from './client'
 export interface ClubSettings {
 	clubMode: boolean
 	memberGroup: string | null
+	profileFieldsAvailable: boolean
 }
 
 export const getClubSettings = (): Promise<ClubSettings> =>
 	apiGet<ClubSettings>('/club-settings')
 
 export const saveClubSettings = (
-	data: ClubSettings,
+	data: Pick<ClubSettings, 'clubMode' | 'memberGroup'>,
 ): Promise<ClubSettings> =>
-	apiPut<ClubSettings, ClubSettings>('/club-settings', data)
+	apiPut<ClubSettings, typeof data>('/club-settings', data)

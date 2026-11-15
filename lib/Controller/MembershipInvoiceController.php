@@ -405,6 +405,16 @@ class MembershipInvoiceController extends Controller {
 		}
 
 		try {
+			$membershipTypes = $this->profileFieldsService->getMembershipTypes();
+			foreach (array_keys($membershipRules) as $membershipType) {
+				if (!in_array((string)$membershipType, $membershipTypes, true)) {
+					throw new \InvalidArgumentException(sprintf(
+						'Die Beitragsart „%s“ ist im Profilfeld nicht auswählbar.',
+						$membershipType
+					));
+				}
+			}
+
 			$result = $this
 				->membershipFeeConfigurationService
 				->saveDraft(

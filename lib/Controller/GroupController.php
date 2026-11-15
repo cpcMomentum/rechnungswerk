@@ -52,7 +52,7 @@ class GroupController extends Controller {
 
 			$groups[] = [
 				'id' => $groupId,
-				'displayName' => $groupId,
+				'displayName' => $group->getDisplayName(),
 			];
 		}
 

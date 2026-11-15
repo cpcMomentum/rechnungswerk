@@ -72,10 +72,9 @@
 					<label class="field">
 						<span>Vereinsgruppe</span>
 						<input
-							v-model.trim="group"
+							:value="group"
 							type="text"
-							:disabled="busy"
-							@keyup.enter="loadConfiguration">
+							readonly>
 					</label>
 				</div>
 
@@ -199,11 +198,18 @@
 								v-for="(row, index) in groupFeeRows"
 								:key="index">
 								<td>
-									<input
-										v-model.trim="row.name"
-										type="text"
-										:disabled="formDisabled"
-										placeholder="z. B. 50nY">
+									<select
+										v-model="row.name"
+										aria-label="Beitragsgruppe"
+										:disabled="formDisabled || groupOptions.length === 0">
+										<option value="" disabled>Beitragsgruppe auswählen</option>
+										<option v-if="row.name && !groupLabels.has(row.name)" :value="row.name" disabled>
+											{{ row.name }} (bisheriger Eintrag)
+										</option>
+										<option v-for="option in groupOptions" :key="option.id" :value="option.id">
+											{{ option.displayName }}
+										</option>
+									</select>
 								</td>
 
 								<td>
@@ -259,6 +265,10 @@
 					</NcButton>
 				</div>
 
+				<p v-if="membershipTypesError" class="message message--error" role="alert">
+					{{ membershipTypesError }}
+				</p>
+
 				<div class="table-wrapper">
 					<table class="config-table">
 						<thead>
@@ -275,11 +285,18 @@
 								v-for="(row, index) in membershipRuleRows"
 								:key="index">
 								<td>
-									<input
-										v-model.trim="row.name"
-										type="text"
-										:disabled="formDisabled"
-										placeholder="z. B. Vollmitglied">
+									<select
+										v-model="row.name"
+										aria-label="Beitragsart"
+										:disabled="formDisabled || membershipTypes.length === 0">
+										<option value="" disabled>Beitragsart auswählen</option>
+										<option v-if="row.name && !membershipTypes.includes(row.name)" :value="row.name" disabled>
+											{{ row.name }} (bisheriger Eintrag)
+										</option>
+										<option v-for="type in membershipTypes" :key="type" :value="type">
+											{{ type }}
+										</option>
+									</select>
 								</td>
 
 								<td>
@@ -467,6 +484,9 @@
 											:class="`member-status--${member.status}`">
 											{{ memberStatusLabel(member) }}
 										</span>
+										<small v-if="member.feeError" class="member-detail">
+											{{ member.feeError }}
+										</small>
 									</td>
 								</tr>
 							</tbody>
@@ -543,6 +563,8 @@ import { computed, onMounted, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { apiGet, apiPost } from '@/api/client'
+import { getClubStatus } from '@/api/clubStatus'
+import { getGroups, type GroupOption } from '@/api/groups'
 import type { ApiError } from '@/types/api'
 
 type RunStatus = 'draft' | 'processing' | 'completed'
@@ -661,7 +683,9 @@ interface MembershipRuleRow {
 const currentYear = new Date().getFullYear()
 
 const year = ref(currentYear)
-const group = ref('LHReV')
+const group = ref('')
+const groupOptions = ref<GroupOption[]>([])
+const groupLabels = computed(() => new Map(groupOptions.value.map(({ id, displayName }) => [id, displayName])))
 
 const run = ref<FeeRun | null>(null)
 const batch = ref<Batch | null>(null)
@@ -675,6 +699,8 @@ const taxRateBp = ref(0)
 
 const groupFeeRows = ref<GroupFeeRow[]>([])
 const membershipRuleRows = ref<MembershipRuleRow[]>([])
+const membershipTypes = ref<string[]>([])
+const membershipTypesError = ref('')
 
 const loading = ref(true)
 const previewLoading = ref(false)
@@ -762,6 +788,22 @@ const canCreateInvoices = computed(() => {
 
 onMounted(async () => {
 	recalculateDueDate()
+	const [clubStatus, groups] = await Promise.allSettled([
+		getClubStatus(true),
+		getGroups(),
+	])
+	if (groups.status === 'fulfilled') {
+		groupOptions.value = groups.value
+	}
+	if (clubStatus.status === 'rejected') {
+		showError((clubStatus.reason as ApiError).message)
+		loading.value = false
+		return
+	}
+	group.value = clubStatus.value.memberGroup ?? ''
+	membershipTypes.value = clubStatus.value.membershipTypes ?? []
+	membershipTypesError.value = clubStatus.value.membershipTypesError
+		?? (membershipTypes.value.length ? '' : 'Die Beitragsarten konnten nicht geladen werden.')
 	await loadConfiguration()
 })
 
@@ -769,7 +811,8 @@ async function loadConfiguration(): Promise<void> {
 	clearMessage()
 
 	if (!group.value.trim()) {
-		showError('Bitte eine Vereinsgruppe angeben.')
+		showError('Bitte zuerst eine Mitgliedergruppe in den Vereinseinstellungen auswählen.')
+		loading.value = false
 		return
 	}
 
@@ -1143,7 +1186,11 @@ function validateConfiguration(): string | null {
 		const name = row.name.trim()
 
 		if (!name) {
-			return 'Eine Beitragsgruppe hat keinen Namen.'
+			return 'Bitte für jeden Jahresbeitrag eine Nextcloud-Gruppe auswählen.'
+		}
+
+		if (!groupLabels.value.has(name)) {
+			return `Bitte eine gültige Nextcloud-Gruppe für "${name}" auswählen.`
 		}
 
 		if (seenGroups.has(name)) {
@@ -1161,13 +1208,21 @@ function validateConfiguration(): string | null {
 		return 'Mindestens eine Beitragsart ist erforderlich.'
 	}
 
+	if (membershipTypesError.value) {
+		return membershipTypesError.value
+	}
+
 	const seenRules = new Set<string>()
 
 	for (const row of membershipRuleRows.value) {
 		const name = row.name.trim()
 
 		if (!name) {
-			return 'Eine Beitragsart hat keinen Namen.'
+			return 'Bitte eine Beitragsart aus dem Profilfeld auswählen.'
+		}
+
+		if (!membershipTypes.value.includes(name)) {
+			return `Bitte für "${name}" eine gültige Beitragsart auswählen.`
 		}
 
 		if (seenRules.has(name)) {

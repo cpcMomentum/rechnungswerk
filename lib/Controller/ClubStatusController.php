@@ -12,6 +12,7 @@ namespace OCA\Rechnungswerk\Controller;
 use OCA\Rechnungswerk\AppInfo\Application;
 use OCA\Rechnungswerk\Service\ClubSettingsService;
 use OCA\Rechnungswerk\Service\PermissionService;
+use OCA\Rechnungswerk\Service\ProfileFieldsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -24,13 +25,14 @@ class ClubStatusController extends Controller {
 		IRequest $request,
 		private readonly ?string $userId,
 		private readonly ClubSettingsService $clubSettingsService,
-		private readonly PermissionService $permissionService
+		private readonly PermissionService $permissionService,
+		private readonly ProfileFieldsService $profileFieldsService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
 	#[NoAdminRequired]
-	public function show(): DataResponse {
+	public function show(bool $includeMembershipTypes = false): DataResponse {
 		if ($this->userId === null) {
 			return new DataResponse(
 				['error' => 'Not authenticated'],
@@ -47,8 +49,18 @@ class ClubStatusController extends Controller {
 
 		$settings = $this->clubSettingsService->get();
 
-		return new DataResponse([
+		$data = [
 			'clubMode' => $settings['clubMode'],
-		]);
+			'memberGroup' => $settings['memberGroup'],
+		];
+		if ($includeMembershipTypes && $settings['clubMode']) {
+			try {
+				$data['membershipTypes'] = $this->profileFieldsService->getMembershipTypes();
+			} catch (\RuntimeException | \JsonException $e) {
+				$data['membershipTypesError'] = $e->getMessage();
+			}
+		}
+
+		return new DataResponse($data);
 	}
 }

@@ -17,35 +17,45 @@ class ClubSettingsService {
 
 	public function __construct(
 		private readonly ClubSettingsMapper $mapper,
-		private readonly IGroupManager $groupManager
+		private readonly IGroupManager $groupManager,
+		private readonly ProfileFieldsService $profileFieldsService,
 	) {
 	}
 
 	/**
 	 * @return array{
 	 *     clubMode: bool,
-	 *     memberGroup: string|null
+	 *     memberGroup: string|null,
+	 *     profileFieldsAvailable: bool,
 	 * }
 	 */
 	public function get(): array {
 		$settings = $this->mapper->findCompany();
+		$profileFieldsAvailable = $this->profileFieldsService->isAvailable();
 
 		return [
-			'clubMode' => (bool)$settings->getClubMode(),
+			'clubMode' => (bool)$settings->getClubMode() && $profileFieldsAvailable,
 			'memberGroup' => $settings->getMemberGroup(),
+			'profileFieldsAvailable' => $profileFieldsAvailable,
 		];
 	}
 
 	/**
 	 * @return array{
 	 *     clubMode: bool,
-	 *     memberGroup: string|null
+	 *     memberGroup: string|null,
+	 *     profileFieldsAvailable: bool,
 	 * }
 	 */
 	public function save(
 		bool $clubMode,
 		?string $memberGroup
 	): array {
+		$profileFieldsAvailable = $this->profileFieldsService->isAvailable();
+		if ($clubMode && !$profileFieldsAvailable) {
+			throw new InvalidArgumentException('Install and enable the Profile fields app before activating club mode.');
+		}
+
 		$memberGroup = $memberGroup !== null
 			? trim($memberGroup)
 			: null;
@@ -79,6 +89,7 @@ class ClubSettingsService {
 		return [
 			'clubMode' => (bool)$settings->getClubMode(),
 			'memberGroup' => $settings->getMemberGroup(),
+			'profileFieldsAvailable' => $profileFieldsAvailable,
 		];
 	}
 }

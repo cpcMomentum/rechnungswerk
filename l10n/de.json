@@ -543,7 +543,9 @@
 		"Vereinsmodus aktivieren": "Vereinsmodus aktivieren",
 		"Mitgliedergruppe": "Mitgliedergruppe",
 		"Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.": "Das Fälligkeitsdatum darf nicht vor dem Rechnungsdatum liegen.",
-		"RechnungsWerk Navigation": "RechnungsWerk Navigation"
+		"RechnungsWerk Navigation": "RechnungsWerk Navigation",
+		"Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.": "Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.",
+		"Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.": "Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“."
 	},
 	"pluralForm": "nplurals=2; plural=(n != 1);"
 }

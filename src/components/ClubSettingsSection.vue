@@ -5,10 +5,15 @@
 		<NcCheckboxRadioSwitch
 			type="switch"
 			:modelValue="clubMode"
-			:disabled="loading || saving"
+			:disabled="loading || saving || !profileFieldsAvailable"
 			@update:modelValue="onToggleClubMode">
 			{{ t('rechnungswerk', 'Vereinsmodus aktivieren') }}
 		</NcCheckboxRadioSwitch>
+
+		<NcNoteCard
+			v-if="!loading"
+			type="info"
+			:text="clubSetupHint" />
 
 		<label v-if="clubMode" class="rw-field rw-club-group">
 			<span>{{ t('rechnungswerk', 'Mitgliedergruppe') }}</span>
@@ -55,6 +60,7 @@ import { useClubStatusStore } from '@/stores/clubStatusStore'
 const clubStatusStore = useClubStatusStore()
 
 const clubMode = ref(false)
+const profileFieldsAvailable = ref(false)
 const memberGroup = ref<string | null>(null)
 
 const groupOptions = ref<GroupOption[]>([])
@@ -63,6 +69,9 @@ const loading = ref(false)
 const groupsLoading = ref(false)
 const saving = ref(false)
 const error = ref('')
+const clubSetupHint = computed(() => profileFieldsAvailable.value
+	? t('rechnungswerk', 'Wähle hier die Mitgliedergruppe. Lege die Nextcloud-Beitragsgruppen und die Beitragsarten anschließend unter Beitragsabrechnung fest. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.')
+	: t('rechnungswerk', 'Installiere und aktiviere in Nextcloud die App „Profile fields“. Wähle danach hier die Mitgliedergruppe und konfiguriere unter Beitragsabrechnung die Beitragsgruppen und Beitragsarten. Die verfügbaren Beitragsarten stammen aus dem Profilfeld „Beitragsart“.'))
 
 const selectedGroup = computed<GroupOption | null>({
 	get() {
@@ -84,6 +93,9 @@ const selectedGroup = computed<GroupOption | null>({
 })
 
 const canSave = computed(() => {
+	if (!profileFieldsAvailable.value) {
+		return false
+	}
 	if (!clubMode.value) {
 		return true
 	}
@@ -104,6 +116,7 @@ async function load(): Promise<void> {
 
 		clubMode.value = settings.clubMode
 		memberGroup.value = settings.memberGroup
+		profileFieldsAvailable.value = settings.profileFieldsAvailable
 
 		// Zentralen Status synchronisieren, damit Navigation und spätere
 		// Router-Prüfungen denselben Vereinsmodus verwenden.
@@ -141,6 +154,7 @@ async function save(): Promise<void> {
 
 		clubMode.value = settings.clubMode
 		memberGroup.value = settings.memberGroup
+		profileFieldsAvailable.value = settings.profileFieldsAvailable
 
 		// Erst nach erfolgreichem Speichern den globalen Status ändern.
 		// Dadurch verschwindet/erscheint die Beitragsabrechnung sofort.

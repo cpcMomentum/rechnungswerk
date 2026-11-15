@@ -7,7 +7,10 @@ import { apiGet } from './client'
 
 export interface ClubStatus {
 	clubMode: boolean
+	memberGroup: string | null
+	membershipTypes?: string[]
+	membershipTypesError?: string
 }
 
-export const getClubStatus = (): Promise<ClubStatus> =>
-	apiGet<ClubStatus>('/club-status')
+export const getClubStatus = (includeMembershipTypes = false): Promise<ClubStatus> =>
+	apiGet<ClubStatus>(includeMembershipTypes ? '/club-status?includeMembershipTypes=1' : '/club-status')

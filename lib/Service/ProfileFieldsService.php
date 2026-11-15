@@ -37,6 +37,25 @@ final class ProfileFieldsService {
 	) {
 	}
 
+	/** @return list<string> */
+	public function getMembershipTypes(): array {
+		$this->ensureProfileFieldsAvailable();
+
+		/** @var FieldDefinitionService $definitionService */
+		$definitionService = $this->container->get(FieldDefinitionService::class);
+		$definition = $definitionService->findByFieldKey('beitragsart');
+		if ($definition === null || !$definition->getActive() || $definition->getType() !== 'select') {
+			throw new RuntimeException('Das Profilfeld „Beitragsart“ muss ein aktives Auswahlfeld sein.');
+		}
+
+		$options = json_decode($definition->getOptions() ?? '[]', true, 512, JSON_THROW_ON_ERROR);
+		if (!is_array($options) || !array_is_list($options) || $options === []) {
+			throw new RuntimeException('Im Profilfeld „Beitragsart“ sind keine Auswahlwerte hinterlegt.');
+		}
+
+		return $options;
+	}
+
 	public function getMemberData(string $userUid): array {
 		$user = $this->userManager->get($userUid);
 
@@ -164,12 +183,12 @@ final class ProfileFieldsService {
 		return $data;
 	}
 
+	public function isAvailable(): bool {
+		return $this->appManager->isEnabledForUser(self::APP_ID);
+	}
+
 	private function ensureProfileFieldsAvailable(): void {
-		/*
-		 * isInstalled() ist in neueren Nextcloud-Versionen deprecated,
-		 * funktioniert aber weiterhin und hält uns kompatibel zu NC 31.
-		 */
-		if (!$this->appManager->isInstalled(self::APP_ID)) {
+		if (!$this->isAvailable()) {
 			throw new RuntimeException(
 				'Die Nextcloud-App "profile_fields" ist nicht aktiviert.'
 			);

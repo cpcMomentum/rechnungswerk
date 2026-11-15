@@ -12,6 +12,7 @@ use OCA\Rechnungswerk\Db\MembershipFeeRun;
 use OCA\Rechnungswerk\Db\MembershipFeeRunMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IDBConnection;
+use OCP\IGroupManager;
 use RuntimeException;
 
 final class MembershipFeeConfigurationService {
@@ -20,6 +21,7 @@ final class MembershipFeeConfigurationService {
 		private readonly MembershipFeeRunMapper $runMapper,
 		private readonly MembershipFeeRuleMapper $ruleMapper,
 		private readonly IDBConnection $db,
+		private readonly IGroupManager $groupManager,
 	) {
 	}
 
@@ -400,7 +402,13 @@ final class MembershipFeeConfigurationService {
 
 			if ($groupId === '') {
 				throw new RuntimeException(
-					'Eine Beitragsgruppe besitzt keinen Namen.'
+					'Bitte eine Nextcloud-Gruppe als Beitragsgruppe auswählen.'
+				);
+			}
+
+			if (!$this->groupManager->groupExists($groupId)) {
+				throw new RuntimeException(
+					sprintf('Die Beitragsgruppe "%s" existiert nicht.', $groupId)
 				);
 			}
 
