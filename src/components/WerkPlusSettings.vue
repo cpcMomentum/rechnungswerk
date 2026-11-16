@@ -6,11 +6,13 @@
 	<div class="rw-werkplus">
 		<p class="rw-hint">
 			{{ t('rechnungswerk', 'Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist.') }}
+			{{ t('rechnungswerk', 'Der Schlüssel gilt für alle Werk-Apps dieser Nextcloud und muss nur in einer davon eingetragen werden.') }}
 		</p>
 
 		<NcNoteCard v-if="loadError" type="error" :text="loadError" />
 
 		<template v-if="status">
+			<NcNoteCard v-if="status.storeTooNew" type="warning" :text="t('rechnungswerk', 'Eine andere Werk-App hat die Lizenz in einem neueren Format gespeichert. Bitte aktualisiere RechnungsWerk.')" />
 			<NcNoteCard v-if="stateNote" :type="stateNote.type" :text="stateNote.text" />
 			<NcNoteCard v-if="trialKey" type="success" class="rw-werkplus__trial-key">
 				<p v-if="licenseActive">{{ t('rechnungswerk', 'Der Testzeitraum läuft. Das ist dein WerkPlus-Schlüssel:') }}</p>
@@ -39,7 +41,11 @@
 				<dd>{{ status.keyHint }}</dd>
 			</dl>
 
-			<label class="rw-field"><span>{{ t('rechnungswerk', 'WerkPlus-Schlüssel') }}</span>
+			<p v-if="!status.canManage && !status.storeTooNew" class="rw-hint">
+				{{ t('rechnungswerk', 'Den Schlüssel können nur Nextcloud-Admins eintragen oder entfernen, weil er für alle Werk-Apps dieser Nextcloud gilt.') }}
+			</p>
+
+			<label v-if="canEdit" class="rw-field"><span>{{ t('rechnungswerk', 'WerkPlus-Schlüssel') }}</span>
 				<input v-model="keyInput"
 					class="rw-input"
 					type="text"
@@ -48,32 +54,32 @@
 					:placeholder="status.keySet ? t('rechnungswerk', 'gespeichert, leer lassen') : 'wp_…'" /></label>
 
 			<div class="rw-werkplus__actions">
-				<NcButton variant="primary" :disabled="busy || (!keyInput.trim() && !status.keySet)" @click="onActivate">
+				<NcButton v-if="canEdit" variant="primary" :disabled="busy || (!keyInput.trim() && !status.keySet)" @click="onActivate">
 					{{ status.keySet ? t('rechnungswerk', 'Speichern und prüfen') : t('rechnungswerk', 'Schlüssel prüfen und speichern') }}
 				</NcButton>
-				<NcButton v-if="!status.keySet" :disabled="busy" @click="confirmTrial = true">
+				<NcButton v-if="canEdit && !status.keySet" :disabled="busy" @click="confirmTrial = true">
 					{{ t('rechnungswerk', '30 Tage testen') }}
 				</NcButton>
-				<NcButton v-if="status.keySet" :disabled="busy" @click="onRefresh">
+				<NcButton v-if="status.keySet && !status.storeTooNew" :disabled="busy" @click="onRefresh">
 					{{ t('rechnungswerk', 'Jetzt prüfen') }}
 				</NcButton>
-				<NcButton v-if="status.keySet" variant="tertiary" :disabled="busy" @click="confirmRemove = true">
+				<NcButton v-if="canEdit && status.keySet" variant="tertiary" :disabled="busy" @click="confirmRemove = true">
 					{{ t('rechnungswerk', 'Schlüssel entfernen') }}
 				</NcButton>
 			</div>
 
 			<div class="rw-werkplus__privacy">
 				<span class="rw-werkplus__label">{{ t('rechnungswerk', 'Was an WerkPlus übertragen wird') }}</span>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Die Kennung dieser Installation, die Version von RechnungsWerk und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer oder Dateien.') }}</p>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Eine aus dieser Nextcloud abgeleitete Kennung, die Versionen der installierten Werk-Apps und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer- oder Datei-IDs.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter.') }}</p>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Kennung dieser Installation:') }} <code>{{ status.instanceUuid }}</code></p>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Kennung dieser Nextcloud:') }} <code>{{ status.instanceUuid }}</code></p>
 			</div>
 		</template>
 
 		<ConfirmDialog
 			:open="confirmTrial"
 			:name="t('rechnungswerk', 'WerkPlus 30 Tage testen')"
-			:message="t('rechnungswerk', 'Der Testzeitraum läuft 30 Tage, braucht keine Zahlungsdaten und ist je Installation nur einmal möglich. Jetzt starten?')"
+			:message="t('rechnungswerk', 'Der Testzeitraum läuft 30 Tage, braucht keine Zahlungsdaten, gilt für alle Werk-Apps dieser Nextcloud und ist je Nextcloud nur einmal möglich. Jetzt starten?')"
 			:confirmLabel="t('rechnungswerk', 'Testzeitraum starten')"
 			@close="confirmTrial = false"
 			@confirm="onTrial" />
@@ -81,7 +87,7 @@
 		<ConfirmDialog
 			:open="confirmRemove"
 			:name="t('rechnungswerk', 'WerkPlus-Schlüssel entfernen')"
-			:message="t('rechnungswerk', 'RechnungsWerk arbeitet danach im freien Umfang. Den Schlüssel kannst du jederzeit wieder eintragen. Fortfahren?')"
+			:message="t('rechnungswerk', 'Der Schlüssel wird für alle Werk-Apps dieser Nextcloud entfernt, sie arbeiten danach im freien Umfang. Den Schlüssel kannst du jederzeit wieder eintragen. Fortfahren?')"
 			:confirmLabel="t('rechnungswerk', 'Entfernen')"
 			@close="confirmRemove = false"
 			@confirm="onRemove" />
@@ -115,6 +121,8 @@ const confirmTrial = ref(false)
 
 // Kein Fehler im eigentlichen Sinn, der Vertrag verlangt eine ruhige Anzeige.
 const CALM_CODES = ['TRIAL_ALREADY_USED']
+
+const canEdit = computed(() => status.value?.canManage === true && !status.value.storeTooNew)
 
 const licenseActive = computed(() => status.value?.state === 'valid' || status.value?.state === 'grace')
 

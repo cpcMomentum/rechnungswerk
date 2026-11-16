@@ -29,9 +29,10 @@ class LicenseControllerTrialTest extends TestCase {
 		$this->entitlement->method('getStatus')->willReturn(['keySet' => true, 'lastError' => null]);
 	}
 
-	private function controller(bool $admin = true): LicenseController {
+	private function controller(bool $admin = true, ?bool $nextcloudAdmin = null): LicenseController {
 		$permissions = $this->createMock(PermissionService::class);
 		$permissions->method('isAdmin')->willReturn($admin);
+		$permissions->method('isNextcloudAdmin')->willReturn($nextcloudAdmin ?? $admin);
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(fn (string $text) => $text);
 		return new LicenseController($this->createMock(IRequest::class), 'admin', $permissions, $this->entitlement, $l10n);
@@ -64,7 +65,8 @@ class LicenseControllerTrialTest extends TestCase {
 	 */
 	public static function trialErrors(): array {
 		return [
-			'schon genutzt' => ['TRIAL_ALREADY_USED', 'bereits genutzt'],
+			'schon genutzt' => ['TRIAL_ALREADY_USED', 'Für diese Nextcloud wurde bereits ein Testzeitraum genutzt'],
+			'andere Nextcloud' => ['INSTANCE_LIMIT_REACHED', 'Kundenportal'],
 			'abgeschaltet' => ['TRIAL_UNAVAILABLE', 'werkwolke.de/testen'],
 			'gebremst' => ['RATE_LIMITED', 'später erneut'],
 		];
@@ -78,5 +80,37 @@ class LicenseControllerTrialTest extends TestCase {
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertSame($code, $response->getData()['code']);
 		$this->assertStringContainsString($text, $response->getData()['error']);
+	}
+
+	public function testAppAdminSeesTheStatusButCannotChangeTheSharedLicense(): void {
+		$this->entitlement->expects($this->never())->method('startTrial');
+		$this->entitlement->expects($this->never())->method('activate');
+		$this->entitlement->expects($this->never())->method('removeKey');
+		$controller = $this->controller(true, false);
+
+		$show = $controller->show();
+		$this->assertSame(Http::STATUS_OK, $show->getStatus());
+		$this->assertFalse($show->getData()['canManage']);
+		foreach ([$controller->trial(), $controller->activate('wp_X'), $controller->destroy()] as $response) {
+			$this->assertSame(Http::STATUS_FORBIDDEN, $response->getStatus());
+			$this->assertStringContainsString('Nextcloud-Admins', $response->getData()['error']);
+		}
+	}
+
+	public function testAppAdminMayStillTriggerARenewal(): void {
+		$this->entitlement->expects($this->once())->method('refresh');
+		$this->assertSame(Http::STATUS_OK, $this->controller(true, false)->refresh()->getStatus());
+	}
+
+	public function testNextcloudAdminMayManage(): void {
+		$this->assertTrue($this->controller()->show()->getData()['canManage']);
+	}
+
+	public function testNewerStoreFormatGetsItsOwnText(): void {
+		$this->entitlement->method('activate')->willThrowException(new \InvalidArgumentException('storeTooNew'));
+		$response = $this->controller()->activate('wp_X');
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertStringContainsString('neueren Format', $response->getData()['error']);
 	}
 }
