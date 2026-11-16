@@ -16,7 +16,8 @@ trait EntitlementTokenFactory {
 
 	protected const TEST_KID = 'test-kid';
 	protected const NOW = 1_792_332_723;
-	protected const UUID = '3f2a1b64-9c8d-4e7f-a1b2-c3d4e5f60718';
+	protected const INSTANCE_ID = 'ocx7k2m9qz4t';
+	protected const UUID = '8cb3c100-9e4c-5375-9e63-1f4d122ea315';
 
 	/** @var array{private: \OpenSSLAsymmetricKey, public: string}|null */
 	private static ?array $testKey = null;
