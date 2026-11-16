@@ -225,6 +225,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->assertSame(self::KEY, $this->shared('key'));
 		$this->assertTrue($this->sensitive['werkwolke/key']);
 		$this->assertNotNull($this->shared('token'));
+		$this->assertTrue($this->sensitive['werkwolke/token']);
 		$this->assertNull($this->own('werkplus_key'));
 		$this->assertNull($this->own('werkplus_token'));
 		$this->assertTrue($service->hasFeature('tenants'));
@@ -497,6 +498,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->assertSame(self::KEY, $this->shared('key'));
 		$this->assertTrue($this->sensitive['werkwolke/key']);
 		$this->assertNotNull($this->shared('token'));
+		$this->assertTrue($this->sensitive['werkwolke/token']);
 		$this->assertTrue($service->hasFeature('tenants'));
 		$this->assertNull($service->lastError());
 	}
@@ -606,10 +608,11 @@ class EntitlementServiceTest extends TestCase {
 		$this->assertNull($this->own('werkplus_key'));
 	}
 
-	public function testStoreOfANewerFormatIsLeftUntouched(): void {
+	public function testStoreOfANewerFormatIsReadButNeverWritten(): void {
 		$this->storeToken();
 		$this->config['werkwolke/store_version'] = '2';
 		$this->config['rechnungswerk/werkplus_key'] = self::OTHER_KEY;
+		$this->now = self::NOW + 31 * 86400;
 		$before = $this->config;
 		$this->client->expects($this->never())->method('validate');
 		$this->client->expects($this->never())->method('trial');
@@ -617,9 +620,12 @@ class EntitlementServiceTest extends TestCase {
 
 		$status = $service->getStatus();
 		$this->assertTrue($status['storeTooNew']);
-		$this->assertFalse($status['keySet']);
-		$this->assertSame('free', $service->tier());
+		$this->assertTrue($status['keySet']);
+		$this->assertSame('…69B6', $status['keyHint']);
+		$this->assertSame('grace', $status['state']);
+		$this->assertSame('werkplus', $service->tier());
 		$this->assertFalse($service->isRefreshDue());
+		$service->refreshIfDue();
 		foreach ([fn () => $service->activate(self::KEY), fn () => $service->startTrial(), fn () => $service->removeKey(), fn () => $service->refresh()] as $action) {
 			try {
 				$action();

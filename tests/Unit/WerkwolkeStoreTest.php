@@ -17,14 +17,18 @@ class WerkwolkeStoreTest extends TestCase {
 
 	/** @var array<string, string> */
 	private array $config = [];
+	/** @var array<string, bool> */
+	private array $sensitive = [];
 
 	private function store(): WerkwolkeStore {
 		$appConfig = $this->createMock(IAppConfig::class);
 		$appConfig->method('getValueString')->willReturnCallback(
 			fn (string $app, string $key, string $default = '') => $this->config["$app/$key"] ?? $default
 		);
-		$appConfig->method('setValueString')->willReturnCallback(function (string $app, string $key, string $value): bool {
+		$appConfig->method('setValueString')->willReturnCallback(function (string $app, string $key, string $value, bool $lazy = false, bool $sensitive = false): bool {
 			$this->config["$app/$key"] = $value;
+			$this->sensitive["$app/$key"] = $sensitive;
+			$this->assertFalse($lazy);
 			return true;
 		});
 		$appConfig->method('deleteKey')->willReturnCallback(function (string $app, string $key): void {
@@ -45,14 +49,24 @@ class WerkwolkeStoreTest extends TestCase {
 		$this->assertSame(['werkwolke/store_version' => '1', 'werkwolke/key' => 'wp_ALT'], $this->config);
 	}
 
-	public function testANewerFormatIsNeitherReadNorWritten(): void {
+	public function testKeyAndTokenAreStoredAsSensitive(): void {
+		$store = $this->store();
+		$store->setKeyAndToken('wp_A', 't1');
+		$this->assertSame(['werkwolke/store_version' => false, 'werkwolke/key' => true, 'werkwolke/token' => true], $this->sensitive);
+
+		$this->sensitive = [];
+		$this->assertTrue($store->replaceTokenIfNewer('wp_A', 't2', 2, fn () => 1));
+		$this->assertTrue($this->sensitive['werkwolke/token']);
+	}
+
+	public function testANewerFormatIsReadButNeverWritten(): void {
 		$this->config = ['werkwolke/store_version' => '2', 'werkwolke/key' => 'wp_NEU', 'werkwolke/token' => 't'];
 		$before = $this->config;
 		$store = $this->store();
 
 		$this->assertTrue($store->isTooNew());
-		$this->assertSame('', $store->getKey());
-		$this->assertSame('', $store->getToken());
+		$this->assertSame('wp_NEU', $store->getKey());
+		$this->assertSame('t', $store->getToken());
 		$store->setKeyAndToken('wp_X', 't2');
 		$store->setKeyOnly('wp_X');
 		$store->clear();

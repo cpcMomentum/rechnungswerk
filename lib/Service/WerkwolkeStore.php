@@ -26,17 +26,17 @@ class WerkwolkeStore {
 	) {
 	}
 
-	/** Eine neuere App hat die Ablage in einem Format angelegt, das diese Version nicht kennt. */
+	/** Neueres Format: `key` und `token` bleiben lesbar, geschrieben wird nichts. */
 	public function isTooNew(): bool {
 		return (int)$this->appConfig->getValueString(self::APP, self::K_VERSION) > self::VERSION;
 	}
 
 	public function getKey(): string {
-		return $this->isTooNew() ? '' : $this->appConfig->getValueString(self::APP, self::K_KEY);
+		return $this->appConfig->getValueString(self::APP, self::K_KEY);
 	}
 
 	public function getToken(): string {
-		return $this->isTooNew() ? '' : $this->appConfig->getValueString(self::APP, self::K_TOKEN);
+		return $this->appConfig->getValueString(self::APP, self::K_TOKEN);
 	}
 
 	/** Ein neuer Schluessel ersetzt Schluessel und Token gemeinsam. */
@@ -46,7 +46,7 @@ class WerkwolkeStore {
 		}
 		$this->writeVersion();
 		$this->appConfig->setValueString(self::APP, self::K_KEY, $key, sensitive: true);
-		$this->appConfig->setValueString(self::APP, self::K_TOKEN, $token);
+		$this->appConfig->setValueString(self::APP, self::K_TOKEN, $token, sensitive: true);
 	}
 
 	/** Uebernimmt einen Schluessel nur in eine leere Ablage und laesst ein vorhandenes Token stehen. */
@@ -83,7 +83,7 @@ class WerkwolkeStore {
 			}
 		}
 		$this->writeVersion();
-		$this->appConfig->setValueString(self::APP, self::K_TOKEN, $token);
+		$this->appConfig->setValueString(self::APP, self::K_TOKEN, $token, sensitive: true);
 		return true;
 	}
 

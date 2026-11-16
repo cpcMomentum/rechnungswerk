@@ -184,7 +184,7 @@ class EntitlementService {
 	}
 
 	public function isRefreshDue(): bool {
-		if ($this->key() === '') {
+		if ($this->store->isTooNew() || $this->key() === '') {
 			return false;
 		}
 		$now = $this->now();
@@ -341,10 +341,10 @@ class EntitlementService {
 
 	/** Schluessel aus der gemeinsamen Ablage; ein Schluessel aus der eigenen Ablage wird einmalig uebernommen. */
 	private function key(): string {
-		if ($this->store->isTooNew()) {
-			return '';
-		}
 		$key = $this->store->getKey();
+		if ($this->store->isTooNew()) {
+			return $key;
+		}
 		$legacyKey = $this->own(self::K_LEGACY_KEY);
 		if ($legacyKey === '') {
 			return $key;
