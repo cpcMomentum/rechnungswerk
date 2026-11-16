@@ -1,4 +1,26 @@
 {
+	"0.9.1": [
+		{
+			"title": {
+				"de": "Eine WerkPlus-Lizenz für alle Werk-Apps",
+				"en": "One WerkPlus licence for all Werk apps",
+				"fr": "Une licence WerkPlus pour toutes les applications Werk"
+			},
+			"text": {
+				"de": "Der WerkPlus-Schlüssel gilt jetzt für alle Werk-Apps dieser Nextcloud und muss nur einmal eingetragen werden. Eintragen, Testzeitraum und Entfernen sind deshalb Nextcloud-Admins vorbehalten. Ein bereits hinterlegter Schlüssel wird übernommen.",
+				"en": "The WerkPlus key now applies to all Werk apps on this Nextcloud and only has to be entered once. Entering it, starting the trial and removing it are therefore reserved for Nextcloud admins. A key you already entered is taken over.",
+				"fr": "La clé WerkPlus vaut désormais pour toutes les applications Werk de ce Nextcloud et ne se saisit qu'une seule fois. La saisie, la période d'essai et la suppression sont donc réservées aux administrateurs Nextcloud. Une clé déjà enregistrée est reprise."
+			},
+			"icon": "star",
+			"where": {
+				"de": "Einstellungen",
+				"en": "Settings",
+				"fr": "Paramètres"
+			},
+			"adminOnly": true,
+			"plus": true
+		}
+	],
 	"0.9.0": [
 		{
 			"title": {
