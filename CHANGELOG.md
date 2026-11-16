@@ -5,6 +5,26 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.9.1] - 2026-11-16
+
+Eine WerkPlus-Lizenz für alle Werk-Apps einer Nextcloud.
+
+### Changed
+- **Eine Lizenz je Nextcloud.** Der WerkPlus-Schlüssel liegt jetzt in einer
+  gemeinsamen Ablage, die alle Werk-Apps dieser Nextcloud nutzen. Ein bereits
+  hinterlegter Schlüssel wird einmalig übernommen. Die Kennung der Nextcloud
+  wird aus der Instanz-ID abgeleitet und nicht mehr gespeichert (#421)
+- **Nur Nextcloud-Admins ändern die Lizenz.** Schlüssel eintragen, Testzeitraum
+  starten und Schlüssel entfernen dürfen nur noch Nextcloud-Admins, weil die
+  Lizenz für alle Werk-Apps gilt. App-Admins sehen den Status und können
+  „Jetzt prüfen“ nutzen (#421)
+
+### Fixed
+- **Lizenz-Erneuerung.** Ein vertippter neuer Schlüssel verzögert die
+  Erneuerung des gültigen nicht mehr, die Wartezeit nach einem Fehlversuch
+  liegt unter dem Takt des Hintergrundjobs, und der Lizenzzustand wird bei
+  jeder Abfrage neu berechnet statt in langlaufenden Prozessen festzuhängen (#420)
+
 ## [0.9.0] - 2026-11-13
 
 Richtiges Belegdatum auch kurz nach Mitternacht, WerkPlus ohne Größenklasse
@@ -678,7 +698,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.6.0...v0.7.0
