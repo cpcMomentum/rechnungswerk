@@ -21,7 +21,7 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IL10N;
 use OCP\IRequest;
 
-// WerkPlus-Lizenz im Admin; nur App-Admins.
+// WerkPlus-Lizenz: Status fuer App-Admins, aendern nur Nextcloud-Admins (der Schluessel gilt fuer alle Werk-Apps).
 class LicenseController extends Controller {
 
 	public function __construct(
@@ -44,7 +44,7 @@ class LicenseController extends Controller {
 
 	#[NoAdminRequired]
 	public function activate(#[\SensitiveParameter] string $key = ''): DataResponse {
-		if (($resp = $this->requireAdmin()) !== null) {
+		if (($resp = $this->requireNextcloudAdmin()) !== null) {
 			return $resp;
 		}
 		try {
@@ -60,7 +60,7 @@ class LicenseController extends Controller {
 	// Der Schluessel steht nur in dieser Antwort; spaeter liefert der Status nur noch den Hinweis.
 	#[NoAdminRequired]
 	public function trial(): DataResponse {
-		if (($resp = $this->requireAdmin()) !== null) {
+		if (($resp = $this->requireNextcloudAdmin()) !== null) {
 			return $resp;
 		}
 		try {
@@ -90,10 +90,14 @@ class LicenseController extends Controller {
 
 	#[NoAdminRequired]
 	public function destroy(): DataResponse {
-		if (($resp = $this->requireAdmin()) !== null) {
+		if (($resp = $this->requireNextcloudAdmin()) !== null) {
 			return $resp;
 		}
-		$this->entitlementService->removeKey();
+		try {
+			$this->entitlementService->removeKey();
+		} catch (\InvalidArgumentException $e) {
+			return $this->invalidInput($e->getMessage());
+		}
 		return new DataResponse($this->status());
 	}
 
@@ -102,6 +106,7 @@ class LicenseController extends Controller {
 	 */
 	private function status(): array {
 		$status = $this->entitlementService->getStatus();
+		$status['canManage'] = $this->userId !== null && $this->permissionService->isNextcloudAdmin($this->userId);
 		$lastError = $status['lastError'];
 		$status['lastError'] = $lastError === null ? null : [
 			'code' => $lastError['code'],
@@ -122,6 +127,7 @@ class LicenseController extends Controller {
 	private function invalidInput(string $field): DataResponse {
 		$message = match ($field) {
 			'keySet' => $this->l10n->t('Es ist bereits ein WerkPlus-Schlüssel hinterlegt. Ein Testzeitraum ist nur ohne Schlüssel möglich.'),
+			'storeTooNew' => $this->l10n->t('Eine andere Werk-App hat die Lizenz in einem neueren Format gespeichert. Bitte aktualisiere RechnungsWerk.'),
 			default => $this->l10n->t('Bitte gib einen gültigen WerkPlus-Schlüssel ein.'),
 		};
 		return new DataResponse(['error' => $message, 'code' => 'INPUT_INVALID'], Http::STATUS_BAD_REQUEST);
@@ -134,8 +140,8 @@ class LicenseController extends Controller {
 			'KEY_UNKNOWN' => $this->l10n->t('Dieser Schlüssel ist nicht bekannt. Bitte prüfe die Schreibweise.'),
 			'KEY_REVOKED' => $this->l10n->t('Dieser Schlüssel wurde gesperrt. RechnungsWerk arbeitet im freien Umfang weiter.'),
 			'KEY_EXPIRED' => $this->l10n->t('Die Lizenz ist abgelaufen. RechnungsWerk arbeitet im freien Umfang weiter.'),
-			'INSTANCE_LIMIT_REACHED' => $this->l10n->t('Dieser Schlüssel gehört bereits zu einer anderen Installation. Ein Umzug wird vom Anbieter freigeschaltet.'),
-			'TRIAL_ALREADY_USED' => $this->l10n->t('Diese Installation hat den Testzeitraum bereits genutzt. Für WerkPlus brauchst du einen Schlüssel.'),
+			'INSTANCE_LIMIT_REACHED' => $this->l10n->t('Diese Lizenz ist einer anderen Nextcloud zugeordnet. Den Umzug kannst du im Kundenportal veranlassen.'),
+			'TRIAL_ALREADY_USED' => $this->l10n->t('Für diese Nextcloud wurde bereits ein Testzeitraum genutzt. Für WerkPlus brauchst du einen Schlüssel.'),
 			'TRIAL_UNAVAILABLE' => $this->l10n->t('Der Testzeitraum lässt sich gerade nicht in der App starten. Unter werkwolke.de/testen steht, wie du ihn trotzdem bekommst.'),
 			'RATE_LIMITED' => $this->l10n->t('Zu viele Versuche. Bitte versuche es später erneut.'),
 			WerkPlusClient::UNREACHABLE => $this->l10n->t('WerkPlus ist gerade nicht erreichbar. Bitte versuche es später erneut.'),
@@ -143,6 +149,17 @@ class LicenseController extends Controller {
 			'SERVER_ERROR', WerkPlusClient::INVALID_RESPONSE => $this->l10n->t('WerkPlus hat einen Fehler gemeldet. Bitte versuche es später erneut.'),
 			default => $serverMessage !== '' ? $serverMessage : $this->l10n->t('WerkPlus hat einen Fehler gemeldet. Bitte versuche es später erneut.'),
 		};
+	}
+
+	// Der Schluessel gilt fuer alle Werk-Apps dieser Nextcloud, deshalb aendern ihn nur Nextcloud-Admins.
+	private function requireNextcloudAdmin(): ?DataResponse {
+		if ($this->userId === null) {
+			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+		}
+		if (!$this->permissionService->isNextcloudAdmin($this->userId)) {
+			return new DataResponse(['error' => $this->l10n->t('Die WerkPlus-Lizenz gilt für alle Werk-Apps dieser Nextcloud und kann nur von Nextcloud-Admins geändert werden.')], Http::STATUS_FORBIDDEN);
+		}
+		return null;
 	}
 
 	private function requireAdmin(): ?DataResponse {

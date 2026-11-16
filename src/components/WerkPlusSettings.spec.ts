@@ -49,7 +49,7 @@ vi.mock('@/components/ConfirmDialog.vue', () => ({
 import WerkPlusSettings from './WerkPlusSettings.vue'
 
 const status = (teil: Partial<LicenseStatus> = {}): LicenseStatus => ({
-	instanceUuid: '3f2a1b64-9c8d-4e7f-a1b2-c3d4e5f60718',
+	instanceUuid: '8cb3c100-9e4c-5375-9e63-1f4d122ea315',
 	keySet: false,
 	keyHint: null,
 	licensedEmployees: null,
@@ -60,6 +60,8 @@ const status = (teil: Partial<LicenseStatus> = {}): LicenseStatus => ({
 	graceUntil: null,
 	lastCheckAt: null,
 	lastError: null,
+	storeTooNew: false,
+	canManage: true,
 	...teil,
 })
 
@@ -96,7 +98,7 @@ describe('WerkPlusSettings', () => {
 		expect(buttons(wrapper)).toEqual(['Schlüssel prüfen und speichern', '30 Tage testen'])
 		expect(wrapper.find('.stub-button').attributes('disabled')).toBeDefined()
 		expect(wrapper.find('dl').exists()).toBe(false)
-		expect(wrapper.text()).toContain('3f2a1b64-9c8d-4e7f-a1b2-c3d4e5f60718')
+		expect(wrapper.text()).toContain('8cb3c100-9e4c-5375-9e63-1f4d122ea315')
 	})
 
 	it('mit Schlüssel: Tarif, Hinweis und alle Knöpfe, keine Größenklasse', async () => {
@@ -254,5 +256,36 @@ describe('WerkPlusSettings', () => {
 		await flushPromises()
 
 		expect(wrapper.find('.stub-note--error').text()).toContain('werkwolke.de/testen')
+	})
+
+	it('App-Admin ohne Nextcloud-Admin: sieht den Status, kann den Schlüssel nicht ändern', async () => {
+		getLicense.mockResolvedValue(aktiv({ canManage: false }))
+		const wrapper = mount(WerkPlusSettings)
+		await flushPromises()
+
+		expect(buttons(wrapper)).toEqual(['Jetzt prüfen'])
+		expect(wrapper.find('input').exists()).toBe(false)
+		expect(wrapper.text()).toContain('nur Nextcloud-Admins')
+		expect(wrapper.text()).toContain('WerkPlus ist aktiv.')
+	})
+
+	it('Ablage in neuerem Format: Hinweis auf Update', async () => {
+		getLicense.mockResolvedValue(aktiv({ storeTooNew: true }))
+		const wrapper = mount(WerkPlusSettings)
+		await flushPromises()
+
+		expect(wrapper.find('.stub-note--warning').text()).toContain('neueren Format')
+		expect(buttons(wrapper)).toEqual([])
+		expect(wrapper.find('input').exists()).toBe(false)
+	})
+
+	it('nennt die abgeleitete Kennung und dass der Schlüssel für alle Werk-Apps gilt', async () => {
+		getLicense.mockResolvedValue(status())
+		const wrapper = mount(WerkPlusSettings)
+		await flushPromises()
+
+		expect(wrapper.text()).toContain('alle Werk-Apps dieser Nextcloud')
+		expect(wrapper.text()).toContain('Eine aus dieser Nextcloud abgeleitete Kennung')
+		expect(wrapper.text()).toContain('8cb3c100-9e4c-5375-9e63-1f4d122ea315')
 	})
 })

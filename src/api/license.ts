@@ -19,6 +19,8 @@ export interface LicenseStatus {
 	graceUntil: string | null
 	lastCheckAt: string | null
 	lastError: { code: string, message: string, at: string | null } | null
+	storeTooNew: boolean
+	canManage: boolean
 }
 
 export const getLicense = (): Promise<LicenseStatus> =>
