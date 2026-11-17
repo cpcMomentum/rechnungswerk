@@ -27,7 +27,7 @@ für deutsche Unternehmen — mit frei wählbarem Empfänger pro Rechnung und au
 RechnungsWerk ist kostenlos und Open Source (AGPL-3.0-or-later).
 Damit die Werk-Apps gepflegt bleiben, gibt es WerkPlus: Zusatzfunktionen in allen
 Werk-Apps, in RechnungsWerk ab 0.7 der API-Zugang für Automatisierungen. Alle bisherigen
-Funktionen sind ohne Lizenz nutzbar. Unter Einstellungen › WerkPlus lässt sich WerkPlus
+Funktionen sind ohne Lizenz nutzbar. Unter Verwaltung › WerkPlus lässt sich WerkPlus
 30 Tage kostenlos testen. Mehr dazu auf https://werkwolke.de.
 
 Ohne Lizenzschlüssel nimmt die App erst Kontakt zu unserem Server auf, wenn du den

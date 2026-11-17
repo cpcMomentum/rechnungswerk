@@ -5,35 +5,41 @@
 		@close="dismiss">
 		<div class="whatsnew">
 			<h2 :id="TITLE_ID">{{ title }}</h2>
-			<p class="whatsnew__version">{{ t('rechnungswerk', 'Version {version}', { version }) }}</p>
+			<p v-if="archive && groups.length === 0" class="whatsnew__empty">
+				{{ t('rechnungswerk', 'Noch keine Neuerungen.') }}
+			</p>
 
-			<div v-for="(entry, index) in entries" :key="index" class="whatsnew__entry">
-				<div class="whatsnew__icon">
-					<component :is="iconFor(entry.icon)" :size="22" />
-				</div>
-				<div class="whatsnew__body">
-					<h3 class="whatsnew__entry-title">
-						{{ entry.title }}
-						<span v-if="entry.plus" class="whatsnew__badge">WerkPlus</span>
-					</h3>
-					<p class="whatsnew__entry-text">{{ entry.text }}</p>
-					<p v-if="entry.where" class="whatsnew__where">
-						{{ t('rechnungswerk', 'Zu finden unter') }}
-						<b>{{ entry.where }}</b><span v-if="entry.adminOnly">{{ ' ' + t('rechnungswerk', '(nur für Administratoren)') }}</span>
-					</p>
-					<a v-if="entry.plus"
-						class="whatsnew__link"
-						:href="WERKPLUS_URL"
-						target="_blank"
-						rel="noreferrer noopener">
-						{{ t('rechnungswerk', 'Mehr zu WerkPlus') }}
-					</a>
+			<div v-for="group in groups" :key="group.version" class="whatsnew__group">
+				<p class="whatsnew__version">{{ t('rechnungswerk', 'Version {version}', { version: group.version }) }}</p>
+
+				<div v-for="(entry, index) in group.entries" :key="group.version + '-' + index" class="whatsnew__entry">
+					<div class="whatsnew__icon">
+						<component :is="iconFor(entry.icon)" :size="22" />
+					</div>
+					<div class="whatsnew__body">
+						<h3 class="whatsnew__entry-title">
+							{{ entry.title }}
+							<span v-if="entry.plus" class="whatsnew__badge">WerkPlus</span>
+						</h3>
+						<p class="whatsnew__entry-text">{{ entry.text }}</p>
+						<p v-if="entry.where" class="whatsnew__where">
+							{{ t('rechnungswerk', 'Zu finden unter') }}
+							<b>{{ entry.where }}</b><span v-if="entry.adminOnly">{{ ' ' + t('rechnungswerk', '(nur für Administratoren)') }}</span>
+						</p>
+						<a v-if="entry.plus"
+							class="whatsnew__link"
+							:href="WERKPLUS_URL"
+							target="_blank"
+							rel="noreferrer noopener">
+							{{ t('rechnungswerk', 'Mehr zu WerkPlus') }}
+						</a>
+					</div>
 				</div>
 			</div>
 
 			<div class="actions">
 				<NcButton variant="primary" @click="dismiss">
-					{{ t('rechnungswerk', 'Alles klar') }}
+					{{ archive ? t('rechnungswerk', 'Schließen') : t('rechnungswerk', 'Alles klar') }}
 				</NcButton>
 			</div>
 		</div>
@@ -60,8 +66,8 @@ import FolderIcon from 'vue-material-design-icons/Folder.vue'
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue'
 import StarIcon from 'vue-material-design-icons/Star.vue'
 import TranslateIcon from 'vue-material-design-icons/Translate.vue'
-import type { WhatsNewEntry } from '@/types/api'
-import { getWhatsNew, markWhatsNewSeen } from '@/api/whatsnew'
+import type { WhatsNewGroup } from '@/types/api'
+import { getWhatsNew, getWhatsNewArchive, markWhatsNewSeen } from '@/api/whatsnew'
 import { escCloses } from '@/utils/modalEsc'
 
 /** Zielseite der WerkPlus-Eintraege (Konzept v1.1, Abschnitt 2). */
@@ -96,8 +102,9 @@ const ICONS: Record<string, Component> = {
 }
 
 const open = ref(false)
-const version = ref('')
-const entries = ref<WhatsNewEntry[]>([])
+// Im Fenster nach einem Update genau eine Version, im Archiv alle.
+const groups = ref<WhatsNewGroup[]>([])
+const archive = ref(false)
 const title = t('rechnungswerk', 'Was ist neu in RechnungsWerk')
 
 /** Unbekannter oder fehlender Name faellt auf den Stern zurueck. */
@@ -109,8 +116,8 @@ onMounted(async () => {
 	try {
 		const payload = await getWhatsNew()
 		if (payload.entries.length > 0) {
-			version.value = payload.version
-			entries.value = payload.entries
+			groups.value = [{ version: payload.version, entries: payload.entries }]
+			archive.value = false
 			open.value = true
 		}
 	} catch {
@@ -118,8 +125,28 @@ onMounted(async () => {
 	}
 })
 
+/** Alle bisherigen Neuerungen, aufgerufen ueber „Neuerungen" im Navigationsfuss. */
+async function openArchive(): Promise<void> {
+	try {
+		const payload = await getWhatsNewArchive()
+		// Ein inzwischen geoeffnetes Update-Fenster nicht ueberschreiben, sonst bleibt es unquittiert.
+		if (open.value && !archive.value) {
+			return
+		}
+		groups.value = payload.versions
+		archive.value = true
+		open.value = true
+	} catch {
+		// Kein Fenster ist besser als eine Fehlermeldung ueber Neuerungen.
+	}
+}
+
 async function dismiss(): Promise<void> {
 	open.value = false
+	// Nachlesen im Archiv quittiert keine Version.
+	if (archive.value) {
+		return
+	}
 	try {
 		await markWhatsNewSeen()
 	} catch {
@@ -127,6 +154,7 @@ async function dismiss(): Promise<void> {
 		// Das ist die harmlosere Seite des Fehlers.
 	}
 }
+defineExpose({ openArchive })
 </script>
 
 <style scoped>
@@ -138,6 +166,15 @@ async function dismiss(): Promise<void> {
 }
 .whatsnew h2 {
 	margin: 0;
+}
+.whatsnew__empty {
+	margin: 12px 0;
+	color: var(--color-text-maxcontrast);
+}
+.whatsnew__group + .whatsnew__group {
+	margin-top: 8px;
+	border-top: 1px solid var(--color-border);
+	padding-top: 8px;
 }
 .whatsnew__version {
 	margin: 2px 0 4px;
