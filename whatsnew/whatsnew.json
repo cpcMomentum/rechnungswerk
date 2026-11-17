@@ -16,7 +16,8 @@
 				"de": "Neuerungen",
 				"en": "What's new",
 				"fr": "Nouveautés"
-			}
+			},
+			"plus": false
 		}
 	],
 	"0.9.1": [
