@@ -5,6 +5,27 @@ Alle nennenswerten Änderungen an RechnungsWerk werden hier dokumentiert.
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
 Versionierung nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [0.9.2] - 2026-11-17
+
+Neuerungen jederzeit nachlesen, aufgeräumte Navigation und ein Sicherheitsfix
+für das Nextcloud-Log.
+
+### Added
+- **Neuerungen nachlesen.** Der neue Punkt „Neuerungen“ unten im Menü zeigt
+  alle bisherigen Neuerungen, die neueste Version zuerst (#425)
+
+### Changed
+- **Navigation wie in den anderen Werk-Apps.** Unten im Menü stehen jetzt
+  Protokoll, Neuerungen, Einstellungen und Verwaltung. „Einstellungen“ enthält
+  die persönlichen Angaben (Ansprechpartner), die App-weiten Einstellungen für
+  Admins heißen jetzt „Verwaltung“ (#425)
+
+### Security
+- **Keine Schlüssel im Log.** Bei Fehlern in der Lizenzprüfung konnten der
+  WerkPlus-Schlüssel und das Lizenz-Token über Fehlerprotokolle ins
+  Nextcloud-Log gelangen, wenn PHP die Aufrufargumente mitprotokolliert. Das
+  ist behoben (#429)
+
 ## [0.9.1] - 2026-11-16
 
 Eine WerkPlus-Lizenz für alle Werk-Apps einer Nextcloud.
@@ -698,7 +719,8 @@ Erster öffentlicher Release im Nextcloud App Store. Rechnungen und E-Rechnungen
   `SettingsService` (per-Owner-Stammdaten, jahresbasierter Nummernkreis)
 - REST-API `/api/v1/invoices` (CRUD + `/commit`, `/cancel`)
 
-[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/cpcMomentum/rechnungswerk/compare/v0.7.0...v0.8.0

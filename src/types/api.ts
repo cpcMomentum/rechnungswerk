@@ -325,3 +325,11 @@ export interface WhatsNewPayload {
 	version: string
 	entries: WhatsNewEntry[]
 }
+
+/** Eine Version mit ihren Neuerungen. */
+export type WhatsNewGroup = WhatsNewPayload
+
+/** Antwort von `GET /whatsnew/all`, neueste Version zuerst. */
+export interface WhatsNewArchive {
+	versions: WhatsNewGroup[]
+}

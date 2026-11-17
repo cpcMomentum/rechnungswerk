@@ -36,11 +36,14 @@
 					<NcAppNavigationItem :name="t('rechnungswerk', 'Protokoll')" :to="{ name: 'audit' }">
 						<template #icon><HistoryIcon :size="20" /></template>
 					</NcAppNavigationItem>
-					<NcAppNavigationItem :name="t('rechnungswerk', 'Mein Kontakt')" :to="{ name: 'my-contact' }">
-						<template #icon><AccountIcon :size="20" /></template>
+					<NcAppNavigationItem :name="t('rechnungswerk', 'Neuerungen')" @click="openWhatsNew">
+						<template #icon><BullhornOutlineIcon :size="20" /></template>
 					</NcAppNavigationItem>
-					<NcAppNavigationItem v-if="isAdmin" :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'settings' }">
+					<NcAppNavigationItem :name="t('rechnungswerk', 'Einstellungen')" :to="{ name: 'my-contact' }">
 						<template #icon><CogIcon :size="20" /></template>
+					</NcAppNavigationItem>
+					<NcAppNavigationItem v-if="isAdmin" :name="t('rechnungswerk', 'Verwaltung')" :to="{ name: 'settings' }">
+						<template #icon><ShieldAccountIcon :size="20" /></template>
 					</NcAppNavigationItem>
 				</template>
 			</NcAppNavigation>
@@ -49,13 +52,13 @@
 			</NcAppContent>
 
 			<!-- „Was ist neu?"-Fenster (#308): erst wenn der Zugriff feststeht. -->
-			<WhatsNewDialog />
+			<WhatsNewDialog ref="whatsNew" />
 		</template>
 	</NcContent>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { translate as t } from '@nextcloud/l10n'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
@@ -66,10 +69,11 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import FileDocumentIcon from 'vue-material-design-icons/FileDocument.vue'
 import FileDocumentOutlineIcon from 'vue-material-design-icons/FileDocumentOutline.vue'
 import AccountGroupIcon from 'vue-material-design-icons/AccountGroup.vue'
-import AccountIcon from 'vue-material-design-icons/Account.vue'
 import PackageVariantIcon from 'vue-material-design-icons/PackageVariant.vue'
 import TextBoxIcon from 'vue-material-design-icons/TextBox.vue'
+import BullhornOutlineIcon from 'vue-material-design-icons/BullhornOutline.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
+import ShieldAccountIcon from 'vue-material-design-icons/ShieldAccount.vue'
 import HistoryIcon from 'vue-material-design-icons/History.vue'
 import LockIcon from 'vue-material-design-icons/Lock.vue'
 import WhatsNewDialog from '@/components/WhatsNewDialog.vue'
@@ -78,6 +82,13 @@ import { usePermissionStore } from '@/stores/permissionStore'
 const store = usePermissionStore()
 const hasAccess = computed(() => store.info?.hasAccess ?? false)
 const isAdmin = computed(() => store.info?.isAdmin ?? false)
+const whatsNew = ref<InstanceType<typeof WhatsNewDialog> | null>(null)
+
+// Der Punkt hat kein Router-Ziel; ohne preventDefault springt href="#" auf die Startseite.
+function openWhatsNew(event?: Event) {
+	event?.preventDefault()
+	whatsNew.value?.openArchive()
+}
 
 onMounted(() => {
 	store.fetch()

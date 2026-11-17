@@ -124,8 +124,8 @@
 					<input v-model="form.sellerContactEmail" class="rw-input" type="email" :readonly="readonly" /></label>
 			</div>
 			<p class="rw-hint">{{ isQuote
-				? t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.')
-				: t('rechnungswerk', 'Vorbelegt aus deinem persönlichen Kontakt („Mein Kontakt“), sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.') }}</p>
+				? t('rechnungswerk', 'Vorbelegt aus deinem Ansprechpartner unter „Einstellungen“, sonst aus dem zentralen Firmenkontakt. Für dieses Angebot änderbar; leer lassen → Firmenkontakt.')
+				: t('rechnungswerk', 'Vorbelegt aus deinem Ansprechpartner unter „Einstellungen“, sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.') }}</p>
 		</section>
 
 		<!-- Anrede & Einleitung (vor den Positionen) -->
@@ -671,11 +671,7 @@ async function initNew(token: number = navToken) {
 	// a customer-specific term still overrides this on customer selection. A
 	// quote has no payment term, so it is left blank there.
 	form.paymentTermDays = isQuote.value ? '' : (s?.defaultPaymentTermDays ?? '')
-	// Seller-contact cascade (#47): the user's personal default ("Mein
-	// Kontakt") first, falling back per field to the central company
-	// contact when unset. Left fully empty → backend uses the company
-	// contact. The NC account is no longer pulled automatically; it is a
-	// manual import in the "Mein Kontakt" area.
+	// Personal contact first, company contact per field as fallback.
 	let mine = { person: '', phone: '', email: '' }
 	try {
 		mine = await getMyContact()

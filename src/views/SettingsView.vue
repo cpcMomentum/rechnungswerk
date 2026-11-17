@@ -1,6 +1,6 @@
 <template>
 	<div class="rw-view rw-view--narrow">
-		<h2 class="rw-settings-title">{{ t('rechnungswerk', 'Einstellungen') }}</h2>
+		<h2 class="rw-settings-title">{{ t('rechnungswerk', 'Verwaltung') }}</h2>
 
 		<div ref="errorAnchor">
 			<NcNoteCard v-if="error" type="error" :text="error" />
