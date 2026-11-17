@@ -1,4 +1,25 @@
 {
+	"0.9.2": [
+		{
+			"title": {
+				"de": "Neuerungen jederzeit nachlesen",
+				"en": "Read past updates any time",
+				"fr": "Relire les nouveautés à tout moment"
+			},
+			"text": {
+				"de": "Unten im Menü stehen jetzt Neuerungen, Einstellungen und Verwaltung. Unter Neuerungen lässt sich alles Bisherige nachlesen. Einstellungen enthält die persönlichen Angaben, die Einstellungen für die ganze App heißen jetzt Verwaltung.",
+				"en": "The menu now ends with What's new, Settings and Administration. What's new lists every earlier update. Settings holds your personal details; the app-wide settings are now called Administration.",
+				"fr": "Le menu se termine par Nouveautés, Paramètres et Administration. Nouveautés reprend toutes les annonces. Paramètres contient vos données personnelles ; les réglages de l'application s'appellent désormais Administration."
+			},
+			"icon": "cog",
+			"where": {
+				"de": "Neuerungen",
+				"en": "What's new",
+				"fr": "Nouveautés"
+			},
+			"plus": false
+		}
+	],
 	"0.9.1": [
 		{
 			"title": {
@@ -446,7 +467,7 @@
 				"fr": "RechnungsWerk parle désormais aussi français"
 			},
 			"text": {
-				"de": "Die Oberfläche gibt es zusätzlich zu Deutsch und Englisch auf Französisch. Welche Sprache erscheint, richtet sich nach der Einstellung Ihres Nextcloud-Kontos.",
+				"de": "Die Oberfläche gibt es zusätzlich zu Deutsch und Englisch auf Französisch. Welche Sprache erscheint, richtet sich nach der Spracheinstellung des Nextcloud-Kontos.",
 				"en": "Besides German and English the interface is now available in French. The language follows the setting of your Nextcloud account.",
 				"fr": "En plus de l'allemand et de l'anglais, l'interface est désormais disponible en français. La langue suit le réglage de votre compte Nextcloud."
 			},
