@@ -31,9 +31,10 @@ Funktionen sind ohne Lizenz nutzbar. Unter Verwaltung › WerkPlus lässt sich W
 30 Tage kostenlos testen. Mehr dazu auf https://werkwolke.de.
 
 Ohne Lizenzschlüssel nimmt die App erst Kontakt zu unserem Server auf, wenn du den
-Testzeitraum startest. Übertragen werden dann nur eine zufällige Kennung der Installation
-und die App-Version, mit Schlüssel zusätzlich der Lizenzschlüssel. Keine Rechnungen,
-keine Kunden. Ist der Server nicht erreichbar, arbeitet RechnungsWerk normal weiter.
+Testzeitraum startest. Übertragen werden dann eine aus der Nextcloud abgeleitete Kennung
+und die Versionen der aktivierten Werk-Apps, mit Schlüssel zusätzlich der Lizenzschlüssel.
+Keine Rechnungen, keine Kunden.
+Ist der Server nicht erreichbar, arbeitet RechnungsWerk normal weiter.
     ]]></description>
 
     <version>0.9.2</version>
