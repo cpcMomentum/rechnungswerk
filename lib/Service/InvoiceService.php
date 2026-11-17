@@ -823,7 +823,7 @@ class InvoiceService {
 			return;
 		}
 		if (trim((string)$settings->getVatId()) === '') {
-			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Einstellungen (nur für Administratoren).'));
+			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Verwaltung (nur für Administratoren).'));
 		}
 		if (trim((string)$invoice->getRecipientVatId()) === '') {
 			throw new ValidationException($this->l10n->t('Für eine innergemeinschaftliche Lieferung ist die USt-IdNr. des Kunden erforderlich.'));
@@ -849,7 +849,7 @@ class InvoiceService {
 			return;
 		}
 
-		throw new ValidationException($this->l10n->t('Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Einstellungen (nur für Administratoren).'));
+		throw new ValidationException($this->l10n->t('Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Verwaltung (nur für Administratoren).'));
 	}
 
 	/**

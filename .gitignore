@@ -34,7 +34,8 @@ CLAUDE.md
 .claude/
 archive/
 sessions/
-docs/
+docs/*
+!docs/design-system.md
 
 # App Store Tarballs
 *.tar.gz

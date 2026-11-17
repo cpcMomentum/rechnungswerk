@@ -8,14 +8,16 @@
 
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import type { WhatsNewEntry, WhatsNewPayload } from '@/types/api'
+import type { WhatsNewArchive, WhatsNewEntry, WhatsNewPayload } from '@/types/api'
 
 const getWhatsNew = vi.fn<() => Promise<WhatsNewPayload>>()
 const markWhatsNewSeen = vi.fn<() => Promise<void>>()
+const getWhatsNewArchive = vi.fn<() => Promise<WhatsNewArchive>>()
 
 vi.mock('@/api/whatsnew', () => ({
 	getWhatsNew: () => getWhatsNew(),
 	markWhatsNewSeen: () => markWhatsNewSeen(),
+	getWhatsNewArchive: () => getWhatsNewArchive(),
 }))
 
 // Die echten Komponenten ziehen ihr CSS mit, das der Test-Runner nicht laedt.
@@ -61,6 +63,7 @@ describe('WhatsNewDialog', () => {
 		getWhatsNew.mockReset()
 		markWhatsNewSeen.mockReset()
 		markWhatsNewSeen.mockResolvedValue(undefined)
+		getWhatsNewArchive.mockReset()
 	})
 
 	it('zeigt kein Fenster, wenn es nichts zu berichten gibt', async () => {
@@ -211,5 +214,73 @@ describe('WhatsNewDialog', () => {
 		await flushPromises()
 
 		expect(wrapper.find('.stub-modal').exists()).toBe(false)
+	})
+
+	describe('Archiv ueber „Neuerungen"', () => {
+		const oeffneArchiv = async (archiv: WhatsNewArchive) => {
+			getWhatsNew.mockResolvedValue(payload([]))
+			getWhatsNewArchive.mockResolvedValue(archiv)
+			const wrapper = mount(WhatsNewDialog)
+			await flushPromises()
+			await (wrapper.vm as unknown as { openArchive: () => Promise<void> }).openArchive()
+			await flushPromises()
+			return wrapper
+		}
+
+		it('zeigt alle Versionen mit ihren Eintraegen', async () => {
+			const wrapper = await oeffneArchiv({ versions: [
+				{ version: '0.9.1', entries: [eintrag({ title: 'Neu' })] },
+				{ version: '0.9.0', entries: [eintrag({ title: 'Aelter A' }), eintrag({ title: 'Aelter B' })] },
+			] })
+
+			expect(wrapper.findAll('.whatsnew__version').map(v => v.text())).toEqual(['Version 0.9.1', 'Version 0.9.0'])
+			expect(wrapper.findAll('.whatsnew__entry')).toHaveLength(3)
+			expect(wrapper.find('.stub-button').text()).toBe('Schließen')
+		})
+
+		it('meldet „Noch keine Neuerungen." ohne Eintraege', async () => {
+			const wrapper = await oeffneArchiv({ versions: [] })
+
+			expect(wrapper.find('.whatsnew__empty').text()).toBe('Noch keine Neuerungen.')
+		})
+
+		it('quittiert beim Schliessen nichts', async () => {
+			const wrapper = await oeffneArchiv({ versions: [{ version: '0.9.1', entries: [eintrag({})] }] })
+
+			await wrapper.find('.stub-button').trigger('click')
+			await flushPromises()
+
+			expect(markWhatsNewSeen).not.toHaveBeenCalled()
+			expect(wrapper.find('.stub-modal').exists()).toBe(false)
+		})
+
+		it('ueberschreibt ein inzwischen offenes Update-Fenster nicht', async () => {
+			let liefereArchiv: (a: WhatsNewArchive) => void = () => {}
+			getWhatsNewArchive.mockReturnValue(new Promise(resolve => { liefereArchiv = resolve }))
+			getWhatsNew.mockResolvedValue(payload([eintrag({ title: 'Update-Eintrag' })]))
+			const wrapper = mount(WhatsNewDialog)
+			const archiv = (wrapper.vm as unknown as { openArchive: () => Promise<void> }).openArchive()
+			await flushPromises()
+
+			liefereArchiv({ versions: [{ version: '0.1.0', entries: [eintrag({ title: 'Archiv-Eintrag' })] }] })
+			await archiv
+			await flushPromises()
+
+			expect(wrapper.text()).toContain('Update-Eintrag')
+			await wrapper.find('.stub-button').trigger('click')
+			await flushPromises()
+			expect(markWhatsNewSeen).toHaveBeenCalledTimes(1)
+		})
+
+		it('bleibt still, wenn der Abruf scheitert', async () => {
+			getWhatsNew.mockResolvedValue(payload([]))
+			getWhatsNewArchive.mockRejectedValue(new Error('offline'))
+			const wrapper = mount(WhatsNewDialog)
+			await flushPromises()
+			await (wrapper.vm as unknown as { openArchive: () => Promise<void> }).openArchive()
+			await flushPromises()
+
+			expect(wrapper.find('.stub-modal').exists()).toBe(false)
+		})
 	})
 })

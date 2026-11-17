@@ -235,6 +235,29 @@ class WhatsNewServiceTest extends TestCase {
 		self::assertSame('0.5.4', $written['alice/' . WhatsNewService::KEY_LAST_SEEN] ?? null);
 	}
 
+	public function testArchivZeigtAlleVersionenNeuesteZuerstUndQuittiertNichts(): void {
+		$this->writeCatalogue($this->catalogueFixture() + ['0.6.0' => [[
+			'title' => ['de' => 'Zukunft', 'en' => 'Future'],
+			'text' => ['de' => 'Noch nicht', 'en' => 'Not yet'],
+		]]]);
+		$written = [];
+		$service = $this->buildService('0.5.3', ['alice/' . WhatsNewService::KEY_LAST_SEEN => '0.5.3'], $written, 'en');
+
+		$result = $service->getAll();
+
+		self::assertSame(['0.5.3', '0.5.1'], array_column($result['versions'], 'version'));
+		self::assertCount(2, $result['versions'][0]['entries']);
+		self::assertSame('Older EN', $result['versions'][1]['entries'][0]['title']);
+		self::assertSame([], $written, 'Nachlesen ist kein Quittieren');
+	}
+
+	public function testArchivOhneKatalogIstLeer(): void {
+		$written = [];
+		$service = $this->buildService('0.5.3', [], $written);
+
+		self::assertSame(['versions' => []], $service->getAll());
+	}
+
 	public function testEintraegeAusDerZukunftBleibenAus(): void {
 		$this->writeCatalogue($this->catalogueFixture());
 		$written = [];

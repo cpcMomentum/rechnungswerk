@@ -70,7 +70,7 @@
 
 			<div class="rw-werkplus__privacy">
 				<span class="rw-werkplus__label">{{ t('rechnungswerk', 'Was an WerkPlus übertragen wird') }}</span>
-				<p class="rw-hint">{{ t('rechnungswerk', 'Eine aus dieser Nextcloud abgeleitete Kennung, die Versionen der installierten Werk-Apps und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer- oder Datei-IDs.') }}</p>
+				<p class="rw-hint">{{ t('rechnungswerk', 'Eine aus dieser Nextcloud abgeleitete Kennung, die Versionen der aktivierten Werk-Apps und, sobald vorhanden, der Schlüssel. Nicht übertragen werden Rechnungen, Kunden oder andere Belegdaten, Personendaten, Nextcloud-Benutzer- oder Datei-IDs.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Die Lizenz wird auf diesem Server geprüft. Ist WerkPlus nicht erreichbar, arbeitet RechnungsWerk normal weiter.') }}</p>
 				<p class="rw-hint">{{ t('rechnungswerk', 'Kennung dieser Nextcloud:') }} <code>{{ status.instanceUuid }}</code></p>
 			</div>

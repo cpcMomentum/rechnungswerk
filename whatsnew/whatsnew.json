@@ -13,9 +13,9 @@
 			},
 			"icon": "star",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": true
@@ -29,17 +29,17 @@
 				"fr": "Date correcte juste après minuit"
 			},
 			"text": {
-				"de": "Zwischen Mitternacht und 1 bzw. 2 Uhr bekamen Rechnungen, Stornos und Angebote bisher das Datum des Vortags. Jetzt zählt die Zeitzone der Firma. Sie lässt sich unter Einstellungen › Firma festlegen.",
-				"en": "Between midnight and 1 or 2 a.m., invoices, cancellations and quotes used to get the previous day's date. The company's time zone now applies. You can set it under Settings › Company.",
-				"fr": "Entre minuit et 1 h ou 2 h, les factures, les avoirs d'annulation et les devis recevaient jusqu'ici la date de la veille. C'est désormais le fuseau horaire de l'entreprise qui compte. Il se règle sous Paramètres › Entreprise."
+				"de": "Zwischen Mitternacht und 1 bzw. 2 Uhr bekamen Rechnungen, Stornos und Angebote bisher das Datum des Vortags. Jetzt zählt die Zeitzone der Firma. Sie lässt sich unter Verwaltung › Firma festlegen.",
+				"en": "Between midnight and 1 or 2 a.m., invoices, cancellations and quotes used to get the previous day's date. The company's time zone now applies. You can set it under Administration › Company.",
+				"fr": "Entre minuit et 1 h ou 2 h, les factures, les avoirs d'annulation et les devis recevaient jusqu'ici la date de la veille. C'est désormais le fuseau horaire de l'entreprise qui compte. Il se règle sous Administration › Entreprise."
 			},
 			"icon": "cog",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
-			"adminOnly": false,
+			"adminOnly": true,
 			"plus": false
 		},
 		{
@@ -69,15 +69,15 @@
 				"fr": "WerkPlus sans indication de l'effectif"
 			},
 			"text": {
-				"de": "Für Aktivierung und Testzeitraum ist die Auswahl „Mitarbeitende“ entfallen. Ist die Lizenz auf eine Zahl von Mitarbeitenden ausgestellt, steht diese unter Einstellungen › WerkPlus.",
-				"en": "Activation and the trial no longer ask for the number of employees. If your licence covers a number of employees, Settings › WerkPlus shows it.",
-				"fr": "L'activation et la période d'essai ne demandent plus le nombre de collaborateurs. Si la licence porte sur un nombre de collaborateurs, il figure sous Paramètres › WerkPlus."
+				"de": "Für Aktivierung und Testzeitraum ist die Auswahl „Mitarbeitende“ entfallen. Ist die Lizenz auf eine Zahl von Mitarbeitenden ausgestellt, steht diese unter Verwaltung › WerkPlus.",
+				"en": "Activation and the trial no longer ask for the number of employees. If your licence covers a number of employees, Administration › WerkPlus shows it.",
+				"fr": "L'activation et la période d'essai ne demandent plus le nombre de collaborateurs. Si la licence porte sur un nombre de collaborateurs, il figure sous Administration › WerkPlus."
 			},
 			"icon": "star",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": true
@@ -172,9 +172,9 @@
 			},
 			"icon": "star",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": true
@@ -188,15 +188,15 @@
 				"fr": "Numéro d'immatriculation pour les factures électroniques sans numéro de TVA"
 			},
 			"text": {
-				"de": "Ohne USt-IdNr. melden Prüfprogramme beim Empfänger einen Fehler, obwohl die Rechnung steuerlich in Ordnung ist. Trage unter Firma deine Registernummer ein, z. B. „HRB 12345, Amtsgericht Stuttgart“. Fehlen beide, weist RechnungsWerk darauf hin.",
-				"en": "Without a VAT ID, the recipient's validation software reports an error, even though the invoice is fine for tax purposes. Enter your register number under Company, e.g. “HRB 12345, Amtsgericht Stuttgart”. If both are missing, RechnungsWerk points it out.",
-				"fr": "Sans numéro de TVA, les logiciels de contrôle du destinataire signalent une erreur, alors que la facture est correcte sur le plan fiscal. Saisissez votre numéro d'immatriculation sous Entreprise, par ex. « HRB 12345, Amtsgericht Stuttgart ». Si les deux manquent, RechnungsWerk vous le signale."
+				"de": "Ohne USt-IdNr. melden Prüfprogramme beim Empfänger einen Fehler, obwohl die Rechnung steuerlich in Ordnung ist. Die Registernummer lässt sich unter Verwaltung › Firma eintragen, z. B. „HRB 12345, Amtsgericht Stuttgart“. Fehlen beide, weist RechnungsWerk darauf hin.",
+				"en": "Without a VAT ID, the recipient's validation software reports an error, even though the invoice is fine for tax purposes. Enter your register number under Administration › Company, e.g. “HRB 12345, Amtsgericht Stuttgart”. If both are missing, RechnungsWerk points it out.",
+				"fr": "Sans numéro de TVA, les logiciels de contrôle du destinataire signalent une erreur, alors que la facture est correcte sur le plan fiscal. Saisissez votre numéro d’immatriculation sous Administration › Entreprise, par ex. « HRB 12345, Amtsgericht Stuttgart ». Si les deux manquent, RechnungsWerk vous le signale."
 			},
 			"icon": "file-document",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": false
@@ -268,35 +268,35 @@
 				"fr": "Accès API pour les automatisations"
 			},
 			"text": {
-				"de": "Mit API-Schlüsseln legen andere Programme Rechnungen an, schreiben sie fest, versenden sie oder melden Zahlungen. Jeder Schlüssel bekommt nur die Rechte, die er braucht. Der API-Zugang gehört zu WerkPlus: Damit finanzieren wir, dass RechnungsWerk weiter gepflegt wird, mit neuen Nextcloud-Versionen, Sicherheit und Support. Alle bisherigen Funktionen sind weiter kostenlos. Unter Einstellungen › WerkPlus kannst du es 30 Tage testen.",
-				"en": "With API keys, other programs can create, finalise and send invoices or record payments. Each key gets only the permissions it needs. API access is part of WerkPlus: it funds the ongoing care of RechnungsWerk, with new Nextcloud versions, security and support. All existing features remain free. You can try it for 30 days under Settings › WerkPlus.",
-				"fr": "Grâce aux clés API, d'autres programmes peuvent créer, finaliser et envoyer des factures ou enregistrer des paiements. Chaque clé ne reçoit que les droits nécessaires. L'accès API fait partie de WerkPlus : il finance la maintenance de RechnungsWerk, avec les nouvelles versions de Nextcloud, la sécurité et le support. Toutes les fonctions existantes restent gratuites. Vous pouvez l'essayer 30 jours sous Paramètres › WerkPlus."
+				"de": "Mit API-Schlüsseln legen andere Programme Rechnungen an, schreiben sie fest, versenden sie oder melden Zahlungen. Jeder Schlüssel bekommt nur die Rechte, die er braucht. Der API-Zugang gehört zu WerkPlus: Damit finanzieren wir, dass RechnungsWerk weiter gepflegt wird, mit neuen Nextcloud-Versionen, Sicherheit und Support. Alle bisherigen Funktionen sind weiter kostenlos. WerkPlus lässt sich unter Verwaltung › WerkPlus 30 Tage testen.",
+				"en": "With API keys, other programs can create, finalise and send invoices or record payments. Each key gets only the permissions it needs. API access is part of WerkPlus: it funds the ongoing care of RechnungsWerk, with new Nextcloud versions, security and support. All existing features remain free. You can try it for 30 days under Administration › WerkPlus.",
+				"fr": "Grâce aux clés API, d'autres programmes peuvent créer, finaliser et envoyer des factures ou enregistrer des paiements. Chaque clé ne reçoit que les droits nécessaires. L'accès API fait partie de WerkPlus : il finance la maintenance de RechnungsWerk, avec les nouvelles versions de Nextcloud, la sécurité et le support. Toutes les fonctions existantes restent gratuites. Vous pouvez l'essayer 30 jours sous Administration › WerkPlus."
 			},
 			"icon": "star",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": true
 		},
 		{
 			"title": {
-				"de": "Einstellungen übersichtlicher",
-				"en": "Clearer settings",
-				"fr": "Des paramètres plus clairs"
+				"de": "Verwaltung übersichtlicher",
+				"en": "Clearer administration page",
+				"fr": "Une page Administration plus claire"
 			},
 			"text": {
-				"de": "Die Einstellungen sind jetzt in Bereiche gegliedert: links die Auswahl, rechts der gewählte Bereich. Angefangene Eingaben bleiben beim Wechsel erhalten.",
-				"en": "Settings are now organised into sections: the selection on the left, the chosen section on the right. Unsaved input is kept when you switch.",
-				"fr": "Les paramètres sont désormais organisés en sections : la sélection à gauche, la section choisie à droite. Les saisies en cours sont conservées lors du changement."
+				"de": "Die Verwaltung ist jetzt in Bereiche gegliedert: links die Auswahl, rechts der gewählte Bereich. Angefangene Eingaben bleiben beim Wechsel erhalten.",
+				"en": "The administration page is now organised into sections: the selection on the left, the chosen section on the right. Unsaved input is kept when you switch.",
+				"fr": "La page Administration est désormais organisée en sections : la sélection à gauche, la section choisie à droite. Les saisies en cours sont conservées lors du changement."
 			},
 			"icon": "cog",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": false
@@ -356,11 +356,11 @@
 			},
 			"icon": "cog",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
-			"adminOnly": false,
+			"adminOnly": true,
 			"plus": false
 		},
 		{
@@ -432,9 +432,9 @@
 			},
 			"icon": "folder",
 			"where": {
-				"de": "Einstellungen",
-				"en": "Settings",
-				"fr": "Paramètres"
+				"de": "Verwaltung",
+				"en": "Administration",
+				"fr": "Administration"
 			},
 			"adminOnly": true,
 			"plus": false
