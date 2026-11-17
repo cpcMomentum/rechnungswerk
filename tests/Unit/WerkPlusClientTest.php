@@ -17,6 +17,7 @@ use OCP\Http\Client\IResponse;
 use PHPUnit\Framework\TestCase;
 
 class WerkPlusClientTest extends TestCase {
+	use TraceStrings;
 
 	private function client(int $status, string $body, ?array &$captured = null): WerkPlusClient {
 		$response = $this->createMock(IResponse::class);
@@ -48,6 +49,23 @@ class WerkPlusClientTest extends TestCase {
 		], $captured['options']['json']);
 		$this->assertFalse($captured['options']['http_errors']);
 		$this->assertSame(['token' => 'a.b.c', 'expiresAt' => 'e', 'graceUntil' => 'g'], $result);
+	}
+
+	public function testUnreachableCarriesNeitherTheKeyNorTheClientTrace(): void {
+		$http = $this->createMock(IClient::class);
+		$http->method('post')->willReturnCallback(function (string $uri, array $options): never {
+			throw new \RuntimeException('cURL error 28: timeout');
+		});
+		$service = $this->createMock(IClientService::class);
+		$service->method('newClient')->willReturn($http);
+		try {
+			$this->call(new WerkPlusClient($service));
+			$this->fail('Ausnahme erwartet');
+		} catch (WerkPlusApiException $e) {
+			$this->assertSame(WerkPlusClient::UNREACHABLE, $e->getErrorCode());
+			$this->assertSame('RuntimeException: cURL error 28: timeout', $e->getPrevious()?->getMessage());
+			self::assertNotInTrace('wp_KEY', $e);
+		}
 	}
 
 	public function testTrialSendsTheContractFieldsWithoutKeyAndReturnsTheKey(): void {
