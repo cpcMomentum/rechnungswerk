@@ -22,7 +22,7 @@ trait TraceStrings {
 			foreach ($t->getTrace() as $frame) {
 				$args = $frame['args'] ?? [];
 				$argCount += count($args);
-				array_walk_recursive($args,static function (mixed $v) use (&$strings): void {
+				array_walk_recursive($args, static function (mixed $v) use (&$strings): void {
 					if (is_string($v)) {
 						$strings[] = $v;
 					}
