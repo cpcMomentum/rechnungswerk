@@ -78,7 +78,7 @@ class ApiKeyService {
 	}
 
 	/** Checks a bearer token and books a rate-limit hit on success; @return array{key: ?ApiKey, error: ?string, retryAfter: int} */
-	public function authenticate(string $token): array {
+	public function authenticate(#[\SensitiveParameter] string $token): array {
 		$fail = static fn (string $error): array => ['key' => null, 'error' => $error, 'retryAfter' => 0];
 
 		if (!preg_match('/^rwrk_[A-Za-z0-9_-]{43}$/', $token)) {

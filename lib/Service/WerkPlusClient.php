@@ -82,7 +82,8 @@ class WerkPlusClient {
 				'http_errors' => false,
 			]);
 		} catch (\Throwable $e) {
-			throw new WerkPlusApiException(self::UNREACHABLE, '', $e);
+			// Nicht $e selbst weiterreichen: Die Trace-Argumente des HTTP-Clients tragen den Schluessel.
+			throw new WerkPlusApiException(self::UNREACHABLE, '', new \RuntimeException(get_class($e) . ': ' . $e->getMessage()));
 		}
 
 		$body = json_decode((string)$response->getBody(), true);
@@ -100,7 +101,7 @@ class WerkPlusClient {
 	 * @return array{token: string, expiresAt: string, graceUntil: string}
 	 * @throws WerkPlusApiException
 	 */
-	private static function tokenFields(array $body): array {
+	private static function tokenFields(#[\SensitiveParameter] array $body): array {
 		if (!is_string($body['token'] ?? null)
 			|| !is_string($body['expiresAt'] ?? null)
 			|| !is_string($body['graceUntil'] ?? null)) {
