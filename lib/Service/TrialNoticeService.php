@@ -52,7 +52,7 @@ class TrialNoticeService {
 	}
 
 	// `exp` nur als Vermerk-Wert, angezeigt wird es nie.
-	private static function trialEnd(EntitlementToken $token): int {
+	public static function trialEnd(EntitlementToken $token): int {
 		return $token->licenseValidUntil ?? $token->expiresAt;
 	}
 

@@ -88,6 +88,12 @@ class EntitlementService {
 		return $this->activeToken()?->tier ?? 'free';
 	}
 
+	/** Testende des aktiven Testtokens, sonst null; derselbe Wert wie in den Erinnerungen. */
+	public function trialEndsAt(): ?int {
+		$token = $this->activeToken();
+		return $token !== null && $token->isTrial() ? TrialNoticeService::trialEnd($token) : null;
+	}
+
 	public function state(): string {
 		return $this->current()['state'];
 	}
