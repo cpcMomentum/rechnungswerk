@@ -7,6 +7,8 @@ export interface ApiError {
 	status: number
 	message: string
 	code?: string
+	/** Grenze des freien Umfangs; die Oberflaeche bietet „Mit WerkPlus freischalten“ an. */
+	werkplusLimit?: boolean
 }
 
 /** UN/ECE Rec. 20 unit codes used in EN16931. Labels are translated at render time. */
@@ -316,7 +318,7 @@ export interface WhatsNewEntry {
 	where: string
 	/** Stelle ist adminpflichtig; der Dialog schreibt es dazu. */
 	adminOnly: boolean
-	/** WerkPlus-Feature: Badge und Link auf werkwolke.de. */
+	/** WerkPlus-Feature: Badge und Link auf die Funktionen-Seite. */
 	plus: boolean
 }
 

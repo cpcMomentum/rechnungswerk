@@ -17,6 +17,10 @@ vi.mock('@/api/apiKeys', () => ({
 	revokeApiKey: (id: number) => revokeApiKey(id),
 }))
 
+vi.mock('@/werkplusLinks', () => ({
+	werkplusLinks: () => ({ buy: 'https://werkwolke.de/preis?app=rechnungswerk', features: '', trial: '' }),
+}))
+
 vi.mock('@nextcloud/vue/components/NcButton', () => ({
 	default: {
 		name: 'NcButton',
@@ -117,6 +121,41 @@ describe('ApiKeysSection', () => {
 
 		expect(createApiKey).toHaveBeenCalledWith('WerkPlus', ['invoices:create'], null)
 		expect(wrapper.text()).toContain('rwrk_newplaintext')
+	})
+
+	it('Grenze des freien Umfangs: Meldung mit Link „Mit WerkPlus freischalten“', async () => {
+		getApiKeys.mockResolvedValue([])
+		createApiKey.mockRejectedValue({ status: 403, message: 'API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.', werkplusLimit: true })
+		const wrapper = mount(ApiKeysSection)
+		await flushPromises()
+
+		await wrapper.find('.stub-button').trigger('click')
+		await wrapper.find('input[type="text"]').setValue('WerkPlus')
+		await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
+		await wrapper.findAll('.stub-button')[2].trigger('click')
+		await flushPromises()
+
+		const note = wrapper.find('.stub-note--error')
+		expect(note.text()).toContain('API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.')
+		const link = note.find('a')
+		expect(link.text()).toBe('Mit WerkPlus freischalten')
+		expect(link.attributes('href')).toBe('https://werkwolke.de/preis?app=rechnungswerk')
+	})
+
+	it('andere Fehler beim Anlegen: kein Freischalt-Link', async () => {
+		getApiKeys.mockResolvedValue([])
+		createApiKey.mockRejectedValue({ status: 400, message: 'Ungültige Rechte.' })
+		const wrapper = mount(ApiKeysSection)
+		await flushPromises()
+
+		await wrapper.find('.stub-button').trigger('click')
+		await wrapper.find('input[type="text"]').setValue('WerkPlus')
+		await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
+		await wrapper.findAll('.stub-button')[2].trigger('click')
+		await flushPromises()
+
+		expect(wrapper.find('.stub-note--error').text()).toContain('Ungültige Rechte.')
+		expect(wrapper.find('.stub-note--error a').exists()).toBe(false)
 	})
 
 	it('bietet das Löschen eigener Entwürfe als eigenes Recht an', async () => {

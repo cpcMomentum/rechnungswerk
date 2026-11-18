@@ -20,6 +20,8 @@ class WerkwolkeStore {
 	private const K_VERSION = 'store_version';
 	private const K_KEY = 'key';
 	private const K_TOKEN = 'token';
+	/** Vermerke je Erinnerungsstufe: `trial_notice_7d`, `_1d`, `_end`. */
+	private const K_TRIAL_NOTICE = 'trial_notice_';
 
 	public function __construct(
 		private readonly IAppConfig $appConfig,
@@ -101,6 +103,21 @@ class WerkwolkeStore {
 		}
 		$this->appConfig->deleteKey(self::APP, self::K_KEY);
 		$this->appConfig->deleteKey(self::APP, self::K_TOKEN);
+	}
+
+	/** Frisch aus der Datenbank, damit eine Erinnerung einer anderen Werk-App im selben Lauf zaehlt. */
+	public function getTrialNotice(string $stage): string {
+		$this->appConfig->clearCache(true);
+		return $this->appConfig->getValueString(self::APP, self::K_TRIAL_NOTICE . $stage);
+	}
+
+	/** False, wenn das Format neuer ist; dann wird auch nicht verschickt. */
+	public function setTrialNotice(string $stage, string $value): bool {
+		if ($this->isTooNew()) {
+			return false;
+		}
+		$this->appConfig->setValueString(self::APP, self::K_TRIAL_NOTICE . $stage, $value);
+		return true;
 	}
 
 	private function writeVersion(): void {

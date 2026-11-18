@@ -104,6 +104,8 @@ final class EntitlementTokenVerifier {
 			$claims['exp'],
 			max($claims['exp'], $claims['graceUntil']),
 			self::positiveCount($licensedEmployees),
+			is_bool($claims['trial'] ?? null) ? $claims['trial'] : null,
+			is_int($claims['licenseValidUntil'] ?? null) ? $claims['licenseValidUntil'] : null,
 		);
 	}
 

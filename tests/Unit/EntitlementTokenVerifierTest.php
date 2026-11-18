@@ -34,6 +34,23 @@ class EntitlementTokenVerifierTest extends TestCase {
 		}
 	}
 
+	public function testTrialAndLicenseEndAreReadOnlyWithTheRightType(): void {
+		$read = fn (array $claims) => $this->verifier()->verify($this->token($this->claims($claims)), self::UUID, self::NOW);
+
+		$token = $read(['trial' => true, 'licenseValidUntil' => self::NOW + 86400]);
+		$this->assertTrue($token->isTrial());
+		$this->assertSame(self::NOW + 86400, $token->licenseValidUntil);
+
+		$token = $read(['trial' => null, 'licenseValidUntil' => null]);
+		$this->assertNull($token->trial);
+		$this->assertFalse($token->isTrial());
+		$this->assertNull($token->licenseValidUntil);
+
+		$token = $read(['trial' => 'true', 'licenseValidUntil' => '1796134323']);
+		$this->assertNull($token->trial);
+		$this->assertNull($token->licenseValidUntil);
+	}
+
 	public function testLicensedEmployeesIsReadWhenItIsAPositiveNumber(): void {
 		$read = fn (mixed $value) => $this->verifier()->verify($this->token($this->claims(['licensedEmployees' => $value])), self::UUID, self::NOW)->licensedEmployees;
 

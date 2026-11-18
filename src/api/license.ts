@@ -15,6 +15,12 @@ export interface LicenseStatus {
 	tier: 'free' | 'werkplus'
 	features: string[]
 	licensedEmployees: number | null
+	/** Schluessel aus dem Testzeitraum; fehlt der Anspruch im Token, false. */
+	trial: boolean
+	/** Laufzeitende der Lizenz. Nie durch expiresAt ersetzen, das ist nur der naechste Prueftermin. */
+	licenseValidUntil: string | null
+	/** Schluessel da, kein Token, Server meldete das Ende des Testzeitraums. */
+	trialEnded: boolean
 	expiresAt: string | null
 	graceUntil: string | null
 	lastCheckAt: string | null
