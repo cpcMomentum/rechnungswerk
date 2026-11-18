@@ -625,7 +625,25 @@
 		"Vorbelegt aus deinem Ansprechpartner unter „Einstellungen“, sonst aus dem zentralen Firmenkontakt. Für diese Rechnung änderbar; leer lassen → Firmenkontakt.": "Pré-rempli à partir de votre interlocuteur dans « Paramètres », sinon à partir du contact central de l'entreprise. Modifiable pour cette facture ; laisser vide → contact de l'entreprise.",
 		"Persönlich": "Personnel",
 		"Für eine innergemeinschaftliche Lieferung muss die eigene USt-IdNr. hinterlegt sein. Zu finden unter Verwaltung (nur für Administratoren).": "Une livraison intracommunautaire nécessite votre propre numéro de TVA intracommunautaire. Vous pouvez le saisir dans Administration (administrateurs uniquement).",
-		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Verwaltung (nur für Administratoren).": "Veuillez d'abord saisir le nom de votre entreprise. Sans lui, aucun document valide ne peut être créé. Vous le trouverez dans Administration (administrateurs uniquement)."
+		"Bitte zuerst den Firmennamen hinterlegen. Ohne ihn entsteht kein gültiger Beleg. Zu finden unter Verwaltung (nur für Administratoren).": "Veuillez d'abord saisir le nom de votre entreprise. Sans lui, aucun document valide ne peut être créé. Vous le trouverez dans Administration (administrateurs uniquement).",
+		"Welche Funktionen WerkPlus bietet": "Les fonctions de WerkPlus",
+		"Testzeitraum auf werkwolke.de": "Essai sur werkwolke.de",
+		"Testzeitraum läuft bis": "Essai jusqu’au",
+		"Laufzeit": "Durée",
+		"abgelaufen, Karenz bis {date}": "expirée, délai de grâce jusqu’au {date}",
+		"Laufzeit bis": "Valable jusqu’au",
+		"Mit dem Kauf bekommst du einen eigenen Schlüssel. Trage ihn hier ein, er ersetzt den Testschlüssel.": "L’achat vous donne votre propre clé. Saisissez-la ici, elle remplace la clé d’essai.",
+		"WerkPlus – Testzeitraum": "WerkPlus – essai",
+		"WerkPlus kaufen": "Acheter WerkPlus",
+		"Jetzt kaufen": "Acheter maintenant",
+		"Der Testzeitraum ist beendet. RechnungsWerk arbeitet im freien Umfang weiter, deine Daten bleiben erhalten.": "L’essai est terminé. RechnungsWerk continue avec les fonctions gratuites, vos données sont conservées.",
+		"Mit WerkPlus freischalten": "Débloquer avec WerkPlus",
+		"Der WerkPlus-Testzeitraum ist beendet.": "L’essai WerkPlus est terminé.",
+		"RechnungsWerk läuft im freien Umfang weiter, deine Daten bleiben erhalten.": "RechnungsWerk continue avec les fonctions gratuites, vos données sont conservées.",
+		"Der WerkPlus-Testzeitraum endet am %s.": "L’essai WerkPlus se termine le %s.",
+		"Danach läuft RechnungsWerk im freien Umfang weiter, deine Daten bleiben erhalten.": "Ensuite, RechnungsWerk continue avec les fonctions gratuites, vos données sont conservées.",
+		"noch 1 Tag": "encore 1 jour",
+		"noch {days} Tage": "encore {days} jours"
 	},
 	"pluralForm": "nplurals=2; plural=(n > 1);"
 }

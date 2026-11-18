@@ -12,6 +12,7 @@ namespace OCA\Rechnungswerk\AppInfo;
 use OCA\Rechnungswerk\BackgroundJob\DatevConfirmationJob;
 use OCA\Rechnungswerk\BackgroundJob\DocumentBackfillJob;
 use OCA\Rechnungswerk\BackgroundJob\EntitlementRefreshJob;
+use OCA\Rechnungswerk\Notification\Notifier;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -34,6 +35,7 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function register(IRegistrationContext $context): void {
+		$context->registerNotifierService(Notifier::class);
 	}
 
 	public function boot(IBootContext $context): void {

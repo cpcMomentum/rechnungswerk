@@ -119,6 +119,29 @@ class WerkPlusClientTest extends TestCase {
 	}
 
 	/**
+	 * @return array<string, array{string, bool}>
+	 */
+	public static function trialFlags(): array {
+		return [
+			'KEY_EXPIRED Testzeitraum' => ['{"error":{"code":"KEY_EXPIRED","message":"x","trial":true}}', true],
+			'KEY_EXPIRED gekauft' => ['{"error":{"code":"KEY_EXPIRED","message":"x","trial":false}}', false],
+			'KEY_EXPIRED ohne Feld' => ['{"error":{"code":"KEY_EXPIRED","message":"x"}}', false],
+			'KEY_EXPIRED als Text' => ['{"error":{"code":"KEY_EXPIRED","message":"x","trial":"true"}}', false],
+			'anderer Code' => ['{"error":{"code":"KEY_REVOKED","message":"x","trial":true}}', false],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('trialFlags')]
+	public function testErrorTrialIsOnlyReadForKeyExpired(string $body, bool $trial): void {
+		try {
+			$this->call($this->client(403, $body));
+			$this->fail('Ausnahme erwartet');
+		} catch (WerkPlusApiException $e) {
+			$this->assertSame($trial, $e->isTrial());
+		}
+	}
+
+	/**
 	 * @return array<string, array{int, string, string}>
 	 */
 	public static function failures(): array {

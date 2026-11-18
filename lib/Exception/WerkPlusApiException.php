@@ -16,6 +16,8 @@ class WerkPlusApiException extends \RuntimeException {
 		private readonly string $errorCode,
 		private readonly string $serverMessage = '',
 		?\Throwable $previous = null,
+		/** Nur bei KEY_EXPIRED: `error.trial` des Servers, fehlt es, false. */
+		private readonly bool $trial = false,
 	) {
 		parent::__construct('WerkPlus: ' . $errorCode, 0, $previous);
 	}
@@ -26,5 +28,9 @@ class WerkPlusApiException extends \RuntimeException {
 
 	public function getServerMessage(): string {
 		return $this->serverMessage;
+	}
+
+	public function isTrial(): bool {
+		return $this->trial;
 	}
 }

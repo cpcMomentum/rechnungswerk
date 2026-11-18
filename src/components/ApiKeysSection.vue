@@ -81,7 +81,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 						:placeholder="t('rechnungswerk', 'Standard: 60')" />
 				</label>
 
-				<NcNoteCard v-if="actionError" type="error" :text="actionError" />
+				<NcNoteCard v-if="actionError" type="error">
+					<p>{{ actionError }}</p>
+					<WerkPlusUnlockLink v-if="actionErrorIsLimit" />
+				</NcNoteCard>
 
 				<div class="rw-api-keys__actions">
 					<NcButton @click="openCreate = false">{{ t('rechnungswerk', 'Abbrechen') }}</NcButton>
@@ -109,6 +112,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcModal from '@nextcloud/vue/components/NcModal'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import WerkPlusUnlockLink from '@/components/WerkPlusUnlockLink.vue'
 import { createApiKey, getApiKeys, revokeApiKey, type ApiKey } from '@/api/apiKeys'
 
 const SCOPES = ['invoices:create', 'invoices:commit', 'invoices:send', 'invoices:pay', 'invoices:cancel', 'invoices:read', 'invoices:pdf', 'invoices:delete'] as const
@@ -133,6 +137,7 @@ const newRateLimit = ref('')
 const busy = ref(false)
 const loadError = ref('')
 const actionError = ref('')
+const actionErrorIsLimit = ref(false)
 const createdKey = ref('')
 const copied = ref(false)
 const revokeId = ref<number | null>(null)
@@ -164,6 +169,7 @@ async function load(): Promise<void> {
 async function onCreate(): Promise<void> {
 	busy.value = true
 	actionError.value = ''
+	actionErrorIsLimit.value = false
 	try {
 		const rateLimit = newRateLimit.value === '' ? null : Number(newRateLimit.value)
 		const created = await createApiKey(newName.value.trim(), [...newScopes.value], rateLimit)
@@ -175,7 +181,9 @@ async function onCreate(): Promise<void> {
 		newRateLimit.value = ''
 		await load()
 	} catch (e) {
-		actionError.value = (e as { message?: string }).message ?? t('rechnungswerk', 'Anlegen fehlgeschlagen.')
+		const { message, werkplusLimit } = e as { message?: string, werkplusLimit?: boolean }
+		actionError.value = message ?? t('rechnungswerk', 'Anlegen fehlgeschlagen.')
+		actionErrorIsLimit.value = werkplusLimit === true
 	} finally {
 		busy.value = false
 	}

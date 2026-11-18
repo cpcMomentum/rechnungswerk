@@ -69,6 +69,8 @@ trait EntitlementTokenFactory {
 			'features' => ['tenants', 'inbound', 'pw_multi_board'],
 			'seatsBucket' => null,
 			'graceUntil' => self::NOW + 44 * 86400,
+			// Ohne den Anspruch erneuert die App sofort, das verfaelschte sonst die Faelligkeitstests.
+			'trial' => false,
 		];
 		foreach ($overrides as $name => $value) {
 			if ($value === null) {

@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Tests\Unit;
 
 use OCA\Rechnungswerk\Exception\WerkPlusApiException;
+use OCA\Rechnungswerk\Notification\NotificationService;
 use OCA\Rechnungswerk\Service\EntitlementService;
+use OCA\Rechnungswerk\Service\TrialNoticeService;
 use OCA\Rechnungswerk\Service\WerkPlusClient;
 use OCA\Rechnungswerk\Service\WerkwolkeStore;
 use OCP\App\IAppManager;
@@ -37,6 +39,7 @@ class EntitlementServiceTest extends TestCase {
 	private int $now = self::NOW;
 	private WerkPlusClient&MockObject $client;
 	private LoggerInterface&MockObject $logger;
+	private NotificationService&MockObject $notifications;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -46,6 +49,7 @@ class EntitlementServiceTest extends TestCase {
 		$this->now = self::NOW;
 		$this->client = $this->createMock(WerkPlusClient::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->notifications = $this->createMock(NotificationService::class);
 	}
 
 	private function service(): EntitlementService {
@@ -75,15 +79,17 @@ class EntitlementServiceTest extends TestCase {
 		$appManager->method('getAppVersion')->willReturnCallback(fn (string $app) => $this->installedApps[$app] ?? '0');
 		$appManager->method('isEnabledForAnyone')->willReturnCallback(fn (string $app) => isset($this->installedApps[$app]));
 
+		$store = new WerkwolkeStore($appConfig);
 		return new EntitlementService(
 			$appConfig,
 			$config,
-			new WerkwolkeStore($appConfig),
+			$store,
 			$time,
 			$this->client,
 			$this->verifier(),
 			$appManager,
 			$this->logger,
+			new TrialNoticeService($store, $this->notifications, $time),
 		);
 	}
 
@@ -749,5 +755,190 @@ class EntitlementServiceTest extends TestCase {
 		$this->config['rechnungswerk/werkplus_last_error'] = json_encode(['code' => 'INSTANCE_LIMIT_REACHED', 'serverMessage' => '', 'at' => self::NOW - 60]);
 
 		$this->assertTrue($this->service()->isRefreshDue());
+	}
+
+	// --- Testzeitraum und Laufzeit aus dem Token ---
+
+	private const TRIAL_END = self::NOW + 30 * 86400;
+
+	private function storeTrialToken(array $overrides = []): void {
+		$this->storeToken(['trial' => true, 'licenseValidUntil' => self::TRIAL_END] + $overrides);
+	}
+
+	public function testTrialTokenShowsTrialAndItsEnd(): void {
+		$this->storeTrialToken();
+		$status = $this->service()->getStatus();
+
+		$this->assertTrue($status['trial']);
+		$this->assertSame(gmdate('Y-m-d\TH:i:s\Z', self::TRIAL_END), $status['licenseValidUntil']);
+		$this->assertFalse($status['trialEnded']);
+	}
+
+	public function testBoughtTokenShowsTheLicenseEndNotTheTokenEnd(): void {
+		$yearEnd = self::NOW + 365 * 86400;
+		$this->storeToken(['trial' => false, 'licenseValidUntil' => $yearEnd]);
+		$status = $this->service()->getStatus();
+
+		$this->assertFalse($status['trial']);
+		$this->assertSame(gmdate('Y-m-d\TH:i:s\Z', $yearEnd), $status['licenseValidUntil']);
+	}
+
+	public function testWithoutTheClaimsThereIsNoLicenseEndAndNoTrial(): void {
+		$this->storeToken(['trial' => null, 'licenseValidUntil' => null]);
+		$status = $this->service()->getStatus();
+
+		$this->assertFalse($status['trial']);
+		$this->assertNull($status['licenseValidUntil'], 'exp darf nie als Laufzeit erscheinen');
+	}
+
+	public function testATokenWithoutTrialClaimIsRenewedRightAway(): void {
+		$this->storeToken(['trial' => null]);
+		$this->assertTrue($this->service()->isRefreshDue());
+
+		$this->storeToken(['trial' => false]);
+		$this->assertFalse($this->service()->isRefreshDue());
+	}
+
+	public function testTheImmediateRenewalHappensOnceADayAtMostWhenTheServerStillOmitsTrial(): void {
+		$this->storeToken(['trial' => null]);
+		// Ein alter Server liefert wieder ein Token ohne `trial`.
+		$this->client->expects($this->once())->method('validate')
+			->willReturn($this->response(['trial' => null, 'iat' => self::NOW + 60]));
+		$this->now = self::NOW + 120;
+		$this->service()->refreshIfDue();
+
+		$this->now = self::NOW + 6 * 3600;
+		$this->assertFalse($this->service()->isRefreshDue(), 'Keine Schleife im Sechs-Stunden-Takt');
+		$this->now = self::NOW + 86400 + 120;
+		$this->assertTrue($this->service()->isRefreshDue(), 'Nach einem Tag ein zweiter Versuch');
+	}
+
+	/**
+	 * @return array<string, array{string, bool}>
+	 */
+	public static function keyExpiredAnswers(): array {
+		return [
+			'Testzeitraum' => ['{"trial":true}', true],
+			'gekauft' => ['{"trial":false}', false],
+			'aelterer Server' => ['{}', false],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('keyExpiredAnswers')]
+	public function testKeyExpiredRemembersWhetherItWasATrial(string $error, bool $trialEnded): void {
+		$this->storeToken();
+		$isTrial = json_decode($error, true)['trial'] ?? false;
+		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_EXPIRED', '', null, $isTrial));
+		try {
+			$this->service()->refresh();
+		} catch (WerkPlusApiException) {
+		}
+
+		$status = $this->service()->getStatus();
+		$this->assertNull($this->shared('token'));
+		$this->assertSame(self::KEY, $this->shared('key'));
+		$this->assertSame($trialEnded, $status['trialEnded']);
+		$this->assertArrayNotHasKey('werkwolke/trial_notice_end', $this->sensitive, 'Der Zustand steht in der eigenen Konfiguration');
+	}
+
+	public function testTheEndNoticeGoesOutBeforeTheTrialTokenIsDropped(): void {
+		$this->storeTrialToken();
+		$this->now = self::TRIAL_END + 3600;
+		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_EXPIRED', '', null, true));
+		$this->notifications->expects($this->once())->method('notifyAdminsAboutTrial')
+			->with(TrialNoticeService::STAGE_END, self::TRIAL_END)
+			->willReturnCallback(fn () => $this->assertNotNull($this->shared('token'), 'Token muss beim Versand noch da sein'));
+		try {
+			$this->service()->refresh();
+		} catch (WerkPlusApiException) {
+		}
+
+		$this->assertSame((string)self::TRIAL_END, $this->shared('trial_notice_end'));
+		$this->assertNull($this->shared('token'));
+	}
+
+	public function testNoEndNoticeWhenABoughtKeyExpires(): void {
+		$this->storeToken(['trial' => false, 'licenseValidUntil' => self::NOW + 86400]);
+		$this->now = self::NOW + 2 * 86400;
+		$this->client->method('validate')->willThrowException(new WerkPlusApiException('KEY_EXPIRED'));
+		$this->notifications->expects($this->never())->method('notifyAdminsAboutTrial');
+		try {
+			$this->service()->refresh();
+		} catch (WerkPlusApiException) {
+		}
+	}
+
+	/**
+	 * @return array<string, array{int, ?string}>
+	 */
+	public static function trialStages(): array {
+		return [
+			'10 Tage vorher' => [10 * 86400, null],
+			'7 Tage vorher' => [7 * 86400, TrialNoticeService::STAGE_7D],
+			'3 Tage vorher' => [3 * 86400, TrialNoticeService::STAGE_7D],
+			'1 Tag vorher' => [86400, TrialNoticeService::STAGE_1D],
+			'2 Stunden vorher' => [7200, TrialNoticeService::STAGE_1D],
+			'danach' => [-3600, TrialNoticeService::STAGE_END],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('trialStages')]
+	public function testTheDueStageIsSentOnce(int $left, ?string $stage): void {
+		$this->storeTrialToken();
+		$this->now = self::TRIAL_END - $left;
+		if ($stage === null) {
+			$this->notifications->expects($this->never())->method('notifyAdminsAboutTrial');
+		} else {
+			$this->notifications->expects($this->once())->method('notifyAdminsAboutTrial')->with($stage, self::TRIAL_END)
+				->willReturnCallback(fn () => $this->assertSame((string)self::TRIAL_END, $this->shared('trial_notice_' . $stage), 'Erst der Vermerk, dann der Versand'));
+		}
+
+		$this->service()->sendTrialNotices();
+		$this->service()->sendTrialNotices();
+
+		if ($stage !== null) {
+			$this->assertSame((string)self::TRIAL_END, $this->shared('trial_notice_' . $stage));
+			$this->assertFalse($this->sensitive['werkwolke/trial_notice_' . $stage]);
+		}
+	}
+
+	public function testANoticeAnotherWerkAppSentIsNotRepeated(): void {
+		$this->storeTrialToken();
+		$this->now = self::TRIAL_END - 3 * 86400;
+		$this->config['werkwolke/trial_notice_7d'] = (string)self::TRIAL_END;
+		$this->notifications->expects($this->never())->method('notifyAdminsAboutTrial');
+
+		$this->service()->sendTrialNotices();
+	}
+
+	public function testBoughtKeysGetNoTrialNotices(): void {
+		$this->storeToken(['trial' => false, 'licenseValidUntil' => self::NOW + 86400]);
+		$this->notifications->expects($this->never())->method('notifyAdminsAboutTrial');
+
+		$this->service()->sendTrialNotices();
+	}
+
+	public function testNoNoticeWhenTheStoreIsTooNew(): void {
+		$this->storeTrialToken();
+		$this->config['werkwolke/store_version'] = '2';
+		$this->now = self::TRIAL_END - 3 * 86400;
+		$this->notifications->expects($this->never())->method('notifyAdminsAboutTrial');
+
+		$this->service()->sendTrialNotices();
+		$this->assertNull($this->shared('trial_notice_7d'));
+	}
+
+	public function testNoEndNoticeWhenAnotherWerkAppSwappedTheKeyMeanwhile(): void {
+		$this->storeTrialToken();
+		$this->now = self::TRIAL_END + 3600;
+		$this->client->method('validate')->willReturnCallback(function (): never {
+			$this->config['werkwolke/key'] = self::OTHER_KEY;
+			throw new WerkPlusApiException('KEY_EXPIRED', '', null, true);
+		});
+		$this->notifications->expects($this->never())->method('notifyAdminsAboutTrial');
+		try {
+			$this->service()->refresh();
+		} catch (WerkPlusApiException) {
+		}
 	}
 }

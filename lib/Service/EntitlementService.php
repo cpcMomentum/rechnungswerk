@@ -53,6 +53,9 @@ class EntitlementService {
 
 	private const K_LAST_ATTEMPT = 'werkplus_last_attempt_at';
 	private const K_LAST_ERROR = 'werkplus_last_error';
+	/** Letzte Sofort-Erneuerung wegen fehlendem `trial`; verfaellt nach einem Tag, damit es keine Schleife gibt. */
+	private const K_CLAIMS_REFRESH = 'werkplus_claims_refresh_at';
+	private const CLAIMS_REFRESH_AFTER = 86400;
 	/** Eigene Ablage vor der gemeinsamen; der Schluessel wird einmalig uebernommen, der Rest geloescht. */
 	private const K_LEGACY_KEY = 'werkplus_key';
 	private const LEGACY_KEYS = ['werkplus_key', 'werkplus_token', 'werkplus_instance_uuid', 'werkplus_last_check_at', 'werkplus_employee_bucket'];
@@ -69,6 +72,7 @@ class EntitlementService {
 		private readonly EntitlementTokenVerifier $verifier,
 		private readonly IAppManager $appManager,
 		private readonly LoggerInterface $logger,
+		private readonly TrialNoticeService $trialNotices,
 	) {
 	}
 
@@ -176,10 +180,25 @@ class EntitlementService {
 		if (!$this->isRefreshDue()) {
 			return;
 		}
+		if ($this->current()['token']?->trial === null) {
+			$this->appConfig->setValueString(Application::APP_ID, self::K_CLAIMS_REFRESH, (string)$this->now());
+		}
 		try {
 			$this->refresh();
 		} catch (\Throwable $e) {
 			$this->logger->info('RechnungsWerk: WerkPlus-Lizenz nicht erneuert', ['reason' => get_class($e) . ': ' . $e->getMessage()]);
+		}
+	}
+
+	/** Fuer den Hintergrundjob: Erinnerung zum Testzeitraum, wirft nie. */
+	public function sendTrialNotices(): void {
+		try {
+			$token = $this->current()['token'];
+			if ($token !== null) {
+				$this->trialNotices->sendDue($token);
+			}
+		} catch (\Throwable $e) {
+			$this->logger->info('RechnungsWerk: Erinnerung zum Testzeitraum nicht verschickt', ['reason' => get_class($e) . ': ' . $e->getMessage()]);
 		}
 	}
 
@@ -202,6 +221,10 @@ class EntitlementService {
 		if ($token === null) {
 			return true;
 		}
+		// Ohne `trial` stammt es von vor dem 18.11.2026: einmal sofort erneuern, danach die normale Regel.
+		if ($token->trial === null && $now - (int)$this->own(self::K_CLAIMS_REFRESH) >= self::CLAIMS_REFRESH_AFTER) {
+			return true;
+		}
 		return $now - $token->issuedAt >= self::RENEW_AFTER
 			|| $token->expiresAt - $now < self::RENEW_BEFORE_EXPIRY;
 	}
@@ -210,7 +233,7 @@ class EntitlementService {
 	public function removeKey(): void {
 		$this->assertStoreWritable();
 		$this->store->clear();
-		foreach ([self::K_LAST_ATTEMPT, self::K_LAST_ERROR, ...self::LEGACY_KEYS] as $configKey) {
+		foreach ([self::K_LAST_ATTEMPT, self::K_LAST_ERROR, self::K_CLAIMS_REFRESH, ...self::LEGACY_KEYS] as $configKey) {
 			$this->appConfig->deleteKey(Application::APP_ID, $configKey);
 		}
 		$this->current = null;
@@ -232,6 +255,10 @@ class EntitlementService {
 			'tier' => $this->tier(),
 			'features' => $active?->features ?? [],
 			'licensedEmployees' => $active?->licensedEmployees,
+			'trial' => $token?->isTrial() ?? false,
+			// Nie `exp` ersatzweise: das ist nur der naechste Prueftermin.
+			'licenseValidUntil' => $token?->licenseValidUntil !== null ? $this->iso($token->licenseValidUntil) : null,
+			'trialEnded' => $this->trialEnded($key, $token),
 			'expiresAt' => $token !== null ? $this->iso($token->expiresAt) : null,
 			'graceUntil' => $token !== null ? $this->iso($token->graceUntil) : null,
 			// Aus dem gemeinsamen Token, damit auch eine Erneuerung durch eine andere Werk-App zaehlt.
@@ -242,8 +269,17 @@ class EntitlementService {
 		];
 	}
 
+	// Schluessel da, kein Token, letzte Antwort KEY_EXPIRED mit `error.trial`; der Vermerk `trial_notice_end` zaehlt nicht.
+	private function trialEnded(string $key, ?EntitlementToken $token): bool {
+		if ($key === '' || $token !== null) {
+			return false;
+		}
+		$lastError = $this->lastError();
+		return $lastError !== null && $lastError['code'] === 'KEY_EXPIRED' && $lastError['trial'];
+	}
+
 	/**
-	 * @return array{code: string, serverMessage: string, at: int}|null
+	 * @return array{code: string, serverMessage: string, at: int, trial: bool}|null
 	 */
 	public function lastError(): ?array {
 		$data = json_decode($this->own(self::K_LAST_ERROR), true);
@@ -264,6 +300,7 @@ class EntitlementService {
 			'code' => $data['code'],
 			'serverMessage' => is_string($data['serverMessage'] ?? null) ? $data['serverMessage'] : '',
 			'at' => $at,
+			'trial' => ($data['trial'] ?? false) === true,
 		];
 	}
 
@@ -319,11 +356,30 @@ class EntitlementService {
 			'serverMessage' => $e->getServerMessage(),
 			'at' => $now,
 			'key' => self::fingerprint($storedKey),
+			'trial' => $e->isTrial(),
 		], JSON_THROW_ON_ERROR));
 		if (in_array($e->getErrorCode(), self::DROP_TOKEN, true)) {
+			$this->sendEndNoticeBeforeDrop($e, $storedKey);
 			$this->store->deleteTokenOfKey($storedKey);
 		}
 		$this->current = null;
+	}
+
+	// Nach dem Loeschen gibt es kein Token mehr, an dem eine App den Testzeitraum erkennt.
+	private function sendEndNoticeBeforeDrop(WerkPlusApiException $e, #[\SensitiveParameter] string $storedKey): void {
+		// Hat eine andere Werk-App inzwischen einen neuen Schluessel eingetragen, gehoert das Token nicht zum geprueften Schluessel.
+		if ($e->getErrorCode() !== 'KEY_EXPIRED' || $this->store->getKey() !== $storedKey) {
+			return;
+		}
+		$token = $this->current()['token'];
+		if ($token === null) {
+			return;
+		}
+		try {
+			$this->trialNotices->sendEnd($token);
+		} catch (\Throwable $t) {
+			$this->logger->info('RechnungsWerk: Erinnerung zum Testende nicht verschickt', ['reason' => get_class($t) . ': ' . $t->getMessage()]);
+		}
 	}
 
 	/**

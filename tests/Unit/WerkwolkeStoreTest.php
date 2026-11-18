@@ -82,4 +82,21 @@ class WerkwolkeStoreTest extends TestCase {
 
 		$this->assertSame(['werkwolke/store_version' => '1'], $this->config);
 	}
+
+	public function testTheTrialNoticeIsReadFreshFromTheDatabase(): void {
+		$cached = ['werkwolke/trial_notice_7d' => ''];
+		$database = ['werkwolke/trial_notice_7d' => '1796134323'];
+		$appConfig = $this->createMock(IAppConfig::class);
+		$appConfig->expects($this->once())->method('clearCache')->with(true)
+			->willReturnCallback(function () use (&$cached, $database): void {
+				$cached = $database;
+			});
+		$appConfig->method('getValueString')->willReturnCallback(
+			function (string $app, string $key) use (&$cached): string {
+				return $cached["$app/$key"] ?? '';
+			}
+		);
+
+		$this->assertSame('1796134323', (new WerkwolkeStore($appConfig))->getTrialNotice('7d'));
+	}
 }

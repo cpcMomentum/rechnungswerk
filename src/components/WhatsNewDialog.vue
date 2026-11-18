@@ -28,7 +28,7 @@
 						</p>
 						<a v-if="entry.plus"
 							class="whatsnew__link"
-							:href="WERKPLUS_URL"
+							:href="links.features"
 							target="_blank"
 							rel="noreferrer noopener">
 							{{ t('rechnungswerk', 'Mehr zu WerkPlus') }}
@@ -69,9 +69,10 @@ import TranslateIcon from 'vue-material-design-icons/Translate.vue'
 import type { WhatsNewGroup } from '@/types/api'
 import { getWhatsNew, getWhatsNewArchive, markWhatsNewSeen } from '@/api/whatsnew'
 import { escCloses } from '@/utils/modalEsc'
+import { werkplusLinks } from '@/werkplusLinks'
 
-/** Zielseite der WerkPlus-Eintraege (Konzept v1.1, Abschnitt 2). */
-const WERKPLUS_URL = 'https://werkwolke.de'
+/** WerkPlus-Eintraege verlinken die Funktionen-Seite. */
+const links = werkplusLinks()
 
 /**
  * NcModal beschriftet sich ueber `name` mit einer eigenen Kopfzeile, die am

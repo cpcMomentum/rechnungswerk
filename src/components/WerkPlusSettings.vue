@@ -7,6 +7,11 @@
 		<p class="rw-hint">
 			{{ t('rechnungswerk', 'Mit einem WerkPlus-Schlüssel schaltet RechnungsWerk zusätzliche Funktionen frei. Ohne Schlüssel bleibt alles, wie es ist.') }}
 			{{ t('rechnungswerk', 'Der Schlüssel gilt für alle Werk-Apps dieser Nextcloud und muss nur in einer davon eingetragen werden.') }}
+			<a v-if="links.features"
+				class="rw-werkplus__link"
+				:href="links.features"
+				target="_blank"
+				rel="noopener noreferrer">{{ t('rechnungswerk', 'Welche Funktionen WerkPlus bietet') }}</a>
 		</p>
 
 		<NcNoteCard v-if="loadError" type="error" :text="loadError" />
@@ -21,19 +26,36 @@
 				<p>{{ t('rechnungswerk', 'Bitte bewahre ihn sicher auf. Er ist hinterlegt, wird aber nur jetzt vollständig angezeigt.') }}</p>
 			</NcNoteCard>
 			<NcNoteCard v-if="actionInfo" type="info" :text="actionInfo" />
-			<NcNoteCard v-if="actionError" type="error" :text="actionError" />
-			<NcNoteCard v-else-if="status.lastError" type="warning" :text="status.lastError.message" />
+			<NcNoteCard v-if="actionError" type="error">
+				<p>{{ actionError }}</p>
+				<a v-if="actionErrorCode === 'TRIAL_UNAVAILABLE' && links.trial"
+					class="rw-werkplus__link"
+					:href="links.trial"
+					target="_blank"
+					rel="noopener noreferrer">{{ t('rechnungswerk', 'Testzeitraum auf werkwolke.de') }}</a>
+			</NcNoteCard>
+			<NcNoteCard v-else-if="status.lastError && !trialOver" type="warning" :text="status.lastError.message" />
 
 			<dl v-if="status.keySet" class="rw-werkplus__facts">
 				<dt>{{ t('rechnungswerk', 'Tarif') }}</dt>
 				<dd>{{ tierLabel }}</dd>
+				<template v-if="trialRunning && status.licenseValidUntil">
+					<dt>{{ t('rechnungswerk', 'Testzeitraum läuft bis') }}</dt>
+					<dd>{{ formatDate(status.licenseValidUntil) }} ({{ daysLeftLabel }})</dd>
+				</template>
+				<template v-else-if="!status.trial && status.licenseValidUntil && licenseActive">
+					<template v-if="isPast(status.licenseValidUntil)">
+						<dt>{{ t('rechnungswerk', 'Laufzeit') }}</dt>
+						<dd>{{ t('rechnungswerk', 'abgelaufen, Karenz bis {date}', { date: status.graceUntil ? formatDate(status.graceUntil) : '' }) }}</dd>
+					</template>
+					<template v-else>
+						<dt>{{ t('rechnungswerk', 'Laufzeit bis') }}</dt>
+						<dd>{{ formatDate(status.licenseValidUntil) }}</dd>
+					</template>
+				</template>
 				<template v-if="status.licensedEmployees">
 					<dt>{{ t('rechnungswerk', 'Lizenzierte Mitarbeitende') }}</dt>
 					<dd>{{ status.licensedEmployees }}</dd>
-				</template>
-				<template v-if="status.expiresAt">
-					<dt>{{ t('rechnungswerk', 'Gültig bis') }}</dt>
-					<dd>{{ formatDate(status.expiresAt) }}</dd>
 				</template>
 				<dt>{{ t('rechnungswerk', 'Letzte erfolgreiche Prüfung') }}</dt>
 				<dd>{{ status.lastCheckAt ? formatDateTime(status.lastCheckAt) : t('rechnungswerk', 'noch keine') }}</dd>
@@ -53,12 +75,21 @@
 					spellcheck="false"
 					:placeholder="status.keySet ? t('rechnungswerk', 'gespeichert, leer lassen') : 'wp_…'" /></label>
 
+			<p v-if="showBuyHint" class="rw-hint">
+				{{ t('rechnungswerk', 'Mit dem Kauf bekommst du einen eigenen Schlüssel. Trage ihn hier ein, er ersetzt den Testschlüssel.') }}
+			</p>
+
 			<div class="rw-werkplus__actions">
 				<NcButton v-if="canEdit" variant="primary" :disabled="busy || (!keyInput.trim() && !status.keySet)" @click="onActivate">
 					{{ status.keySet ? t('rechnungswerk', 'Speichern und prüfen') : t('rechnungswerk', 'Schlüssel prüfen und speichern') }}
 				</NcButton>
 				<NcButton v-if="canEdit && !status.keySet" :disabled="busy" @click="confirmTrial = true">
 					{{ t('rechnungswerk', '30 Tage testen') }}
+				</NcButton>
+				<NcButton v-if="buyLabel && links.buy"
+					:href="links.buy"
+					target="_blank">
+					{{ buyLabel }}
 				</NcButton>
 				<NcButton v-if="status.keySet && !status.storeTooNew" :disabled="busy" @click="onRefresh">
 					{{ t('rechnungswerk', 'Jetzt prüfen') }}
@@ -108,12 +139,16 @@ import {
 	startTrial,
 	type LicenseStatus,
 } from '@/api/license'
+import { werkplusLinks } from '@/werkplusLinks'
+
+const links = werkplusLinks()
 
 const status = ref<LicenseStatus | null>(null)
 const keyInput = ref('')
 const busy = ref(false)
 const loadError = ref('')
 const actionError = ref('')
+const actionErrorCode = ref('')
 const actionInfo = ref('')
 const trialKey = ref('')
 const confirmRemove = ref(false)
@@ -126,12 +161,45 @@ const canEdit = computed(() => status.value?.canManage === true && !status.value
 
 const licenseActive = computed(() => status.value?.state === 'valid' || status.value?.state === 'grace')
 
-const tierLabel = computed(() => (status.value?.tier === 'werkplus' ? 'WerkPlus' : t('rechnungswerk', 'Frei')))
+const trialRunning = computed(() => status.value?.trial === true && licenseActive.value)
+
+// Auch ohne Netz: Ein abgelaufenes Testtoken zaehlt, bevor die Pruefung KEY_EXPIRED meldet.
+const trialOver = computed(() => status.value?.trialEnded === true || (status.value?.trial === true && status.value.state === 'expired'))
+
+const tierLabel = computed(() => {
+	if (status.value?.tier !== 'werkplus') {
+		return t('rechnungswerk', 'Frei')
+	}
+	return status.value.trial ? t('rechnungswerk', 'WerkPlus – Testzeitraum') : 'WerkPlus'
+})
+
+// Kauf-Link ohne Schluessel und im oder nach dem Testzeitraum, nie bei gekauftem Schluessel.
+const buyLabel = computed(() => {
+	const s = status.value
+	if (!s || s.storeTooNew) {
+		return ''
+	}
+	if (!s.keySet) {
+		return t('rechnungswerk', 'WerkPlus kaufen')
+	}
+	return trialRunning.value || trialOver.value ? t('rechnungswerk', 'Jetzt kaufen') : ''
+})
+
+const showBuyHint = computed(() => trialRunning.value || trialOver.value)
+
+const daysLeftLabel = computed(() => {
+	const until = status.value?.licenseValidUntil
+	const days = until ? Math.max(0, Math.ceil((new Date(until).getTime() - Date.now()) / 86400000)) : 0
+	return days === 1 ? t('rechnungswerk', 'noch 1 Tag') : t('rechnungswerk', 'noch {days} Tage', { days })
+})
 
 const stateNote = computed<{ type: 'success' | 'warning' | 'error', text: string } | null>(() => {
 	const s = status.value
 	if (!s) {
 		return null
+	}
+	if (trialOver.value) {
+		return { type: 'warning', text: t('rechnungswerk', 'Der Testzeitraum ist beendet. RechnungsWerk arbeitet im freien Umfang weiter, deine Daten bleiben erhalten.') }
 	}
 	switch (s.state) {
 	case 'valid':
@@ -154,6 +222,10 @@ function formatDate(iso: string): string {
 	return new Date(iso).toLocaleDateString()
 }
 
+function isPast(iso: string): boolean {
+	return new Date(iso).getTime() <= Date.now()
+}
+
 function formatDateTime(iso: string): string {
 	return new Date(iso).toLocaleString()
 }
@@ -171,6 +243,7 @@ async function load(): Promise<void> {
 async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 	busy.value = true
 	actionError.value = ''
+	actionErrorCode.value = ''
 	actionInfo.value = ''
 	try {
 		status.value = await action()
@@ -182,6 +255,7 @@ async function run(action: () => Promise<LicenseStatus>): Promise<void> {
 			actionInfo.value = text
 		} else {
 			actionError.value = text
+			actionErrorCode.value = code ?? ''
 		}
 		await load()
 	} finally {
@@ -243,6 +317,11 @@ onMounted(load)
 	flex-wrap: wrap;
 	gap: 8px;
 	margin: 12px 0 20px;
+}
+
+.rw-werkplus__link {
+	display: inline-block;
+	font-weight: 600;
 }
 
 .rw-werkplus__label {

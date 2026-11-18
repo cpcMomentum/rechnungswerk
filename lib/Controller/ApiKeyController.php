@@ -52,7 +52,8 @@ class ApiKeyController extends Controller {
 			return $r;
 		}
 		if (!$this->entitlementService->hasFeature('api_keys')) {
-			return new DataResponse(['error' => $this->l10n->t('API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.')], Http::STATUS_FORBIDDEN);
+			// `werkplusLimit`: Die Oberflaeche haengt den Link „Mit WerkPlus freischalten“ an (app-links-v1).
+			return new DataResponse(['error' => $this->l10n->t('API-Schlüssel erfordern eine aktive WerkPlus-Lizenz.'), 'werkplusLimit' => true], Http::STATUS_FORBIDDEN);
 		}
 		try {
 			$scopes = array_key_exists('scopes', $data) && is_array($data['scopes']) ? $data['scopes'] : [];

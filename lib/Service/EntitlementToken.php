@@ -25,7 +25,15 @@ final class EntitlementToken {
 		public readonly int $expiresAt,
 		public readonly int $graceUntil,
 		public readonly ?int $licensedEmployees,
+		/** null: Token von vor dem 18.11.2026 ohne den Anspruch, gilt als gekauft. */
+		public readonly ?bool $trial = null,
+		/** Laufzeitende der Lizenz; nie durch `exp` ersetzen, das ist nur der naechste Prueftermin. */
+		public readonly ?int $licenseValidUntil = null,
 	) {
+	}
+
+	public function isTrial(): bool {
+		return $this->trial === true;
 	}
 
 	public function stateAt(int $now): string {

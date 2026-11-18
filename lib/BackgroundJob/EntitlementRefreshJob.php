@@ -29,5 +29,6 @@ class EntitlementRefreshJob extends TimedJob {
 
 	protected function run($argument): void {
 		$this->entitlementService->refreshIfDue();
+		$this->entitlementService->sendTrialNotices();
 	}
 }
