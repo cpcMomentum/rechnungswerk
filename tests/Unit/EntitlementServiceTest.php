@@ -941,4 +941,25 @@ class EntitlementServiceTest extends TestCase {
 		} catch (WerkPlusApiException) {
 		}
 	}
+
+	public function testTrialEndsAtComesFromTheActiveTrialToken(): void {
+		$this->storeTrialToken();
+		$this->assertSame(self::TRIAL_END, $this->service()->trialEndsAt());
+	}
+
+	public function testTrialEndsAtIsNullForABoughtKey(): void {
+		$this->storeToken(['trial' => false, 'licenseValidUntil' => self::NOW + 365 * 86400]);
+		$this->assertNull($this->service()->trialEndsAt());
+	}
+
+	public function testTrialEndsAtIsNullOnceTheTrialTokenExpired(): void {
+		$this->storeTrialToken();
+		$this->now = self::NOW + 45 * 86400;
+		$this->assertNull($this->service()->trialEndsAt());
+	}
+
+	public function testTrialEndsAtMatchesTheNoticeValueWithoutLicenseEnd(): void {
+		$this->storeToken(['trial' => true, 'licenseValidUntil' => null]);
+		$this->assertSame(self::NOW + 30 * 86400, $this->service()->trialEndsAt());
+	}
 }
