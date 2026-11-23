@@ -34,21 +34,21 @@
     "@nextcloud/router": "^3.1.0",
     "@nextcloud/vue": "^9.14.1",
     "pinia": "^4.1.0",
-    "vue": "^3.5.42",
+    "vue": "^3.5.46",
     "vue-material-design-icons": "^5.4.0",
-    "vue-router": "^5.3.0"
+    "vue-router": "^5.5.1"
   },
   "devDependencies": {
     "@nextcloud/eslint-config": "^9.0.1",
-    "@vitejs/plugin-vue": "^6.0.10",
-    "@vue/test-utils": "^2.5.0",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "@vue/test-utils": "^2.6.0",
     "@vue/tsconfig": "^0.9.1",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "happy-dom": "^21.0.4",
     "nc-app-tooling": "github:cpcMomentum/nc-app-tooling#v1.23.0",
-    "sass": "^1.107.1",
+    "sass": "^1.108.2",
     "typescript": "^5.7.2",
-    "vite": "^8.3.5",
+    "vite": "^8.3.8",
     "vitest": "^4.1.12"
   },
   "engines": {
