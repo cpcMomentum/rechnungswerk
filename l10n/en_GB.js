@@ -644,6 +644,9 @@ OC.L10N.register(
     "Der WerkPlus-Testzeitraum endet am %s." : "The WerkPlus trial ends on %s.",
     "Danach läuft RechnungsWerk im freien Umfang weiter, deine Daten bleiben erhalten." : "After that, RechnungsWerk keeps working with the free features, your data stays as it is.",
     "noch 1 Tag" : "1 day left",
-    "noch {days} Tage" : "{days} days left"
+    "noch {days} Tage" : "{days} days left",
+    "Unbekannter Status \"%1$s\". Erlaubt sind draft, committed und cancelled." : "Unknown status \"%1$s\". Allowed are draft, committed and cancelled.",
+    "\"%1$s\" ist kein gültiges Datum. Erwartet wird JJJJ-MM-TT, zum Beispiel 2026-01-31." : "\"%1$s\" is not a valid date. Expected is YYYY-MM-DD, for example 2026-01-31.",
+    "\"%1$s\" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl ab %3$s." : "\"%1$s\" is not a valid value for %2$s. Expected is a whole number of at least %3$s."
 },
 "nplurals=2; plural=(n != 1);");

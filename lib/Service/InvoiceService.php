@@ -28,6 +28,8 @@ use Psr\Log\LoggerInterface;
 
 class InvoiceService {
 
+	public const LIST_LIMIT_MAX = 500;
+
 	public function __construct(
 		private readonly InvoiceMapper $invoiceMapper,
 		private readonly InvoiceItemMapper $itemMapper,
@@ -49,9 +51,13 @@ class InvoiceService {
 	/**
 	 * @return array<int, array<string, mixed>> serialized invoices, each with a
 	 *   "relatedNumber" (the original invoice number a storno refers to, or null)
+	 *
+	 * @param array<string, mixed> $query Rohwerte der Filter; ohne Filter der ganze Bestand
+	 * @throws ValidationException
 	 */
-	public function list(): array {
-		$invoices = $this->invoiceMapper->findAll();
+	public function list(array $query = []): array {
+		$filter = $this->listFilter($query);
+		$invoices = $filter === [] ? $this->invoiceMapper->findAll() : $this->invoiceMapper->findFiltered($filter);
 		// Build an id -> number lookup from the same result set so resolving the
 		// storno's original number needs no extra query (no N+1).
 		$numbersById = [];
@@ -61,13 +67,59 @@ class InvoiceService {
 		return array_map(function (Invoice $invoice) use ($numbersById): array {
 			$data = $invoice->jsonSerialize();
 			$relatedId = $invoice->getRelatedInvoiceId();
-			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? null) : null;
+			// Im gefilterten Ausschnitt fehlt das Original eines Stornos oft.
+			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? $this->relatedNumber($invoice)) : null;
 			// The list feeds the payment-status column/filter (#117); the derived
 			// status is not stored, so compute it here just like present() does.
 			$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
 			$data['quoteStatus'] = $this->deriveQuoteStatus($invoice);
 			return $data;
 		}, $invoices);
+	}
+
+	/**
+	 * @param array<string, mixed> $query
+	 * @return array{orderNumber?: string, status?: string, from?: DateTime, to?: DateTime, limit?: int, offset?: int}
+	 * @throws ValidationException
+	 */
+	private function listFilter(array $query): array {
+		$given = static fn (string $key): bool => isset($query[$key]) && is_scalar($query[$key]) && trim((string)$query[$key]) !== '';
+		$filter = [];
+		if ($given('orderNumber')) {
+			$filter['orderNumber'] = trim((string)$query['orderNumber']);
+		}
+		if ($given('status')) {
+			$status = trim((string)$query['status']);
+			if (!in_array($status, Invoice::STATUSES, true)) {
+				throw new ValidationException($this->l10n->t('Unbekannter Status "%1$s". Erlaubt sind draft, committed und cancelled.', [$status]));
+			}
+			$filter['status'] = $status;
+		}
+		foreach (['from', 'to'] as $key) {
+			if (!$given($key)) {
+				continue;
+			}
+			$raw = trim((string)$query[$key]);
+			$date = DateTime::createFromFormat('!Y-m-d', $raw);
+			if ($date === false || $date->format('Y-m-d') !== $raw) {
+				throw new ValidationException($this->l10n->t('"%1$s" ist kein gültiges Datum. Erwartet wird JJJJ-MM-TT, zum Beispiel 2026-01-31.', [$raw]));
+			}
+			$filter[$key] = $date;
+		}
+		foreach (['limit' => 1, 'offset' => 0] as $key => $min) {
+			if (!$given($key)) {
+				continue;
+			}
+			$raw = trim((string)$query[$key]);
+			if (!ctype_digit($raw) || (int)$raw < $min) {
+				throw new ValidationException($this->l10n->t('"%1$s" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl ab %3$s.', [$raw, $key, (string)$min]));
+			}
+			$filter[$key] = (int)$raw;
+		}
+		if (isset($filter['limit']) || isset($filter['offset'])) {
+			$filter['limit'] = min($filter['limit'] ?? self::LIST_LIMIT_MAX, self::LIST_LIMIT_MAX);
+		}
+		return $filter;
 	}
 
 	/**
