@@ -196,4 +196,30 @@ class InvoiceServiceApiKeyDeleteTest extends TestCase {
 			$this->companyClock(),
 		);
 	}
+
+	public function testStateErrorsNameTheStateOfTheDocument(): void {
+		$this->draft(null, Invoice::STATUS_COMMITTED);
+		$this->assertSame('INVOICE_ALREADY_COMMITTED', $this->codeOf(fn () => $this->service->deleteInvoice(7)));
+		$this->assertSame('INVOICE_ALREADY_COMMITTED', $this->codeOf(fn () => $this->service->generatePreviewPdf(7)));
+
+		$this->draft(null, Invoice::STATUS_CANCELLED);
+		$this->assertSame('INVOICE_CANCELLED', $this->codeOf(fn () => $this->service->deleteInvoice(7)));
+		$this->assertSame('INVOICE_CANCELLED', $this->codeOf(fn () => $this->service->markPaid(7)));
+		$this->assertSame('INVOICE_CANCELLED', $this->codeOf(fn () => $this->service->cancel(7, 'alice')));
+
+		$this->draft(null);
+		$this->assertSame('INVOICE_NOT_COMMITTED', $this->codeOf(fn () => $this->service->generatePdf(7)));
+		$this->assertSame('INVOICE_NOT_COMMITTED', $this->codeOf(fn () => $this->service->markPaid(7)));
+		$this->assertSame('INVOICE_NOT_COMMITTED', $this->codeOf(fn () => $this->service->cancel(7, 'alice')));
+		$this->assertSame('INVOICE_NOT_COMMITTED', $this->codeOf(fn () => $this->service->sendToCustomer(7, 'a@example.org', 'Betreff', 'Text')));
+	}
+
+	private function codeOf(callable $call): ?string {
+		try {
+			$call();
+		} catch (IllegalStateException $e) {
+			return $e->getErrorCode();
+		}
+		$this->fail('Der Vorgang haette abgelehnt werden muessen.');
+	}
 }

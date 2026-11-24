@@ -9,5 +9,5 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Exception;
 
-class NotFoundException extends \RuntimeException {
+class NotFoundException extends CodedException {
 }
