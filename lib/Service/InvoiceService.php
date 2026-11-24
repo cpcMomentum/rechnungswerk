@@ -16,6 +16,7 @@ use OCA\Rechnungswerk\Db\InvoiceItem;
 use OCA\Rechnungswerk\Db\InvoiceItemMapper;
 use OCA\Rechnungswerk\Db\InvoiceMapper;
 use OCA\Rechnungswerk\Db\Settings;
+use OCA\Rechnungswerk\Exception\ErrorCode;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\NumberFormatException;
@@ -446,7 +447,7 @@ class InvoiceService {
 	public function sendToCustomer(int $id, string $to, string $subject, string $body): void {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können versendet werden.'));
+			throw $this->notCommitted($invoice, $this->l10n->t('Nur festgeschriebene Rechnungen können versendet werden.'));
 		}
 		if (trim($subject) === '') {
 			throw new ValidationException($this->l10n->t('Ein Betreff ist erforderlich.'));
@@ -695,7 +696,7 @@ class InvoiceService {
 	public function generatePdf(int $id): array {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() === Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.'));
+			throw (new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.')))->withErrorCode(ErrorCode::INVOICE_NOT_COMMITTED);
 		}
 		// Der eingefrorene Beleg, nicht ein neu erzeugter (#181, Schritt 2).
 		return $this->documentFor($invoice);
@@ -713,7 +714,7 @@ class InvoiceService {
 	public function generatePreviewPdf(int $id): array {
 		$invoice = $this->assertInvoiceType($this->findById($id));
 		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException($this->l10n->t('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.'));
+			throw $this->notDraft($invoice, $this->l10n->t('Die Vorschau ist nur für Entwürfe verfügbar. Festgeschriebene Rechnungen können als PDF heruntergeladen werden.'));
 		}
 		$items = $this->itemMapper->findByInvoice((int)$invoice->getId());
 		$settings = $this->settingsService->getCompany();
@@ -857,8 +858,26 @@ class InvoiceService {
 	 */
 	private function assertDraft(Invoice $invoice): void {
 		if ($invoice->getStatus() !== Invoice::STATUS_DRAFT) {
-			throw new IllegalStateException($this->l10n->t('Festgeschriebene oder stornierte Rechnungen können nicht mehr geändert werden.'));
+			throw $this->notDraft($invoice, $this->l10n->t('Festgeschriebene oder stornierte Rechnungen können nicht mehr geändert werden.'));
 		}
+	}
+
+	/** Fuer Vorgaenge, die einen Entwurf verlangen. */
+	private function notDraft(Invoice $invoice, string $message): IllegalStateException {
+		$code = $invoice->getStatus() === Invoice::STATUS_CANCELLED
+			? ErrorCode::INVOICE_CANCELLED
+			: ErrorCode::INVOICE_ALREADY_COMMITTED;
+		return (new IllegalStateException($message))->withErrorCode($code);
+	}
+
+	/** Fuer Vorgaenge, die eine festgeschriebene Rechnung verlangen. */
+	private function notCommitted(Invoice $invoice, string $message): IllegalStateException {
+		$code = match (true) {
+			$invoice->getStatus() === Invoice::STATUS_DRAFT => ErrorCode::INVOICE_NOT_COMMITTED,
+			$invoice->getStatus() === Invoice::STATUS_CANCELLED => ErrorCode::INVOICE_CANCELLED,
+			default => ErrorCode::INVOICE_STATE_INVALID,
+		};
+		return (new IllegalStateException($message))->withErrorCode($code);
 	}
 
 	/**
@@ -1161,7 +1180,7 @@ class InvoiceService {
 		}
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
 			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
+			throw $this->notCommitted($invoice, $this->l10n->t('Nur festgeschriebene Rechnungen können storniert werden.'));
 		}
 		return $invoice;
 	}
@@ -1172,7 +1191,7 @@ class InvoiceService {
 	private function assertPayable(Invoice $invoice): Invoice {
 		if ($invoice->getStatus() !== Invoice::STATUS_COMMITTED
 			|| $invoice->getInvoiceType() !== Invoice::TYPE_INVOICE) {
-			throw new IllegalStateException($this->l10n->t('Nur festgeschriebene Rechnungen können als bezahlt markiert werden.'));
+			throw $this->notCommitted($invoice, $this->l10n->t('Nur festgeschriebene Rechnungen können als bezahlt markiert werden.'));
 		}
 		return $invoice;
 	}

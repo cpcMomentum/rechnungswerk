@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OCA\Rechnungswerk\Controller;
 
 use OCA\Rechnungswerk\AppInfo\Application;
+use OCA\Rechnungswerk\Exception\CodedException;
+use OCA\Rechnungswerk\Exception\ErrorCode;
 use OCA\Rechnungswerk\Exception\IllegalStateException;
 use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\ValidationException;
@@ -59,7 +61,7 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->get($id));
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		}
 	}
 
@@ -72,7 +74,7 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->create($this->actingUserId(), $data, $this->authContext->getApiKeyId()), Http::STATUS_CREATED);
 		} catch (ValidationException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		}
 	}
 
@@ -84,11 +86,11 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->updateInvoice($id, $data));
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		} catch (ValidationException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		}
 	}
 
@@ -102,9 +104,9 @@ class InvoiceController extends Controller {
 			$this->invoiceService->deleteInvoice($id, $this->authContext->getApiKeyId());
 			return new DataResponse(null, Http::STATUS_NO_CONTENT);
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		}
 	}
 
@@ -117,11 +119,11 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->commit($id));
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		} catch (ValidationException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		}
 	}
 
@@ -139,12 +141,12 @@ class InvoiceController extends Controller {
 			$pdf = $this->invoiceService->generatePdf($id);
 			return new DataDownloadResponse($pdf['content'], $pdf['filename'], 'application/pdf');
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: PDF generation failed', ['exception' => $e, 'invoice' => $id]);
-			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.', 'code' => ErrorCode::PDF_GENERATION_FAILED], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -167,12 +169,12 @@ class InvoiceController extends Controller {
 			$response->setContentSecurityPolicy($csp);
 			return $response;
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: preview PDF generation failed', ['exception' => $e, 'invoice' => $id]);
-			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+			return new DataResponse(['error' => 'Die PDF-Erzeugung ist fehlgeschlagen.', 'code' => ErrorCode::PDF_GENERATION_FAILED], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -186,14 +188,14 @@ class InvoiceController extends Controller {
 			$this->invoiceService->sendToCustomer($id, $to, $subject, $body);
 			return new DataResponse(['sent' => true]);
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		} catch (ValidationException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		} catch (\Throwable $e) {
 			$this->logger->error('Rechnungswerk: invoice mail failed', ['exception' => $e, 'invoice' => $id]);
-			return new DataResponse(['error' => 'Der Versand ist fehlgeschlagen.'], Http::STATUS_INTERNAL_SERVER_ERROR);
+			return new DataResponse(['error' => 'Der Versand ist fehlgeschlagen.', 'code' => ErrorCode::MAIL_SEND_FAILED], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -206,13 +208,13 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->cancel($id, $this->actingUserId()));
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		} catch (ValidationException $e) {
 			// Wie beim Festschreiben: fehlt der Firmenname, ist das eine Angabe,
 			// die der Nutzer nachholen kann (#313) — kein Serverfehler.
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		}
 	}
 
@@ -224,9 +226,9 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->duplicate($id, $this->actingUserId()), Http::STATUS_CREATED);
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		}
 	}
 
@@ -239,9 +241,9 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->markPaid($id, $date));
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		}
 	}
 
@@ -253,9 +255,9 @@ class InvoiceController extends Controller {
 		try {
 			return new DataResponse($this->invoiceService->markUnpaid($id));
 		} catch (NotFoundException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_NOT_FOUND);
+			return $this->fail($e, ErrorCode::INVOICE_NOT_FOUND, Http::STATUS_NOT_FOUND);
 		} catch (IllegalStateException $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CONFLICT);
+			return $this->fail($e, ErrorCode::INVOICE_STATE_INVALID, Http::STATUS_CONFLICT);
 		}
 	}
 
@@ -269,16 +271,16 @@ class InvoiceController extends Controller {
 					$rejection['retryAfter'] > 0 ? ['Retry-After' => (string)$rejection['retryAfter']] : []
 				);
 			}
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+			return new DataResponse(['error' => 'Not authenticated', 'code' => ErrorCode::NOT_AUTHENTICATED], Http::STATUS_UNAUTHORIZED);
 		}
 		if ($this->authContext->isMachine()) {
 			if ($scope !== null && $this->authContext->hasScope($scope)) {
 				return null;
 			}
-			return new DataResponse(['error' => 'Forbidden', 'code' => 'SCOPE_MISSING'], Http::STATUS_FORBIDDEN);
+			return new DataResponse(['error' => 'Forbidden', 'code' => ErrorCode::SCOPE_MISSING], Http::STATUS_FORBIDDEN);
 		}
 		if (!$this->permissionService->hasAccess($userId)) {
-			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+			return new DataResponse(['error' => 'Forbidden', 'code' => ErrorCode::FORBIDDEN], Http::STATUS_FORBIDDEN);
 		}
 		return null;
 	}
@@ -293,18 +295,22 @@ class InvoiceController extends Controller {
 					$rejection['retryAfter'] > 0 ? ['Retry-After' => (string)$rejection['retryAfter']] : []
 				);
 			}
-			return new DataResponse(['error' => 'Not authenticated'], Http::STATUS_UNAUTHORIZED);
+			return new DataResponse(['error' => 'Not authenticated', 'code' => ErrorCode::NOT_AUTHENTICATED], Http::STATUS_UNAUTHORIZED);
 		}
 		if ($this->authContext->isMachine()) {
 			if ($scope !== null && $this->authContext->hasScope($scope) && $this->permissionService->canEdit($userId)) {
 				return null;
 			}
-			return new DataResponse(['error' => 'Forbidden', 'code' => 'SCOPE_MISSING'], Http::STATUS_FORBIDDEN);
+			return new DataResponse(['error' => 'Forbidden', 'code' => ErrorCode::SCOPE_MISSING], Http::STATUS_FORBIDDEN);
 		}
 		if (!$this->permissionService->canEdit($userId)) {
-			return new DataResponse(['error' => 'Forbidden'], Http::STATUS_FORBIDDEN);
+			return new DataResponse(['error' => 'Forbidden', 'code' => ErrorCode::FORBIDDEN], Http::STATUS_FORBIDDEN);
 		}
 		return null;
+	}
+
+	private function fail(CodedException $e, string $defaultCode, int $status): DataResponse {
+		return new DataResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode() ?? $defaultCode], $status);
 	}
 
 	/** Session user or key owner — the identity every invoice operation acts as. */

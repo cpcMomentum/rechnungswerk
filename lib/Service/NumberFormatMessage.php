@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\Rechnungswerk\Service;
 
+use OCA\Rechnungswerk\Exception\ErrorCode;
 use OCA\Rechnungswerk\Exception\NumberFormatException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\IL10N;
@@ -37,7 +38,7 @@ class NumberFormatMessage {
 	 * HTTP 400 mit Meldung uebersetzen.
 	 */
 	public function asValidationException(NumberFormatException $e): ValidationException {
-		return new ValidationException($this->describe($e), 0, $e);
+		return (new ValidationException($this->describe($e), 0, $e))->withErrorCode(ErrorCode::NUMBER_FORMAT_INVALID);
 	}
 
 	private function describe(NumberFormatException $e): string {

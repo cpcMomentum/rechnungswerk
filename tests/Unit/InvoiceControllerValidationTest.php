@@ -56,7 +56,7 @@ class InvoiceControllerValidationTest extends TestCase {
 		$response = $this->controllerRefusingWith('cancel')->cancel(7);
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertSame(['error' => self::MELDUNG], $response->getData());
+		$this->assertSame(['error' => self::MELDUNG, 'code' => 'VALIDATION_FAILED'], $response->getData());
 	}
 
 	/** Zum Vergleich der Weg, der es schon konnte. */
@@ -64,6 +64,6 @@ class InvoiceControllerValidationTest extends TestCase {
 		$response = $this->controllerRefusingWith('commit')->commit(7);
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertSame(['error' => self::MELDUNG], $response->getData());
+		$this->assertSame(['error' => self::MELDUNG, 'code' => 'VALIDATION_FAILED'], $response->getData());
 	}
 }
