@@ -29,6 +29,7 @@ use Psr\Log\LoggerInterface;
 class InvoiceService {
 
 	public const LIST_LIMIT_MAX = 500;
+	public const WARNING_TAX_RATE_OVERRIDDEN = 'TAX_RATE_OVERRIDDEN_SMALL_BUSINESS';
 
 	public function __construct(
 		private readonly InvoiceMapper $invoiceMapper,
@@ -152,7 +153,8 @@ class InvoiceService {
 		// Nebeneffekt: der Settings-Zugriff darin kann eine Zeile anlegen, und ein
 		// fehlschlagender INSERT wuerde die Transaktion auf PostgreSQL abbrechen —
 		// dieselbe Ueberlegung wie in commit().
-		$items = $this->extractItems($data);
+		$warnings = [];
+		$items = $this->extractItems($data, $warnings);
 
 		$this->db->beginTransaction();
 		try {
@@ -169,7 +171,7 @@ class InvoiceService {
 			throw $e;
 		}
 
-		return $this->present($invoice);
+		return $this->present($invoice) + ['warnings' => $warnings];
 	}
 
 	/**
@@ -196,7 +198,8 @@ class InvoiceService {
 		// Fast 404/409 outside the transaction for a quick user-visible error.
 		$this->assertDraft($this->findById($id));
 		// Wie in create(): Eingaben auswerten, bevor die Transaktion aufgeht (#180).
-		$items = array_key_exists('items', $data) ? $this->extractItems($data) : null;
+		$warnings = [];
+		$items = array_key_exists('items', $data) ? $this->extractItems($data, $warnings) : null;
 
 		$this->db->beginTransaction();
 		try {
@@ -223,7 +226,7 @@ class InvoiceService {
 			throw $e;
 		}
 
-		return $this->present($invoice);
+		return $this->present($invoice) + ['warnings' => $warnings];
 	}
 
 	/**
@@ -998,9 +1001,10 @@ class InvoiceService {
 	 * For small-business owners (§19) the effective tax rate is forced to 0.
 	 *
 	 * @param array<string, mixed> $data
+	 * @param list<string> $warnings Hinweise an den Klienten, siehe WARNING_*
 	 * @return InvoiceItem[]
 	 */
-	private function extractItems(array $data): array {
+	private function extractItems(array $data, array &$warnings = []): array {
 		$raw = $data['items'] ?? [];
 		if (!is_array($raw)) {
 			return [];
@@ -1031,6 +1035,9 @@ class InvoiceService {
 				throw $this->numberFormatMessage->asValidationException($e);
 			}
 			$taxRateBp = $smallBusiness ? 0 : (int)($row['taxRateBp'] ?? 0);
+			if ($smallBusiness && (int)($row['taxRateBp'] ?? 0) !== 0 && !in_array(self::WARNING_TAX_RATE_OVERRIDDEN, $warnings, true)) {
+				$warnings[] = self::WARNING_TAX_RATE_OVERRIDDEN;
+			}
 
 			$name = (string)($row['name'] ?? '');
 			if (mb_strlen($name) > 255) {
