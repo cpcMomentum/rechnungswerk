@@ -126,4 +126,24 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 		$this->assertSame(ErrorCode::FORBIDDEN, $this->controller(allowed: false)->index()->getData()['code']);
 		$this->assertSame(ErrorCode::FORBIDDEN, $this->controller(allowed: false)->commit(7)->getData()['code']);
 	}
+
+	public function testListPassesTheFiltersAndRefusesUnreadableOnes(): void {
+		$controller = $this->controller();
+		$this->service->expects($this->once())->method('list')
+			->with(['orderNumber' => 'WP-1', 'status' => null, 'from' => null, 'to' => null, 'limit' => null, 'offset' => null])
+			->willReturn([]);
+
+		$response = $controller->index(orderNumber: 'WP-1');
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+		$this->assertSame([], $response->getData());
+
+		$controller = $this->controller();
+		$this->service->method('list')->willThrowException(new ValidationException('Unbekannter Status.'));
+
+		$response = $controller->index(status: 'paid');
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertSame(ErrorCode::VALIDATION_FAILED, $response->getData()['code']);
+	}
 }

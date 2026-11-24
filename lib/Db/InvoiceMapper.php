@@ -54,6 +54,36 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * Wie findAll(), eingegrenzt fuer Maschinenklienten. Entwuerfe haben kein
+	 * Rechnungsdatum und fallen bei einem Datumsfilter heraus.
+	 *
+	 * @param array{orderNumber?: string, status?: string, from?: \DateTime, to?: \DateTime, limit?: int, offset?: int} $filter
+	 * @return Invoice[]
+	 */
+	public function findFiltered(array $filter): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->in('invoice_type', $qb->createNamedParameter(Invoice::INVOICE_TYPES, IQueryBuilder::PARAM_STR_ARRAY)));
+		if (isset($filter['orderNumber'])) {
+			$qb->andWhere($qb->expr()->eq('order_number', $qb->createNamedParameter($filter['orderNumber'])));
+		}
+		if (isset($filter['status'])) {
+			$qb->andWhere($qb->expr()->eq('status', $qb->createNamedParameter($filter['status'])));
+		}
+		if (isset($filter['from'])) {
+			$qb->andWhere($qb->expr()->gte('issue_date', $qb->createNamedParameter($filter['from'], IQueryBuilder::PARAM_DATE_MUTABLE)));
+		}
+		if (isset($filter['to'])) {
+			$qb->andWhere($qb->expr()->lte('issue_date', $qb->createNamedParameter($filter['to'], IQueryBuilder::PARAM_DATE_MUTABLE)));
+		}
+		$qb->orderBy('created_at', 'DESC')->addOrderBy('id', 'DESC');
+		if (isset($filter['limit'])) {
+			$qb->setMaxResults($filter['limit'])->setFirstResult($filter['offset'] ?? 0);
+		}
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * All invoices (not quotes) referencing a given customer (newest first), for
 	 * the customer view (#60).
 	 *

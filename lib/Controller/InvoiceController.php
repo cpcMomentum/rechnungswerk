@@ -45,11 +45,29 @@ class InvoiceController extends Controller {
 
 	#[PublicPage]
 	#[NoAdminRequired]
-	public function index(): DataResponse {
+	public function index(
+		?string $orderNumber = null,
+		?string $status = null,
+		?string $from = null,
+		?string $to = null,
+		?string $limit = null,
+		?string $offset = null,
+	): DataResponse {
 		if (($r = $this->guardAccess('invoices:read')) !== null) {
 			return $r;
 		}
-		return new DataResponse($this->invoiceService->list());
+		try {
+			return new DataResponse($this->invoiceService->list([
+				'orderNumber' => $orderNumber,
+				'status' => $status,
+				'from' => $from,
+				'to' => $to,
+				'limit' => $limit,
+				'offset' => $offset,
+			]));
+		} catch (ValidationException $e) {
+			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
+		}
 	}
 
 	#[PublicPage]
