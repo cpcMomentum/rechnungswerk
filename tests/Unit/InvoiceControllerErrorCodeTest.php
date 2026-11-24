@@ -31,9 +31,11 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 	use TranslatorStub;
 
 	private InvoiceService&MockObject $service;
+	private IRequest&MockObject $request;
 
 	private function controller(?string $userId = 'alice', bool $allowed = true): InvoiceController {
 		$this->service = $this->createMock(InvoiceService::class);
+		$this->request = $this->createMock(IRequest::class);
 
 		$permissions = $this->createMock(PermissionService::class);
 		$permissions->method('hasAccess')->willReturn($allowed);
@@ -45,7 +47,7 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 		$authContext->method('rejection')->willReturn(null);
 
 		return new InvoiceController(
-			$this->createMock(IRequest::class),
+			$this->request,
 			$authContext,
 			$this->service,
 			$permissions,
@@ -129,11 +131,12 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 
 	public function testListPassesTheFiltersAndRefusesUnreadableOnes(): void {
 		$controller = $this->controller();
+		$this->request->method('getParam')->willReturnMap([['orderNumber', null, 'WP-1'], ['status', null, ['draft']]]);
 		$this->service->expects($this->once())->method('list')
-			->with(['orderNumber' => 'WP-1', 'status' => null, 'from' => null, 'to' => null, 'limit' => null, 'offset' => null])
+			->with(['orderNumber' => 'WP-1', 'status' => ['draft'], 'from' => null, 'to' => null, 'limit' => null, 'offset' => null])
 			->willReturn([]);
 
-		$response = $controller->index(orderNumber: 'WP-1');
+		$response = $controller->index();
 
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 		$this->assertSame([], $response->getData());
@@ -141,9 +144,21 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 		$controller = $this->controller();
 		$this->service->method('list')->willThrowException(new ValidationException('Unbekannter Status.'));
 
-		$response = $controller->index(status: 'paid');
+		$response = $controller->index();
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertSame(ErrorCode::VALIDATION_FAILED, $response->getData()['code']);
+	}
+
+	public function testCreatePassesTheIdempotencyKeyHeaderOn(): void {
+		$controller = $this->controller();
+		$this->request->method('getHeader')->willReturnMap([['Idempotency-Key', 'bestellung-4711']]);
+		$this->service->expects($this->once())->method('create')
+			->with('alice', ['recipientName' => 'Kunde AG'], null, 'bestellung-4711')
+			->willReturn(['id' => 7]);
+
+		$response = $controller->create(['recipientName' => 'Kunde AG']);
+
+		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
 	}
 }

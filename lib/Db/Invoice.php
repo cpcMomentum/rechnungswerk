@@ -120,6 +120,8 @@ use OCP\DB\Types;
  * @method void setDatevResponseRaw(?string $datevResponseRaw)
  * @method ?int getApiKeyId()
  * @method void setApiKeyId(?int $apiKeyId)
+ * @method ?string getIdempotencyKey()
+ * @method void setIdempotencyKey(?string $idempotencyKey)
  * @method ?\DateTime getCommittedAt()
  * @method void setCommittedAt(?\DateTime $committedAt)
  * @method ?\DateTime getPaidAt()
@@ -286,6 +288,7 @@ class Invoice extends Entity implements JsonSerializable {
 	protected ?\DateTime $datevStatusAt = null;
 	protected ?string $datevResponseRaw = null;
 	protected ?int $apiKeyId = null;
+	protected ?string $idempotencyKey = null;
 	protected ?\DateTime $committedAt = null;
 	protected ?\DateTime $paidAt = null;
 	protected ?\DateTime $createdAt = null;
@@ -294,6 +297,7 @@ class Invoice extends Entity implements JsonSerializable {
 	public function __construct() {
 		$this->addType('ownerUserId', Types::STRING);
 		$this->addType('apiKeyId', Types::INTEGER);
+		$this->addType('idempotencyKey', Types::STRING);
 		$this->addType('number', Types::STRING);
 		$this->addType('status', Types::STRING);
 		$this->addType('invoiceType', Types::STRING);

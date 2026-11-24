@@ -54,6 +54,36 @@ class InvoiceMapper extends QBMapper {
 	}
 
 	/**
+	 * @param int[] $ids
+	 * @return array<int, ?string> Nummer je ID
+	 */
+	public function findNumbersByIds(array $ids): array {
+		$numbers = [];
+		foreach (array_chunk(array_values(array_unique($ids)), 500) as $chunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('id', 'number')->from($this->tableName)
+				->where($qb->expr()->in('id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$numbers[(int)$row['id']] = $row['number'];
+			}
+			$result->closeCursor();
+		}
+		return $numbers;
+	}
+
+	public function findByIdempotencyKey(string $hash): ?Invoice {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->eq('idempotency_key', $qb->createNamedParameter($hash)));
+		try {
+			return $this->findEntity($qb);
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
+
+	/**
 	 * Wie findAll(), eingegrenzt fuer Maschinenklienten. Entwuerfe haben kein
 	 * Rechnungsdatum und fallen bei einem Datumsfilter heraus.
 	 *

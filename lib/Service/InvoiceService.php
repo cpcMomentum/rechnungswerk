@@ -22,6 +22,7 @@ use OCA\Rechnungswerk\Exception\NotFoundException;
 use OCA\Rechnungswerk\Exception\NumberFormatException;
 use OCA\Rechnungswerk\Exception\ValidationException;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\DB\Exception as DbException;
 use OCP\IDBConnection;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
@@ -29,6 +30,9 @@ use Psr\Log\LoggerInterface;
 class InvoiceService {
 
 	public const LIST_LIMIT_MAX = 500;
+	public const IDEMPOTENCY_KEY_MAX = 255;
+	public const LIST_FILTERS = ['orderNumber', 'status', 'from', 'to', 'limit', 'offset'];
+	public const WARNING_IDEMPOTENT_REPLAY = 'IDEMPOTENT_REPLAY';
 	public const WARNING_TAX_RATE_OVERRIDDEN = 'TAX_RATE_OVERRIDDEN_SMALL_BUSINESS';
 
 	public function __construct(
@@ -50,10 +54,9 @@ class InvoiceService {
 	}
 
 	/**
+	 * @param array<string, mixed> $query Rohwerte der Filter; ohne Filter der ganze Bestand
 	 * @return array<int, array<string, mixed>> serialized invoices, each with a
 	 *   "relatedNumber" (the original invoice number a storno refers to, or null)
-	 *
-	 * @param array<string, mixed> $query Rohwerte der Filter; ohne Filter der ganze Bestand
 	 * @throws ValidationException
 	 */
 	public function list(array $query = []): array {
@@ -65,17 +68,44 @@ class InvoiceService {
 		foreach ($invoices as $invoice) {
 			$numbersById[(int)$invoice->getId()] = $invoice->getNumber();
 		}
+		// Im gefilterten Ausschnitt fehlt das Original eines Stornos oft: gesammelt nachladen statt je Zeile.
+		$missing = [];
+		foreach ($invoices as $invoice) {
+			$relatedId = $invoice->getRelatedInvoiceId();
+			if ($relatedId !== null && !array_key_exists($relatedId, $numbersById)) {
+				$missing[] = $relatedId;
+			}
+		}
+		if ($missing !== []) {
+			$numbersById += $this->invoiceMapper->findNumbersByIds($missing);
+		}
 		return array_map(function (Invoice $invoice) use ($numbersById): array {
 			$data = $invoice->jsonSerialize();
 			$relatedId = $invoice->getRelatedInvoiceId();
-			// Im gefilterten Ausschnitt fehlt das Original eines Stornos oft.
-			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? $this->relatedNumber($invoice)) : null;
+			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? null) : null;
 			// The list feeds the payment-status column/filter (#117); the derived
 			// status is not stored, so compute it here just like present() does.
 			$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
 			$data['quoteStatus'] = $this->deriveQuoteStatus($invoice);
 			return $data;
 		}, $invoices);
+	}
+
+	/**
+	 * Gespeichert wird nur der Hash samt Urheber: so trifft der Schluessel eines Klienten nie die Rechnung eines anderen.
+	 *
+	 * @throws ValidationException
+	 */
+	private function idempotencyHash(string $userId, ?int $apiKeyId, ?string $key): ?string {
+		$key = trim((string)$key);
+		if ($key === '') {
+			return null;
+		}
+		if (mb_strlen($key) > self::IDEMPOTENCY_KEY_MAX) {
+			throw new ValidationException($this->l10n->t('Der Idempotenzschlüssel darf höchstens %1$s Zeichen lang sein.', [(string)self::IDEMPOTENCY_KEY_MAX]));
+		}
+		$scope = $apiKeyId !== null ? 'key:' . $apiKeyId : 'user:' . $userId;
+		return hash('sha256', $scope . "\n" . $key);
 	}
 
 	/**
@@ -134,14 +164,17 @@ class InvoiceService {
 
 	/**
 	 * @param array<string, mixed> $data
+	 * @param ?string $idempotencyKey Wiederholt ein Klient denselben Schluessel, bekommt er die schon angelegte Rechnung
 	 * @return array<string, mixed>
 	 * @throws ValidationException
 	 */
-	public function create(string $userId, array $data, ?int $apiKeyId = null): array {
+	public function create(string $userId, array $data, ?int $apiKeyId = null, ?string $idempotencyKey = null): array {
+		$idempotencyHash = $this->idempotencyHash($userId, $apiKeyId, $idempotencyKey);
 		$now = new DateTime(); // tz-ok: Zeitstempel, Kalendertage kommen aus CompanyClock
 		$invoice = new Invoice();
 		$invoice->setOwnerUserId($userId);
 		$invoice->setApiKeyId($apiKeyId);
+		$invoice->setIdempotencyKey($idempotencyHash);
 		$invoice->setStatus(Invoice::STATUS_DRAFT);
 		$invoice->setInvoiceType(Invoice::TYPE_INVOICE);
 		$invoice->setCreatedAt($now);
@@ -156,6 +189,11 @@ class InvoiceService {
 		$warnings = [];
 		$items = $this->extractItems($data, $warnings);
 
+		$existing = $idempotencyHash !== null ? $this->invoiceMapper->findByIdempotencyKey($idempotencyHash) : null;
+		if ($existing !== null) {
+			return $this->present($existing) + ['warnings' => [...$warnings, self::WARNING_IDEMPOTENT_REPLAY]];
+		}
+
 		$this->db->beginTransaction();
 		try {
 			$invoice = $this->invoiceMapper->insert($invoice);
@@ -168,6 +206,13 @@ class InvoiceService {
 		} catch (\Throwable $e) {
 			$this->db->rollBack();
 			$this->auditService->discard();
+			// Zwei gleichzeitige Aufrufe mit demselben Schluessel: der zweite verliert am Unique-Index.
+			if ($idempotencyHash !== null && $e instanceof DbException && $e->getReason() === DbException::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
+				$existing = $this->invoiceMapper->findByIdempotencyKey($idempotencyHash);
+				if ($existing !== null) {
+					return $this->present($existing) + ['warnings' => [...$warnings, self::WARNING_IDEMPOTENT_REPLAY]];
+				}
+			}
 			throw $e;
 		}
 
@@ -1328,7 +1373,9 @@ class InvoiceService {
 	 */
 	public function updateQuote(int $id, array $data): array {
 		$this->assertQuoteType($this->findById($id));
-		return $this->update($id, $data);
+		$quote = $this->update($id, $data);
+		unset($quote['warnings']);
+		return $quote;
 	}
 
 	/**
