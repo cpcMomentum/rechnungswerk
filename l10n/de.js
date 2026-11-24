@@ -647,6 +647,6 @@ OC.L10N.register(
     "noch {days} Tage" : "noch {days} Tage",
     "Unbekannter Status \"%1$s\". Erlaubt sind draft, committed und cancelled." : "Unbekannter Status \"%1$s\". Erlaubt sind draft, committed und cancelled.",
     "\"%1$s\" ist kein gültiges Datum. Erwartet wird JJJJ-MM-TT, zum Beispiel 2026-01-31." : "\"%1$s\" ist kein gültiges Datum. Erwartet wird JJJJ-MM-TT, zum Beispiel 2026-01-31.",
-    "\"%1$s\" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl." : "\"%1$s\" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl."
+    "\"%1$s\" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl ab %3$s." : "\"%1$s\" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl ab %3$s."
 },
 "nplurals=2; plural=(n != 1);");
