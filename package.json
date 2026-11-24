@@ -22,6 +22,7 @@
     "l10n:check": "nc-l10n-check",
     "l10n:fix": "nc-l10n-check --fix",
     "timezone:check": "nc-timezone-check",
+    "whatsnew:check": "nc-whatsnew-check",
     "design:check": "nc-design-check",
     "lint:fix": "eslint src --fix",
     "prepare": "git config core.hooksPath .githooks || true"
