@@ -106,13 +106,13 @@ class InvoiceService {
 			}
 			$filter[$key] = $date;
 		}
-		foreach (['limit', 'offset'] as $key) {
+		foreach (['limit' => 1, 'offset' => 0] as $key => $min) {
 			if (!$given($key)) {
 				continue;
 			}
 			$raw = trim((string)$query[$key]);
-			if (!ctype_digit($raw) || ($key === 'limit' && (int)$raw === 0)) {
-				throw new ValidationException($this->l10n->t('"%1$s" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl.', [$raw, $key]));
+			if (!ctype_digit($raw) || (int)$raw < $min) {
+				throw new ValidationException($this->l10n->t('"%1$s" ist keine gültige Angabe für %2$s. Erwartet wird eine ganze Zahl ab %3$s.', [$raw, $key, (string)$min]));
 			}
 			$filter[$key] = (int)$raw;
 		}
