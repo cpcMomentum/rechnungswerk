@@ -8,6 +8,8 @@ die Stellen, an denen die API etwas anderes tut, als ein Feldname vermuten läss
 - Basis: `https://<instanz>/apps/rechnungswerk/api/v1`
 - Anmeldung: `Authorization: Bearer rwrk_…` mit einem API-Schlüssel. API-Schlüssel setzen eine aktive WerkPlus-Lizenz
   voraus.
+- Jeder Aufruf braucht zusätzlich den Kopf `OCS-APIRequest: true`. Ohne ihn antwortet Nextcloud mit
+  `412 CSRF check failed`, noch bevor die API den Schlüssel prüft.
 - Jeder Schlüssel trägt Rechte (Scopes). Fehlt das Recht für einen Aufruf, antwortet die API mit `403` und
   `SCOPE_MISSING`.
 
@@ -65,7 +67,7 @@ bei diesem Hinweis abbrechen, statt festzuschreiben.
 | `orderNumber` | exakte Suche nach der eigenen Referenz |
 | `status` | `draft`, `committed` oder `cancelled` |
 | `from`, `to` | Rechnungsdatum von/bis, `JJJJ-MM-TT`, jeweils einschließlich |
-| `limit`, `offset` | Ausschnitt; höchstens 500 je Aufruf |
+| `limit`, `offset` | Ausschnitt; `limit` von 1 bis 500, `offset` ab 0 |
 
 - Kein Treffer ergibt eine leere Liste, kein `404`.
 - Unbekannte Parameter werden ignoriert.
