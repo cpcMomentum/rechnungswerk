@@ -402,7 +402,8 @@ class WhatsNewServiceTest extends TestCase {
 		self::assertSame('0.5.3', $written['alice/' . WhatsNewService::KEY_LAST_SEEN] ?? null);
 	}
 
-	public function testDieAusgelieferteDateiIstGueltig(): void {
+	/** Das Schema prueft nc-whatsnew-check; hier bleibt, was nur diese App weiss. */
+	public function testDieAusgelieferteDateiNenntPlusUndKenntIhreSymbole(): void {
 		$file = dirname(__DIR__, 2) . '/whatsnew/whatsnew.json';
 		self::assertFileExists($file);
 
@@ -411,25 +412,11 @@ class WhatsNewServiceTest extends TestCase {
 		self::assertNotEmpty($catalogue);
 
 		foreach ($catalogue as $version => $entries) {
-			self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', (string)$version);
 			self::assertIsArray($entries);
 			foreach ($entries as $entry) {
-				// de und en sind Pflicht (Konzept v1.1, Abschnitt 2).
-				foreach (['title', 'text'] as $field) {
-					self::assertArrayHasKey($field, $entry);
-					self::assertArrayHasKey('de', $entry[$field], "$version: $field braucht de");
-					self::assertArrayHasKey('en', $entry[$field], "$version: $field braucht en");
-					self::assertNotSame('', trim((string)$entry[$field]['de']));
-					self::assertNotSame('', trim((string)$entry[$field]['en']));
-				}
-				self::assertArrayHasKey('plus', $entry);
+				self::assertArrayHasKey('plus', $entry, "$version: plus ist Pflicht");
 				self::assertIsBool($entry['plus']);
 
-				// Fundort ist optional, aber wenn da, dann zweisprachig.
-				if (isset($entry['where'])) {
-					self::assertArrayHasKey('de', $entry['where'], "$version: where braucht de");
-					self::assertArrayHasKey('en', $entry['where'], "$version: where braucht en");
-				}
 				// Symbol muss der Dialog kennen, sonst erscheint stumm der Stern.
 				if (isset($entry['icon'])) {
 					self::assertContains($entry['icon'], self::BEKANNTE_SYMBOLE, "$version: unbekanntes Symbol");
