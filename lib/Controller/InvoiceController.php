@@ -90,7 +90,12 @@ class InvoiceController extends Controller {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->create($this->actingUserId(), $data, $this->authContext->getApiKeyId()), Http::STATUS_CREATED);
+			return new DataResponse($this->invoiceService->create(
+				$this->actingUserId(),
+				$data,
+				$this->authContext->getApiKeyId(),
+				$this->request->getHeader('Idempotency-Key'),
+			), Http::STATUS_CREATED);
 		} catch (ValidationException $e) {
 			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		}

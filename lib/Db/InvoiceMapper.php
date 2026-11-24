@@ -53,6 +53,17 @@ class InvoiceMapper extends QBMapper {
 		return $this->findByTypes(Invoice::INVOICE_TYPES);
 	}
 
+	public function findByIdempotencyKey(string $hash): ?Invoice {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->tableName)
+			->where($qb->expr()->eq('idempotency_key', $qb->createNamedParameter($hash)));
+		try {
+			return $this->findEntity($qb);
+		} catch (DoesNotExistException) {
+			return null;
+		}
+	}
+
 	/**
 	 * Wie findAll(), eingegrenzt fuer Maschinenklienten. Entwuerfe haben kein
 	 * Rechnungsdatum und fallen bei einem Datumsfilter heraus.

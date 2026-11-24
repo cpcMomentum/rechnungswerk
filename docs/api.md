@@ -74,8 +74,27 @@ bei diesem Hinweis abbrechen, statt festzuschreiben.
 - Ein unlesbarer Wert eines bekannten Parameters ergibt `400` mit `VALIDATION_FAILED`.
 - Entwürfe haben noch kein Rechnungsdatum und fallen bei `from`/`to` heraus.
 
-Nach einer Zeitüberschreitung beim Anlegen zuerst mit `?orderNumber=…` suchen und nur dann erneut anlegen, wenn
-die Liste leer ist. So entsteht keine doppelte Rechnung.
+## Doppeltes Anlegen vermeiden
+
+Geht die Antwort auf `POST /invoices` in einer Zeitüberschreitung verloren, weiß der Klient nicht, ob die
+Rechnung entstanden ist. Dafür gibt es den Kopf `Idempotency-Key`:
+
+```
+POST /invoices
+Idempotency-Key: bestellung-4711
+```
+
+- Kommt derselbe Schlüssel erneut, legt die API nichts an und antwortet mit der schon angelegten Rechnung:
+  gleicher Status `201`, gleiche `id`.
+- Der Schlüssel ist frei wählbar (höchstens 255 Zeichen), sinnvoll ist die eigene Bestell- oder Vorgangsnummer.
+- Er gilt je API-Schlüssel. Zwei Klienten mit demselben Wert treffen nie dieselbe Rechnung.
+- Die Antwort zeigt den **aktuellen** Stand der Rechnung. Wurde sie inzwischen festgeschrieben, ist sie es auch in
+  der Antwort. Der mitgeschickte Inhalt wird beim Wiederholen nicht verglichen.
+- Wurde der Entwurf inzwischen gelöscht, ist der Schlüssel wieder frei.
+- Ohne den Kopf legt jeder Aufruf eine neue Rechnung an.
+
+Wer keinen Schlüssel mitschickt, sucht nach einer Zeitüberschreitung zuerst mit `?orderNumber=…` und legt nur
+dann erneut an, wenn die Liste leer ist.
 
 ## Fehler
 

@@ -31,9 +31,11 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 	use TranslatorStub;
 
 	private InvoiceService&MockObject $service;
+	private IRequest&MockObject $request;
 
 	private function controller(?string $userId = 'alice', bool $allowed = true): InvoiceController {
 		$this->service = $this->createMock(InvoiceService::class);
+		$this->request = $this->createMock(IRequest::class);
 
 		$permissions = $this->createMock(PermissionService::class);
 		$permissions->method('hasAccess')->willReturn($allowed);
@@ -45,7 +47,7 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 		$authContext->method('rejection')->willReturn(null);
 
 		return new InvoiceController(
-			$this->createMock(IRequest::class),
+			$this->request,
 			$authContext,
 			$this->service,
 			$permissions,
@@ -145,5 +147,17 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertSame(ErrorCode::VALIDATION_FAILED, $response->getData()['code']);
+	}
+
+	public function testCreatePassesTheIdempotencyKeyHeaderOn(): void {
+		$controller = $this->controller();
+		$this->request->method('getHeader')->willReturnMap([['Idempotency-Key', 'bestellung-4711']]);
+		$this->service->expects($this->once())->method('create')
+			->with('alice', ['recipientName' => 'Kunde AG'], null, 'bestellung-4711')
+			->willReturn(['id' => 7]);
+
+		$response = $controller->create(['recipientName' => 'Kunde AG']);
+
+		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
 	}
 }
