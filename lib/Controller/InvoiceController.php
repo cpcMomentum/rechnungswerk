@@ -45,26 +45,17 @@ class InvoiceController extends Controller {
 
 	#[PublicPage]
 	#[NoAdminRequired]
-	public function index(
-		?string $orderNumber = null,
-		?string $status = null,
-		?string $from = null,
-		?string $to = null,
-		?string $limit = null,
-		?string $offset = null,
-	): DataResponse {
+	public function index(): DataResponse {
 		if (($r = $this->guardAccess('invoices:read')) !== null) {
 			return $r;
 		}
 		try {
-			return new DataResponse($this->invoiceService->list([
-				'orderNumber' => $orderNumber,
-				'status' => $status,
-				'from' => $from,
-				'to' => $to,
-				'limit' => $limit,
-				'offset' => $offset,
-			]));
+			// Ueber getParam statt typisierter Argumente: ein Array-Wert (?status[]=x) waere sonst ein TypeError.
+			$query = [];
+			foreach (InvoiceService::LIST_FILTERS as $name) {
+				$query[$name] = $this->request->getParam($name);
+			}
+			return new DataResponse($this->invoiceService->list($query));
 		} catch (ValidationException $e) {
 			return $this->fail($e, ErrorCode::VALIDATION_FAILED, Http::STATUS_BAD_REQUEST);
 		}

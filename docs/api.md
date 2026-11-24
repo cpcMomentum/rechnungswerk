@@ -55,7 +55,8 @@ Die Antwort auf `POST /invoices` meldet das im Feld `warnings`:
 { "id": 42, "totalCents": 14900, "warnings": ["TAX_RATE_OVERRIDDEN_SMALL_BUSINESS"] }
 ```
 
-`warnings` ist beim Anlegen immer vorhanden und ohne Hinweis leer. Ein Klient, der Umsatzsteuer erwartet, sollte
+`warnings` ist beim Anlegen immer vorhanden und ohne Hinweis leer. Mögliche Werte:
+`TAX_RATE_OVERRIDDEN_SMALL_BUSINESS` und `IDEMPOTENT_REPLAY` (siehe unten). Ein Klient, der Umsatzsteuer erwartet, sollte
 bei diesem Hinweis abbrechen, statt festzuschreiben.
 
 ## Rechnungen suchen
@@ -64,10 +65,10 @@ bei diesem Hinweis abbrechen, statt festzuschreiben.
 
 | Parameter | Bedeutung |
 |---|---|
-| `orderNumber` | exakte Suche nach der eigenen Referenz |
+| `orderNumber` | Suche nach der eigenen Referenz, ganzer Wert. Groß-/Kleinschreibung hängt von der Datenbank ab (MySQL unterscheidet meist nicht) |
 | `status` | `draft`, `committed` oder `cancelled` |
 | `from`, `to` | Rechnungsdatum von/bis, `JJJJ-MM-TT`, jeweils einschließlich |
-| `limit`, `offset` | Ausschnitt; `limit` von 1 bis 500, `offset` ab 0 |
+| `limit`, `offset` | Ausschnitt; `limit` ab 1, `offset` ab 0. Mehr als 500 je Aufruf gibt es nicht: ein größeres `limit` wird ohne Fehler auf 500 gekürzt |
 
 - Kein Treffer ergibt eine leere Liste, kein `404`.
 - Unbekannte Parameter werden ignoriert.
@@ -85,11 +86,16 @@ Idempotency-Key: bestellung-4711
 ```
 
 - Kommt derselbe Schlüssel erneut, legt die API nichts an und antwortet mit der schon angelegten Rechnung:
-  gleicher Status `201`, gleiche `id`.
-- Der Schlüssel ist frei wählbar (höchstens 255 Zeichen), sinnvoll ist die eigene Bestell- oder Vorgangsnummer.
+  gleicher Status `201`, gleiche `id`. Die Wiederholung ist an `"warnings": ["IDEMPOTENT_REPLAY"]` zu erkennen.
+- Der Schlüssel ist frei wählbar (höchstens 255 Zeichen), etwa die eigene Vorgangsnummer.
 - Er gilt je API-Schlüssel. Zwei Klienten mit demselben Wert treffen nie dieselbe Rechnung.
-- Die Antwort zeigt den **aktuellen** Stand der Rechnung. Wurde sie inzwischen festgeschrieben, ist sie es auch in
-  der Antwort. Der mitgeschickte Inhalt wird beim Wiederholen nicht verglichen.
+- Die Antwort zeigt den **aktuellen** Stand der Rechnung, samt späterer Änderungen in der Oberfläche. Wurde sie
+  inzwischen festgeschrieben oder storniert, ist sie es auch in der Antwort. Der mitgeschickte Inhalt wird beim
+  Wiederholen nicht mit dem ursprünglichen verglichen.
+- Ein Schlüssel verfällt nicht. Wer eine stornierte Rechnung neu ausstellen will, braucht einen neuen Schlüssel.
+  Die bloße Bestellnummer taugt deshalb nur, solange es je Bestellung genau eine Rechnung gibt; sonst einen Zähler
+  anhängen (`bestellung-4711-2`).
+- Auch eine Wiederholung muss gültig sein: ein unlesbarer Betrag ergibt `400`, nicht die alte Rechnung.
 - Wurde der Entwurf inzwischen gelöscht, ist der Schlüssel wieder frei.
 - Ohne den Kopf legt jeder Aufruf eine neue Rechnung an.
 
@@ -98,11 +104,14 @@ dann erneut an, wenn die Liste leer ist.
 
 ## Fehler
 
-Jeder Fehler trägt neben dem Text einen Code:
+Jeder Fehler der Rechnungs-API trägt neben dem Text einen Code:
 
 ```json
 { "error": "Nur festgeschriebene Rechnungen können als PDF heruntergeladen werden.", "code": "INVOICE_NOT_COMMITTED" }
 ```
+
+Ohne `code` antwortet nur Nextcloud selbst, bevor die API erreicht ist (etwa `412` ohne `OCS-APIRequest`, `404`
+bei unbekanntem Pfad), und ein unerwarteter Serverfehler (`500`).
 
 **Verzweigen und protokollieren nur über `code`.** Der Text ist für Menschen, kann sich jederzeit ändern und kann
 Kundendaten enthalten.
@@ -116,7 +125,7 @@ Kundendaten enthalten.
 | `SCOPE_MISSING` | 403 | dem Schlüssel fehlt das Recht für diesen Aufruf |
 | `FORBIDDEN` | 403 | angemeldeter Nutzer ohne Berechtigung |
 | `RATE_LIMITED` | 429 | zu viele Aufrufe, Wartezeit im Kopf `Retry-After` |
-| `INVOICE_NOT_FOUND` | 404 | unbekannte ID |
+| `INVOICE_NOT_FOUND` | 404 | unbekannte ID; ebenso ein Angebot oder, beim Löschen, ein Entwurf, den der Schlüssel nicht selbst angelegt hat |
 | `INVOICE_NOT_COMMITTED` | 409 | Vorgang verlangt eine festgeschriebene Rechnung |
 | `INVOICE_ALREADY_COMMITTED` | 409 | Vorgang verlangt einen Entwurf |
 | `INVOICE_CANCELLED` | 409 | Vorgang auf einem stornierten Beleg |

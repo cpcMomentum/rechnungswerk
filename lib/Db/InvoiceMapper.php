@@ -53,6 +53,25 @@ class InvoiceMapper extends QBMapper {
 		return $this->findByTypes(Invoice::INVOICE_TYPES);
 	}
 
+	/**
+	 * @param int[] $ids
+	 * @return array<int, ?string> Nummer je ID
+	 */
+	public function findNumbersByIds(array $ids): array {
+		$numbers = [];
+		foreach (array_chunk(array_values(array_unique($ids)), 500) as $chunk) {
+			$qb = $this->db->getQueryBuilder();
+			$qb->select('id', 'number')->from($this->tableName)
+				->where($qb->expr()->in('id', $qb->createNamedParameter($chunk, IQueryBuilder::PARAM_INT_ARRAY)));
+			$result = $qb->executeQuery();
+			while ($row = $result->fetch()) {
+				$numbers[(int)$row['id']] = $row['number'];
+			}
+			$result->closeCursor();
+		}
+		return $numbers;
+	}
+
 	public function findByIdempotencyKey(string $hash): ?Invoice {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->tableName)

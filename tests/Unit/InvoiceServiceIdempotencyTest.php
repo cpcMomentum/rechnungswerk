@@ -44,6 +44,8 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 	/** @var array<int|string, Invoice> */
 	private array $stored = [];
 	private ?\Throwable $failInsertWith = null;
+	/** @var list<string> */
+	private array $order = [];
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -68,6 +70,7 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 			return $i;
 		});
 		$this->invoiceMapper->method('findByIdempotencyKey')->willReturnCallback(function (string $hash): ?Invoice {
+			$this->order[] = 'lookup';
 			foreach ($this->stored as $i) {
 				if ($i->getIdempotencyKey() === $hash) {
 					return $i;
@@ -88,7 +91,7 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 			$this->createMock(DocumentStore::class),
 			$this->createMock(MailService::class),
 			$this->createMock(CountryService::class),
-			$this->createMock(IDBConnection::class),
+			$this->db(),
 			$this->createMock(LoggerInterface::class),
 			new NumberFormatMessage($this->l10nStub()),
 			$this->l10nStub(),
@@ -98,6 +101,14 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 	}
 
 	private const DATA = ['recipientName' => 'Kunde AG', 'orderNumber' => 'WP-1', 'items' => [['name' => 'Beratung', 'quantity' => '1', 'unitPriceInput' => '149,00']]];
+
+	private function db(): IDBConnection {
+		$db = $this->createMock(IDBConnection::class);
+		$db->method('rollBack')->willReturnCallback(function (): void {
+			$this->order[] = 'rollBack';
+		});
+		return $db;
+	}
 
 	private function raceWinner(?string $hash): Invoice {
 		$winner = new Invoice();
@@ -116,7 +127,8 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 
 		$this->assertSame($first['id'], $second['id']);
 		$this->assertCount(1, $this->stored);
-		$this->assertSame([], $second['warnings']);
+		$this->assertSame([], $first['warnings']);
+		$this->assertSame(['IDEMPOTENT_REPLAY'], $second['warnings']);
 	}
 
 	public function testWithoutAKeyEveryCallCreatesAnInvoice(): void {
@@ -176,6 +188,9 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 		$result = $this->service->create('alice', self::DATA, 3, 'gleichzeitig');
 
 		$this->assertSame(999, $result['id']);
+		$this->assertSame(['IDEMPOTENT_REPLAY'], $result['warnings']);
+		// Auf PostgreSQL ist die Transaktion nach dem Fehler abgebrochen: erst zurueckrollen, dann lesen.
+		$this->assertSame(['lookup', 'rollBack', 'lookup'], $this->order);
 	}
 
 	public function testAnotherDatabaseErrorIsNotSwallowed(): void {
@@ -185,5 +200,23 @@ class InvoiceServiceIdempotencyTest extends TestCase {
 
 		$this->expectException(DbException::class);
 		$this->service->create('alice', self::DATA, 3, 'kaputt');
+	}
+
+	public function testRepeatShowsTheCurrentStateOfTheInvoice(): void {
+		$first = $this->service->create('alice', self::DATA, 3, 'k');
+		$this->stored[0]->setStatus(Invoice::STATUS_COMMITTED);
+		$this->stored[0]->setNumber('RE-2026-0001');
+
+		$second = $this->service->create('alice', self::DATA, 3, 'k');
+
+		$this->assertSame($first['id'], $second['id']);
+		$this->assertSame(Invoice::STATUS_COMMITTED, $second['status']);
+		$this->assertSame('RE-2026-0001', $second['number']);
+	}
+
+	public function testKeyLengthCountsCharactersNotBytes(): void {
+		$result = $this->service->create('alice', self::DATA, 3, str_repeat('ä', 255));
+
+		$this->assertSame([], $result['warnings']);
 	}
 }

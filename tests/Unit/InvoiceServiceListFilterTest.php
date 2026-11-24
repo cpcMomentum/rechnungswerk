@@ -70,11 +70,11 @@ class InvoiceServiceListFilterTest extends TestCase {
 		$this->assertSame([], $this->service->list());
 	}
 
-	public function testEmptyAndUnknownParametersAreNoFilter(): void {
+	public function testEmptyUnknownAndArrayParametersAreNoFilter(): void {
 		$this->invoiceMapper->expects($this->once())->method('findAll')->willReturn([]);
 		$this->invoiceMapper->expects($this->never())->method('findFiltered');
 
-		$this->service->list(['orderNumber' => null, 'status' => '', 'from' => ' ', 'colour' => 'blue']);
+		$this->service->list(['orderNumber' => null, 'status' => '', 'from' => ' ', 'colour' => 'blue', 'limit' => ['5']]);
 	}
 
 	public function testOrderNumberIsPassedOnExactly(): void {
@@ -145,14 +145,13 @@ class InvoiceServiceListFilterTest extends TestCase {
 		$storno->setRelatedInvoiceId(7);
 		$storno->setCreatedAt(new DateTime('2026-11-01'));
 		$storno->setUpdatedAt(new DateTime('2026-11-01'));
-		$original = new Invoice();
-		$original->setId(7);
-		$original->setNumber('RE-2026-0007');
-		$this->invoiceMapper->method('findFiltered')->willReturn([$storno]);
-		$this->invoiceMapper->method('findOne')->with(7)->willReturn($original);
+		$this->invoiceMapper->method('findFiltered')->willReturn([$storno, clone $storno]);
+		$this->invoiceMapper->expects($this->once())->method('findNumbersByIds')->with([7, 7])->willReturn([7 => 'RE-2026-0007']);
+		$this->invoiceMapper->expects($this->never())->method('findOne');
 
 		$rows = $this->service->list(['orderNumber' => 'WP-1']);
 
 		$this->assertSame('RE-2026-0007', $rows[0]['relatedNumber']);
+		$this->assertSame('RE-2026-0007', $rows[1]['relatedNumber']);
 	}
 }

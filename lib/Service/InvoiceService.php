@@ -31,6 +31,8 @@ class InvoiceService {
 
 	public const LIST_LIMIT_MAX = 500;
 	public const IDEMPOTENCY_KEY_MAX = 255;
+	public const LIST_FILTERS = ['orderNumber', 'status', 'from', 'to', 'limit', 'offset'];
+	public const WARNING_IDEMPOTENT_REPLAY = 'IDEMPOTENT_REPLAY';
 	public const WARNING_TAX_RATE_OVERRIDDEN = 'TAX_RATE_OVERRIDDEN_SMALL_BUSINESS';
 
 	public function __construct(
@@ -52,10 +54,9 @@ class InvoiceService {
 	}
 
 	/**
+	 * @param array<string, mixed> $query Rohwerte der Filter; ohne Filter der ganze Bestand
 	 * @return array<int, array<string, mixed>> serialized invoices, each with a
 	 *   "relatedNumber" (the original invoice number a storno refers to, or null)
-	 *
-	 * @param array<string, mixed> $query Rohwerte der Filter; ohne Filter der ganze Bestand
 	 * @throws ValidationException
 	 */
 	public function list(array $query = []): array {
@@ -67,11 +68,21 @@ class InvoiceService {
 		foreach ($invoices as $invoice) {
 			$numbersById[(int)$invoice->getId()] = $invoice->getNumber();
 		}
+		// Im gefilterten Ausschnitt fehlt das Original eines Stornos oft: gesammelt nachladen statt je Zeile.
+		$missing = [];
+		foreach ($invoices as $invoice) {
+			$relatedId = $invoice->getRelatedInvoiceId();
+			if ($relatedId !== null && !array_key_exists($relatedId, $numbersById)) {
+				$missing[] = $relatedId;
+			}
+		}
+		if ($missing !== []) {
+			$numbersById += $this->invoiceMapper->findNumbersByIds($missing);
+		}
 		return array_map(function (Invoice $invoice) use ($numbersById): array {
 			$data = $invoice->jsonSerialize();
 			$relatedId = $invoice->getRelatedInvoiceId();
-			// Im gefilterten Ausschnitt fehlt das Original eines Stornos oft.
-			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? $this->relatedNumber($invoice)) : null;
+			$data['relatedNumber'] = $relatedId !== null ? ($numbersById[$relatedId] ?? null) : null;
 			// The list feeds the payment-status column/filter (#117); the derived
 			// status is not stored, so compute it here just like present() does.
 			$data['paymentStatus'] = $this->derivePaymentStatus($invoice);
@@ -90,7 +101,7 @@ class InvoiceService {
 		if ($key === '') {
 			return null;
 		}
-		if (strlen($key) > self::IDEMPOTENCY_KEY_MAX) {
+		if (mb_strlen($key) > self::IDEMPOTENCY_KEY_MAX) {
 			throw new ValidationException($this->l10n->t('Der Idempotenzschlüssel darf höchstens %1$s Zeichen lang sein.', [(string)self::IDEMPOTENCY_KEY_MAX]));
 		}
 		$scope = $apiKeyId !== null ? 'key:' . $apiKeyId : 'user:' . $userId;
@@ -180,7 +191,7 @@ class InvoiceService {
 
 		$existing = $idempotencyHash !== null ? $this->invoiceMapper->findByIdempotencyKey($idempotencyHash) : null;
 		if ($existing !== null) {
-			return $this->present($existing) + ['warnings' => $warnings];
+			return $this->present($existing) + ['warnings' => [...$warnings, self::WARNING_IDEMPOTENT_REPLAY]];
 		}
 
 		$this->db->beginTransaction();
@@ -199,7 +210,7 @@ class InvoiceService {
 			if ($idempotencyHash !== null && $e instanceof DbException && $e->getReason() === DbException::REASON_UNIQUE_CONSTRAINT_VIOLATION) {
 				$existing = $this->invoiceMapper->findByIdempotencyKey($idempotencyHash);
 				if ($existing !== null) {
-					return $this->present($existing) + ['warnings' => $warnings];
+					return $this->present($existing) + ['warnings' => [...$warnings, self::WARNING_IDEMPOTENT_REPLAY]];
 				}
 			}
 			throw $e;
@@ -1362,7 +1373,9 @@ class InvoiceService {
 	 */
 	public function updateQuote(int $id, array $data): array {
 		$this->assertQuoteType($this->findById($id));
-		return $this->update($id, $data);
+		$quote = $this->update($id, $data);
+		unset($quote['warnings']);
+		return $quote;
 	}
 
 	/**

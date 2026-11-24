@@ -131,11 +131,12 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 
 	public function testListPassesTheFiltersAndRefusesUnreadableOnes(): void {
 		$controller = $this->controller();
+		$this->request->method('getParam')->willReturnMap([['orderNumber', null, 'WP-1'], ['status', null, ['draft']]]);
 		$this->service->expects($this->once())->method('list')
-			->with(['orderNumber' => 'WP-1', 'status' => null, 'from' => null, 'to' => null, 'limit' => null, 'offset' => null])
+			->with(['orderNumber' => 'WP-1', 'status' => ['draft'], 'from' => null, 'to' => null, 'limit' => null, 'offset' => null])
 			->willReturn([]);
 
-		$response = $controller->index(orderNumber: 'WP-1');
+		$response = $controller->index();
 
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 		$this->assertSame([], $response->getData());
@@ -143,7 +144,7 @@ class InvoiceControllerErrorCodeTest extends TestCase {
 		$controller = $this->controller();
 		$this->service->method('list')->willThrowException(new ValidationException('Unbekannter Status.'));
 
-		$response = $controller->index(status: 'paid');
+		$response = $controller->index();
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertSame(ErrorCode::VALIDATION_FAILED, $response->getData()['code']);
